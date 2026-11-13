@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.env.local
+# Nếu đẩy repo lên chế độ Public và không muốn đưa PDF/tài liệu gốc lên GitHub, bỏ dấu # ở dòng dưới:
+# materials/

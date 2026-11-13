@@ -1,0 +1,23 @@
+{
+  "id": "se1-l03", "order": 3,
+  "title": "Lecture 3: Iteration Abstraction",
+  "summary": [
+    { "h": "Vì sao cần iteration abstraction", "text": "Trả về mảng (int[] members()) kém hiệu quả với tập lớn vì phải sao chép. Thêm get(int index) không hơn vòng for, còn trả về vector nội bộ elements làm lộ rep (phá encapsulation). Iteration abstraction cho truy cập tăng dần kiểu hỏi–lấy (ask & get), không giới hạn kích thước và không giả định biểu diễn của collection." },
+    { "h": "Generator: pre-populated và auto-populated", "text": "Pre-populated collection (ví dụ LinkedList): generator sinh chỉ số trên các phần tử đã có. Auto-populated collection (ví dụ PrimeList): phần tử (có thể đến một giới hạn max) được sinh ngay khi truy cập qua generator." },
+    { "h": "Iterator và Iterable trong Java", "text": "Collection implement Iterable và có iterator()/elements() trả về generator implement java.util.Iterator; generator thường là private inner class của collection (ví dụ LinkedListGen).", "code": { "lang": "java", "text": "Iterator<Integer> g = list.iterator();\nwhile (g.hasNext()) {\n  Integer x = g.next();\n}\n// hoặc kiểm soát bằng exception\ntry {\n  while (true) { Integer x = g.next(); }\n} catch (NoSuchElementException e) { }" } },
+    { "h": "Ba method của Iterator", "text": "hasNext(): hỏi còn phần tử không. next() throws NoSuchElementException: trả phần tử kế và cập nhật trạng thái generator. remove() throws UnsupportedOperationException, IllegalStateException: xóa phần tử cuối do next() trả về; tùy chọn, chỉ cho collection sửa được." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 3.pdf", "loc": "Slides 1–30" }],
+  "cards": [
+    { "id": "se1-l03-c01", "front": "Vì sao trả về vector nội bộ không phải cách tốt?", "back": "Làm lộ rep (exposing the rep) nên phá encapsulation.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 8" } },
+    { "id": "se1-l03-c02", "front": "Pre-populated và auto-populated collection?", "back": "Pre-populated: phần tử đã có (LinkedList). Auto-populated: phần tử được sinh khi truy cập qua generator (PrimeList).", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 10–12" } },
+    { "id": "se1-l03-c03", "front": "Ba method của Iterator?", "back": "hasNext(), next() (có thể ném NoSuchElementException), remove() (tùy chọn).", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 13, 19–23" } },
+    { "id": "se1-l03-c04", "front": "Generator thường được khai báo ở đâu?", "back": "Là private inner class của collection class.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 18" } },
+    { "id": "se1-l03-c05", "front": "Hai cách điều khiển vòng lặp với iterator?", "back": "while (g.hasNext()) { g.next() } hoặc while (true) { g.next() } bọc trong try...catch NoSuchElementException.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 27–29" } }
+  ],
+  "questions": [
+    { "id": "se1-l03-q01", "stem": "PrimeList thuộc loại collection nào?", "options": ["Pre-populated", "Auto-populated", "Immutable", "Sorted"], "answer": 1, "explanation": "Slide 12: PrimeList là ví dụ auto-populated, phần tử sinh khi truy cập.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 12" } },
+    { "id": "se1-l03-q02", "stem": "Method nào của Iterator ném NoSuchElementException khi hết phần tử?", "options": ["hasNext()", "next()", "remove()", "iterator()"], "answer": 1, "explanation": "next() ném NoSuchElementException khi không còn phần tử.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 19–23" } },
+    { "id": "se1-l03-q03", "stem": "Nhược điểm của việc dùng get(int index) thay iteration abstraction là gì?", "options": ["Không cải thiện so với vòng for và có nguy cơ lộ rep", "Quá nhanh", "Không dùng được với mảng", "Tốn ít bộ nhớ"], "answer": 0, "explanation": "Slide 8: không hơn vòng for; trả về elements nội bộ làm lộ rep.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 8" } }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "se1-l06", "order": 5,
+  "title": "Lecture 6: Software Development Life Cycle",
+  "summary": [
+    { "h": "Program, software, software engineering", "text": "Software gồm chương trình và mọi tài liệu, dữ liệu cấu hình liên quan. Software engineering là ngành kỹ thuật liên quan mọi khía cạnh sản xuất phần mềm từ ý tưởng tới vận hành và bảo trì (gồm quản lý dự án: rủi ro, chất lượng, tiến độ, ngân sách)." },
+    { "h": "4 hoạt động của software process", "text": "1) Specification (requirements engineering): xác định dịch vụ yêu cầu và ràng buộc; có user requirements và system requirements; 3 hoạt động: elicitation & analysis, specification, validation. 2) Development: design (architectural, database, interface, component selection and design) và programming/debugging. 3) Validation (V&V): Verification = 'Are we building the product right?'; Validation = 'Are we building the right product?'; 3 giai đoạn test: component, system (gồm integration), customer (gồm beta test). 4) Evolution: sửa đổi sau bàn giao." },
+    { "h": "Mô hình quy trình", "text": "Waterfall (5 pha) chỉ phù hợp hệ nhúng, hệ critical, hệ lớn nhiều công ty. Incremental dùng khi yêu cầu ban đầu khá rõ. Evolutionary (prototyping, spiral) dùng khi lõi sản phẩm rõ nhưng chi tiết chưa định. Prototyping có nhược điểm hy sinh chất lượng tổng thể/khả năng bảo trì. Spiral kết hợp tính lặp của prototyping với tính hệ thống của waterfall; ưu: giảm rủi ro; nhược: khó ước lượng thời gian, cần đánh giá rủi ro ở mọi giai đoạn." },
+    { "h": "Agile", "text": "4 giá trị Agile Manifesto: con người và tương tác hơn quy trình và công cụ; phần mềm chạy được hơn tài liệu đầy đủ; hợp tác với khách hàng hơn đàm phán hợp đồng; đáp ứng thay đổi hơn bám kế hoạch. 5 nguyên tắc: customer involvement, embrace change, incremental delivery, maintain simplicity, people not process. Cách tiếp cận: Scrum, Lean, Kanban, XP. Project management triangle: Scope–Time–Cost, Quality ở giữa." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 6.pdf", "loc": "Slides 1–34" }],
+  "cards": [
+    { "id": "se1-l06-c01", "front": "Verification và validation khác nhau thế nào?", "back": "Verification: 'Are we building the product right?' (đúng đặc tả). Validation: 'Are we building the right product?' (đáp ứng kỳ vọng khách hàng).", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 15–16" } },
+    { "id": "se1-l06-c02", "front": "Bốn hoạt động cơ bản của software process?", "back": "Specification, Development, Validation, Evolution.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 6–17" } },
+    { "id": "se1-l06-c03", "front": "Waterfall chỉ phù hợp với loại hệ thống nào?", "back": "Hệ nhúng, hệ critical (an toàn/an ninh), hệ phần mềm lớn do nhiều công ty phát triển.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 19–21" } },
+    { "id": "se1-l06-c04", "front": "4 giá trị của Agile Manifesto?", "back": "Individuals & interactions; working software; customer collaboration; responding to change (hơn các vế còn lại).", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slide 29" } },
+    { "id": "se1-l06-c05", "front": "Nhược điểm của Spiral model?", "back": "Khó ước lượng thời gian (không biết số pha), cần đánh giá rủi ro ở mọi giai đoạn, review tốn thời gian.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 26–27" } },
+    { "id": "se1-l06-c06", "front": "4 hoạt động của software design?", "back": "Architectural design, database design, interface design, component selection and design.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 12–13" } }
+  ],
+  "questions": [
+    { "id": "se1-l06-q01", "stem": "Câu 'Are we building the right product?' mô tả hoạt động nào?", "options": ["Verification", "Validation", "Debugging", "Maintenance"], "answer": 1, "explanation": "Validation bảo đảm phần mềm đáp ứng kỳ vọng người dùng.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slide 15" } },
+    { "id": "se1-l06-q02", "stem": "Mô hình nào dùng khi lõi sản phẩm đã rõ nhưng chi tiết và phần mở rộng chưa xác định?", "options": ["Waterfall", "Evolutionary", "Incremental", "Không mô hình nào"], "answer": 1, "explanation": "Evolutionary process models dùng khi chi tiết/mở rộng chưa được định nghĩa.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 23–27" } },
+    { "id": "se1-l06-q03", "stem": "Ba giai đoạn testing trong validation theo thứ tự?", "options": ["Customer → System → Component", "Component → System → Customer", "System → Component → Customer", "Unit → Beta → Alpha"], "answer": 1, "explanation": "Component testing → System testing (gồm integration) → Customer testing.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slide 16" } }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "se1-l08", "order": 7,
+  "title": "Lecture 8: Architectural Design",
+  "summary": [
+    { "h": "Vì sao cần kiến trúc", "text": "Kiến trúc xác định các thành phần cấu trúc chính và quan hệ giữa chúng. Quan trọng vì: quyết định đặc tính phi chức năng; là biểu diễn để các stakeholder giao tiếp; cho phép lý giải và quản lý thay đổi." },
+    { "h": "Ba loại cấu trúc", "text": "Module structures: chia hệ thành các đơn vị cài đặt (class, layer, chức năng), là cơ sở phân công làm việc. Component-and-Connector (C&C): các thành phần chạy lúc runtime (client, server, filter) và connector (call-return, pipe...). Allocation structures: ánh xạ cấu trúc phần mềm sang môi trường phi phần mềm (tổ chức, phát triển, cài đặt, thực thi)." },
+    { "h": "Quy tắc kiến trúc tốt", "text": "Thiết kế information hiding và separation of concerns; dùng pattern và tactic đã biết; không phụ thuộc phiên bản sản phẩm thương mại; module tạo dữ liệu tách khỏi module tiêu thụ dữ liệu; không kỳ vọng module và component tương ứng 1-1; dễ đổi processor cho mỗi process; ít cách để component tương tác; tập tranh chấp tài nguyên nhỏ và xác định rõ." },
+    { "h": "Layered pattern", "text": "Chia phần mềm thành các layer với quan hệ allowed-to-use một chiều. Mỗi phần mềm thuộc đúng một layer; ít nhất 2 layer (thường 3+); quan hệ allowed-to-use không được vòng tròn (không dùng ngược lên). Nhược điểm: tốn chi phí và độ phức tạp ban đầu, giảm hiệu năng. Layer bridging (dùng layer thấp không kề) quá nhiều làm hại portability và modifiability." },
+    { "h": "Client-Server, Broker, MVC", "text": "Client-Server: client khởi tạo yêu cầu, server phục vụ (request/reply connector); nhược điểm: server là bottleneck và single point of failure. Broker: broker trung gian định vị server cho client (kèm client-side/server-side proxy, bridge tùy chọn); nhược điểm: thêm độ trễ, broker là single point of failure, dễ là mục tiêu tấn công, khó test. MVC: Model (dữ liệu và logic), View (hiển thị/nhập), Controller (điều phối), quan hệ notifies; phải có ít nhất một instance mỗi loại." },
+    { "h": "Modifiability, coupling, cohesion", "text": "Modifiability là chi phí và rủi ro khi thay đổi. Coupling: xác suất sửa module này lan sang module khác. Cohesion: mức liên quan chặt giữa các trách nhiệm của module. Tactics: split module, increase cohesion, reduce coupling (encapsulate, use an intermediary, restrict dependencies, refactor, abstract common services)." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 8.pdf", "loc": "Slides 1–38 (PDF ảnh 1 trang)" }],
+  "cards": [
+    { "id": "se1-l08-c01", "front": "Ba loại software structure?", "back": "Module, Component-and-Connector (C&C), Allocation.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 5–11" } },
+    { "id": "se1-l08-c02", "front": "Ràng buộc của layered pattern?", "back": "Mỗi phần mềm thuộc đúng một layer; ít nhất 2 layer; allowed-to-use không vòng tròn.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 18–21" } },
+    { "id": "se1-l08-c03", "front": "Nhược điểm của Client-Server?", "back": "Server có thể là performance bottleneck và single point of failure; quyết định đặt chức năng ở client hay server khó và tốn kém để đổi.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 22–25" } },
+    { "id": "se1-l08-c04", "front": "Vai trò broker trong Broker pattern?", "back": "Trung gian lúc runtime: định vị server phù hợp, chuyển yêu cầu và trả kết quả/exception cho client, che giấu bản chất và vị trí của server.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 26–29" } },
+    { "id": "se1-l08-c05", "front": "Ba thành phần của MVC?", "back": "Model (dữ liệu/trạng thái và logic), View (hiển thị và nhập liệu), Controller (dịch thao tác người dùng thành thay đổi model/view).", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 30–33" } },
+    { "id": "se1-l08-c06", "front": "Coupling và cohesion định nghĩa thế nào?", "back": "Coupling: xác suất sửa module này lan sang module khác. Cohesion: mức độ liên quan chặt giữa các trách nhiệm trong một module.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slide 36" } }
+  ],
+  "questions": [
+    { "id": "se1-l08-q01", "stem": "Pattern nào là module pattern?", "options": ["Broker", "MVC", "Layered", "Client-Server"], "answer": 2, "explanation": "Slide 17: Layered là module pattern; Broker, MVC, Client-Server là C&C pattern.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slide 17" } },
+    { "id": "se1-l08-q02", "stem": "Tactic nào KHÔNG thuộc nhóm giảm coupling?", "options": ["Encapsulate", "Use an intermediary", "Split module", "Restrict dependencies"], "answer": 2, "explanation": "Split module là tactic riêng; giảm coupling gồm encapsulate, intermediary, restrict dependencies, refactor, abstract common services.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slide 37" } },
+    { "id": "se1-l08-q03", "stem": "Allocation structure trả lời câu hỏi nào?", "options": ["Component nào chạy song song?", "Mỗi phần tử phần mềm chạy trên processor nào và giao cho team nào?", "Module nào kế thừa module nào?", "Dữ liệu chảy thế nào?"], "answer": 1, "explanation": "Allocation structures ánh xạ phần mềm sang processor, thư mục/file và nhóm phát triển.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 10–11" } }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "dbs-ch03", "order": 3,
+  "title": "Chương 3: The Enhanced E-R Model",
+  "summary": [
+    { "h": "Supertype / Subtype", "text": "Subtype là nhóm con của entity type có thuộc tính riêng. Supertype là entity type tổng quát có quan hệ với một hay nhiều subtype. Subtype kế thừa (attribute inheritance) mọi attribute, kể cả identifier, của supertype; một instance của subtype cũng là instance của supertype. Quan hệ ở mức supertype áp dụng cho mọi subtype; quan hệ ở mức subtype chỉ áp dụng cho subtype đó (ví dụ chỉ RESIDENT PATIENT liên kết với BED)." },
+    { "h": "Generalization và Specialization", "text": "Generalization là bottom-up: định nghĩa entity type tổng quát từ nhiều entity type chuyên biệt (CAR, TRUCK, MOTORCYCLE → VEHICLE; MOTORCYCLE không có subtype vì không có thuộc tính hay quan hệ riêng). Specialization là top-down: định nghĩa subtype từ supertype (PART → MANUFACTURED PART, PURCHASED PART)." },
+    { "h": "Completeness constraint", "text": "Hỏi: một instance của supertype có bắt buộc thuộc ít nhất một subtype không? Total specialization: có (đường đôi). Partial specialization: không bắt buộc (đường đơn)." },
+    { "h": "Disjointness constraint", "text": "Hỏi: một instance của supertype có thể đồng thời thuộc 2 subtype trở lên không? Disjoint (d): chỉ một subtype. Overlap (o): có thể nhiều subtype." },
+    { "h": "Subtype discriminator", "text": "Attribute của supertype mà giá trị xác định subtype. Với disjoint: attribute đơn (ví dụ Employee Type = H, S, C). Với overlap: attribute composite gồm các thành phần Boolean Y/N (ví dụ Part Type(Manufactured?, Purchased?))." },
+    { "h": "Entity cluster và universal data model", "text": "Entity cluster gom nhiều entity và quan hệ thành một entity trừu tượng để sơ đồ dễ đọc. Universal (packaged) data model là mẫu mô hình dùng lại (pattern), ví dụ PARTY, PARTY ROLE, ROLE TYPE." }
+  ],
+  "sources": [{ "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 1–32" }],
+  "cards": [
+    { "id": "dbs-ch03-c01", "front": "Generalization và specialization khác nhau thế nào?", "back": "Generalization: bottom-up, tạo supertype tổng quát từ các entity chuyên biệt. Specialization: top-down, tạo subtype từ supertype.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 9" } },
+    { "id": "dbs-ch03-c02", "front": "Total specialization vẽ thế nào và nghĩa là gì?", "back": "Đường đôi từ supertype tới vòng tròn; mọi instance của supertype phải thuộc ít nhất một subtype.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 14–15" } },
+    { "id": "dbs-ch03-c03", "front": "Disjoint rule và overlap rule?", "back": "Disjoint (d): instance thuộc đúng một subtype. Overlap (o): có thể thuộc nhiều subtype cùng lúc.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 17–19" } },
+    { "id": "dbs-ch03-c04", "front": "Subtype discriminator là gì?", "back": "Attribute của supertype có giá trị xác định instance thuộc subtype nào. Disjoint: attribute đơn; overlap: attribute composite gồm các cờ Boolean.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 20–22" } },
+    { "id": "dbs-ch03-c05", "front": "Vì sao MOTORCYCLE không thành subtype của VEHICLE trong ví dụ?", "back": "Vì nó không có thuộc tính hay quan hệ riêng.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 11" } },
+    { "id": "dbs-ch03-c06", "front": "Entity cluster dùng để làm gì?", "back": "Gom nhiều entity và quan hệ thành một entity trừu tượng để EER diagram dễ đọc.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 24" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch03-q01", "stem": "Instance của supertype chỉ có thể thuộc đúng một subtype, và không bắt buộc thuộc subtype nào. Ràng buộc là gì?", "options": ["Overlap, total", "Disjoint, total", "Overlap, partial", "Disjoint, partial"], "answer": 3, "explanation": "'Chỉ một subtype' = disjoint; 'không bắt buộc' = partial specialization (đường đơn).", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 14–19" } },
+    { "id": "dbs-ch03-q02", "stem": "Ký hiệu 'o' trong vòng tròn của quan hệ supertype/subtype nghĩa là gì?", "options": ["Optional", "Overlap", "Ordered", "Owner"], "answer": 1, "explanation": "Chữ o là overlap rule; chữ d là disjoint.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 17" } },
+    { "id": "dbs-ch03-q03", "stem": "Việc gom CAR, TRUCK thành VEHICLE từ các entity có sẵn gọi là gì?", "options": ["Specialization", "Generalization", "Normalization", "Clustering"], "answer": 1, "explanation": "Bottom-up từ nhiều entity chuyên biệt lên supertype là generalization.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 9–11" } }
+  ]
+}

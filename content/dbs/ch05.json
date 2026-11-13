@@ -1,0 +1,27 @@
+{
+  "id": "dbs-ch05", "order": 5,
+  "title": "Chương 5: Physical Database Design and Performance",
+  "summary": [
+    { "h": "Mục đích và quyết định", "text": "Chuyển logical schema thành đặc tả kỹ thuật để lưu/truy xuất dữ liệu với hiệu năng đủ tốt, đồng thời bảo đảm integrity, security, recoverability. Quyết định: kiểu dữ liệu attribute, physical record, file organization, index, tối ưu truy vấn." },
+    { "h": "Chọn data type", "text": "4 mục tiêu: biểu diễn mọi giá trị có thể, tăng data integrity, hỗ trợ mọi thao tác dữ liệu, tối thiểu dung lượng. Dùng coding/look-up table để tiết kiệm chỗ. Kiểm soát cấp field: default value, range control, null control, referential integrity." },
+    { "h": "Denormalization", "text": "Gộp bảng đã chuẩn hóa để giảm JOIN, tăng tốc truy vấn, nhưng tốn chỗ, đe dọa integrity (quay lại các anomaly) và phải sửa chương trình khi quy tắc đổi. 3 tình huống thường gặp: 1:1; M:N có thuộc tính non-key (sao chép thuộc tính vào bảng trung gian); reference data ở quan hệ 1:N." },
+    { "h": "Partitioning", "text": "Horizontal: chia hàng (key range, hash, composite). Vertical: chia cột; PK phải lặp ở mọi partition. Lợi ích: hiệu quả, tối ưu cục bộ, bảo mật, recovery/uptime, load balancing. Hạn chế: tốc độ truy cập không đồng đều, phức tạp, tốn thêm chỗ và thời gian update." },
+    { "h": "Phân cấp lưu trữ", "text": "Database → Tablespace → Segment → Extent → Data Block (đơn vị I/O nhỏ nhất của DBMS)." },
+    { "h": "File organization", "text": "Heap (không thứ tự, tìm trung bình n/2), Sequential (theo PK, tìm nhị phân log2 n), Indexed (index như B+ tree, hỗ trợ nhiều khóa), Hashed (hàm băm tính địa chỉ; nhanh với truy cập ngẫu nhiên theo PK, không hợp truy cập tuần tự/theo khoảng, có collision)." },
+    { "h": "9 quy tắc dùng index", "text": "Dùng cho bảng lớn; index PK; index search field; index trường trong ORDER BY và GROUP BY; dùng khi có hơn 100 giá trị khác nhau, tránh khi ít hơn 30; tránh index giá trị dài; khóa clustering nên dùng surrogate/sequence key; để ý giới hạn DBMS; cẩn thận với cột có NULL." }
+  ],
+  "sources": [{ "file": "Chapter 05.pdf", "loc": "Slides 1–40" }],
+  "cards": [
+    { "id": "dbs-ch05-c01", "front": "Denormalization có lợi và hại gì?", "back": "Lợi: ít JOIN, truy vấn nhanh. Hại: tốn dung lượng, nguy cơ anomaly/inconsistency, phải lập trình lại khi nghiệp vụ đổi.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 16–21" } },
+    { "id": "dbs-ch05-c02", "front": "Horizontal vs vertical partitioning?", "back": "Horizontal chia theo hàng (key range, hash, composite). Vertical chia theo cột và phải lặp PK ở mỗi partition.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 22–27" } },
+    { "id": "dbs-ch05-c03", "front": "Thứ tự phân cấp lưu trữ từ lớn đến nhỏ?", "back": "Database → Tablespace → Segment → Extent → Data Block.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 28–29" } },
+    { "id": "dbs-ch05-c04", "front": "Hashed file organization mạnh và yếu ở đâu?", "back": "Rất nhanh với truy cập ngẫu nhiên theo PK, dễ insert/delete/update; không thực tế cho truy cập tuần tự/theo khoảng và có hash collision.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 33–36" } },
+    { "id": "dbs-ch05-c05", "front": "Khi nào nên và không nên tạo index theo số giá trị khác nhau?", "back": "Nên khi có hơn 100 giá trị khác nhau; không nên khi ít hơn 30.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 38–39" } },
+    { "id": "dbs-ch05-c06", "front": "4 mục tiêu khi chọn data type?", "back": "Biểu diễn mọi giá trị; tăng data integrity; hỗ trợ mọi thao tác; tối thiểu dung lượng lưu trữ.", "source": { "file": "Chapter 05.pdf", "loc": "Slide 11" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch05-q01", "stem": "Trong vertical partitioning, điều nào bắt buộc?", "options": ["Không được lặp cột nào", "PK phải lặp lại ở mọi partition", "Chỉ chia theo khoảng khóa", "Phải dùng hash"], "answer": 1, "explanation": "Slide về vertical partitioning nêu PK phải được lặp ở mỗi partition.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 24–26" } },
+    { "id": "dbs-ch05-q02", "stem": "Đơn vị I/O nhỏ nhất của DBMS trong phân cấp lưu trữ là gì?", "options": ["Tablespace", "Segment", "Extent", "Data block"], "answer": 3, "explanation": "Data block là đơn vị I/O nhỏ nhất, gồm các OS block.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 28–29" } },
+    { "id": "dbs-ch05-q03", "stem": "Tổ chức file nào phù hợp nhất cho truy xuất ngẫu nhiên nhanh theo PK nhưng không hợp truy cập tuần tự?", "options": ["Sequential", "Hashed", "Heap", "Indexed tuần tự"], "answer": 1, "explanation": "Theo Table 5-3: hashed rất nhanh cho random retrieval trên PK và impractical cho sequential retrieval.", "source": { "file": "Chapter 05.pdf", "loc": "Slide 36" } }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dbs-view-proc", "order": 11,
+  "title": "Subquery, View, Stored Procedure và Trigger (slide)",
+  "summary": [
+    { "h": "View", "text": "View là bảng ảo tạo động khi được yêu cầu, không lưu dữ liệu, giúp kiểm soát truy cập. Ưu điểm: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất lập trình, dữ liệu mới nhất, ít tốn chỗ, view tùy biến, physical data independence. Nhược điểm: tốn thời gian xử lý mỗi lần tham chiếu, có thể không update được trực tiếp.", "code": { "lang": "sql", "text": "CREATE VIEW display_employee AS\nSELECT * FROM employee NATURAL JOIN themepark;\nSELECT * FROM display_employee;" } },
+    { "h": "Stored procedure", "text": "Tập lệnh SQL lưu trên server, hữu ích khi nhiều ứng dụng khác ngôn ngữ/nền tảng cùng thực hiện một thao tác, hoặc khi cần bảo mật/ghi log. Lợi ích: giảm lưu lượng mạng, dễ bảo trì (tái sử dụng), an toàn (cấp quyền EXECUTE không cần quyền trực tiếp trên bảng, giúp ngăn SQL injection).", "code": { "lang": "sql", "text": "DELIMITER //\nCREATE PROCEDURE get_average_quantity(OUT average INT)\nBEGIN\n  SELECT AVG(line_qty) INTO average FROM sales_line;\nEND //\nDELIMITER ;\nCALL get_average_quantity(@average);\nSELECT @average, sales_line.* FROM sales_line WHERE line_qty < @average;" } },
+    { "h": "Trigger", "text": "Trigger tự động chạy khi có sự kiện; ví dụ ghi log sau khi thêm student.", "code": { "lang": "sql", "text": "CREATE TRIGGER myTrigger\nAFTER INSERT ON student\nFOR EACH ROW\nBEGIN\n  INSERT INTO student_log VALUES (new.id, 'add', now());\nEND" } }
+  ],
+  "sources": [{ "file": "Subquerries, view and stored procedures.pdf", "loc": "Slides 1–17" }],
+  "cards": [
+    { "id": "dbs-vp-c01", "front": "Base table khác dynamic view?", "back": "Base table chứa dữ liệu thật; dynamic view là bảng ảo tạo động, không lưu dữ liệu.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 7" } },
+    { "id": "dbs-vp-c02", "front": "Hai nhược điểm của view?", "back": "Tốn thời gian xử lý mỗi lần tham chiếu; có thể không update trực tiếp được.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 11" } },
+    { "id": "dbs-vp-c03", "front": "Khi nào nên dùng stored procedure?", "back": "Khi nhiều ứng dụng ở các ngôn ngữ/nền tảng khác nhau thực hiện cùng thao tác CSDL, hoặc khi bảo mật và ghi log là ưu tiên.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 12" } },
+    { "id": "dbs-vp-c04", "front": "Ba lợi ích của stored procedure?", "back": "Giảm lưu lượng mạng; dễ bảo trì (tái sử dụng); an toàn (cấp EXECUTE không cần quyền bảng, giúp ngăn SQL injection).", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 16" } },
+    { "id": "dbs-vp-c05", "front": "Cú pháp bọc procedure trong MySQL?", "back": "DELIMITER // ... CREATE PROCEDURE name (IN/OUT params) BEGIN ... END // ... DELIMITER ;", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 13" } }
+  ],
+  "questions": [
+    { "id": "dbs-vp-q01", "stem": "Lệnh nào gọi procedure có tham số OUT 'average' và đọc kết quả?", "options": ["CALL get_average_quantity(@average); SELECT @average;", "EXEC average;", "SELECT get_average_quantity;", "RUN get_average_quantity;"], "answer": 0, "explanation": "Slide 15 gọi bằng CALL với biến session @average rồi dùng @average trong SELECT.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 15" } },
+    { "id": "dbs-vp-q02", "stem": "Phát biểu nào về view đúng theo slide?", "options": ["View lưu bản sao dữ liệu", "View là virtual table tạo động, không lưu dữ liệu", "View luôn update được", "View không giúp bảo mật"], "answer": 1, "explanation": "Slide 7: dynamic view là virtual table, không lưu dữ liệu.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 7" } },
+    { "id": "dbs-vp-q03", "stem": "Trigger myTrigger trong slide kích hoạt khi nào?", "options": ["Sau khi insert vào student", "Trước khi xóa student", "Khi tạo view", "Khi gọi CALL"], "answer": 0, "explanation": "AFTER INSERT ON student FOR EACH ROW.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 17" } }
+  ]
+}

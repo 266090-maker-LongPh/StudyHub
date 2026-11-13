@@ -1,0 +1,29 @@
+{
+  "id": "dbs-ch04", "order": 4,
+  "title": "Chương 4: Logical Database Design and the Relational Model",
+  "summary": [
+    { "h": "Mô hình quan hệ", "text": "Logical design chuyển conceptual model (E-R/EER) thành relational schema, kết hợp top-down (biến đổi EER) và bottom-up (chuẩn hóa user view). Ba thành phần: data structure (relation/table, tuple/row, attribute/column), data manipulation (SQL), data integrity." },
+    { "h": "6 tính chất của relation", "text": "Tên relation duy nhất; giá trị attribute atomic; mỗi row duy nhất; tên attribute duy nhất; thứ tự cột không quan trọng; thứ tự hàng không quan trọng. Theo định nghĩa mọi relation đều ở 1NF." },
+    { "h": "Khóa và ràng buộc toàn vẹn", "text": "Candidate key phải có 2 tính chất: định danh duy nhất và không dư thừa (không bỏ được attribute nào). Primary key là candidate key được chọn; surrogate key là khóa do hệ thống gán. Foreign key khớp primary key của relation cha. Ràng buộc: domain constraint, entity integrity (PK không NULL), referential integrity (FK khớp PK hoặc NULL). Luật xóa: Restrict, Cascade, Set-to-Null." },
+    { "h": "7 bước biến đổi EER thành relation", "text": "1) Strong entity: composite chỉ lấy thành phần đơn; multivalued tạo relation riêng với PK ghép. 2) Weak entity: relation riêng, PK = PK owner + partial identifier. 3) Binary: 1:M đặt PK bên 1 làm FK bên M; M:N tạo relation trung gian; 1:1 đặt PK của bên mandatory làm FK ở bên optional. 4) Associative entity. 5) Unary: 1:M thêm FK đệ quy cùng bảng; M:N thêm relation thứ hai. 6) Ternary: một relation liên kết có FK tới mọi entity. 7) Supertype/subtype: mỗi loại một relation; PK của subtype vừa là PK vừa là FK tới supertype." },
+    { "h": "Anomaly và chuẩn hóa", "text": "Ba anomaly: insertion, deletion, modification. Functional dependency A → B: A (determinant) xác định duy nhất B. 2NF: 1NF và không có partial dependency (relation có PK đơn tự động đạt 2NF). 3NF: 2NF và không có transitive dependency. BCNF: mọi determinant là candidate key. 4NF loại multivalued dependency; 5NF loại join dependency còn lại." },
+    { "h": "Merging relations (view integration)", "text": "Gộp relation từ nhiều view có 4 vấn đề: synonyms, homonyms, transitive dependencies, supertype/subtype ẩn. Gộp hai quan hệ 3NF không bảo đảm kết quả 3NF." }
+  ],
+  "sources": [{ "file": "Chapter 04.pdf", "loc": "Slides 1–57" }],
+  "cards": [
+    { "id": "dbs-ch04-c01", "front": "Hai tính chất của candidate key?", "back": "Định danh duy nhất mọi row và không dư thừa (không thể bỏ attribute nào mà vẫn duy nhất).", "source": { "file": "Chapter 04.pdf", "loc": "Slides 9–12" } },
+    { "id": "dbs-ch04-c02", "front": "Entity integrity và referential integrity?", "back": "Entity integrity: không thành phần nào của PK được NULL. Referential integrity: giá trị FK phải khớp PK hiện có ở bảng cha hoặc là NULL.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 13–17" } },
+    { "id": "dbs-ch04-c03", "front": "Quan hệ 1:M ánh xạ thế nào?", "back": "PK của phía 1 trở thành FK ở phía M (kèm thuộc tính quan hệ nếu có).", "source": { "file": "Chapter 04.pdf", "loc": "Slides 24–28" } },
+    { "id": "dbs-ch04-c04", "front": "Quan hệ M:N ánh xạ thế nào?", "back": "Tạo relation trung gian; PK là tổ hợp PK của hai entity (cũng là FK) cộng thuộc tính quan hệ.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 24–28" } },
+    { "id": "dbs-ch04-c05", "front": "Điều kiện của 2NF và 3NF?", "back": "2NF: 1NF và không partial dependency. 3NF: 2NF và không transitive dependency.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 44–50" } },
+    { "id": "dbs-ch04-c06", "front": "Ba loại anomaly?", "back": "Insertion, deletion, modification (update) anomaly.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 39–40" } },
+    { "id": "dbs-ch04-c07", "front": "Subtype được ánh xạ thế nào sang relation?", "back": "Mỗi subtype một relation; PK của subtype đồng thời là FK tham chiếu PK supertype.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 36–37" } },
+    { "id": "dbs-ch04-c08", "front": "Bốn vấn đề khi merge relation?", "back": "Synonyms, homonyms, transitive dependencies, supertype/subtype ẩn.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 51–55" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch04-q01", "stem": "Bước chuẩn hóa nào loại bỏ partial dependency?", "options": ["1NF → 2NF", "2NF → 3NF", "3NF → BCNF", "BCNF → 4NF"], "answer": 0, "explanation": "2NF yêu cầu không có phụ thuộc bộ phận vào một phần của PK ghép; 3NF loại transitive dependency.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 44–47" } },
+    { "id": "dbs-ch04-q02", "stem": "Trong quan hệ 1:1, FK nên đặt ở bên nào để tránh NULL?", "options": ["Bên optional, tham chiếu PK của bên mandatory", "Bên mandatory", "Cả hai bên", "Tạo bảng riêng luôn"], "answer": 0, "explanation": "PK của bên mandatory trở thành FK ở bên optional.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 24–28" } },
+    { "id": "dbs-ch04-q03", "stem": "Luật xóa nào tự động xóa các hàng con tham chiếu hàng cha bị xóa?", "options": ["Restrict", "Cascade", "Set-to-Null", "No action"], "answer": 1, "explanation": "Cascade xóa dây chuyền dependent rows.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 15–17" } },
+    { "id": "dbs-ch04-q04", "stem": "Với PK ghép (OrderID, ProductID), thuộc tính OrderDate chỉ phụ thuộc OrderID. Đây là dạng nào?", "options": ["Transitive dependency", "Partial dependency", "Multivalued dependency", "Join dependency"], "answer": 1, "explanation": "Phụ thuộc vào một phần của PK ghép là partial dependency, vi phạm 2NF.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 44–47" } }
+  ]
+}

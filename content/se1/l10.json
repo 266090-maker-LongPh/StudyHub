@@ -1,0 +1,27 @@
+{
+  "id": "se1-l10-11", "order": 9,
+  "title": "Lecture 10–11: Design và ví dụ KEngine",
+  "summary": [
+    { "h": "Nguyên tắc và các bước", "text": "Hai nguyên tắc: decomposition by abstraction và iterative refinement (top-down). Mỗi vòng lặp: chọn một abstraction A, xác định helper abstraction cần để cài đặt A, viết/cập nhật design specification cho A, dừng khi mọi abstraction đều có đặc tả. Iteration 0: abstraction ban đầu (phần mềm và khái niệm hiển nhiên). Iteration 1: abstraction mức cao nhất từ đặc tả. Iteration 2+: lặp tới khi không có abstraction mới. Design notebook ghi mọi quyết định thiết kế (đặc tả, bản phác cài đặt, ngữ cảnh dùng) kèm class, sequence, activity diagram." },
+    { "h": "KEngine: yêu cầu", "text": "Dựa trên Liskov & Guttag mục 12.4. Entity: Document, Word (Keyword, NonKeyword), Query, Match. Quan hệ: appears-in (association class có frequency), hasKeyword (aggregation Query–Keyword), hasMatch (composition Query–Match), refers-to (Match → Document). Use case: Add Documents, Search for document, Query, QueryMore." },
+    { "h": "KEngine: thiết kế", "text": "Iteration 0: Engine, Doc, Query với các method Engine(), queryFirst(String), queryMore(String), findDoc(String), addDocs(String), ném NotPossibleException. Iteration 1: thêm WordTable (lưu từ quan trọng/không quan trọng và số lần xuất hiện), TitleTable (tra cứu theo title), Comm (getDocs từ URL). Iteration 2: TitleTable dùng Hashtable; Query dùng WordTable, keys, matches (Vector); DocCnt (implements Comparable) và Sorting.quickSort; Helpers.canon chuẩn hóa từ về dạng chuẩn; WordTable.addDoc trả Hashtable từ→tần suất." },
+    { "h": "Ví dụ chạy (Lecture 11)", "text": "Dữ liệu: d1 (t1: W1=6, W2=12), d2 (t2: W1=10), d3 (t3: W2=4). addDocs tạo TitleTable <t1,d1>,<t2,d2>,<t3,d3> và WordTable w1→[<d1,6>,<d2,10>], w2→[<d1,12>,<d3,4>]. queryFirst(w1) → matches sắp giảm dần [<d2,10>,<d1,6>]. queryMore(w2) giữ tài liệu có cả w1 và w2, cộng tần suất → [<d1,18>]. findDoc(t1) → d1." }
+  ],
+  "sources": [
+    { "file": "Resources/Lecture 10.pdf", "loc": "Slides 1–102" },
+    { "file": "Resources/Lecture 11.pdf", "loc": "Slides 1–19 (PDF ảnh 1 trang)" }
+  ],
+  "cards": [
+    { "id": "se1-l10-c01", "front": "Hai nguyên tắc của quy trình design?", "back": "Decomposition by abstraction và iterative refinement (top-down).", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slide 3" } },
+    { "id": "se1-l10-c02", "front": "WordTable trong KEngine để làm gì?", "back": "Lưu các từ quan trọng và không quan trọng cùng số lần xuất hiện trong tài liệu, phục vụ truy vấn.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 41–51" } },
+    { "id": "se1-l10-c03", "front": "TitleTable trong KEngine?", "back": "Tra cứu nhanh Doc theo title (lookUp), dùng Hashtable ở Iteration 2; addDoc ném DuplicateException.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 56–60, 81–83" } },
+    { "id": "se1-l10-c04", "front": "Helpers.canon làm gì?", "back": "Chuyển từ về dạng chuẩn chung (ví dụ Student → student).", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 99–101" } },
+    { "id": "se1-l10-c05", "front": "queryMore(w2) xử lý matches thế nào trong ví dụ?", "back": "Chỉ giữ tài liệu có cả w1 và w2, cộng tần suất (d1: 6 + 12 = 18) và loại d2.", "source": { "file": "Resources/Lecture 11.pdf", "loc": "Slides 15–17" } },
+    { "id": "se1-l10-c06", "front": "Design notebook gồm gì?", "back": "Một phần cho mỗi abstraction: design specification, bản phác cài đặt nếu cần, ngữ cảnh dùng, ghi chú; kèm class, sequence, activity diagram.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slide 9" } }
+  ],
+  "questions": [
+    { "id": "se1-l10-q01", "stem": "Trong ví dụ Lecture 11, queryFirst(w1) trả danh sách matches thế nào?", "options": ["[<d1,6>,<d2,10>]", "[<d2,10>,<d1,6>] (giảm dần theo tần suất)", "[<d3,4>]", "[<d1,18>]"], "answer": 1, "explanation": "Query sắp xếp bằng Sorting.quickSort theo tần suất giảm dần.", "source": { "file": "Resources/Lecture 11.pdf", "loc": "Slides 13–14" } },
+    { "id": "se1-l10-q02", "stem": "Trong quy trình design, bước nào thực hiện ở mỗi iteration?", "options": ["Chọn abstraction, xác định helper abstraction, viết/cập nhật đặc tả, dừng khi mọi abstraction đã có đặc tả", "Chỉ viết code", "Chỉ vẽ sequence diagram", "Chỉ test"], "answer": 0, "explanation": "Slide 4 liệt kê các bước lặp.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slide 4" } },
+    { "id": "se1-l10-q03", "stem": "Quan hệ giữa Query và Match trong phân tích KEngine?", "options": ["Aggregation", "Composition (hasMatch)", "Dependency", "Generalization"], "answer": 1, "explanation": "Slides 14–17: hasMatch là composition giữa Query và Match.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 14–17" } }
+  ]
+}

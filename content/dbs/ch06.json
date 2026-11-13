@@ -1,0 +1,25 @@
+{
+  "id": "dbs-ch06", "order": 6,
+  "title": "Chương 6: Introduction to SQL",
+  "summary": [
+    { "h": "SQL và môi trường", "text": "SQL xuất phát từ mô hình quan hệ của Codd (1970) và System R của IBM; chuẩn ANSI đầu tiên năm 1986. DDL định nghĩa database (CREATE, ALTER, DROP, ràng buộc); DML thao tác và truy vấn (INSERT, UPDATE, DELETE, SELECT); DCL kiểm soát (GRANT, REVOKE, COMMIT). Catalog là tập các schema; schema chứa mô tả đối tượng do user tạo." },
+    { "h": "Tạo bảng và referential integrity", "text": "7 bước: chọn data type, cột NOT NULL, cột UNIQUE, cặp PK–FK, giá trị DEFAULT, domain constraint (CHECK), tạo bảng và index. Hành động ON UPDATE/DELETE cho FK: RESTRICT, CASCADE, SET NULL, SET DEFAULT." },
+    { "h": "Thứ tự xử lý SELECT", "text": "Thứ tự viết: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY. Thứ tự xử lý logic: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. WHERE lọc hàng trước khi gom nhóm (không chứa hàm tổng hợp); HAVING lọc nhóm sau GROUP BY. Với hàm tổng hợp, cột không tổng hợp trong SELECT phải có trong GROUP BY." },
+    { "h": "Độ ưu tiên toán tử Boolean", "text": "NOT trước, rồi AND, rồi OR. Dùng ngoặc để thay đổi thứ tự." },
+    { "h": "View", "text": "Dynamic view là bảng ảo, chỉ lưu định nghĩa SELECT. Materialized view lưu vật lý kết quả và cần refresh. WITH CHECK OPTION ngăn INSERT/UPDATE qua view tạo hàng không thỏa WHERE của view. Ưu điểm: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất, dữ liệu mới nhất, tốn ít chỗ, view tùy biến, physical data independence. Nhược điểm: tốn thời gian xử lý mỗi lần dùng; có thể không update được trực tiếp." }
+  ],
+  "sources": [{ "file": "Chapter 06.pdf", "loc": "Slides 1–48" }],
+  "cards": [
+    { "id": "dbs-ch06-c01", "front": "Thứ tự xử lý logic của SELECT?", "back": "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY.", "source": { "file": "Chapter 06.pdf", "loc": "Slide 32" } },
+    { "id": "dbs-ch06-c02", "front": "WHERE khác HAVING?", "back": "WHERE lọc hàng trước khi nhóm và không chứa hàm tổng hợp; HAVING lọc nhóm sau GROUP BY.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 42–43" } },
+    { "id": "dbs-ch06-c03", "front": "Độ ưu tiên NOT, AND, OR?", "back": "NOT trước, sau đó AND, cuối cùng OR; dùng ngoặc để đổi.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 36–39" } },
+    { "id": "dbs-ch06-c04", "front": "DDL, DML, DCL là gì?", "back": "DDL định nghĩa cấu trúc (CREATE/ALTER/DROP); DML thao tác dữ liệu (INSERT/UPDATE/DELETE/SELECT); DCL kiểm soát quyền và commit (GRANT/REVOKE/COMMIT).", "source": { "file": "Chapter 06.pdf", "loc": "Slides 7–9" } },
+    { "id": "dbs-ch06-c05", "front": "Dynamic view khác materialized view?", "back": "Dynamic view là bảng ảo, không lưu dữ liệu; materialized view lưu kết quả vật lý và cần làm mới định kỳ.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 44–45" } },
+    { "id": "dbs-ch06-c06", "front": "Bốn hành động ON DELETE/UPDATE cho FK?", "back": "RESTRICT, CASCADE, SET NULL, SET DEFAULT.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 22–23" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch06-q01", "stem": "Mệnh đề nào được thực thi đầu tiên về mặt logic trong SELECT?", "options": ["SELECT", "WHERE", "FROM", "GROUP BY"], "answer": 2, "explanation": "Thứ tự logic bắt đầu từ FROM.", "source": { "file": "Chapter 06.pdf", "loc": "Slide 32" } },
+    { "id": "dbs-ch06-q02", "stem": "Biểu thức ProductDescription LIKE '%Desk' OR ProductDescription LIKE '%Table' AND ProductStandardPrice > 300 (không ngoặc) trả về gì?", "options": ["Chỉ Desk và Table giá trên 300", "Mọi Desk (mọi giá) cộng Table giá trên 300", "Chỉ Table", "Lỗi cú pháp"], "answer": 1, "explanation": "AND chạy trước OR nên kết quả là mọi Desk hợp với Table có giá trên 300.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 36–39" } },
+    { "id": "dbs-ch06-q03", "stem": "Dynamic view lưu gì trong database?", "options": ["Toàn bộ dữ liệu kết quả", "Chỉ định nghĩa truy vấn SELECT", "Một bản sao bảng gốc", "Chỉ index"], "answer": 1, "explanation": "Dynamic view là virtual table, không lưu dữ liệu.", "source": { "file": "Chapter 06.pdf", "loc": "Slide 44" } }
+  ]
+}

@@ -1,0 +1,1641 @@
+{
+  "subject": "dbs",
+  "name": "DBS",
+  "chapters": [
+    {
+      "id": "dbs-ch01",
+      "order": 1,
+      "title": "Chương 1: The Database Environment and Development Process",
+      "summary": [
+        {
+          "h": "Data, Information, Metadata",
+          "text": "Database là tập hợp dữ liệu có tổ chức, liên quan logic với nhau. Data là biểu diễn lưu trữ của đối tượng/sự kiện có ý nghĩa (structured: số, text, ngày; unstructured: ảnh, video, tài liệu). Information là dữ liệu đã xử lý để tăng hiểu biết cho người dùng. Metadata mô tả thuộc tính và ngữ cảnh của dữ liệu: kiểu dữ liệu, kích thước field, giá trị cho phép (min/max), mô tả, nguồn."
+        },
+        {
+          "h": "File processing truyền thống và 5 nhược điểm",
+          "text": "1) Program-data dependence (mỗi chương trình tự giữ metadata cho từng file). 2) Duplication of data (data redundancy; nguy cơ inconsistency, mất data integrity). 3) Limited data sharing. 4) Lengthy development times. 5) Excessive program maintenance (chiếm 80% ngân sách hệ thống thông tin)."
+        },
+        {
+          "h": "Database approach và DBMS",
+          "text": "Kho dữ liệu dùng chung, quản lý bởi một tác nhân điều khiển và cần DBMS. DBMS là hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới database. Ưu điểm gồm 10 mục (program-data independence, planned data redundancy, improved data consistency, sharing, productivity, enforcement of standards, data quality, accessibility, reduced maintenance, decision support). Chi phí/rủi ro gồm 5 mục (personnel mới, chi phí cài đặt/quản lý, chi phí chuyển đổi, backup/recovery tường minh, xung đột tổ chức)."
+        },
+        {
+          "h": "9 thành phần của database environment",
+          "text": "CASE tools, Repository (kho metadata), DBMS, Database, Application programs, User interface, Data/Database administrators, System developers, End users."
+        },
+        {
+          "h": "SDLC, Prototyping, Agile",
+          "text": "SDLC có 6 pha: Planning, Analysis, Logical Design, Physical Design, Implementation, Maintenance. Prototyping (RAD): làm conceptual data modeling sơ lược, định nghĩa database trong lúc làm prototype đầu tiên, lặp lại. Agile nhấn mạnh con người, phần mềm chạy được, hợp tác với khách hàng, đáp ứng thay đổi (ví dụ XP, Scrum, DSDM, FDD)."
+        },
+        {
+          "h": "Three-schema architecture",
+          "text": "External schema (user views) ⊂ Conceptual schema (mô hình E-R) → Internal schema gồm logical schema (Chương 4) và physical schema (Chương 5)."
+        }
+      ],
+      "sources": [
+        {
+          "file": "hoffer_mdm12e_pp_ch01.pdf",
+          "loc": "Slides 1–55"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch01-c01",
+          "front": "Metadata là gì?",
+          "back": "Dữ liệu mô tả thuộc tính và ngữ cảnh của dữ liệu người dùng: kiểu dữ liệu, kích thước field, giá trị cho phép, mô tả, nguồn.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slides 3, 6"
+          }
+        },
+        {
+          "id": "dbs-ch01-c02",
+          "front": "5 nhược điểm của file processing truyền thống?",
+          "back": "Program-data dependence; duplication of data; limited data sharing; lengthy development times; excessive program maintenance (80% ngân sách IS).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "id": "dbs-ch01-c03",
+          "front": "DBMS là gì?",
+          "back": "Hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới user databases.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "id": "dbs-ch01-c04",
+          "front": "Enterprise Data Model khác Project Data Model thế nào?",
+          "back": "Enterprise: entity và relationship mức cao cho toàn tổ chức. Project: góc nhìn chi tiết hơn, khớp cấu trúc dữ liệu trong database/data warehouse.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slides 14–15"
+          }
+        },
+        {
+          "id": "dbs-ch01-c05",
+          "front": "Ba tầng của three-schema architecture?",
+          "back": "External schema (user views), Conceptual schema (E-R), Internal schema (logical + physical).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slides 42–43"
+          }
+        },
+        {
+          "id": "dbs-ch01-c06",
+          "front": "Sáu pha của SDLC theo thứ tự?",
+          "back": "Planning → Analysis → Logical Design → Physical Design → Implementation → Maintenance.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slides 29–35"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch01-q01",
+          "stem": "Vấn đề lớn nhất của data redundancy trong file processing là gì?",
+          "options": [
+            "Tốn băng thông mạng",
+            "Thay đổi dữ liệu ở một file có thể gây inconsistency và ảnh hưởng data integrity",
+            "Chương trình chạy chậm hơn",
+            "Không thể backup"
+          ],
+          "answer": 1,
+          "explanation": "Slide 11 nêu 'biggest problem' là thay đổi ở một file có thể dẫn tới inconsistency và compromise data integrity.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "id": "dbs-ch01-q02",
+          "stem": "Thành phần nào của database environment là 'centralized storehouse of metadata'?",
+          "options": [
+            "DBMS",
+            "Repository",
+            "CASE tool",
+            "User interface"
+          ],
+          "answer": 1,
+          "explanation": "Repository là kho tập trung chứa metadata.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slides 24–25"
+          }
+        },
+        {
+          "id": "dbs-ch01-q03",
+          "stem": "Trong three-schema architecture, user views thuộc schema nào?",
+          "options": [
+            "External schema",
+            "Conceptual schema",
+            "Internal schema",
+            "Physical schema"
+          ],
+          "answer": 0,
+          "explanation": "User views (report, màn hình, form) là external schema, là tập con của conceptual schema.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slides 42–43"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch02",
+      "order": 2,
+      "title": "Chương 2: Modeling Data in the Organization (E-R)",
+      "summary": [
+        {
+          "h": "Thành phần mô hình E-R",
+          "text": "Entity instance (thường tương ứng một row), entity type (một table). Relationship instance là liên kết giữa các entity (tương ứng PK–FK), relationship type là loại liên kết giữa các entity type. Attribute là thuộc tính (một field)."
+        },
+        {
+          "h": "Ký hiệu cơ bản",
+          "text": "Strong entity: hình chữ nhật nét đơn. Weak entity: nét đôi. Associative entity: hình chữ nhật bo tròn nằm trong hình chữ nhật. Identifier: đậm, gạch dưới đơn. Partial identifier: đậm, gạch dưới đôi. [Derived] trong ngoặc vuông, {Multivalued} trong ngoặc nhọn, Composite( , , ) trong ngoặc tròn. Cardinality: mandatory one (||), optional one (o|), mandatory many (|<), optional many (o<)."
+        },
+        {
+          "h": "Business rules",
+          "text": "Phát biểu định nghĩa hoặc ràng buộc một khía cạnh của nghiệp vụ. Business rule tốt có 7 đặc tính: Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented."
+        },
+        {
+          "h": "Entity nên và không nên là gì",
+          "text": "Nên là đối tượng có nhiều instance, gồm nhiều attribute, là thứ ta đang cần mô hình hóa. Không nên là user của hệ thống (ví dụ TREASURER) hoặc output của hệ thống (ví dụ EXPENSE REPORT)."
+        },
+        {
+          "h": "Phân loại attribute",
+          "text": "5 cách phân loại: required/optional; simple/composite; single-valued/multivalued; stored/derived; identifier. Tiêu chí chọn identifier: giá trị không đổi, không null, tránh intelligent identifier, thay key phức hợp dài bằng key đơn mới."
+        },
+        {
+          "h": "Degree và cardinality",
+          "text": "Degree = số entity type tham gia: unary (1), binary (2), ternary (3). Cardinality cơ bản: 1:1, 1:M, M:N. Cardinality constraint gồm minimum (0 = optional, ≥1 = mandatory) và maximum (1 hoặc many)."
+        },
+        {
+          "h": "Associative entity và time stamp",
+          "text": "Quan hệ có thuộc tính nên thành associative entity khi: mọi quan hệ đều many, có ý nghĩa độc lập, ưu tiên có identifier riêng và thuộc tính khác, có thể tham gia quan hệ khác; quan hệ ternary nên chuyển thành associative entity. Time stamp lưu thời điểm sự kiện (cần cho HIPAA, Sarbanes-Oxley)."
+        }
+      ],
+      "sources": [
+        {
+          "file": "hoffer_mdm12e_pp_ch02.pdf",
+          "loc": "Slides 1–49"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch02-c01",
+          "front": "Weak entity khác strong entity thế nào?",
+          "back": "Weak entity phụ thuộc strong entity (identifying owner), không có identifier riêng mà chỉ có partial identifier; vẽ hộp nét đôi, nối bằng identifying relationship (nét đôi).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "id": "dbs-ch02-c02",
+          "front": "Ký hiệu derived và multivalued attribute?",
+          "back": "Derived: [ngoặc vuông]. Multivalued: {ngoặc nhọn}.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slides 5, 20"
+          }
+        },
+        {
+          "id": "dbs-ch02-c03",
+          "front": "Degree của relationship là gì? Kể tên.",
+          "back": "Số entity type tham gia: unary (1), binary (2), ternary (3).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "id": "dbs-ch02-c04",
+          "front": "Minimum cardinality bằng 0 nghĩa là gì?",
+          "back": "Optional (vẽ vòng tròn o); từ 1 trở lên là mandatory (vạch |).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "id": "dbs-ch02-c05",
+          "front": "4 tiêu chí chọn identifier?",
+          "back": "Không đổi giá trị; không null; tránh intelligent identifier; thay key phức hợp dài bằng key đơn mới.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "id": "dbs-ch02-c06",
+          "front": "7 đặc tính của business rule tốt?",
+          "back": "Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "id": "dbs-ch02-c07",
+          "front": "Khi nào nên chuyển relationship có thuộc tính thành associative entity?",
+          "back": "Mọi quan hệ đều many; có ý nghĩa độc lập; ưu tiên có identifier riêng và thuộc tính khác; có thể tham gia quan hệ khác; ternary nên chuyển thành associative entity.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 41"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch02-q01",
+          "stem": "Thực thể nào KHÔNG nên mô hình hóa thành entity?",
+          "options": [
+            "ORDER",
+            "PRODUCT",
+            "EXPENSE REPORT (output của hệ thống)",
+            "CUSTOMER"
+          ],
+          "answer": 2,
+          "explanation": "Entity không nên là user hoặc output của hệ thống; ví dụ Figure 2-4 loại TREASURER và EXPENSE REPORT.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slides 12–13"
+          }
+        },
+        {
+          "id": "dbs-ch02-q02",
+          "stem": "Ký hiệu 'o<' trên đầu quan hệ có nghĩa là gì?",
+          "options": [
+            "Mandatory one",
+            "Optional one",
+            "Mandatory many",
+            "Optional many"
+          ],
+          "answer": 3,
+          "explanation": "Vòng tròn = optional (min 0), chân chim = many.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "id": "dbs-ch02-q03",
+          "stem": "Attribute [Years Employed] tính từ Date Employed và ngày hiện tại thuộc loại nào?",
+          "options": [
+            "Multivalued",
+            "Composite",
+            "Derived",
+            "Identifier"
+          ],
+          "answer": 2,
+          "explanation": "Giá trị tính được từ attribute khác, không lưu: derived, ký hiệu [ ].",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 20"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch03",
+      "order": 3,
+      "title": "Chương 3: The Enhanced E-R Model",
+      "summary": [
+        {
+          "h": "Supertype / Subtype",
+          "text": "Subtype là nhóm con của entity type có thuộc tính riêng. Supertype là entity type tổng quát có quan hệ với một hay nhiều subtype. Subtype kế thừa (attribute inheritance) mọi attribute, kể cả identifier, của supertype; một instance của subtype cũng là instance của supertype. Quan hệ ở mức supertype áp dụng cho mọi subtype; quan hệ ở mức subtype chỉ áp dụng cho subtype đó (ví dụ chỉ RESIDENT PATIENT liên kết với BED)."
+        },
+        {
+          "h": "Generalization và Specialization",
+          "text": "Generalization là bottom-up: định nghĩa entity type tổng quát từ nhiều entity type chuyên biệt (CAR, TRUCK, MOTORCYCLE → VEHICLE; MOTORCYCLE không có subtype vì không có thuộc tính hay quan hệ riêng). Specialization là top-down: định nghĩa subtype từ supertype (PART → MANUFACTURED PART, PURCHASED PART)."
+        },
+        {
+          "h": "Completeness constraint",
+          "text": "Hỏi: một instance của supertype có bắt buộc thuộc ít nhất một subtype không? Total specialization: có (đường đôi). Partial specialization: không bắt buộc (đường đơn)."
+        },
+        {
+          "h": "Disjointness constraint",
+          "text": "Hỏi: một instance của supertype có thể đồng thời thuộc 2 subtype trở lên không? Disjoint (d): chỉ một subtype. Overlap (o): có thể nhiều subtype."
+        },
+        {
+          "h": "Subtype discriminator",
+          "text": "Attribute của supertype mà giá trị xác định subtype. Với disjoint: attribute đơn (ví dụ Employee Type = H, S, C). Với overlap: attribute composite gồm các thành phần Boolean Y/N (ví dụ Part Type(Manufactured?, Purchased?))."
+        },
+        {
+          "h": "Entity cluster và universal data model",
+          "text": "Entity cluster gom nhiều entity và quan hệ thành một entity trừu tượng để sơ đồ dễ đọc. Universal (packaged) data model là mẫu mô hình dùng lại (pattern), ví dụ PARTY, PARTY ROLE, ROLE TYPE."
+        }
+      ],
+      "sources": [
+        {
+          "file": "hoffer_mdm12e_pp_ch03.pdf",
+          "loc": "Slides 1–32"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch03-c01",
+          "front": "Generalization và specialization khác nhau thế nào?",
+          "back": "Generalization: bottom-up, tạo supertype tổng quát từ các entity chuyên biệt. Specialization: top-down, tạo subtype từ supertype.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "id": "dbs-ch03-c02",
+          "front": "Total specialization vẽ thế nào và nghĩa là gì?",
+          "back": "Đường đôi từ supertype tới vòng tròn; mọi instance của supertype phải thuộc ít nhất một subtype.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slides 14–15"
+          }
+        },
+        {
+          "id": "dbs-ch03-c03",
+          "front": "Disjoint rule và overlap rule?",
+          "back": "Disjoint (d): instance thuộc đúng một subtype. Overlap (o): có thể thuộc nhiều subtype cùng lúc.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slides 17–19"
+          }
+        },
+        {
+          "id": "dbs-ch03-c04",
+          "front": "Subtype discriminator là gì?",
+          "back": "Attribute của supertype có giá trị xác định instance thuộc subtype nào. Disjoint: attribute đơn; overlap: attribute composite gồm các cờ Boolean.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slides 20–22"
+          }
+        },
+        {
+          "id": "dbs-ch03-c05",
+          "front": "Vì sao MOTORCYCLE không thành subtype của VEHICLE trong ví dụ?",
+          "back": "Vì nó không có thuộc tính hay quan hệ riêng.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "id": "dbs-ch03-c06",
+          "front": "Entity cluster dùng để làm gì?",
+          "back": "Gom nhiều entity và quan hệ thành một entity trừu tượng để EER diagram dễ đọc.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 24"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch03-q01",
+          "stem": "Instance của supertype chỉ có thể thuộc đúng một subtype, và không bắt buộc thuộc subtype nào. Ràng buộc là gì?",
+          "options": [
+            "Overlap, total",
+            "Disjoint, total",
+            "Overlap, partial",
+            "Disjoint, partial"
+          ],
+          "answer": 3,
+          "explanation": "'Chỉ một subtype' = disjoint; 'không bắt buộc' = partial specialization (đường đơn).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slides 14–19"
+          }
+        },
+        {
+          "id": "dbs-ch03-q02",
+          "stem": "Ký hiệu 'o' trong vòng tròn của quan hệ supertype/subtype nghĩa là gì?",
+          "options": [
+            "Optional",
+            "Overlap",
+            "Ordered",
+            "Owner"
+          ],
+          "answer": 1,
+          "explanation": "Chữ o là overlap rule; chữ d là disjoint.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "id": "dbs-ch03-q03",
+          "stem": "Việc gom CAR, TRUCK thành VEHICLE từ các entity có sẵn gọi là gì?",
+          "options": [
+            "Specialization",
+            "Generalization",
+            "Normalization",
+            "Clustering"
+          ],
+          "answer": 1,
+          "explanation": "Bottom-up từ nhiều entity chuyên biệt lên supertype là generalization.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slides 9–11"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch04",
+      "order": 4,
+      "title": "Chương 4: Logical Database Design and the Relational Model",
+      "summary": [
+        {
+          "h": "Mô hình quan hệ",
+          "text": "Logical design chuyển conceptual model (E-R/EER) thành relational schema, kết hợp top-down (biến đổi EER) và bottom-up (chuẩn hóa user view). Ba thành phần: data structure (relation/table, tuple/row, attribute/column), data manipulation (SQL), data integrity."
+        },
+        {
+          "h": "6 tính chất của relation",
+          "text": "Tên relation duy nhất; giá trị attribute atomic; mỗi row duy nhất; tên attribute duy nhất; thứ tự cột không quan trọng; thứ tự hàng không quan trọng. Theo định nghĩa mọi relation đều ở 1NF."
+        },
+        {
+          "h": "Khóa và ràng buộc toàn vẹn",
+          "text": "Candidate key phải có 2 tính chất: định danh duy nhất và không dư thừa (không bỏ được attribute nào). Primary key là candidate key được chọn; surrogate key là khóa do hệ thống gán. Foreign key khớp primary key của relation cha. Ràng buộc: domain constraint, entity integrity (PK không NULL), referential integrity (FK khớp PK hoặc NULL). Luật xóa: Restrict, Cascade, Set-to-Null."
+        },
+        {
+          "h": "7 bước biến đổi EER thành relation",
+          "text": "1) Strong entity: composite chỉ lấy thành phần đơn; multivalued tạo relation riêng với PK ghép. 2) Weak entity: relation riêng, PK = PK owner + partial identifier. 3) Binary: 1:M đặt PK bên 1 làm FK bên M; M:N tạo relation trung gian; 1:1 đặt PK của bên mandatory làm FK ở bên optional. 4) Associative entity. 5) Unary: 1:M thêm FK đệ quy cùng bảng; M:N thêm relation thứ hai. 6) Ternary: một relation liên kết có FK tới mọi entity. 7) Supertype/subtype: mỗi loại một relation; PK của subtype vừa là PK vừa là FK tới supertype."
+        },
+        {
+          "h": "Anomaly và chuẩn hóa",
+          "text": "Ba anomaly: insertion, deletion, modification. Functional dependency A → B: A (determinant) xác định duy nhất B. 2NF: 1NF và không có partial dependency (relation có PK đơn tự động đạt 2NF). 3NF: 2NF và không có transitive dependency. BCNF: mọi determinant là candidate key. 4NF loại multivalued dependency; 5NF loại join dependency còn lại."
+        },
+        {
+          "h": "Merging relations (view integration)",
+          "text": "Gộp relation từ nhiều view có 4 vấn đề: synonyms, homonyms, transitive dependencies, supertype/subtype ẩn. Gộp hai quan hệ 3NF không bảo đảm kết quả 3NF."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Chapter 04.pdf",
+          "loc": "Slides 1–57"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch04-c01",
+          "front": "Hai tính chất của candidate key?",
+          "back": "Định danh duy nhất mọi row và không dư thừa (không thể bỏ attribute nào mà vẫn duy nhất).",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 9–12"
+          }
+        },
+        {
+          "id": "dbs-ch04-c02",
+          "front": "Entity integrity và referential integrity?",
+          "back": "Entity integrity: không thành phần nào của PK được NULL. Referential integrity: giá trị FK phải khớp PK hiện có ở bảng cha hoặc là NULL.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 13–17"
+          }
+        },
+        {
+          "id": "dbs-ch04-c03",
+          "front": "Quan hệ 1:M ánh xạ thế nào?",
+          "back": "PK của phía 1 trở thành FK ở phía M (kèm thuộc tính quan hệ nếu có).",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 24–28"
+          }
+        },
+        {
+          "id": "dbs-ch04-c04",
+          "front": "Quan hệ M:N ánh xạ thế nào?",
+          "back": "Tạo relation trung gian; PK là tổ hợp PK của hai entity (cũng là FK) cộng thuộc tính quan hệ.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 24–28"
+          }
+        },
+        {
+          "id": "dbs-ch04-c05",
+          "front": "Điều kiện của 2NF và 3NF?",
+          "back": "2NF: 1NF và không partial dependency. 3NF: 2NF và không transitive dependency.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 44–50"
+          }
+        },
+        {
+          "id": "dbs-ch04-c06",
+          "front": "Ba loại anomaly?",
+          "back": "Insertion, deletion, modification (update) anomaly.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 39–40"
+          }
+        },
+        {
+          "id": "dbs-ch04-c07",
+          "front": "Subtype được ánh xạ thế nào sang relation?",
+          "back": "Mỗi subtype một relation; PK của subtype đồng thời là FK tham chiếu PK supertype.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 36–37"
+          }
+        },
+        {
+          "id": "dbs-ch04-c08",
+          "front": "Bốn vấn đề khi merge relation?",
+          "back": "Synonyms, homonyms, transitive dependencies, supertype/subtype ẩn.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 51–55"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch04-q01",
+          "stem": "Bước chuẩn hóa nào loại bỏ partial dependency?",
+          "options": [
+            "1NF → 2NF",
+            "2NF → 3NF",
+            "3NF → BCNF",
+            "BCNF → 4NF"
+          ],
+          "answer": 0,
+          "explanation": "2NF yêu cầu không có phụ thuộc bộ phận vào một phần của PK ghép; 3NF loại transitive dependency.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 44–47"
+          }
+        },
+        {
+          "id": "dbs-ch04-q02",
+          "stem": "Trong quan hệ 1:1, FK nên đặt ở bên nào để tránh NULL?",
+          "options": [
+            "Bên optional, tham chiếu PK của bên mandatory",
+            "Bên mandatory",
+            "Cả hai bên",
+            "Tạo bảng riêng luôn"
+          ],
+          "answer": 0,
+          "explanation": "PK của bên mandatory trở thành FK ở bên optional.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 24–28"
+          }
+        },
+        {
+          "id": "dbs-ch04-q03",
+          "stem": "Luật xóa nào tự động xóa các hàng con tham chiếu hàng cha bị xóa?",
+          "options": [
+            "Restrict",
+            "Cascade",
+            "Set-to-Null",
+            "No action"
+          ],
+          "answer": 1,
+          "explanation": "Cascade xóa dây chuyền dependent rows.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 15–17"
+          }
+        },
+        {
+          "id": "dbs-ch04-q04",
+          "stem": "Với PK ghép (OrderID, ProductID), thuộc tính OrderDate chỉ phụ thuộc OrderID. Đây là dạng nào?",
+          "options": [
+            "Transitive dependency",
+            "Partial dependency",
+            "Multivalued dependency",
+            "Join dependency"
+          ],
+          "answer": 1,
+          "explanation": "Phụ thuộc vào một phần của PK ghép là partial dependency, vi phạm 2NF.",
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slides 44–47"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch05",
+      "order": 5,
+      "title": "Chương 5: Physical Database Design and Performance",
+      "summary": [
+        {
+          "h": "Mục đích và quyết định",
+          "text": "Chuyển logical schema thành đặc tả kỹ thuật để lưu/truy xuất dữ liệu với hiệu năng đủ tốt, đồng thời bảo đảm integrity, security, recoverability. Quyết định: kiểu dữ liệu attribute, physical record, file organization, index, tối ưu truy vấn."
+        },
+        {
+          "h": "Chọn data type",
+          "text": "4 mục tiêu: biểu diễn mọi giá trị có thể, tăng data integrity, hỗ trợ mọi thao tác dữ liệu, tối thiểu dung lượng. Dùng coding/look-up table để tiết kiệm chỗ. Kiểm soát cấp field: default value, range control, null control, referential integrity."
+        },
+        {
+          "h": "Denormalization",
+          "text": "Gộp bảng đã chuẩn hóa để giảm JOIN, tăng tốc truy vấn, nhưng tốn chỗ, đe dọa integrity (quay lại các anomaly) và phải sửa chương trình khi quy tắc đổi. 3 tình huống thường gặp: 1:1; M:N có thuộc tính non-key (sao chép thuộc tính vào bảng trung gian); reference data ở quan hệ 1:N."
+        },
+        {
+          "h": "Partitioning",
+          "text": "Horizontal: chia hàng (key range, hash, composite). Vertical: chia cột; PK phải lặp ở mọi partition. Lợi ích: hiệu quả, tối ưu cục bộ, bảo mật, recovery/uptime, load balancing. Hạn chế: tốc độ truy cập không đồng đều, phức tạp, tốn thêm chỗ và thời gian update."
+        },
+        {
+          "h": "Phân cấp lưu trữ",
+          "text": "Database → Tablespace → Segment → Extent → Data Block (đơn vị I/O nhỏ nhất của DBMS)."
+        },
+        {
+          "h": "File organization",
+          "text": "Heap (không thứ tự, tìm trung bình n/2), Sequential (theo PK, tìm nhị phân log2 n), Indexed (index như B+ tree, hỗ trợ nhiều khóa), Hashed (hàm băm tính địa chỉ; nhanh với truy cập ngẫu nhiên theo PK, không hợp truy cập tuần tự/theo khoảng, có collision)."
+        },
+        {
+          "h": "9 quy tắc dùng index",
+          "text": "Dùng cho bảng lớn; index PK; index search field; index trường trong ORDER BY và GROUP BY; dùng khi có hơn 100 giá trị khác nhau, tránh khi ít hơn 30; tránh index giá trị dài; khóa clustering nên dùng surrogate/sequence key; để ý giới hạn DBMS; cẩn thận với cột có NULL."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Chapter 05.pdf",
+          "loc": "Slides 1–40"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch05-c01",
+          "front": "Denormalization có lợi và hại gì?",
+          "back": "Lợi: ít JOIN, truy vấn nhanh. Hại: tốn dung lượng, nguy cơ anomaly/inconsistency, phải lập trình lại khi nghiệp vụ đổi.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 16–21"
+          }
+        },
+        {
+          "id": "dbs-ch05-c02",
+          "front": "Horizontal vs vertical partitioning?",
+          "back": "Horizontal chia theo hàng (key range, hash, composite). Vertical chia theo cột và phải lặp PK ở mỗi partition.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 22–27"
+          }
+        },
+        {
+          "id": "dbs-ch05-c03",
+          "front": "Thứ tự phân cấp lưu trữ từ lớn đến nhỏ?",
+          "back": "Database → Tablespace → Segment → Extent → Data Block.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 28–29"
+          }
+        },
+        {
+          "id": "dbs-ch05-c04",
+          "front": "Hashed file organization mạnh và yếu ở đâu?",
+          "back": "Rất nhanh với truy cập ngẫu nhiên theo PK, dễ insert/delete/update; không thực tế cho truy cập tuần tự/theo khoảng và có hash collision.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 33–36"
+          }
+        },
+        {
+          "id": "dbs-ch05-c05",
+          "front": "Khi nào nên và không nên tạo index theo số giá trị khác nhau?",
+          "back": "Nên khi có hơn 100 giá trị khác nhau; không nên khi ít hơn 30.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 38–39"
+          }
+        },
+        {
+          "id": "dbs-ch05-c06",
+          "front": "4 mục tiêu khi chọn data type?",
+          "back": "Biểu diễn mọi giá trị; tăng data integrity; hỗ trợ mọi thao tác; tối thiểu dung lượng lưu trữ.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 11"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch05-q01",
+          "stem": "Trong vertical partitioning, điều nào bắt buộc?",
+          "options": [
+            "Không được lặp cột nào",
+            "PK phải lặp lại ở mọi partition",
+            "Chỉ chia theo khoảng khóa",
+            "Phải dùng hash"
+          ],
+          "answer": 1,
+          "explanation": "Slide về vertical partitioning nêu PK phải được lặp ở mỗi partition.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 24–26"
+          }
+        },
+        {
+          "id": "dbs-ch05-q02",
+          "stem": "Đơn vị I/O nhỏ nhất của DBMS trong phân cấp lưu trữ là gì?",
+          "options": [
+            "Tablespace",
+            "Segment",
+            "Extent",
+            "Data block"
+          ],
+          "answer": 3,
+          "explanation": "Data block là đơn vị I/O nhỏ nhất, gồm các OS block.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slides 28–29"
+          }
+        },
+        {
+          "id": "dbs-ch05-q03",
+          "stem": "Tổ chức file nào phù hợp nhất cho truy xuất ngẫu nhiên nhanh theo PK nhưng không hợp truy cập tuần tự?",
+          "options": [
+            "Sequential",
+            "Hashed",
+            "Heap",
+            "Indexed tuần tự"
+          ],
+          "answer": 1,
+          "explanation": "Theo Table 5-3: hashed rất nhanh cho random retrieval trên PK và impractical cho sequential retrieval.",
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 36"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch06",
+      "order": 6,
+      "title": "Chương 6: Introduction to SQL",
+      "summary": [
+        {
+          "h": "SQL và môi trường",
+          "text": "SQL xuất phát từ mô hình quan hệ của Codd (1970) và System R của IBM; chuẩn ANSI đầu tiên năm 1986. DDL định nghĩa database (CREATE, ALTER, DROP, ràng buộc); DML thao tác và truy vấn (INSERT, UPDATE, DELETE, SELECT); DCL kiểm soát (GRANT, REVOKE, COMMIT). Catalog là tập các schema; schema chứa mô tả đối tượng do user tạo."
+        },
+        {
+          "h": "Tạo bảng và referential integrity",
+          "text": "7 bước: chọn data type, cột NOT NULL, cột UNIQUE, cặp PK–FK, giá trị DEFAULT, domain constraint (CHECK), tạo bảng và index. Hành động ON UPDATE/DELETE cho FK: RESTRICT, CASCADE, SET NULL, SET DEFAULT."
+        },
+        {
+          "h": "Thứ tự xử lý SELECT",
+          "text": "Thứ tự viết: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY. Thứ tự xử lý logic: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. WHERE lọc hàng trước khi gom nhóm (không chứa hàm tổng hợp); HAVING lọc nhóm sau GROUP BY. Với hàm tổng hợp, cột không tổng hợp trong SELECT phải có trong GROUP BY."
+        },
+        {
+          "h": "Độ ưu tiên toán tử Boolean",
+          "text": "NOT trước, rồi AND, rồi OR. Dùng ngoặc để thay đổi thứ tự."
+        },
+        {
+          "h": "View",
+          "text": "Dynamic view là bảng ảo, chỉ lưu định nghĩa SELECT. Materialized view lưu vật lý kết quả và cần refresh. WITH CHECK OPTION ngăn INSERT/UPDATE qua view tạo hàng không thỏa WHERE của view. Ưu điểm: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất, dữ liệu mới nhất, tốn ít chỗ, view tùy biến, physical data independence. Nhược điểm: tốn thời gian xử lý mỗi lần dùng; có thể không update được trực tiếp."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Chapter 06.pdf",
+          "loc": "Slides 1–48"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch06-c01",
+          "front": "Thứ tự xử lý logic của SELECT?",
+          "back": "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "id": "dbs-ch06-c02",
+          "front": "WHERE khác HAVING?",
+          "back": "WHERE lọc hàng trước khi nhóm và không chứa hàm tổng hợp; HAVING lọc nhóm sau GROUP BY.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slides 42–43"
+          }
+        },
+        {
+          "id": "dbs-ch06-c03",
+          "front": "Độ ưu tiên NOT, AND, OR?",
+          "back": "NOT trước, sau đó AND, cuối cùng OR; dùng ngoặc để đổi.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slides 36–39"
+          }
+        },
+        {
+          "id": "dbs-ch06-c04",
+          "front": "DDL, DML, DCL là gì?",
+          "back": "DDL định nghĩa cấu trúc (CREATE/ALTER/DROP); DML thao tác dữ liệu (INSERT/UPDATE/DELETE/SELECT); DCL kiểm soát quyền và commit (GRANT/REVOKE/COMMIT).",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slides 7–9"
+          }
+        },
+        {
+          "id": "dbs-ch06-c05",
+          "front": "Dynamic view khác materialized view?",
+          "back": "Dynamic view là bảng ảo, không lưu dữ liệu; materialized view lưu kết quả vật lý và cần làm mới định kỳ.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slides 44–45"
+          }
+        },
+        {
+          "id": "dbs-ch06-c06",
+          "front": "Bốn hành động ON DELETE/UPDATE cho FK?",
+          "back": "RESTRICT, CASCADE, SET NULL, SET DEFAULT.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slides 22–23"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch06-q01",
+          "stem": "Mệnh đề nào được thực thi đầu tiên về mặt logic trong SELECT?",
+          "options": [
+            "SELECT",
+            "WHERE",
+            "FROM",
+            "GROUP BY"
+          ],
+          "answer": 2,
+          "explanation": "Thứ tự logic bắt đầu từ FROM.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "id": "dbs-ch06-q02",
+          "stem": "Biểu thức ProductDescription LIKE '%Desk' OR ProductDescription LIKE '%Table' AND ProductStandardPrice > 300 (không ngoặc) trả về gì?",
+          "options": [
+            "Chỉ Desk và Table giá trên 300",
+            "Mọi Desk (mọi giá) cộng Table giá trên 300",
+            "Chỉ Table",
+            "Lỗi cú pháp"
+          ],
+          "answer": 1,
+          "explanation": "AND chạy trước OR nên kết quả là mọi Desk hợp với Table có giá trên 300.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slides 36–39"
+          }
+        },
+        {
+          "id": "dbs-ch06-q03",
+          "stem": "Dynamic view lưu gì trong database?",
+          "options": [
+            "Toàn bộ dữ liệu kết quả",
+            "Chỉ định nghĩa truy vấn SELECT",
+            "Một bản sao bảng gốc",
+            "Chỉ index"
+          ],
+          "answer": 1,
+          "explanation": "Dynamic view là virtual table, không lưu dữ liệu.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 44"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch07",
+      "order": 7,
+      "title": "Chương 7: Advanced SQL",
+      "summary": [
+        {
+          "h": "Các loại join",
+          "text": "Equi-join dựa trên so sánh bằng, cột chung xuất hiện hai lần. Natural join là equi-join loại bỏ cột trùng. Inner join chỉ giữ hàng khớp ở cả hai bảng. Outer join (LEFT/RIGHT/FULL) giữ cả hàng không khớp (điền NULL). Union join chứa mọi dữ liệu từ mỗi bảng. Self-join nối bảng với chính nó (quan hệ unary), cần alias. Nối N bảng cần N−1 điều kiện join."
+        },
+        {
+          "h": "Subquery",
+          "text": "Subquery là SELECT lồng trong WHERE, FROM (derived table) hoặc HAVING. Noncorrelated subquery không phụ thuộc truy vấn ngoài, chạy một lần. Correlated subquery tham chiếu bảng của truy vấn ngoài, chạy một lần cho mỗi hàng ngoài, thường dùng EXISTS. Derived table trong FROM giúp dùng kết quả tổng hợp trong WHERE."
+        },
+        {
+          "h": "UNION và CASE",
+          "text": "UNION gộp kết quả nhiều SELECT; số lượng và kiểu dữ liệu cột phải giống nhau (union-compatible). CASE WHEN ... THEN ... ELSE ... END là biểu thức điều kiện; còn có NULLIF, COALESCE."
+        },
+        {
+          "h": "Transaction",
+          "text": "Transaction là đơn vị công việc phải hoàn tất toàn bộ hoặc không gì cả. COMMIT làm cập nhật vĩnh viễn; ROLLBACK hủy mọi cập nhật kể từ COMMIT gần nhất."
+        },
+        {
+          "h": "Routine và trigger",
+          "text": "Function trả về giá trị và nhận tham số vào. Stored procedure không trả giá trị như biểu thức, nhận IN/OUT/IN OUT, gọi tường minh. Trigger là routine hướng sự kiện, chạy ngầm khi INSERT/UPDATE/DELETE (BEFORE/AFTER/INSTEAD OF)."
+        },
+        {
+          "h": "Hiệu quả truy vấn",
+          "text": "Tránh SELECT *, hạn chế subquery và self-join, lưu truy vấn phức tạp thành view hoặc bảng tạm, giữ thống kê optimizer cập nhật, dùng kiểu dữ liệu tương thích. Embedded SQL nằm cố định trong ngôn ngữ chủ; dynamic SQL được sinh và chạy lúc runtime."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Chapter 07.pdf",
+          "loc": "Slides 1–45"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch07-c01",
+          "front": "Equi-join, natural join, outer join khác nhau thế nào?",
+          "back": "Equi-join giữ cột trùng hai lần; natural join bỏ một cột trùng; outer join giữ thêm hàng không khớp (NULL).",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 3–16"
+          }
+        },
+        {
+          "id": "dbs-ch07-c02",
+          "front": "Correlated subquery khác noncorrelated?",
+          "back": "Correlated tham chiếu bảng của truy vấn ngoài và chạy một lần cho mỗi hàng ngoài (thường EXISTS); noncorrelated chạy một lần trước truy vấn ngoài.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 22–25"
+          }
+        },
+        {
+          "id": "dbs-ch07-c03",
+          "front": "Điều kiện để dùng UNION?",
+          "back": "Các SELECT phải có cùng số cột và kiểu dữ liệu tương thích.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 27–28"
+          }
+        },
+        {
+          "id": "dbs-ch07-c04",
+          "front": "Trigger khác stored procedure?",
+          "back": "Trigger chạy tự động theo sự kiện DML/DDL; stored procedure được gọi tường minh (EXEC/CALL).",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 39–43"
+          }
+        },
+        {
+          "id": "dbs-ch07-c05",
+          "front": "COMMIT và ROLLBACK?",
+          "back": "COMMIT làm mọi cập nhật trong transaction thành vĩnh viễn; ROLLBACK hủy cập nhật kể từ COMMIT cuối.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 36–37"
+          }
+        },
+        {
+          "id": "dbs-ch07-c06",
+          "front": "Vì sao dùng derived table trong FROM?",
+          "back": "Vì WHERE không chứa trực tiếp hàm tổng hợp; derived table cho phép dùng kết quả tổng hợp (ví dụ AVG) trong WHERE của truy vấn ngoài.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 26"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch07-q01",
+          "stem": "Nối 4 bảng bằng điều kiện bằng cần tối thiểu bao nhiêu điều kiện join?",
+          "options": [
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "answer": 1,
+          "explanation": "N bảng cần N−1 điều kiện join.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "id": "dbs-ch07-q02",
+          "stem": "Loại subquery nào thực thi một lần cho mỗi hàng của truy vấn ngoài?",
+          "options": [
+            "Noncorrelated",
+            "Correlated",
+            "Derived table",
+            "Scalar luôn luôn"
+          ],
+          "answer": 1,
+          "explanation": "Correlated subquery tham chiếu truy vấn ngoài nên chạy lặp theo từng hàng.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 22, 24–25"
+          }
+        },
+        {
+          "id": "dbs-ch07-q03",
+          "stem": "Routine chạy ngầm khi có INSERT/UPDATE/DELETE gọi là gì?",
+          "options": [
+            "Function",
+            "Stored procedure",
+            "Trigger",
+            "View"
+          ],
+          "answer": 2,
+          "explanation": "Trigger là routine hướng sự kiện, thực thi implicitly.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slides 39–43"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-ch08",
+      "order": 8,
+      "title": "Chương 8: Database Application Development",
+      "summary": [
+        {
+          "h": "Client/server và 3 thành phần logic",
+          "text": "Ba thành phần ứng dụng: Presentation logic (giao diện), Processing logic (xử lý I/O, business rules, quản lý dữ liệu), Storage logic (lưu và truy xuất, hoạt động DBMS). Fat client: client lo presentation và processing, server lo storage. Thin client: client chỉ lo presentation (ví dụ trình duyệt). Application partitioning là đặt các phần mã ở client hoặc server sau khi viết."
+        },
+        {
+          "h": "Two-tier và three-tier",
+          "text": "Two-tier: client lo presentation, data processing, business rules; database server lo lưu trữ và truy cập; phù hợp quy mô phòng ban, ít người dùng. Three-tier: client (thin) – application/web server (business rules, processing) – database server (storage). Lợi ích 3-tier: scalability, linh hoạt công nghệ, giảm chi phí dài hạn, phù hợp nghiệp vụ, cải thiện dịch vụ, lợi thế cạnh tranh, giảm rủi ro."
+        },
+        {
+          "h": "Middleware và API",
+          "text": "Middleware cho phép ứng dụng tương tác với phần mềm khác mà không phải lập trình thao tác cấp thấp. API phổ biến: ODBC, ADO.NET, JDBC. 6 bước dùng database qua API: đăng ký driver, mở kết nối, thực thi truy vấn, xử lý kết quả, lặp lại, đóng kết nối."
+        },
+        {
+          "h": "Stored procedure và connection pooling",
+          "text": "Stored procedure: hiệu năng tốt hơn (SQL biên dịch sẵn), giảm lưu lượng mạng, an toàn hơn, toàn vẹn hơn, client mỏng hơn; nhược điểm: lập trình tốn thời gian và cú pháp phụ thuộc nhà cung cấp. Connection pooling dùng chung và tái sử dụng kết nối."
+        },
+        {
+          "h": "Cloud, XML, Web services",
+          "text": "Cloud: IaaS, PaaS, SaaS. XML Schema (XSD) tương tự CREATE TABLE (metadata), tài liệu XML tương tự bản ghi. 4 cách lưu XML: shredding vào bảng quan hệ, lưu trong BLOB/CLOB, cột XML đặc biệt, native XML database. XPath định vị node; XQuery (FLWOR) truy vấn; XSLT chuyển XML sang HTML. Web services: UDDI (đăng ký/tìm), WSDL (mô tả), SOAP (trao đổi thông điệp), XML, Internet. SOA là tập dịch vụ liên kết lỏng."
+        }
+      ],
+      "sources": [
+        {
+          "file": "hoffer_mdm12e_pp_ch08.pdf",
+          "loc": "Slides 1–45"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-ch08-c01",
+          "front": "Fat client khác thin client?",
+          "back": "Fat client xử lý cả presentation và processing logic; thin client chỉ presentation (như trình duyệt), phần còn lại ở server.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "id": "dbs-ch08-c02",
+          "front": "Ba tầng của kiến trúc three-tier?",
+          "back": "Client (thin, presentation) – Business/Application layer (web + application server) – Database layer (database server).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slides 17–24"
+          }
+        },
+        {
+          "id": "dbs-ch08-c03",
+          "front": "6 bước dùng database qua middleware API?",
+          "back": "Đăng ký driver; mở kết nối; thực thi truy vấn; xử lý kết quả; lặp lại 3–4 nếu cần; đóng kết nối.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "id": "dbs-ch08-c04",
+          "front": "UDDI, WSDL, SOAP lần lượt làm gì?",
+          "back": "UDDI: đăng ký để publish/find/use service. WSDL: mô tả service và giao diện công khai. SOAP: giao thức XML để trao đổi thông điệp.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slides 40–41"
+          }
+        },
+        {
+          "id": "dbs-ch08-c05",
+          "front": "Bốn cách lưu tài liệu XML?",
+          "back": "Shredding vào bảng quan hệ; lưu trong BLOB/CLOB; cột XML đặc biệt; native XML database.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 35"
+          }
+        },
+        {
+          "id": "dbs-ch08-c06",
+          "front": "Ba loại cloud computing?",
+          "back": "IaaS, PaaS, SaaS.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 30"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-ch08-q01",
+          "stem": "Trong three-tier, business rules và processing logic thường nằm ở đâu?",
+          "options": [
+            "Client",
+            "Application/web server",
+            "Database server chỉ",
+            "Máy in"
+          ],
+          "answer": 1,
+          "explanation": "Tầng giữa (application server) xử lý business rules và processing logic.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slides 17–24"
+          }
+        },
+        {
+          "id": "dbs-ch08-q02",
+          "stem": "Chuẩn nào dùng XML để mô tả public interface của web service?",
+          "options": [
+            "UDDI",
+            "WSDL",
+            "SOAP",
+            "XPath"
+          ],
+          "answer": 1,
+          "explanation": "WSDL là ngữ pháp XML mô tả service.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slides 40–41"
+          }
+        },
+        {
+          "id": "dbs-ch08-q03",
+          "stem": "Một lợi ích của stored procedure là gì?",
+          "options": [
+            "Cú pháp giống nhau mọi DBMS",
+            "Giảm lưu lượng mạng và tăng hiệu năng",
+            "Không cần DBMS",
+            "Dễ viết hơn mọi mã khác"
+          ],
+          "answer": 1,
+          "explanation": "Slide nêu stored procedure giảm network traffic và cải thiện hiệu năng (SQL biên dịch sẵn).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 28"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-lab-ddl-dml",
+      "order": 9,
+      "title": "Lab 2–4: DDL, DML và SELECT cơ bản (themepark)",
+      "summary": [
+        {
+          "h": "CSDL THEMEPARK",
+          "text": "Bảy bảng: THEMEPARK(PARK_CODE PK, PARK_NAME, PARK_CITY, PARK_COUNTRY), EMPLOYEE, TICKET, ATTRACTION, HOURS (PK ghép EMP_NUM, ATTRACT_NO, DATE_WORKED), SALES, SALES_LINE (PK ghép TRANSACTION_NO, LINE_NO; FK tới SALES ON DELETE CASCADE)."
+        },
+        {
+          "h": "Ràng buộc trong MySQL (Lab 2)",
+          "text": "DEFAULT phải là hằng số. FOREIGN KEY cần engine InnoDB, cột được đánh index và cùng kiểu dữ liệu. Tài liệu lab ghi MySQL 5.0 không hỗ trợ CHECK. Xóa bảng theo thứ tự ngược phụ thuộc.",
+          "code": {
+            "lang": "sql",
+            "text": "CREATE DATABASE themepark;\nUSE themepark;\nCREATE TABLE THEMEPARK (\n  PARK_CODE VARCHAR(10) PRIMARY KEY,\n  PARK_NAME VARCHAR(35) NOT NULL,\n  PARK_CITY VARCHAR(50) NOT NULL,\n  PARK_COUNTRY CHAR(2) NOT NULL\n);\nCREATE INDEX EMP_LNAME_INDEX ON EMPLOYEE(EMP_LNAME(8));\nALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);\nDROP TABLE SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK;"
+          }
+        },
+        {
+          "h": "DML (Lab 3)",
+          "text": "INSERT theo thứ tự thỏa referential integrity (bảng cha trước). UPDATE không có WHERE sẽ cập nhật mọi hàng. Dùng SET AUTOCOMMIT = 0 và ROLLBACK để khôi phục. INSERT ... SELECT chép dữ liệu từ bảng khác.",
+          "code": {
+            "lang": "sql",
+            "text": "UPDATE ATTRACTION SET ATTRACT_AGE = 14;  -- thiếu WHERE: sửa mọi hàng\nSET AUTOCOMMIT = 0;\nROLLBACK;\nDELETE FROM PARK_COPY WHERE PARK_CODE = 'RL1';\nINSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;"
+          }
+        },
+        {
+          "h": "SELECT cơ bản (Lab 4)",
+          "text": "Toán tử số học và alias; so sánh (=, <, <=, >, >=, <>, !=); BETWEEN, IN, LIKE với % và _, IS NULL. Độ ưu tiên NOT > AND > OR.",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT TICKET_NO, ROUND(TICKET_PRICE * 0.1, 2) AS Discount FROM TICKET;\nSELECT * FROM EMPLOYEE WHERE EMP_FNAME LIKE '%n_';\nSELECT * FROM SECTION WHERE SECTIONNO BETWEEN 2713 AND 2717;"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "file": "TUT06 DDL basic_building themeparkDB.pdf",
+          "loc": "Lab 2 (20 trang)"
+        },
+        {
+          "file": "Tut9_DML and select statement.pdf",
+          "loc": "Lab 3–4 (27 trang)"
+        },
+        {
+          "file": "Basic select statement.sql",
+          "loc": "dòng 1–57"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-lab1-c01",
+          "front": "UPDATE không có WHERE thì sao?",
+          "back": "Cập nhật mọi hàng trong bảng (ví dụ UPDATE ATTRACTION SET ATTRACT_AGE = 14 đổi tuổi mọi attraction).",
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Lab 3, mục 3.3"
+          }
+        },
+        {
+          "id": "dbs-lab1-c02",
+          "front": "Điều kiện để tạo FOREIGN KEY trong MySQL theo Lab 2?",
+          "back": "Engine InnoDB, cột FK được đánh index, hai cột cùng kiểu dữ liệu.",
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Mục 2.4"
+          }
+        },
+        {
+          "id": "dbs-lab1-c03",
+          "front": "Vì sao phải DROP TABLE theo thứ tự ngược phụ thuộc?",
+          "back": "Bảng con (có FK) phải xóa trước bảng cha: SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK.",
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Mục 2.5"
+          }
+        },
+        {
+          "id": "dbs-lab1-c04",
+          "front": "Lệnh sửa kiểu cột ATTRACT_CAPACITY thành NUMERIC(4)?",
+          "back": "ALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);",
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Mục 2.8"
+          }
+        },
+        {
+          "id": "dbs-lab1-c05",
+          "front": "Cách chép dữ liệu EMPLOYEE sang EMP_COPY?",
+          "back": "INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;",
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Lab 3, mục 3.6"
+          }
+        },
+        {
+          "id": "dbs-lab1-c06",
+          "front": "Khôi phục dữ liệu sau khi thử UPDATE/DELETE?",
+          "back": "SET AUTOCOMMIT = 0; thao tác; rồi ROLLBACK;",
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Lab 3, mục 3.4"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-lab1-q01",
+          "stem": "Trong Lab 3, lệnh nào đổi ATTRACT_AGE của mọi attraction thành 14?",
+          "options": [
+            "UPDATE ATTRACTION SET ATTRACT_AGE = 14;",
+            "ALTER TABLE ATTRACTION SET ATTRACT_AGE = 14;",
+            "INSERT INTO ATTRACTION VALUES (14);",
+            "SELECT 14 FROM ATTRACTION;"
+          ],
+          "answer": 0,
+          "explanation": "UPDATE không WHERE tác động lên mọi hàng.",
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Lab 3, mục 3.3"
+          }
+        },
+        {
+          "id": "dbs-lab1-q02",
+          "stem": "Điều kiện nào KHÔNG thuộc yêu cầu tạo FOREIGN KEY trong MySQL (Lab 2)?",
+          "options": [
+            "Dùng engine InnoDB",
+            "Cột FK được index",
+            "Hai cột cùng kiểu dữ liệu",
+            "Bảng phải có CHECK constraint"
+          ],
+          "answer": 3,
+          "explanation": "Lab 2 nêu InnoDB, index và cùng kiểu; không yêu cầu CHECK.",
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Mục 2.4"
+          }
+        },
+        {
+          "id": "dbs-lab1-q03",
+          "stem": "SELECT * FROM employee WHERE emp_fname LIKE '%n_' khớp tên nào?",
+          "options": [
+            "Tên kết thúc bằng n",
+            "Tên có chữ n là ký tự kế cuối",
+            "Tên bắt đầu bằng n",
+            "Tên có đúng 2 ký tự"
+          ],
+          "answer": 1,
+          "explanation": "% khớp chuỗi bất kỳ, _ khớp đúng một ký tự, nên n là ký tự áp chót.",
+          "source": {
+            "file": "Basic select statement.sql",
+            "loc": "dòng 24"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-lab-adv",
+      "order": 10,
+      "title": "Lab 5–8: Aggregate, Join, Functions và Subquery",
+      "summary": [
+        {
+          "h": "Aggregate, GROUP BY, HAVING (Lab 5)",
+          "text": "COUNT(*) đếm mọi hàng, COUNT(cột) bỏ qua NULL, COUNT(DISTINCT cột) đếm giá trị khác nhau. ORDER BY ASC/DESC, có thể nhiều cột.",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT park_code, COUNT(*) AS 'Total attractions'\nFROM attraction\nWHERE park_code LIKE 'UK%'\nGROUP BY park_code\nHAVING COUNT(*) > 3\nORDER BY park_code DESC;"
+          }
+        },
+        {
+          "h": "Joins (Lab 6)",
+          "text": "Join kiểu cũ: FROM T1, T2 WHERE T1.col = T2.col; N bảng cần N−1 điều kiện. CROSS JOIN là tích Descartes (19 × 31 = 589 hàng trong ví dụ). NATURAL JOIN và JOIN ... USING không cần qualifier cho cột chung; JOIN ... ON cần qualifier. LEFT/RIGHT JOIN giữ hàng không khớp.",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT * FROM attraction INNER JOIN themepark\n  ON attraction.park_code = themepark.park_code;\nSELECT * FROM attraction NATURAL JOIN themepark;\nSELECT * FROM themepark LEFT JOIN attraction\n  ON attraction.park_code = themepark.park_code;"
+          }
+        },
+        {
+          "h": "SQL functions (Lab 7)",
+          "text": "Ngày giờ: DATE_FORMAT, CURDATE, CURTIME, DAYOFMONTH, MONTH, YEAR, DATEDIFF, DATE_ADD/ADDDATE, DATE_SUB, LAST_DAY. Số: ABS, ROUND, TRUNCATE, MOD. Chuỗi: CONCAT, UPPER, LOWER, SUBSTR, LENGTH. Chuyển đổi/điều kiện: CAST, CONVERT, IFNULL (tương đương NVL của Oracle), CASE.",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT IFNULL(EMP_HIRE_DATE, 'N/A') FROM EMPLOYEE;\nSELECT CASE WHEN TICKET_PRICE > 30 THEN 'High' ELSE 'Low' END FROM TICKET;"
+          }
+        },
+        {
+          "h": "Subquery (Lab 8)",
+          "text": "Subquery trả về giá trị vô hướng, danh sách giá trị hoặc bảng ảo. Gồm scalar subquery với toán tử so sánh, IN, HAVING subquery, toán tử ALL, inline subquery trong SELECT, correlated subquery với EXISTS / NOT EXISTS.",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT * FROM ticket\nWHERE ticket_price = (SELECT MIN(ticket_price) FROM ticket);\nSELECT * FROM employee\nWHERE emp_num IN (SELECT DISTINCT emp_num FROM hours WHERE hour_rate > 6);"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "file": "MySQL Lab 5-6.pdf",
+          "loc": "Lab 5–6 (27 trang)"
+        },
+        {
+          "file": "Lab 7 - 8.pdf",
+          "loc": "Lab 7–8 (33 trang)"
+        },
+        {
+          "file": "Advanced SQL and Join 10.10.sql",
+          "loc": "dòng 1–78"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-lab2-c01",
+          "front": "COUNT(*), COUNT(cột), COUNT(DISTINCT cột) khác gì?",
+          "back": "COUNT(*) đếm mọi hàng; COUNT(cột) bỏ qua NULL; COUNT(DISTINCT cột) đếm giá trị khác nhau.",
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Lab 5, mục 5.3"
+          }
+        },
+        {
+          "id": "dbs-lab2-c02",
+          "front": "CROSS JOIN trả về gì?",
+          "back": "Tích Descartes của hai bảng (ví dụ 19 × 31 = 589 hàng).",
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Lab 6, mục 6.3"
+          }
+        },
+        {
+          "id": "dbs-lab2-c03",
+          "front": "NATURAL JOIN, JOIN USING, JOIN ON khác nhau ở qualifier thế nào?",
+          "back": "NATURAL JOIN và USING không cần qualifier cho cột chung; JOIN ON cần qualifier cho cột chung.",
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Lab 6, mục 6.4–6.6"
+          }
+        },
+        {
+          "id": "dbs-lab2-c04",
+          "front": "IFNULL trong MySQL tương đương hàm nào của Oracle?",
+          "back": "NVL.",
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Lab 7, mục 7.4"
+          }
+        },
+        {
+          "id": "dbs-lab2-c05",
+          "front": "Ba dạng kết quả của subquery?",
+          "back": "Giá trị vô hướng; danh sách giá trị (1 cột nhiều hàng); bảng ảo (nhiều cột nhiều hàng).",
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Lab 8, đầu mục"
+          }
+        },
+        {
+          "id": "dbs-lab2-c06",
+          "front": "Vì sao HAVING dùng cho điều kiện COUNT(*) > 3?",
+          "back": "Vì điều kiện trên nhóm sau GROUP BY; WHERE lọc hàng trước khi nhóm nên không dùng được hàm tổng hợp.",
+          "source": {
+            "file": "Advanced SQL and Join 10.10.sql",
+            "loc": "dòng 25–37"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-lab2-q01",
+          "stem": "Ba cách viết INNER JOIN attraction và themepark theo file Advanced SQL gồm?",
+          "options": [
+            "WHERE, INNER JOIN ... ON, NATURAL JOIN",
+            "UNION, INTERSECT, EXCEPT",
+            "LEFT, RIGHT, FULL",
+            "CASE, IF, IFNULL"
+          ],
+          "answer": 0,
+          "explanation": "Script nêu 3 cách: điều kiện trong WHERE, INNER JOIN ... ON, NATURAL JOIN.",
+          "source": {
+            "file": "Advanced SQL and Join 10.10.sql",
+            "loc": "dòng 39–47"
+          }
+        },
+        {
+          "id": "dbs-lab2-q02",
+          "stem": "Mệnh đề nào dùng để lọc theo COUNT(*) sau khi GROUP BY?",
+          "options": [
+            "WHERE",
+            "HAVING",
+            "ORDER BY",
+            "LIMIT"
+          ],
+          "answer": 1,
+          "explanation": "HAVING lọc nhóm sau GROUP BY.",
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Lab 5, mục GROUP BY/HAVING"
+          }
+        },
+        {
+          "id": "dbs-lab2-q03",
+          "stem": "Subquery trả về một cột nhiều hàng thường dùng với toán tử nào?",
+          "options": [
+            "=",
+            "IN",
+            "+",
+            "BETWEEN"
+          ],
+          "answer": 1,
+          "explanation": "Danh sách giá trị dùng với IN (hoặc ALL/ANY).",
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Lab 8, mục 8.2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dbs-view-proc",
+      "order": 11,
+      "title": "Subquery, View, Stored Procedure và Trigger (slide)",
+      "summary": [
+        {
+          "h": "View",
+          "text": "View là bảng ảo tạo động khi được yêu cầu, không lưu dữ liệu, giúp kiểm soát truy cập. Ưu điểm: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất lập trình, dữ liệu mới nhất, ít tốn chỗ, view tùy biến, physical data independence. Nhược điểm: tốn thời gian xử lý mỗi lần tham chiếu, có thể không update được trực tiếp.",
+          "code": {
+            "lang": "sql",
+            "text": "CREATE VIEW display_employee AS\nSELECT * FROM employee NATURAL JOIN themepark;\nSELECT * FROM display_employee;"
+          }
+        },
+        {
+          "h": "Stored procedure",
+          "text": "Tập lệnh SQL lưu trên server, hữu ích khi nhiều ứng dụng khác ngôn ngữ/nền tảng cùng thực hiện một thao tác, hoặc khi cần bảo mật/ghi log. Lợi ích: giảm lưu lượng mạng, dễ bảo trì (tái sử dụng), an toàn (cấp quyền EXECUTE không cần quyền trực tiếp trên bảng, giúp ngăn SQL injection).",
+          "code": {
+            "lang": "sql",
+            "text": "DELIMITER //\nCREATE PROCEDURE get_average_quantity(OUT average INT)\nBEGIN\n  SELECT AVG(line_qty) INTO average FROM sales_line;\nEND //\nDELIMITER ;\nCALL get_average_quantity(@average);\nSELECT @average, sales_line.* FROM sales_line WHERE line_qty < @average;"
+          }
+        },
+        {
+          "h": "Trigger",
+          "text": "Trigger tự động chạy khi có sự kiện; ví dụ ghi log sau khi thêm student.",
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TRIGGER myTrigger\nAFTER INSERT ON student\nFOR EACH ROW\nBEGIN\n  INSERT INTO student_log VALUES (new.id, 'add', now());\nEND"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "file": "Subquerries, view and stored procedures.pdf",
+          "loc": "Slides 1–17"
+        }
+      ],
+      "cards": [
+        {
+          "id": "dbs-vp-c01",
+          "front": "Base table khác dynamic view?",
+          "back": "Base table chứa dữ liệu thật; dynamic view là bảng ảo tạo động, không lưu dữ liệu.",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "id": "dbs-vp-c02",
+          "front": "Hai nhược điểm của view?",
+          "back": "Tốn thời gian xử lý mỗi lần tham chiếu; có thể không update trực tiếp được.",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "id": "dbs-vp-c03",
+          "front": "Khi nào nên dùng stored procedure?",
+          "back": "Khi nhiều ứng dụng ở các ngôn ngữ/nền tảng khác nhau thực hiện cùng thao tác CSDL, hoặc khi bảo mật và ghi log là ưu tiên.",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "id": "dbs-vp-c04",
+          "front": "Ba lợi ích của stored procedure?",
+          "back": "Giảm lưu lượng mạng; dễ bảo trì (tái sử dụng); an toàn (cấp EXECUTE không cần quyền bảng, giúp ngăn SQL injection).",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "id": "dbs-vp-c05",
+          "front": "Cú pháp bọc procedure trong MySQL?",
+          "back": "DELIMITER // ... CREATE PROCEDURE name (IN/OUT params) BEGIN ... END // ... DELIMITER ;",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 13"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "dbs-vp-q01",
+          "stem": "Lệnh nào gọi procedure có tham số OUT 'average' và đọc kết quả?",
+          "options": [
+            "CALL get_average_quantity(@average); SELECT @average;",
+            "EXEC average;",
+            "SELECT get_average_quantity;",
+            "RUN get_average_quantity;"
+          ],
+          "answer": 0,
+          "explanation": "Slide 15 gọi bằng CALL với biến session @average rồi dùng @average trong SELECT.",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "id": "dbs-vp-q02",
+          "stem": "Phát biểu nào về view đúng theo slide?",
+          "options": [
+            "View lưu bản sao dữ liệu",
+            "View là virtual table tạo động, không lưu dữ liệu",
+            "View luôn update được",
+            "View không giúp bảo mật"
+          ],
+          "answer": 1,
+          "explanation": "Slide 7: dynamic view là virtual table, không lưu dữ liệu.",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "id": "dbs-vp-q03",
+          "stem": "Trigger myTrigger trong slide kích hoạt khi nào?",
+          "options": [
+            "Sau khi insert vào student",
+            "Trước khi xóa student",
+            "Khi tạo view",
+            "Khi gọi CALL"
+          ],
+          "answer": 0,
+          "explanation": "AFTER INSERT ON student FOR EACH ROW.",
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 17"
+          }
+        }
+      ]
+    }
+  ]
+}

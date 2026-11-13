@@ -1,0 +1,26 @@
+{
+  "id": "dbs-ch07", "order": 7,
+  "title": "Chương 7: Advanced SQL",
+  "summary": [
+    { "h": "Các loại join", "text": "Equi-join dựa trên so sánh bằng, cột chung xuất hiện hai lần. Natural join là equi-join loại bỏ cột trùng. Inner join chỉ giữ hàng khớp ở cả hai bảng. Outer join (LEFT/RIGHT/FULL) giữ cả hàng không khớp (điền NULL). Union join chứa mọi dữ liệu từ mỗi bảng. Self-join nối bảng với chính nó (quan hệ unary), cần alias. Nối N bảng cần N−1 điều kiện join." },
+    { "h": "Subquery", "text": "Subquery là SELECT lồng trong WHERE, FROM (derived table) hoặc HAVING. Noncorrelated subquery không phụ thuộc truy vấn ngoài, chạy một lần. Correlated subquery tham chiếu bảng của truy vấn ngoài, chạy một lần cho mỗi hàng ngoài, thường dùng EXISTS. Derived table trong FROM giúp dùng kết quả tổng hợp trong WHERE." },
+    { "h": "UNION và CASE", "text": "UNION gộp kết quả nhiều SELECT; số lượng và kiểu dữ liệu cột phải giống nhau (union-compatible). CASE WHEN ... THEN ... ELSE ... END là biểu thức điều kiện; còn có NULLIF, COALESCE." },
+    { "h": "Transaction", "text": "Transaction là đơn vị công việc phải hoàn tất toàn bộ hoặc không gì cả. COMMIT làm cập nhật vĩnh viễn; ROLLBACK hủy mọi cập nhật kể từ COMMIT gần nhất." },
+    { "h": "Routine và trigger", "text": "Function trả về giá trị và nhận tham số vào. Stored procedure không trả giá trị như biểu thức, nhận IN/OUT/IN OUT, gọi tường minh. Trigger là routine hướng sự kiện, chạy ngầm khi INSERT/UPDATE/DELETE (BEFORE/AFTER/INSTEAD OF)." },
+    { "h": "Hiệu quả truy vấn", "text": "Tránh SELECT *, hạn chế subquery và self-join, lưu truy vấn phức tạp thành view hoặc bảng tạm, giữ thống kê optimizer cập nhật, dùng kiểu dữ liệu tương thích. Embedded SQL nằm cố định trong ngôn ngữ chủ; dynamic SQL được sinh và chạy lúc runtime." }
+  ],
+  "sources": [{ "file": "Chapter 07.pdf", "loc": "Slides 1–45" }],
+  "cards": [
+    { "id": "dbs-ch07-c01", "front": "Equi-join, natural join, outer join khác nhau thế nào?", "back": "Equi-join giữ cột trùng hai lần; natural join bỏ một cột trùng; outer join giữ thêm hàng không khớp (NULL).", "source": { "file": "Chapter 07.pdf", "loc": "Slides 3–16" } },
+    { "id": "dbs-ch07-c02", "front": "Correlated subquery khác noncorrelated?", "back": "Correlated tham chiếu bảng của truy vấn ngoài và chạy một lần cho mỗi hàng ngoài (thường EXISTS); noncorrelated chạy một lần trước truy vấn ngoài.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 22–25" } },
+    { "id": "dbs-ch07-c03", "front": "Điều kiện để dùng UNION?", "back": "Các SELECT phải có cùng số cột và kiểu dữ liệu tương thích.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 27–28" } },
+    { "id": "dbs-ch07-c04", "front": "Trigger khác stored procedure?", "back": "Trigger chạy tự động theo sự kiện DML/DDL; stored procedure được gọi tường minh (EXEC/CALL).", "source": { "file": "Chapter 07.pdf", "loc": "Slides 39–43" } },
+    { "id": "dbs-ch07-c05", "front": "COMMIT và ROLLBACK?", "back": "COMMIT làm mọi cập nhật trong transaction thành vĩnh viễn; ROLLBACK hủy cập nhật kể từ COMMIT cuối.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 36–37" } },
+    { "id": "dbs-ch07-c06", "front": "Vì sao dùng derived table trong FROM?", "back": "Vì WHERE không chứa trực tiếp hàm tổng hợp; derived table cho phép dùng kết quả tổng hợp (ví dụ AVG) trong WHERE của truy vấn ngoài.", "source": { "file": "Chapter 07.pdf", "loc": "Slide 26" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch07-q01", "stem": "Nối 4 bảng bằng điều kiện bằng cần tối thiểu bao nhiêu điều kiện join?", "options": ["2", "3", "4", "5"], "answer": 1, "explanation": "N bảng cần N−1 điều kiện join.", "source": { "file": "Chapter 07.pdf", "loc": "Slide 13" } },
+    { "id": "dbs-ch07-q02", "stem": "Loại subquery nào thực thi một lần cho mỗi hàng của truy vấn ngoài?", "options": ["Noncorrelated", "Correlated", "Derived table", "Scalar luôn luôn"], "answer": 1, "explanation": "Correlated subquery tham chiếu truy vấn ngoài nên chạy lặp theo từng hàng.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 22, 24–25" } },
+    { "id": "dbs-ch07-q03", "stem": "Routine chạy ngầm khi có INSERT/UPDATE/DELETE gọi là gì?", "options": ["Function", "Stored procedure", "Trigger", "View"], "answer": 2, "explanation": "Trigger là routine hướng sự kiện, thực thi implicitly.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 39–43" } }
+  ]
+}

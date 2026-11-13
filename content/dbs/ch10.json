@@ -1,0 +1,28 @@
+{
+  "id": "dbs-lab-adv", "order": 10,
+  "title": "Lab 5–8: Aggregate, Join, Functions và Subquery",
+  "summary": [
+    { "h": "Aggregate, GROUP BY, HAVING (Lab 5)", "text": "COUNT(*) đếm mọi hàng, COUNT(cột) bỏ qua NULL, COUNT(DISTINCT cột) đếm giá trị khác nhau. ORDER BY ASC/DESC, có thể nhiều cột.", "code": { "lang": "sql", "text": "SELECT park_code, COUNT(*) AS 'Total attractions'\nFROM attraction\nWHERE park_code LIKE 'UK%'\nGROUP BY park_code\nHAVING COUNT(*) > 3\nORDER BY park_code DESC;" } },
+    { "h": "Joins (Lab 6)", "text": "Join kiểu cũ: FROM T1, T2 WHERE T1.col = T2.col; N bảng cần N−1 điều kiện. CROSS JOIN là tích Descartes (19 × 31 = 589 hàng trong ví dụ). NATURAL JOIN và JOIN ... USING không cần qualifier cho cột chung; JOIN ... ON cần qualifier. LEFT/RIGHT JOIN giữ hàng không khớp.", "code": { "lang": "sql", "text": "SELECT * FROM attraction INNER JOIN themepark\n  ON attraction.park_code = themepark.park_code;\nSELECT * FROM attraction NATURAL JOIN themepark;\nSELECT * FROM themepark LEFT JOIN attraction\n  ON attraction.park_code = themepark.park_code;" } },
+    { "h": "SQL functions (Lab 7)", "text": "Ngày giờ: DATE_FORMAT, CURDATE, CURTIME, DAYOFMONTH, MONTH, YEAR, DATEDIFF, DATE_ADD/ADDDATE, DATE_SUB, LAST_DAY. Số: ABS, ROUND, TRUNCATE, MOD. Chuỗi: CONCAT, UPPER, LOWER, SUBSTR, LENGTH. Chuyển đổi/điều kiện: CAST, CONVERT, IFNULL (tương đương NVL của Oracle), CASE.", "code": { "lang": "sql", "text": "SELECT IFNULL(EMP_HIRE_DATE, 'N/A') FROM EMPLOYEE;\nSELECT CASE WHEN TICKET_PRICE > 30 THEN 'High' ELSE 'Low' END FROM TICKET;" } },
+    { "h": "Subquery (Lab 8)", "text": "Subquery trả về giá trị vô hướng, danh sách giá trị hoặc bảng ảo. Gồm scalar subquery với toán tử so sánh, IN, HAVING subquery, toán tử ALL, inline subquery trong SELECT, correlated subquery với EXISTS / NOT EXISTS.", "code": { "lang": "sql", "text": "SELECT * FROM ticket\nWHERE ticket_price = (SELECT MIN(ticket_price) FROM ticket);\nSELECT * FROM employee\nWHERE emp_num IN (SELECT DISTINCT emp_num FROM hours WHERE hour_rate > 6);" } }
+  ],
+  "sources": [
+    { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 5–6 (27 trang)" },
+    { "file": "Lab 7 - 8.pdf", "loc": "Lab 7–8 (33 trang)" },
+    { "file": "Advanced SQL and Join 10.10.sql", "loc": "dòng 1–78" }
+  ],
+  "cards": [
+    { "id": "dbs-lab2-c01", "front": "COUNT(*), COUNT(cột), COUNT(DISTINCT cột) khác gì?", "back": "COUNT(*) đếm mọi hàng; COUNT(cột) bỏ qua NULL; COUNT(DISTINCT cột) đếm giá trị khác nhau.", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 5, mục 5.3" } },
+    { "id": "dbs-lab2-c02", "front": "CROSS JOIN trả về gì?", "back": "Tích Descartes của hai bảng (ví dụ 19 × 31 = 589 hàng).", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 6, mục 6.3" } },
+    { "id": "dbs-lab2-c03", "front": "NATURAL JOIN, JOIN USING, JOIN ON khác nhau ở qualifier thế nào?", "back": "NATURAL JOIN và USING không cần qualifier cho cột chung; JOIN ON cần qualifier cho cột chung.", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 6, mục 6.4–6.6" } },
+    { "id": "dbs-lab2-c04", "front": "IFNULL trong MySQL tương đương hàm nào của Oracle?", "back": "NVL.", "source": { "file": "Lab 7 - 8.pdf", "loc": "Lab 7, mục 7.4" } },
+    { "id": "dbs-lab2-c05", "front": "Ba dạng kết quả của subquery?", "back": "Giá trị vô hướng; danh sách giá trị (1 cột nhiều hàng); bảng ảo (nhiều cột nhiều hàng).", "source": { "file": "Lab 7 - 8.pdf", "loc": "Lab 8, đầu mục" } },
+    { "id": "dbs-lab2-c06", "front": "Vì sao HAVING dùng cho điều kiện COUNT(*) > 3?", "back": "Vì điều kiện trên nhóm sau GROUP BY; WHERE lọc hàng trước khi nhóm nên không dùng được hàm tổng hợp.", "source": { "file": "Advanced SQL and Join 10.10.sql", "loc": "dòng 25–37" } }
+  ],
+  "questions": [
+    { "id": "dbs-lab2-q01", "stem": "Ba cách viết INNER JOIN attraction và themepark theo file Advanced SQL gồm?", "options": ["WHERE, INNER JOIN ... ON, NATURAL JOIN", "UNION, INTERSECT, EXCEPT", "LEFT, RIGHT, FULL", "CASE, IF, IFNULL"], "answer": 0, "explanation": "Script nêu 3 cách: điều kiện trong WHERE, INNER JOIN ... ON, NATURAL JOIN.", "source": { "file": "Advanced SQL and Join 10.10.sql", "loc": "dòng 39–47" } },
+    { "id": "dbs-lab2-q02", "stem": "Mệnh đề nào dùng để lọc theo COUNT(*) sau khi GROUP BY?", "options": ["WHERE", "HAVING", "ORDER BY", "LIMIT"], "answer": 1, "explanation": "HAVING lọc nhóm sau GROUP BY.", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 5, mục GROUP BY/HAVING" } },
+    { "id": "dbs-lab2-q03", "stem": "Subquery trả về một cột nhiều hàng thường dùng với toán tử nào?", "options": ["=", "IN", "+", "BETWEEN"], "answer": 1, "explanation": "Danh sách giá trị dùng với IN (hoặc ALL/ANY).", "source": { "file": "Lab 7 - 8.pdf", "loc": "Lab 8, mục 8.2" } }
+  ]
+}

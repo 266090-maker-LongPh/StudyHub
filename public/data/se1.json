@@ -1,0 +1,1574 @@
+{
+  "subject": "se1",
+  "name": "SE1-2026",
+  "chapters": [
+    {
+      "id": "se1-l01",
+      "order": 1,
+      "title": "Lecture 1: Review of OOP",
+      "summary": [
+        {
+          "h": "Procedural vs OOP",
+          "text": "Procedural programming dùng danh sách thủ tục để chỉ máy làm từng bước; OOP dùng tập đối tượng tương tác với nhau. Thêm hình Amoeba (phát .mp3, xoay quanh một đầu) vào code thủ tục phải sửa và test lại các thủ tục cũ; trong OOP chỉ thêm/sửa lớp Amoeba. Lợi ích OOP: dữ liệu an toàn hơn, dễ bảo trì, dễ mở rộng, tái sử dụng qua inheritance và polymorphism."
+        },
+        {
+          "h": "Encapsulation",
+          "text": "Giữ instance variable ẩn (thường private) và cung cấp accessor public set<Property>/get<Property>; khi yêu cầu đổi (ví dụ size > 0) chỉ cần sửa setSize()."
+        },
+        {
+          "h": "Inheritance và type hierarchy",
+          "text": "Đưa thuộc tính chung (address, name, phone) của Programmer và Manager lên superclass Employee. Lợi ích: lớp nhỏ gọn, dễ sửa thuộc tính chung, mở rộng, tái sử dụng, loại trùng lặp. Một subtype có thể kế thừa nhiều supertype nhưng chỉ một supertype là class, còn lại là interface. IS-A dựa trên inheritance/interface (Horse IS-A Animal); HAS-A dựa trên composition (Horse HAS-A Hat)."
+        },
+        {
+          "h": "Polymorphism và reference variable",
+          "text": "Polymorphism là nhiều dạng: một đối tượng có hành vi khác nhau tùy ngữ cảnh. Kiểu khai báo của reference variable quyết định method gọi được lúc compile; biến có thể trỏ tới đối tượng cùng kiểu hoặc bất kỳ subtype. Dynamic method dispatching chọn cài đặt theo kiểu thực tế (runtime type) của đối tượng khi method bị override."
+        },
+        {
+          "h": "Liskov Substitution Principle",
+          "text": "Đối tượng của superclass có thể được thay bằng đối tượng của subclass mà không làm sai chương trình. Ba quy tắc: Signature rule (subtype có đủ method của supertype; kiểu trả về cùng hoặc là subtype; ném ít exception hơn hoặc hẹp hơn); Methods rule (subtype có thể làm yếu precondition và làm mạnh postcondition); Properties rule (subtype phải bảo toàn các invariant của supertype)."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 1.pdf",
+          "loc": "Slides 1–36"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l01-c01",
+          "front": "Lợi ích của OOP so với procedural?",
+          "back": "Dữ liệu an toàn hơn, dễ bảo trì, dễ mở rộng, tái sử dụng code qua inheritance và polymorphism.",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "id": "se1-l01-c02",
+          "front": "IS-A và HAS-A khác nhau thế nào?",
+          "back": "IS-A dựa trên inheritance hoặc cài đặt interface (Horse IS-A Animal). HAS-A dựa trên sử dụng/composition (Horse HAS-A Hat).",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "id": "se1-l01-c03",
+          "front": "Dynamic method dispatching là gì?",
+          "back": "Cơ chế runtime chọn phiên bản method bị override theo kiểu thực tế (runtime type) của đối tượng, không theo kiểu khai báo.",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "id": "se1-l01-c04",
+          "front": "Ba quy tắc của Liskov Substitution Principle?",
+          "back": "Signature rule, Methods rule (làm yếu precondition, làm mạnh postcondition), Properties rule (bảo toàn invariant).",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slides 30–33"
+          }
+        },
+        {
+          "id": "se1-l01-c05",
+          "front": "Subtype có thể có bao nhiêu supertype là class?",
+          "back": "Nhiều supertype nhưng chỉ một là class, các supertype còn lại phải là interface.",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 22"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l01-q01",
+          "stem": "Theo Signature rule của LSP, method override ở subtype phải thế nào về exception?",
+          "options": [
+            "Ném nhiều exception hơn",
+            "Ném ít (hoặc hẹp hơn) exception so với supertype",
+            "Không được ném exception",
+            "Tùy ý"
+          ],
+          "answer": 1,
+          "explanation": "Slide 31: exception được ném phải ít hơn (hoặc hẹp hơn) method của supertype.",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 31"
+          }
+        },
+        {
+          "id": "se1-l01-q02",
+          "stem": "Methods rule cho phép subtype method làm gì với precondition và postcondition?",
+          "options": [
+            "Làm mạnh precondition, làm yếu postcondition",
+            "Làm yếu precondition, làm mạnh postcondition",
+            "Giữ nguyên cả hai bắt buộc",
+            "Bỏ cả hai"
+          ],
+          "answer": 1,
+          "explanation": "Slide 32: weaken precondition và strengthen postcondition.",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "id": "se1-l01-q03",
+          "stem": "Method nào được gọi khi Animal a = new Horse(); a.eat() và Horse override eat()?",
+          "options": [
+            "Animal.eat() vì kiểu khai báo",
+            "Horse.eat() vì kiểu runtime",
+            "Lỗi biên dịch",
+            "Cả hai"
+          ],
+          "answer": 1,
+          "explanation": "Dynamic dispatch chọn theo actual (runtime) type.",
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 34"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l02",
+      "order": 2,
+      "title": "Lecture 2: Exceptions",
+      "summary": [
+        {
+          "h": "Robust procedure",
+          "text": "Thủ tục robust hành xử xác định khi có lỗi, không dừng đột ngột, đưa ra xấp xỉ hành vi bình thường. Hai giải pháp cho input không hợp lệ: trả về giá trị đặc biệt (hạn chế: không mang chi tiết lỗi, một số thủ tục như boolean isSorted(int[]) không có giá trị đặc biệt, caller có thể bỏ qua, cần kiểm tra thêm) hoặc phát tín hiệu (exception): không cần giá trị trả về đặc biệt, dừng thực thi tới khi xử lý, buộc caller xử lý, mang chi tiết lỗi."
+        },
+        {
+          "h": "Phân cấp exception",
+          "text": "Throwable → Error (lỗi môi trường) và Exception (lỗi chương trình) → RuntimeException (unchecked) và các subtype Exception khác (checked). Checked exception phải khai báo trong throws hoặc bắt bằng try...catch, nếu không sẽ lỗi biên dịch. Unchecked (subtype của RuntimeException) không bắt buộc. Chỉ dùng unchecked khi người dùng thường viết code đảm bảo exception không xảy ra vì có cách tránh tiện lợi, rẻ và ngữ cảnh dùng cục bộ; ngược lại dùng checked."
+        },
+        {
+          "h": "Đặt tên và khai báo",
+          "text": "Tên = loại lỗi + 'Exception' (NullPointerException). Khai báo bằng cách extend Exception (checked) hoặc RuntimeException (unchecked) với constructor mặc định super() và constructor String super(s)."
+        },
+        {
+          "h": "Ba kỹ thuật xử lý",
+          "text": "Logging: in/ghi chi tiết lỗi (System.err.println, printStackTrace). Masking: exception là một phần logic dự kiến, xử lý rồi tiếp tục luồng bình thường (ví dụ ghi lỗi và trả -1). Reflecting: truyền exception lên caller, tự động hoặc bắt rồi ném exception khác mức cao hơn (bắt NonPositiveException ném NotPossibleException)."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 2.pdf",
+          "loc": "Slides 1–31"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l02-c01",
+          "front": "Checked và unchecked exception khác nhau thế nào?",
+          "back": "Checked: subtype của Exception (không phải RuntimeException), phải khai báo throws hoặc catch. Unchecked: subtype của RuntimeException, không bắt buộc.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "id": "se1-l02-c02",
+          "front": "Khi nào dùng unchecked exception?",
+          "back": "Chỉ khi người dùng thường viết code bảo đảm exception không xảy ra: có cách tránh tiện lợi và rẻ, và ngữ cảnh dùng cục bộ.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "id": "se1-l02-c03",
+          "front": "Ba kỹ thuật xử lý exception?",
+          "back": "Logging, Masking, Reflecting.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slides 25–30"
+          }
+        },
+        {
+          "id": "se1-l02-c04",
+          "front": "Reflecting exception là gì?",
+          "back": "Truyền exception lên caller (tự động) hoặc bắt rồi ném exception khác mức cao hơn, ví dụ bắt NonPositiveException và ném NotPossibleException.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slides 29–30"
+          }
+        },
+        {
+          "id": "se1-l02-c05",
+          "front": "Giới hạn của việc trả về special value để báo lỗi?",
+          "back": "Không mang chi tiết lỗi; có thủ tục không có giá trị đặc biệt (isSorted); caller có thể bỏ qua; cần kiểm tra thêm.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slides 6–8"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l02-q01",
+          "stem": "Lớp nào là checked exception?",
+          "options": [
+            "RuntimeException",
+            "NullPointerException",
+            "Một subtype của Exception không phải RuntimeException",
+            "Error"
+          ],
+          "answer": 2,
+          "explanation": "Checked exception là subtype của Exception ngoại trừ RuntimeException.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "id": "se1-l02-q02",
+          "stem": "Xử lý exception như computeFact1 (ghi lỗi rồi trả về -1 và chạy tiếp) thuộc kỹ thuật nào?",
+          "options": [
+            "Logging",
+            "Masking",
+            "Reflecting",
+            "Propagating tự động"
+          ],
+          "answer": 1,
+          "explanation": "Masking: xử lý exception dự kiến và tiếp tục luồng bình thường.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slides 27–28"
+          }
+        },
+        {
+          "id": "se1-l02-q03",
+          "stem": "Quy ước đặt tên exception đúng là?",
+          "options": [
+            "'Exception' + loại lỗi",
+            "Loại lỗi + 'Exception'",
+            "'Err' + loại lỗi",
+            "Tùy ý"
+          ],
+          "answer": 1,
+          "explanation": "Ví dụ NullPointerException, DivideByZeroException.",
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 18"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l03",
+      "order": 3,
+      "title": "Lecture 3: Iteration Abstraction",
+      "summary": [
+        {
+          "h": "Vì sao cần iteration abstraction",
+          "text": "Trả về mảng (int[] members()) kém hiệu quả với tập lớn vì phải sao chép. Thêm get(int index) không hơn vòng for, còn trả về vector nội bộ elements làm lộ rep (phá encapsulation). Iteration abstraction cho truy cập tăng dần kiểu hỏi–lấy (ask & get), không giới hạn kích thước và không giả định biểu diễn của collection."
+        },
+        {
+          "h": "Generator: pre-populated và auto-populated",
+          "text": "Pre-populated collection (ví dụ LinkedList): generator sinh chỉ số trên các phần tử đã có. Auto-populated collection (ví dụ PrimeList): phần tử (có thể đến một giới hạn max) được sinh ngay khi truy cập qua generator."
+        },
+        {
+          "h": "Iterator và Iterable trong Java",
+          "text": "Collection implement Iterable và có iterator()/elements() trả về generator implement java.util.Iterator; generator thường là private inner class của collection (ví dụ LinkedListGen).",
+          "code": {
+            "lang": "java",
+            "text": "Iterator<Integer> g = list.iterator();\nwhile (g.hasNext()) {\n  Integer x = g.next();\n}\n// hoặc kiểm soát bằng exception\ntry {\n  while (true) { Integer x = g.next(); }\n} catch (NoSuchElementException e) { }"
+          }
+        },
+        {
+          "h": "Ba method của Iterator",
+          "text": "hasNext(): hỏi còn phần tử không. next() throws NoSuchElementException: trả phần tử kế và cập nhật trạng thái generator. remove() throws UnsupportedOperationException, IllegalStateException: xóa phần tử cuối do next() trả về; tùy chọn, chỉ cho collection sửa được."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 3.pdf",
+          "loc": "Slides 1–30"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l03-c01",
+          "front": "Vì sao trả về vector nội bộ không phải cách tốt?",
+          "back": "Làm lộ rep (exposing the rep) nên phá encapsulation.",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "id": "se1-l03-c02",
+          "front": "Pre-populated và auto-populated collection?",
+          "back": "Pre-populated: phần tử đã có (LinkedList). Auto-populated: phần tử được sinh khi truy cập qua generator (PrimeList).",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slides 10–12"
+          }
+        },
+        {
+          "id": "se1-l03-c03",
+          "front": "Ba method của Iterator?",
+          "back": "hasNext(), next() (có thể ném NoSuchElementException), remove() (tùy chọn).",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slides 13, 19–23"
+          }
+        },
+        {
+          "id": "se1-l03-c04",
+          "front": "Generator thường được khai báo ở đâu?",
+          "back": "Là private inner class của collection class.",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "id": "se1-l03-c05",
+          "front": "Hai cách điều khiển vòng lặp với iterator?",
+          "back": "while (g.hasNext()) { g.next() } hoặc while (true) { g.next() } bọc trong try...catch NoSuchElementException.",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slides 27–29"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l03-q01",
+          "stem": "PrimeList thuộc loại collection nào?",
+          "options": [
+            "Pre-populated",
+            "Auto-populated",
+            "Immutable",
+            "Sorted"
+          ],
+          "answer": 1,
+          "explanation": "Slide 12: PrimeList là ví dụ auto-populated, phần tử sinh khi truy cập.",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "id": "se1-l03-q02",
+          "stem": "Method nào của Iterator ném NoSuchElementException khi hết phần tử?",
+          "options": [
+            "hasNext()",
+            "next()",
+            "remove()",
+            "iterator()"
+          ],
+          "answer": 1,
+          "explanation": "next() ném NoSuchElementException khi không còn phần tử.",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slides 19–23"
+          }
+        },
+        {
+          "id": "se1-l03-q03",
+          "stem": "Nhược điểm của việc dùng get(int index) thay iteration abstraction là gì?",
+          "options": [
+            "Không cải thiện so với vòng for và có nguy cơ lộ rep",
+            "Quá nhanh",
+            "Không dùng được với mảng",
+            "Tốn ít bộ nhớ"
+          ],
+          "answer": 0,
+          "explanation": "Slide 8: không hơn vòng for; trả về elements nội bộ làm lộ rep.",
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l04-5",
+      "order": 4,
+      "title": "Lecture 4–5: Unit test với JUnit 5 và Mockito",
+      "summary": [
+        {
+          "h": "Mức kiểm thử và 4 pha unit test",
+          "text": "Kim tự tháp: Unit → Integration → System → Acceptance. Unit/Integration/System là development testing (verification); Acceptance là user testing (validation). 4 pha của unit test case: Setup (@BeforeAll, @BeforeEach), Exercise (@Test), Verify (assertion), Teardown (@AfterEach, @AfterAll)."
+        },
+        {
+          "h": "Kiến trúc JUnit 5",
+          "text": "JUnit do Kent Beck và Erich Gamma phát triển cuối 1995; JUnit 5 ra ngày 10/09/2017. Ba thành phần: Platform (nền tảng chạy testing framework trên JVM), Jupiter (mô hình lập trình/extension mới), Vintage (engine chạy test JUnit 3 và 4). Tương ứng annotation: @BeforeEach = @Before, @AfterEach = @After, @BeforeAll = @BeforeClass, @AfterAll = @AfterClass (hai cái sau phải static). Khác: @Disabled, @DisplayName, @Tag, @RepeatedTest."
+        },
+        {
+          "h": "Assertion",
+          "text": "Một assertion gồm expected value, actual value, logic comparator → test verdict. assertAll chạy mọi assertion và báo lỗi gộp; assertThrows; assertTimeout chờ đến khi xong dù quá hạn; assertTimeoutPreemptively hủy ngay khi quá hạn.",
+          "code": {
+            "lang": "java",
+            "text": "@Test\nvoid sumNull() {\n  Exception e = assertThrows(Exception.class, () -> ArraySum.sum(null));\n  assertEquals(\"Array is null\", e.getMessage());\n}"
+          }
+        },
+        {
+          "h": "Dynamic và parameterized test",
+          "text": "@TestFactory phương thức trả về Stream/Collection/Iterable/Iterator của DynamicTest (trả List<String> sẽ ném exception). @ParameterizedTest với nguồn đối số: @ValueSource, @EnumSource, @MethodSource (static method trả Stream), @CsvSource, @CsvFileSource, @ArgumentsSource (lớp implement ArgumentsProvider)."
+        },
+        {
+          "h": "Mockito",
+          "text": "Cô lập SUT (System Under Test) khỏi DOC (Depended-On Components) qua 3 bước: mocking, setting expectations (stubbing), verification. Dùng @ExtendWith(MockitoExtension.class), @Mock cho DOC, @InjectMocks cho SUT. Stubbing: when(x).thenReturn(y), thenThrow, thenAnswer, thenCallRealMethod. Verification: verify(mock, mode) với times, never, atLeastOnce, atLeast, atMost, only, timeout."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 4_5.pdf",
+          "loc": "Slides 1–44"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l04-c01",
+          "front": "4 pha của một unit test case?",
+          "back": "Setup, Exercise, Verify, Teardown.",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slides 6, 11"
+          }
+        },
+        {
+          "id": "se1-l04-c02",
+          "front": "Ba thành phần của JUnit 5?",
+          "back": "Platform, Jupiter, Vintage.",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "id": "se1-l04-c03",
+          "front": "assertTimeout khác assertTimeoutPreemptively?",
+          "back": "assertTimeout chờ thao tác xong dù vượt hạn; assertTimeoutPreemptively hủy thực thi ngay khi quá hạn.",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "id": "se1-l04-c04",
+          "front": "@BeforeAll và @AfterAll có yêu cầu gì?",
+          "back": "Phải là static method (tương đương @BeforeClass/@AfterClass của JUnit 4).",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "id": "se1-l04-c05",
+          "front": "@Mock và @InjectMocks khác nhau?",
+          "back": "@Mock tạo mock cho DOC; @InjectMocks đánh dấu SUT được inject các @Mock.",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 36"
+          }
+        },
+        {
+          "id": "se1-l04-c06",
+          "front": "@TestFactory phải trả về kiểu gì?",
+          "back": "Stream, Collection, Iterable hoặc Iterator của DynamicTest; trả List<String> sẽ ném exception.",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slides 20–22"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l04-q01",
+          "stem": "Annotation JUnit 5 nào tương đương @Before của JUnit 4?",
+          "options": [
+            "@BeforeAll",
+            "@BeforeEach",
+            "@Test",
+            "@Setup"
+          ],
+          "answer": 1,
+          "explanation": "@BeforeEach = @Before; @BeforeAll = @BeforeClass.",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slides 9–12"
+          }
+        },
+        {
+          "id": "se1-l04-q02",
+          "stem": "Annotation nào dùng với lớp tùy biến implement ArgumentsProvider?",
+          "options": [
+            "@ValueSource",
+            "@MethodSource",
+            "@ArgumentsSource",
+            "@CsvSource"
+          ],
+          "answer": 2,
+          "explanation": "@ArgumentsSource dùng lớp ArgumentsProvider tự viết (provideArguments).",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slides 25–33"
+          }
+        },
+        {
+          "id": "se1-l04-q03",
+          "stem": "Acceptance testing thuộc nhóm nào?",
+          "options": [
+            "Development testing (verification)",
+            "User testing (validation)",
+            "Unit testing",
+            "Integration testing"
+          ],
+          "answer": 1,
+          "explanation": "Slide 4: Acceptance là user testing (validation).",
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l06",
+      "order": 5,
+      "title": "Lecture 6: Software Development Life Cycle",
+      "summary": [
+        {
+          "h": "Program, software, software engineering",
+          "text": "Software gồm chương trình và mọi tài liệu, dữ liệu cấu hình liên quan. Software engineering là ngành kỹ thuật liên quan mọi khía cạnh sản xuất phần mềm từ ý tưởng tới vận hành và bảo trì (gồm quản lý dự án: rủi ro, chất lượng, tiến độ, ngân sách)."
+        },
+        {
+          "h": "4 hoạt động của software process",
+          "text": "1) Specification (requirements engineering): xác định dịch vụ yêu cầu và ràng buộc; có user requirements và system requirements; 3 hoạt động: elicitation & analysis, specification, validation. 2) Development: design (architectural, database, interface, component selection and design) và programming/debugging. 3) Validation (V&V): Verification = 'Are we building the product right?'; Validation = 'Are we building the right product?'; 3 giai đoạn test: component, system (gồm integration), customer (gồm beta test). 4) Evolution: sửa đổi sau bàn giao."
+        },
+        {
+          "h": "Mô hình quy trình",
+          "text": "Waterfall (5 pha) chỉ phù hợp hệ nhúng, hệ critical, hệ lớn nhiều công ty. Incremental dùng khi yêu cầu ban đầu khá rõ. Evolutionary (prototyping, spiral) dùng khi lõi sản phẩm rõ nhưng chi tiết chưa định. Prototyping có nhược điểm hy sinh chất lượng tổng thể/khả năng bảo trì. Spiral kết hợp tính lặp của prototyping với tính hệ thống của waterfall; ưu: giảm rủi ro; nhược: khó ước lượng thời gian, cần đánh giá rủi ro ở mọi giai đoạn."
+        },
+        {
+          "h": "Agile",
+          "text": "4 giá trị Agile Manifesto: con người và tương tác hơn quy trình và công cụ; phần mềm chạy được hơn tài liệu đầy đủ; hợp tác với khách hàng hơn đàm phán hợp đồng; đáp ứng thay đổi hơn bám kế hoạch. 5 nguyên tắc: customer involvement, embrace change, incremental delivery, maintain simplicity, people not process. Cách tiếp cận: Scrum, Lean, Kanban, XP. Project management triangle: Scope–Time–Cost, Quality ở giữa."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 6.pdf",
+          "loc": "Slides 1–34"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l06-c01",
+          "front": "Verification và validation khác nhau thế nào?",
+          "back": "Verification: 'Are we building the product right?' (đúng đặc tả). Validation: 'Are we building the right product?' (đáp ứng kỳ vọng khách hàng).",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slides 15–16"
+          }
+        },
+        {
+          "id": "se1-l06-c02",
+          "front": "Bốn hoạt động cơ bản của software process?",
+          "back": "Specification, Development, Validation, Evolution.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slides 6–17"
+          }
+        },
+        {
+          "id": "se1-l06-c03",
+          "front": "Waterfall chỉ phù hợp với loại hệ thống nào?",
+          "back": "Hệ nhúng, hệ critical (an toàn/an ninh), hệ phần mềm lớn do nhiều công ty phát triển.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slides 19–21"
+          }
+        },
+        {
+          "id": "se1-l06-c04",
+          "front": "4 giá trị của Agile Manifesto?",
+          "back": "Individuals & interactions; working software; customer collaboration; responding to change (hơn các vế còn lại).",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "id": "se1-l06-c05",
+          "front": "Nhược điểm của Spiral model?",
+          "back": "Khó ước lượng thời gian (không biết số pha), cần đánh giá rủi ro ở mọi giai đoạn, review tốn thời gian.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slides 26–27"
+          }
+        },
+        {
+          "id": "se1-l06-c06",
+          "front": "4 hoạt động của software design?",
+          "back": "Architectural design, database design, interface design, component selection and design.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slides 12–13"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l06-q01",
+          "stem": "Câu 'Are we building the right product?' mô tả hoạt động nào?",
+          "options": [
+            "Verification",
+            "Validation",
+            "Debugging",
+            "Maintenance"
+          ],
+          "answer": 1,
+          "explanation": "Validation bảo đảm phần mềm đáp ứng kỳ vọng người dùng.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "id": "se1-l06-q02",
+          "stem": "Mô hình nào dùng khi lõi sản phẩm đã rõ nhưng chi tiết và phần mở rộng chưa xác định?",
+          "options": [
+            "Waterfall",
+            "Evolutionary",
+            "Incremental",
+            "Không mô hình nào"
+          ],
+          "answer": 1,
+          "explanation": "Evolutionary process models dùng khi chi tiết/mở rộng chưa được định nghĩa.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slides 23–27"
+          }
+        },
+        {
+          "id": "se1-l06-q03",
+          "stem": "Ba giai đoạn testing trong validation theo thứ tự?",
+          "options": [
+            "Customer → System → Component",
+            "Component → System → Customer",
+            "System → Component → Customer",
+            "Unit → Beta → Alpha"
+          ],
+          "answer": 1,
+          "explanation": "Component testing → System testing (gồm integration) → Customer testing.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 16"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l07",
+      "order": 6,
+      "title": "Lecture 7: Requirement Engineering",
+      "summary": [
+        {
+          "h": "Định nghĩa",
+          "text": "Requirements là mô tả các dịch vụ hệ thống cung cấp và các ràng buộc khi vận hành. Requirements engineering là quá trình tìm hiểu, phân tích, ghi tài liệu và kiểm tra các dịch vụ và ràng buộc đó. Functional requirements: dịch vụ hệ thống cung cấp, phản ứng với input cụ thể, hành vi trong tình huống cụ thể, và điều hệ thống không làm. Non-functional requirements: ràng buộc lên dịch vụ/chức năng (thời gian, bộ nhớ, luật...) và thường quan trọng hơn từng functional requirement riêng lẻ."
+        },
+        {
+          "h": "Phân loại non-functional",
+          "text": "Product (hiệu năng, bộ nhớ, độ tin cậy: efficiency, dependability, security, usability), Organizational (environmental, operational, development), External (regulatory, ethical, legislative). Nên viết định lượng để kiểm thử khách quan: tốc độ (giao dịch/giây, thời gian phản hồi), kích thước, dễ dùng (thời gian training), độ tin cậy (mean time to failure), robustness, portability."
+        },
+        {
+          "h": "Quy trình RE",
+          "text": "Lặp theo xoắn ốc gồm elicitation, specification, validation. Elicitation khó vì: stakeholder không biết mình muốn gì; kỹ sư thiếu hiểu biết miền; mỗi stakeholder một yêu cầu; yếu tố chính trị; môi trường kinh doanh thay đổi. 4 hoạt động: discovery, classification & organization, prioritization & negotiation, specification. Hai cách tiếp cận: Interviewing và Observation/ethnography (không hiệu quả để tìm yêu cầu tổ chức rộng hơn và gợi ý đổi mới)."
+        },
+        {
+          "h": "Specification và use case",
+          "text": "User requirements viết bằng ngôn ngữ tự nhiên, hình, bảng, không dùng thuật ngữ phần mềm. System requirements có thể dùng structured natural language, UML, đặc tả toán học, và không bàn thiết kế/cài đặt. Use case diagram gồm actor, use case, system boundary và 4 quan hệ: association, include (bao gồm vô điều kiện), extend (mở rộng có điều kiện), generalization (is-a). Use case template gồm Name, ID, Description, Actor, Organizational Benefits, Frequency of Use, Triggers, Precondition, Postcondition, Main Course, Alternate Courses, Exceptions."
+        },
+        {
+          "h": "SRS và validation",
+          "text": "SRS phục vụ 5 nhóm: customers, managers, developers, testers, maintenance engineers. Validation có 5 kiểm tra: validity, consistency, completeness, realism, verifiability. Yêu cầu thay đổi liên tục nên cần traceability; evolutionary model và agile phù hợp."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 7.pdf",
+          "loc": "Slides 1–31 (PDF ảnh 1 trang)"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l07-c01",
+          "front": "Functional và non-functional requirement?",
+          "back": "Functional: dịch vụ và hành vi hệ thống. Non-functional: ràng buộc lên dịch vụ (thời gian, bộ nhớ, luật...), thường quan trọng hơn từng functional requirement.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "id": "se1-l07-c02",
+          "front": "Ba nguồn của non-functional requirement?",
+          "back": "Product, Organizational, External.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slides 6–7"
+          }
+        },
+        {
+          "id": "se1-l07-c03",
+          "front": "Bốn hoạt động của elicitation và analysis?",
+          "back": "Discovery & understanding; classification & organization; prioritization & negotiation; specification (documentation).",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slides 14–15"
+          }
+        },
+        {
+          "id": "se1-l07-c04",
+          "front": "include và extend trong use case diagram?",
+          "back": "include: use case bao gồm chức năng của use case khác vô điều kiện. extend: use case được mở rộng bởi use case khác trong điều kiện cụ thể.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "id": "se1-l07-c05",
+          "front": "Năm kiểm tra của requirements validation?",
+          "back": "Validity, consistency, completeness, realism, verifiability.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "id": "se1-l07-c06",
+          "front": "Hai hạn chế của ethnography?",
+          "back": "Không hiệu quả để phát hiện yêu cầu tổ chức rộng hơn và để gợi ý đổi mới (vì tập trung vào người dùng cuối).",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "id": "se1-l07-c07",
+          "front": "Năm nhóm đọc SRS?",
+          "back": "Customers, managers, developers, testers, maintenance engineers.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 24"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l07-q01",
+          "stem": "Yêu cầu 'Chỉ người dùng được phép (trong access control list) mới xem báo cáo chi phí' thuộc loại nào?",
+          "options": [
+            "Functional",
+            "Non-functional (security)",
+            "Domain",
+            "Không phải yêu cầu"
+          ],
+          "answer": 1,
+          "explanation": "Slide 10 đánh dấu ràng buộc truy cập/đăng nhập là non-functional về bảo mật.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "id": "se1-l07-q02",
+          "stem": "Quan hệ nào trong use case diagram thiết lập kết nối 'is-a' giữa hai actor hoặc hai use case?",
+          "options": [
+            "Include",
+            "Extend",
+            "Generalization",
+            "Association"
+          ],
+          "answer": 2,
+          "explanation": "Generalization tạo quan hệ is-a.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "id": "se1-l07-q03",
+          "stem": "Kiểm tra 'yêu cầu phải viết sao cho có thể kiểm thử' là kiểm tra nào?",
+          "options": [
+            "Validity",
+            "Consistency",
+            "Realism",
+            "Verifiability"
+          ],
+          "answer": 3,
+          "explanation": "Verifiability: yêu cầu hệ thống phải viết sao cho có thể kiểm chứng.",
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 29"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l08",
+      "order": 7,
+      "title": "Lecture 8: Architectural Design",
+      "summary": [
+        {
+          "h": "Vì sao cần kiến trúc",
+          "text": "Kiến trúc xác định các thành phần cấu trúc chính và quan hệ giữa chúng. Quan trọng vì: quyết định đặc tính phi chức năng; là biểu diễn để các stakeholder giao tiếp; cho phép lý giải và quản lý thay đổi."
+        },
+        {
+          "h": "Ba loại cấu trúc",
+          "text": "Module structures: chia hệ thành các đơn vị cài đặt (class, layer, chức năng), là cơ sở phân công làm việc. Component-and-Connector (C&C): các thành phần chạy lúc runtime (client, server, filter) và connector (call-return, pipe...). Allocation structures: ánh xạ cấu trúc phần mềm sang môi trường phi phần mềm (tổ chức, phát triển, cài đặt, thực thi)."
+        },
+        {
+          "h": "Quy tắc kiến trúc tốt",
+          "text": "Thiết kế information hiding và separation of concerns; dùng pattern và tactic đã biết; không phụ thuộc phiên bản sản phẩm thương mại; module tạo dữ liệu tách khỏi module tiêu thụ dữ liệu; không kỳ vọng module và component tương ứng 1-1; dễ đổi processor cho mỗi process; ít cách để component tương tác; tập tranh chấp tài nguyên nhỏ và xác định rõ."
+        },
+        {
+          "h": "Layered pattern",
+          "text": "Chia phần mềm thành các layer với quan hệ allowed-to-use một chiều. Mỗi phần mềm thuộc đúng một layer; ít nhất 2 layer (thường 3+); quan hệ allowed-to-use không được vòng tròn (không dùng ngược lên). Nhược điểm: tốn chi phí và độ phức tạp ban đầu, giảm hiệu năng. Layer bridging (dùng layer thấp không kề) quá nhiều làm hại portability và modifiability."
+        },
+        {
+          "h": "Client-Server, Broker, MVC",
+          "text": "Client-Server: client khởi tạo yêu cầu, server phục vụ (request/reply connector); nhược điểm: server là bottleneck và single point of failure. Broker: broker trung gian định vị server cho client (kèm client-side/server-side proxy, bridge tùy chọn); nhược điểm: thêm độ trễ, broker là single point of failure, dễ là mục tiêu tấn công, khó test. MVC: Model (dữ liệu và logic), View (hiển thị/nhập), Controller (điều phối), quan hệ notifies; phải có ít nhất một instance mỗi loại."
+        },
+        {
+          "h": "Modifiability, coupling, cohesion",
+          "text": "Modifiability là chi phí và rủi ro khi thay đổi. Coupling: xác suất sửa module này lan sang module khác. Cohesion: mức liên quan chặt giữa các trách nhiệm của module. Tactics: split module, increase cohesion, reduce coupling (encapsulate, use an intermediary, restrict dependencies, refactor, abstract common services)."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 8.pdf",
+          "loc": "Slides 1–38 (PDF ảnh 1 trang)"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l08-c01",
+          "front": "Ba loại software structure?",
+          "back": "Module, Component-and-Connector (C&C), Allocation.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slides 5–11"
+          }
+        },
+        {
+          "id": "se1-l08-c02",
+          "front": "Ràng buộc của layered pattern?",
+          "back": "Mỗi phần mềm thuộc đúng một layer; ít nhất 2 layer; allowed-to-use không vòng tròn.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slides 18–21"
+          }
+        },
+        {
+          "id": "se1-l08-c03",
+          "front": "Nhược điểm của Client-Server?",
+          "back": "Server có thể là performance bottleneck và single point of failure; quyết định đặt chức năng ở client hay server khó và tốn kém để đổi.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slides 22–25"
+          }
+        },
+        {
+          "id": "se1-l08-c04",
+          "front": "Vai trò broker trong Broker pattern?",
+          "back": "Trung gian lúc runtime: định vị server phù hợp, chuyển yêu cầu và trả kết quả/exception cho client, che giấu bản chất và vị trí của server.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slides 26–29"
+          }
+        },
+        {
+          "id": "se1-l08-c05",
+          "front": "Ba thành phần của MVC?",
+          "back": "Model (dữ liệu/trạng thái và logic), View (hiển thị và nhập liệu), Controller (dịch thao tác người dùng thành thay đổi model/view).",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slides 30–33"
+          }
+        },
+        {
+          "id": "se1-l08-c06",
+          "front": "Coupling và cohesion định nghĩa thế nào?",
+          "back": "Coupling: xác suất sửa module này lan sang module khác. Cohesion: mức độ liên quan chặt giữa các trách nhiệm trong một module.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 36"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l08-q01",
+          "stem": "Pattern nào là module pattern?",
+          "options": [
+            "Broker",
+            "MVC",
+            "Layered",
+            "Client-Server"
+          ],
+          "answer": 2,
+          "explanation": "Slide 17: Layered là module pattern; Broker, MVC, Client-Server là C&C pattern.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "id": "se1-l08-q02",
+          "stem": "Tactic nào KHÔNG thuộc nhóm giảm coupling?",
+          "options": [
+            "Encapsulate",
+            "Use an intermediary",
+            "Split module",
+            "Restrict dependencies"
+          ],
+          "answer": 2,
+          "explanation": "Split module là tactic riêng; giảm coupling gồm encapsulate, intermediary, restrict dependencies, refactor, abstract common services.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 37"
+          }
+        },
+        {
+          "id": "se1-l08-q03",
+          "stem": "Allocation structure trả lời câu hỏi nào?",
+          "options": [
+            "Component nào chạy song song?",
+            "Mỗi phần tử phần mềm chạy trên processor nào và giao cho team nào?",
+            "Module nào kế thừa module nào?",
+            "Dữ liệu chảy thế nào?"
+          ],
+          "answer": 1,
+          "explanation": "Allocation structures ánh xạ phần mềm sang processor, thư mục/file và nhóm phát triển.",
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slides 10–11"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l09",
+      "order": 8,
+      "title": "Lecture 9: UML Class Diagrams",
+      "summary": [
+        {
+          "h": "Design và UML",
+          "text": "Design chuyển từ 'what' sang 'how' mà chưa viết cài đặt đầy đủ. Ba view cốt lõi: class diagram (static view), sequence diagram (dynamic view), activity diagram (thuật toán của chức năng). UML dùng như sketch (forward/backward design), blueprint, hoặc ngôn ngữ lập trình."
+        },
+        {
+          "h": "Cú pháp class diagram",
+          "text": "Interface ghi «interface»; tên abstract class in nghiêng. Attribute: visibility name : type. Visibility: + public, # protected, - private, ~ package, / derived attribute. Static: gạch chân. Operation: visibility name(parameters) : return_type; bỏ ': return_type' ở constructor và khi void; không liệt kê method kế thừa; không bỏ method nào của interface."
+        },
+        {
+          "h": "Quan hệ",
+          "text": "Generalization (mũi tên từ con tới cha): cha là class dùng nét liền + tam giác rỗng; cha là interface dùng nét đứt + tam giác rỗng. Aggregation ('is part of'): hình thoi rỗng ở phía toàn thể, phần có thể tồn tại độc lập. Composition ('is entirely made of'): hình thoi đặc, phần sống và chết cùng toàn thể. Dependency ('uses temporarily'): nét đứt mũi tên mở. Association có 3 chú thích: multiplicity (*, 1, 2..4, 3..*), name, navigability."
+        },
+        {
+          "h": "Cách tạo",
+          "text": "Danh từ → class/object/field; động từ → method; quan hệ giữa danh từ → tương tác (chứa, tổng quát hóa, phụ thuộc). Analysis class diagram: ánh xạ entity thành domain class, relationship thành association, associative entity thành association class, viết constraint nếu có. Class diagram tốt để khám phá dữ liệu/thuộc tính liên quan và phụ thuộc; kém để khám phá hành vi thuật toán và luồng điều khiển."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 9.pdf",
+          "loc": "Slides 1–23 (PDF ảnh 1 trang)"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l09-c01",
+          "front": "Ký hiệu visibility trong UML?",
+          "back": "+ public, # protected, - private, ~ package, / derived attribute.",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slides 7–8"
+          }
+        },
+        {
+          "id": "se1-l09-c02",
+          "front": "Aggregation khác composition?",
+          "back": "Aggregation (thoi rỗng): phần tồn tại được khi toàn thể mất. Composition (thoi đặc): phần sống và chết cùng toàn thể.",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slides 13–15"
+          }
+        },
+        {
+          "id": "se1-l09-c03",
+          "front": "Vẽ generalization với cha là interface thế nào?",
+          "back": "Nét đứt với tam giác rỗng (cha là class: nét liền).",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slides 11–12"
+          }
+        },
+        {
+          "id": "se1-l09-c04",
+          "front": "Ba chú thích của association?",
+          "back": "Multiplicity, name, navigability.",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "id": "se1-l09-c05",
+          "front": "Ba view UML cốt lõi?",
+          "back": "Class (static), sequence (dynamic), activity (thuật toán).",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "id": "se1-l09-c06",
+          "front": "Quy tắc khi liệt kê operation trong class diagram?",
+          "back": "Có thể bỏ get/set tầm thường ở class thường nhưng không bỏ method của interface; không ghi method kế thừa; bỏ return type ở constructor và void.",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slides 7, 9"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l09-q01",
+          "stem": "Ký hiệu nào biểu diễn thuộc tính dẫn xuất (derived)?",
+          "options": [
+            "+",
+            "#",
+            "~",
+            "/"
+          ],
+          "answer": 3,
+          "explanation": "Dấu / đặt trước tên attribute là derived.",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "id": "se1-l09-q02",
+          "stem": "Book và Page: trang sách chỉ tồn tại cùng cuốn sách. Quan hệ phù hợp?",
+          "options": [
+            "Dependency",
+            "Aggregation",
+            "Composition",
+            "Generalization"
+          ],
+          "answer": 2,
+          "explanation": "Composition: parts live and die with the whole (hình thoi đặc).",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slides 13–15"
+          }
+        },
+        {
+          "id": "se1-l09-q03",
+          "stem": "Class diagram KHÔNG phù hợp để làm gì?",
+          "options": [
+            "Khám phá dữ liệu liên quan",
+            "Nhìn nhanh các entity quan trọng",
+            "Hiểu luồng điều khiển tổng thể và thuật toán",
+            "Phát hiện phụ thuộc"
+          ],
+          "answer": 2,
+          "explanation": "Slide 20: kém trong khám phá hành vi thuật toán và control flow.",
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slides 19–20"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l10-11",
+      "order": 9,
+      "title": "Lecture 10–11: Design và ví dụ KEngine",
+      "summary": [
+        {
+          "h": "Nguyên tắc và các bước",
+          "text": "Hai nguyên tắc: decomposition by abstraction và iterative refinement (top-down). Mỗi vòng lặp: chọn một abstraction A, xác định helper abstraction cần để cài đặt A, viết/cập nhật design specification cho A, dừng khi mọi abstraction đều có đặc tả. Iteration 0: abstraction ban đầu (phần mềm và khái niệm hiển nhiên). Iteration 1: abstraction mức cao nhất từ đặc tả. Iteration 2+: lặp tới khi không có abstraction mới. Design notebook ghi mọi quyết định thiết kế (đặc tả, bản phác cài đặt, ngữ cảnh dùng) kèm class, sequence, activity diagram."
+        },
+        {
+          "h": "KEngine: yêu cầu",
+          "text": "Dựa trên Liskov & Guttag mục 12.4. Entity: Document, Word (Keyword, NonKeyword), Query, Match. Quan hệ: appears-in (association class có frequency), hasKeyword (aggregation Query–Keyword), hasMatch (composition Query–Match), refers-to (Match → Document). Use case: Add Documents, Search for document, Query, QueryMore."
+        },
+        {
+          "h": "KEngine: thiết kế",
+          "text": "Iteration 0: Engine, Doc, Query với các method Engine(), queryFirst(String), queryMore(String), findDoc(String), addDocs(String), ném NotPossibleException. Iteration 1: thêm WordTable (lưu từ quan trọng/không quan trọng và số lần xuất hiện), TitleTable (tra cứu theo title), Comm (getDocs từ URL). Iteration 2: TitleTable dùng Hashtable; Query dùng WordTable, keys, matches (Vector); DocCnt (implements Comparable) và Sorting.quickSort; Helpers.canon chuẩn hóa từ về dạng chuẩn; WordTable.addDoc trả Hashtable từ→tần suất."
+        },
+        {
+          "h": "Ví dụ chạy (Lecture 11)",
+          "text": "Dữ liệu: d1 (t1: W1=6, W2=12), d2 (t2: W1=10), d3 (t3: W2=4). addDocs tạo TitleTable <t1,d1>,<t2,d2>,<t3,d3> và WordTable w1→[<d1,6>,<d2,10>], w2→[<d1,12>,<d3,4>]. queryFirst(w1) → matches sắp giảm dần [<d2,10>,<d1,6>]. queryMore(w2) giữ tài liệu có cả w1 và w2, cộng tần suất → [<d1,18>]. findDoc(t1) → d1."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 10.pdf",
+          "loc": "Slides 1–102"
+        },
+        {
+          "file": "Resources/Lecture 11.pdf",
+          "loc": "Slides 1–19 (PDF ảnh 1 trang)"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l10-c01",
+          "front": "Hai nguyên tắc của quy trình design?",
+          "back": "Decomposition by abstraction và iterative refinement (top-down).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "id": "se1-l10-c02",
+          "front": "WordTable trong KEngine để làm gì?",
+          "back": "Lưu các từ quan trọng và không quan trọng cùng số lần xuất hiện trong tài liệu, phục vụ truy vấn.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slides 41–51"
+          }
+        },
+        {
+          "id": "se1-l10-c03",
+          "front": "TitleTable trong KEngine?",
+          "back": "Tra cứu nhanh Doc theo title (lookUp), dùng Hashtable ở Iteration 2; addDoc ném DuplicateException.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slides 56–60, 81–83"
+          }
+        },
+        {
+          "id": "se1-l10-c04",
+          "front": "Helpers.canon làm gì?",
+          "back": "Chuyển từ về dạng chuẩn chung (ví dụ Student → student).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slides 99–101"
+          }
+        },
+        {
+          "id": "se1-l10-c05",
+          "front": "queryMore(w2) xử lý matches thế nào trong ví dụ?",
+          "back": "Chỉ giữ tài liệu có cả w1 và w2, cộng tần suất (d1: 6 + 12 = 18) và loại d2.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slides 15–17"
+          }
+        },
+        {
+          "id": "se1-l10-c06",
+          "front": "Design notebook gồm gì?",
+          "back": "Một phần cho mỗi abstraction: design specification, bản phác cài đặt nếu cần, ngữ cảnh dùng, ghi chú; kèm class, sequence, activity diagram.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 9"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l10-q01",
+          "stem": "Trong ví dụ Lecture 11, queryFirst(w1) trả danh sách matches thế nào?",
+          "options": [
+            "[<d1,6>,<d2,10>]",
+            "[<d2,10>,<d1,6>] (giảm dần theo tần suất)",
+            "[<d3,4>]",
+            "[<d1,18>]"
+          ],
+          "answer": 1,
+          "explanation": "Query sắp xếp bằng Sorting.quickSort theo tần suất giảm dần.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slides 13–14"
+          }
+        },
+        {
+          "id": "se1-l10-q02",
+          "stem": "Trong quy trình design, bước nào thực hiện ở mỗi iteration?",
+          "options": [
+            "Chọn abstraction, xác định helper abstraction, viết/cập nhật đặc tả, dừng khi mọi abstraction đã có đặc tả",
+            "Chỉ viết code",
+            "Chỉ vẽ sequence diagram",
+            "Chỉ test"
+          ],
+          "answer": 0,
+          "explanation": "Slide 4 liệt kê các bước lặp.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "id": "se1-l10-q03",
+          "stem": "Quan hệ giữa Query và Match trong phân tích KEngine?",
+          "options": [
+            "Aggregation",
+            "Composition (hasMatch)",
+            "Dependency",
+            "Generalization"
+          ],
+          "answer": 1,
+          "explanation": "Slides 14–17: hasMatch là composition giữa Query và Match.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slides 14–17"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-l12",
+      "order": 10,
+      "title": "Lecture 12: Testing",
+      "summary": [
+        {
+          "h": "Định nghĩa",
+          "text": "Software testing là đánh giá động (dynamic) hành vi chương trình trên một tập hữu hạn (finite) test case được chọn phù hợp (selected) từ miền thực thi thường vô hạn, so với hành vi mong đợi (expected). Phân loại 3 trục: mức (unit, integration, system, acceptance), phương pháp (black-box, white-box, non-functional), loại (manual, automated)."
+        },
+        {
+          "h": "Mức kiểm thử",
+          "text": "Unit: kiểm tra mã nguồn (setup, exercise, verify, teardown). Integration: kiểm tra giao diện giữa các module. Top-down: bắt đầu từ main program, dùng stub thay module cấp dưới, thay dần bằng module thật (depth-first hoặc breadth-first), có regression testing. Bottom-up: bắt đầu từ module thấp nhất, gom thành cluster, dùng driver điều phối test, sau đó bỏ driver và đi lên. System testing: tích hợp tất cả thành phần. Acceptance: dùng dữ liệu thật của khách, đội phát triển không chịu trách nhiệm, thường là black-box."
+        },
+        {
+          "h": "Black-box",
+          "text": "Equivalence partitioning: khoảng giá trị → 1 lớp hợp lệ và 2 không hợp lệ; một giá trị cụ thể → 1 hợp lệ và 2 không hợp lệ; thành viên của tập → 1 và 1; Boolean → 1 và 1; mảng/chuỗi → 1 hợp lệ và 2 không hợp lệ. Boundary value analysis: chọn test ở biên, ví dụ khoảng [a, b]: a, b và ngay trên/dưới a, b (cả đầu vào và đầu ra)."
+        },
+        {
+          "h": "White-box",
+          "text": "Coverage: statement, decision, condition, paths, function, entry/exit. Basis path testing (McCabe): vẽ flow graph, tính cyclomatic complexity, tìm tập đường độc lập tuyến tính, soạn test cho mỗi đường. Compound condition (IF a OR b) cần predicate node riêng cho từng điều kiện. Công thức: V(G) = số region (gồm vùng ngoài) = E − N + 2 = P + 1 (P là số predicate node)."
+        },
+        {
+          "h": "Loop testing",
+          "text": "Simple loop (tối đa n lần): bỏ qua vòng, 1 lần, 2 lần, m lần (m < n), n−1, n, n+1 lần. Nested: bắt đầu vòng trong cùng với vòng ngoài ở giá trị nhỏ nhất, rồi làm ngược ra ngoài. Concatenated: độc lập → test như simple; phụ thuộc → test như nested. Unstructured: nên thiết kế lại."
+        },
+        {
+          "h": "Non-functional",
+          "text": "Performance, load, volume (tập trung khối lượng dữ liệu), stress (vượt công suất bình thường tới khi hỏng), security (6 khái niệm: confidentiality, integrity, authentication, authorization, availability, non-repudiation), usability, accessibility."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Resources/Lecture 12.pdf",
+          "loc": "Slides 1–35 (PDF ảnh 1 trang)"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-l12-c01",
+          "front": "Bốn khái niệm then chốt trong định nghĩa software testing?",
+          "back": "Dynamic, Finite, Selected, Expected.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "id": "se1-l12-c02",
+          "front": "Top-down khác bottom-up integration ở công cụ giả lập?",
+          "back": "Top-down dùng stub thay module cấp dưới; bottom-up dùng driver điều phối test cho cluster.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slides 13–14"
+          }
+        },
+        {
+          "id": "se1-l12-c03",
+          "front": "Equivalence classes cho input là một khoảng giá trị?",
+          "back": "1 lớp hợp lệ và 2 lớp không hợp lệ.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "id": "se1-l12-c04",
+          "front": "Ba công thức cyclomatic complexity V(G)?",
+          "back": "V(G) = số region (gồm vùng ngoài) = E − N + 2 = P + 1 (P: predicate nodes).",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "id": "se1-l12-c05",
+          "front": "Các test case cho simple loop tối đa n lần?",
+          "back": "0, 1, 2, m (m < n), n−1, n, n+1 lần.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "id": "se1-l12-c06",
+          "front": "Stress testing là gì?",
+          "back": "Thực thi vượt công suất vận hành bình thường tới khi hệ thống hỏng để xác định ranh giới thực.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 33"
+          }
+        },
+        {
+          "id": "se1-l12-c07",
+          "front": "Sáu khái niệm của security testing?",
+          "back": "Confidentiality, integrity, authentication, authorization, availability, non-repudiation.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 33"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-l12-q01",
+          "stem": "Flow graph có E = 11 cạnh và N = 9 nút. V(G) bằng?",
+          "options": [
+            "2",
+            "4",
+            "6",
+            "20"
+          ],
+          "answer": 1,
+          "explanation": "V(G) = E − N + 2 = 11 − 9 + 2 = 4.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "id": "se1-l12-q02",
+          "stem": "Với IF a OR b (compound condition) trong flow graph, cần bao nhiêu predicate node?",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "0"
+          ],
+          "answer": 1,
+          "explanation": "Mỗi điều kiện đơn (a và b) cần một predicate node riêng.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "id": "se1-l12-q03",
+          "stem": "Ai KHÔNG nên chịu trách nhiệm acceptance testing?",
+          "options": [
+            "Khách hàng",
+            "Đội phát triển hệ thống",
+            "Người dùng cuối",
+            "Bên thứ ba độc lập"
+          ],
+          "answer": 1,
+          "explanation": "Slide 17: đội phát triển không nên chịu trách nhiệm acceptance testing.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 17"
+          }
+        }
+      ]
+    },
+    {
+      "id": "se1-tutorials",
+      "order": 11,
+      "title": "Tutorials: Spring Boot, REST, ReactJS, Unit test",
+      "summary": [
+        {
+          "h": "Tutorial 7: Spring Boot (1)",
+          "text": "Spring framework: nền tảng Java cung cấp hạ tầng toàn diện. Spring Boot: công cụ giúp phát triển web/microservice nhanh hơn nhờ autoconfiguration. Hibernate: ORM cho Java. JPA: tập lớp/phương thức lưu trữ dữ liệu bền vững. Thymeleaf: server-side template engine. Dependencies: Spring Web, Thymeleaf, Spring Data JPA, MySQL Driver. Phần 2: bài Stock Trader, vẽ use case diagram và dùng use case template.",
+          "code": {
+            "lang": "java",
+            "text": "@Entity\npublic class Employee {\n  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)\n  @Column(name = \"id\", nullable = false)\n  private Long id;\n  private String name;\n}\npublic interface EmployeeRepository extends JpaRepository<Employee, Long> {}"
+          }
+        },
+        {
+          "h": "Tutorial 8: Security, Validation, Layout",
+          "text": "Spring Security (login/logout), Hibernate Validator (@Length(min=3,max=30), @Min(18), @Max(55), @NotEmpty), Thymeleaf Layout Dialect (layout:decorate, layout:fragment). Controller dùng @Valid và BindingResult; nếu result.hasErrors() trả lại form."
+        },
+        {
+          "h": "Tutorial 9: Quan hệ, tìm kiếm, sắp xếp",
+          "text": "@ManyToOne Employee–Company; tìm kiếm với findByNameContaining; sắp xếp với Sort.by(Sort.Direction.ASC/DESC, \"name\").",
+          "code": {
+            "lang": "java",
+            "text": "List<Employee> findByNameContaining(String name);\nemployeeRepository.findAll(Sort.by(Sort.Direction.ASC, \"name\"));"
+          }
+        },
+        {
+          "h": "Tutorial 10: RESTful web service",
+          "text": "REST: kiểu kiến trúc cho web service, đơn giản hơn RPC/SOAP; thuộc tính: simplicity, modifiability, visibility, portability, reliability. Ánh xạ CRUD: Create = POST (201), Read = GET (200), Update = PUT (200), Delete = DELETE (204).",
+          "code": {
+            "lang": "java",
+            "text": "@RestController\npublic class StudentController {\n  @GetMapping(\"/\") List<Student> all() { ... }\n  @PostMapping(\"/add\") Student add(@RequestBody Student s) { ... }\n  @PutMapping(\"/update/{id}\") ...\n  @DeleteMapping(\"/delete/{id}\") ...\n}"
+          }
+        },
+        {
+          "h": "Tutorial 11: ReactJS gọi REST API",
+          "text": "ReactJS là thư viện JavaScript xây UI. Gọi REST bằng Axios (HTTP client dựa trên promise) hoặc Fetch API. Kiến trúc: MySQL ↔ Spring (cổng 8080) ↔ API ↔ ReactJS (cổng 3000). Phải bật CORS: toàn cục qua WebMvcConfigurer.addCorsMappings hoặc cục bộ bằng @CrossOrigin(origins = \"http://localhost:3000\")."
+        },
+        {
+          "h": "Tut3, Tut4, Tut5, Tut12: Iteration và Unit test",
+          "text": "Tut3: iteration (First10Primes, evenIterator, primeIterator, PrimeList auto-populated). Tut4: ModifyString, ArraySum, FibonacciList với JUnit 5 (@Test, @TestFactory, parameterized với @MethodSource/@ValueSource/@ArgumentsSource). Tut5: unit test với JUnit 5 và Mockito cho bài Hanu University. Tut12: thiết kế test theo black-box strategy rồi cài đặt bằng parameterized tests."
+        }
+      ],
+      "sources": [
+        {
+          "file": "Tut3.pdf",
+          "loc": "trang 1"
+        },
+        {
+          "file": "Tut4.pdf",
+          "loc": "trang 1"
+        },
+        {
+          "file": "Tut5.pdf",
+          "loc": "trang 1"
+        },
+        {
+          "file": "Tutorial 7.pdf",
+          "loc": "trang 1–9"
+        },
+        {
+          "file": "Tutorial 8.pdf",
+          "loc": "trang 1–7"
+        },
+        {
+          "file": "Tutorial 9.pdf",
+          "loc": "trang 1–7"
+        },
+        {
+          "file": "Tutorial 10.pdf",
+          "loc": "trang 1–9"
+        },
+        {
+          "file": "Tutorial 11.pdf",
+          "loc": "trang 1–7"
+        },
+        {
+          "file": "Tut12.pdf",
+          "loc": "trang 1"
+        }
+      ],
+      "cards": [
+        {
+          "id": "se1-tut-c01",
+          "front": "Spring Boot, Hibernate, JPA, Thymeleaf là gì?",
+          "back": "Spring Boot: dựng ứng dụng Spring nhanh nhờ autoconfiguration. Hibernate: ORM. JPA: API lưu trữ dữ liệu bền vững. Thymeleaf: server-side template engine.",
+          "source": {
+            "file": "Tutorial 7.pdf",
+            "loc": "trang 1"
+          }
+        },
+        {
+          "id": "se1-tut-c02",
+          "front": "Ánh xạ CRUD sang HTTP method và status code?",
+          "back": "Create: POST 201; Read: GET 200; Update: PUT 200; Delete: DELETE 204.",
+          "source": {
+            "file": "Tutorial 10.pdf",
+            "loc": "trang 2, Figure 2"
+          }
+        },
+        {
+          "id": "se1-tut-c03",
+          "front": "Hai cách bật CORS trong Spring Boot?",
+          "back": "Toàn cục: WebMvcConfigurer.addCorsMappings; cục bộ: @CrossOrigin(origins = \"http://localhost:3000\") trên controller.",
+          "source": {
+            "file": "Tutorial 11.pdf",
+            "loc": "trang 2–3"
+          }
+        },
+        {
+          "id": "se1-tut-c04",
+          "front": "Annotation validation dùng trong Tutorial 8?",
+          "back": "@Length(min = 3, max = 30), @Min(18), @Max(55), @NotEmpty; controller dùng @Valid và BindingResult.",
+          "source": {
+            "file": "Tutorial 8.pdf",
+            "loc": "trang 3–4"
+          }
+        },
+        {
+          "id": "se1-tut-c05",
+          "front": "Phương thức repository tìm theo tên chứa chuỗi?",
+          "back": "List<Employee> findByNameContaining(String name);",
+          "source": {
+            "file": "Tutorial 9.pdf",
+            "loc": "trang 4"
+          }
+        },
+        {
+          "id": "se1-tut-c06",
+          "front": "Hai cách gọi REST API trong ReactJS?",
+          "back": "Axios (promise-based HTTP client) và Fetch API (có sẵn trong trình duyệt).",
+          "source": {
+            "file": "Tutorial 11.pdf",
+            "loc": "trang 1"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": "se1-tut-q01",
+          "stem": "HTTP method và status code chuẩn cho thao tác Create trong Tutorial 10?",
+          "options": [
+            "GET, 200",
+            "POST, 201",
+            "PUT, 200",
+            "DELETE, 204"
+          ],
+          "answer": 1,
+          "explanation": "Figure 2: Create ↔ POST ↔ 201.",
+          "source": {
+            "file": "Tutorial 10.pdf",
+            "loc": "trang 2, Figure 2"
+          }
+        },
+        {
+          "id": "se1-tut-q02",
+          "stem": "Vì sao cần bật CORS khi ReactJS (cổng 3000) gọi Spring Boot (cổng 8080)?",
+          "options": [
+            "Để tăng tốc",
+            "Không bật CORS thì back-end và front-end không trao đổi dữ liệu qua API được",
+            "Để dùng JPA",
+            "Để mã hóa"
+          ],
+          "answer": 1,
+          "explanation": "Tutorial 11: không bật CORS, hai bên không giao tiếp được.",
+          "source": {
+            "file": "Tutorial 11.pdf",
+            "loc": "trang 2–3"
+          }
+        },
+        {
+          "id": "se1-tut-q03",
+          "stem": "Annotation Spring Data JPA nào sinh khóa tự tăng cho id?",
+          "options": [
+            "@GeneratedValue(strategy = GenerationType.IDENTITY)",
+            "@Column",
+            "@NotEmpty",
+            "@PathVariable"
+          ],
+          "answer": 0,
+          "explanation": "Employee dùng @Id với @GeneratedValue(strategy = GenerationType.IDENTITY).",
+          "source": {
+            "file": "Tutorial 7.pdf",
+            "loc": "trang 3"
+          }
+        }
+      ]
+    }
+  ]
+}

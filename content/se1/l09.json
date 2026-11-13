@@ -1,0 +1,24 @@
+{
+  "id": "se1-l09", "order": 8,
+  "title": "Lecture 9: UML Class Diagrams",
+  "summary": [
+    { "h": "Design và UML", "text": "Design chuyển từ 'what' sang 'how' mà chưa viết cài đặt đầy đủ. Ba view cốt lõi: class diagram (static view), sequence diagram (dynamic view), activity diagram (thuật toán của chức năng). UML dùng như sketch (forward/backward design), blueprint, hoặc ngôn ngữ lập trình." },
+    { "h": "Cú pháp class diagram", "text": "Interface ghi «interface»; tên abstract class in nghiêng. Attribute: visibility name : type. Visibility: + public, # protected, - private, ~ package, / derived attribute. Static: gạch chân. Operation: visibility name(parameters) : return_type; bỏ ': return_type' ở constructor và khi void; không liệt kê method kế thừa; không bỏ method nào của interface." },
+    { "h": "Quan hệ", "text": "Generalization (mũi tên từ con tới cha): cha là class dùng nét liền + tam giác rỗng; cha là interface dùng nét đứt + tam giác rỗng. Aggregation ('is part of'): hình thoi rỗng ở phía toàn thể, phần có thể tồn tại độc lập. Composition ('is entirely made of'): hình thoi đặc, phần sống và chết cùng toàn thể. Dependency ('uses temporarily'): nét đứt mũi tên mở. Association có 3 chú thích: multiplicity (*, 1, 2..4, 3..*), name, navigability." },
+    { "h": "Cách tạo", "text": "Danh từ → class/object/field; động từ → method; quan hệ giữa danh từ → tương tác (chứa, tổng quát hóa, phụ thuộc). Analysis class diagram: ánh xạ entity thành domain class, relationship thành association, associative entity thành association class, viết constraint nếu có. Class diagram tốt để khám phá dữ liệu/thuộc tính liên quan và phụ thuộc; kém để khám phá hành vi thuật toán và luồng điều khiển." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 9.pdf", "loc": "Slides 1–23 (PDF ảnh 1 trang)" }],
+  "cards": [
+    { "id": "se1-l09-c01", "front": "Ký hiệu visibility trong UML?", "back": "+ public, # protected, - private, ~ package, / derived attribute.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 7–8" } },
+    { "id": "se1-l09-c02", "front": "Aggregation khác composition?", "back": "Aggregation (thoi rỗng): phần tồn tại được khi toàn thể mất. Composition (thoi đặc): phần sống và chết cùng toàn thể.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 13–15" } },
+    { "id": "se1-l09-c03", "front": "Vẽ generalization với cha là interface thế nào?", "back": "Nét đứt với tam giác rỗng (cha là class: nét liền).", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 11–12" } },
+    { "id": "se1-l09-c04", "front": "Ba chú thích của association?", "back": "Multiplicity, name, navigability.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slide 14" } },
+    { "id": "se1-l09-c05", "front": "Ba view UML cốt lõi?", "back": "Class (static), sequence (dynamic), activity (thuật toán).", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slide 3" } },
+    { "id": "se1-l09-c06", "front": "Quy tắc khi liệt kê operation trong class diagram?", "back": "Có thể bỏ get/set tầm thường ở class thường nhưng không bỏ method của interface; không ghi method kế thừa; bỏ return type ở constructor và void.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 7, 9" } }
+  ],
+  "questions": [
+    { "id": "se1-l09-q01", "stem": "Ký hiệu nào biểu diễn thuộc tính dẫn xuất (derived)?", "options": ["+", "#", "~", "/"], "answer": 3, "explanation": "Dấu / đặt trước tên attribute là derived.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slide 8" } },
+    { "id": "se1-l09-q02", "stem": "Book và Page: trang sách chỉ tồn tại cùng cuốn sách. Quan hệ phù hợp?", "options": ["Dependency", "Aggregation", "Composition", "Generalization"], "answer": 2, "explanation": "Composition: parts live and die with the whole (hình thoi đặc).", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 13–15" } },
+    { "id": "se1-l09-q03", "stem": "Class diagram KHÔNG phù hợp để làm gì?", "options": ["Khám phá dữ liệu liên quan", "Nhìn nhanh các entity quan trọng", "Hiểu luồng điều khiển tổng thể và thuật toán", "Phát hiện phụ thuộc"], "answer": 2, "explanation": "Slide 20: kém trong khám phá hành vi thuật toán và control flow.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 19–20" } }
+  ]
+}

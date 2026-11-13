@@ -1,0 +1,25 @@
+{
+  "id": "dbs-ch08", "order": 8,
+  "title": "Chương 8: Database Application Development",
+  "summary": [
+    { "h": "Client/server và 3 thành phần logic", "text": "Ba thành phần ứng dụng: Presentation logic (giao diện), Processing logic (xử lý I/O, business rules, quản lý dữ liệu), Storage logic (lưu và truy xuất, hoạt động DBMS). Fat client: client lo presentation và processing, server lo storage. Thin client: client chỉ lo presentation (ví dụ trình duyệt). Application partitioning là đặt các phần mã ở client hoặc server sau khi viết." },
+    { "h": "Two-tier và three-tier", "text": "Two-tier: client lo presentation, data processing, business rules; database server lo lưu trữ và truy cập; phù hợp quy mô phòng ban, ít người dùng. Three-tier: client (thin) – application/web server (business rules, processing) – database server (storage). Lợi ích 3-tier: scalability, linh hoạt công nghệ, giảm chi phí dài hạn, phù hợp nghiệp vụ, cải thiện dịch vụ, lợi thế cạnh tranh, giảm rủi ro." },
+    { "h": "Middleware và API", "text": "Middleware cho phép ứng dụng tương tác với phần mềm khác mà không phải lập trình thao tác cấp thấp. API phổ biến: ODBC, ADO.NET, JDBC. 6 bước dùng database qua API: đăng ký driver, mở kết nối, thực thi truy vấn, xử lý kết quả, lặp lại, đóng kết nối." },
+    { "h": "Stored procedure và connection pooling", "text": "Stored procedure: hiệu năng tốt hơn (SQL biên dịch sẵn), giảm lưu lượng mạng, an toàn hơn, toàn vẹn hơn, client mỏng hơn; nhược điểm: lập trình tốn thời gian và cú pháp phụ thuộc nhà cung cấp. Connection pooling dùng chung và tái sử dụng kết nối." },
+    { "h": "Cloud, XML, Web services", "text": "Cloud: IaaS, PaaS, SaaS. XML Schema (XSD) tương tự CREATE TABLE (metadata), tài liệu XML tương tự bản ghi. 4 cách lưu XML: shredding vào bảng quan hệ, lưu trong BLOB/CLOB, cột XML đặc biệt, native XML database. XPath định vị node; XQuery (FLWOR) truy vấn; XSLT chuyển XML sang HTML. Web services: UDDI (đăng ký/tìm), WSDL (mô tả), SOAP (trao đổi thông điệp), XML, Internet. SOA là tập dịch vụ liên kết lỏng." }
+  ],
+  "sources": [{ "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 1–45" }],
+  "cards": [
+    { "id": "dbs-ch08-c01", "front": "Fat client khác thin client?", "back": "Fat client xử lý cả presentation và processing logic; thin client chỉ presentation (như trình duyệt), phần còn lại ở server.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 6" } },
+    { "id": "dbs-ch08-c02", "front": "Ba tầng của kiến trúc three-tier?", "back": "Client (thin, presentation) – Business/Application layer (web + application server) – Database layer (database server).", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 17–24" } },
+    { "id": "dbs-ch08-c03", "front": "6 bước dùng database qua middleware API?", "back": "Đăng ký driver; mở kết nối; thực thi truy vấn; xử lý kết quả; lặp lại 3–4 nếu cần; đóng kết nối.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 12" } },
+    { "id": "dbs-ch08-c04", "front": "UDDI, WSDL, SOAP lần lượt làm gì?", "back": "UDDI: đăng ký để publish/find/use service. WSDL: mô tả service và giao diện công khai. SOAP: giao thức XML để trao đổi thông điệp.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 40–41" } },
+    { "id": "dbs-ch08-c05", "front": "Bốn cách lưu tài liệu XML?", "back": "Shredding vào bảng quan hệ; lưu trong BLOB/CLOB; cột XML đặc biệt; native XML database.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 35" } },
+    { "id": "dbs-ch08-c06", "front": "Ba loại cloud computing?", "back": "IaaS, PaaS, SaaS.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 30" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch08-q01", "stem": "Trong three-tier, business rules và processing logic thường nằm ở đâu?", "options": ["Client", "Application/web server", "Database server chỉ", "Máy in"], "answer": 1, "explanation": "Tầng giữa (application server) xử lý business rules và processing logic.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 17–24" } },
+    { "id": "dbs-ch08-q02", "stem": "Chuẩn nào dùng XML để mô tả public interface của web service?", "options": ["UDDI", "WSDL", "SOAP", "XPath"], "answer": 1, "explanation": "WSDL là ngữ pháp XML mô tả service.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 40–41" } },
+    { "id": "dbs-ch08-q03", "stem": "Một lợi ích của stored procedure là gì?", "options": ["Cú pháp giống nhau mọi DBMS", "Giảm lưu lượng mạng và tăng hiệu năng", "Không cần DBMS", "Dễ viết hơn mọi mã khác"], "answer": 1, "explanation": "Slide nêu stored procedure giảm network traffic và cải thiện hiệu năng (SQL biên dịch sẵn).", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 28" } }
+  ]
+}

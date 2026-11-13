@@ -1,0 +1,36 @@
+{
+  "id": "se1-tutorials", "order": 11,
+  "title": "Tutorials: Spring Boot, REST, ReactJS, Unit test",
+  "summary": [
+    { "h": "Tutorial 7: Spring Boot (1)", "text": "Spring framework: nền tảng Java cung cấp hạ tầng toàn diện. Spring Boot: công cụ giúp phát triển web/microservice nhanh hơn nhờ autoconfiguration. Hibernate: ORM cho Java. JPA: tập lớp/phương thức lưu trữ dữ liệu bền vững. Thymeleaf: server-side template engine. Dependencies: Spring Web, Thymeleaf, Spring Data JPA, MySQL Driver. Phần 2: bài Stock Trader, vẽ use case diagram và dùng use case template.", "code": { "lang": "java", "text": "@Entity\npublic class Employee {\n  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)\n  @Column(name = \"id\", nullable = false)\n  private Long id;\n  private String name;\n}\npublic interface EmployeeRepository extends JpaRepository<Employee, Long> {}" } },
+    { "h": "Tutorial 8: Security, Validation, Layout", "text": "Spring Security (login/logout), Hibernate Validator (@Length(min=3,max=30), @Min(18), @Max(55), @NotEmpty), Thymeleaf Layout Dialect (layout:decorate, layout:fragment). Controller dùng @Valid và BindingResult; nếu result.hasErrors() trả lại form." },
+    { "h": "Tutorial 9: Quan hệ, tìm kiếm, sắp xếp", "text": "@ManyToOne Employee–Company; tìm kiếm với findByNameContaining; sắp xếp với Sort.by(Sort.Direction.ASC/DESC, \"name\").", "code": { "lang": "java", "text": "List<Employee> findByNameContaining(String name);\nemployeeRepository.findAll(Sort.by(Sort.Direction.ASC, \"name\"));" } },
+    { "h": "Tutorial 10: RESTful web service", "text": "REST: kiểu kiến trúc cho web service, đơn giản hơn RPC/SOAP; thuộc tính: simplicity, modifiability, visibility, portability, reliability. Ánh xạ CRUD: Create = POST (201), Read = GET (200), Update = PUT (200), Delete = DELETE (204).", "code": { "lang": "java", "text": "@RestController\npublic class StudentController {\n  @GetMapping(\"/\") List<Student> all() { ... }\n  @PostMapping(\"/add\") Student add(@RequestBody Student s) { ... }\n  @PutMapping(\"/update/{id}\") ...\n  @DeleteMapping(\"/delete/{id}\") ...\n}" } },
+    { "h": "Tutorial 11: ReactJS gọi REST API", "text": "ReactJS là thư viện JavaScript xây UI. Gọi REST bằng Axios (HTTP client dựa trên promise) hoặc Fetch API. Kiến trúc: MySQL ↔ Spring (cổng 8080) ↔ API ↔ ReactJS (cổng 3000). Phải bật CORS: toàn cục qua WebMvcConfigurer.addCorsMappings hoặc cục bộ bằng @CrossOrigin(origins = \"http://localhost:3000\")." },
+    { "h": "Tut3, Tut4, Tut5, Tut12: Iteration và Unit test", "text": "Tut3: iteration (First10Primes, evenIterator, primeIterator, PrimeList auto-populated). Tut4: ModifyString, ArraySum, FibonacciList với JUnit 5 (@Test, @TestFactory, parameterized với @MethodSource/@ValueSource/@ArgumentsSource). Tut5: unit test với JUnit 5 và Mockito cho bài Hanu University. Tut12: thiết kế test theo black-box strategy rồi cài đặt bằng parameterized tests." }
+  ],
+  "sources": [
+    { "file": "Tut3.pdf", "loc": "trang 1" },
+    { "file": "Tut4.pdf", "loc": "trang 1" },
+    { "file": "Tut5.pdf", "loc": "trang 1" },
+    { "file": "Tutorial 7.pdf", "loc": "trang 1–9" },
+    { "file": "Tutorial 8.pdf", "loc": "trang 1–7" },
+    { "file": "Tutorial 9.pdf", "loc": "trang 1–7" },
+    { "file": "Tutorial 10.pdf", "loc": "trang 1–9" },
+    { "file": "Tutorial 11.pdf", "loc": "trang 1–7" },
+    { "file": "Tut12.pdf", "loc": "trang 1" }
+  ],
+  "cards": [
+    { "id": "se1-tut-c01", "front": "Spring Boot, Hibernate, JPA, Thymeleaf là gì?", "back": "Spring Boot: dựng ứng dụng Spring nhanh nhờ autoconfiguration. Hibernate: ORM. JPA: API lưu trữ dữ liệu bền vững. Thymeleaf: server-side template engine.", "source": { "file": "Tutorial 7.pdf", "loc": "trang 1" } },
+    { "id": "se1-tut-c02", "front": "Ánh xạ CRUD sang HTTP method và status code?", "back": "Create: POST 201; Read: GET 200; Update: PUT 200; Delete: DELETE 204.", "source": { "file": "Tutorial 10.pdf", "loc": "trang 2, Figure 2" } },
+    { "id": "se1-tut-c03", "front": "Hai cách bật CORS trong Spring Boot?", "back": "Toàn cục: WebMvcConfigurer.addCorsMappings; cục bộ: @CrossOrigin(origins = \"http://localhost:3000\") trên controller.", "source": { "file": "Tutorial 11.pdf", "loc": "trang 2–3" } },
+    { "id": "se1-tut-c04", "front": "Annotation validation dùng trong Tutorial 8?", "back": "@Length(min = 3, max = 30), @Min(18), @Max(55), @NotEmpty; controller dùng @Valid và BindingResult.", "source": { "file": "Tutorial 8.pdf", "loc": "trang 3–4" } },
+    { "id": "se1-tut-c05", "front": "Phương thức repository tìm theo tên chứa chuỗi?", "back": "List<Employee> findByNameContaining(String name);", "source": { "file": "Tutorial 9.pdf", "loc": "trang 4" } },
+    { "id": "se1-tut-c06", "front": "Hai cách gọi REST API trong ReactJS?", "back": "Axios (promise-based HTTP client) và Fetch API (có sẵn trong trình duyệt).", "source": { "file": "Tutorial 11.pdf", "loc": "trang 1" } }
+  ],
+  "questions": [
+    { "id": "se1-tut-q01", "stem": "HTTP method và status code chuẩn cho thao tác Create trong Tutorial 10?", "options": ["GET, 200", "POST, 201", "PUT, 200", "DELETE, 204"], "answer": 1, "explanation": "Figure 2: Create ↔ POST ↔ 201.", "source": { "file": "Tutorial 10.pdf", "loc": "trang 2, Figure 2" } },
+    { "id": "se1-tut-q02", "stem": "Vì sao cần bật CORS khi ReactJS (cổng 3000) gọi Spring Boot (cổng 8080)?", "options": ["Để tăng tốc", "Không bật CORS thì back-end và front-end không trao đổi dữ liệu qua API được", "Để dùng JPA", "Để mã hóa"], "answer": 1, "explanation": "Tutorial 11: không bật CORS, hai bên không giao tiếp được.", "source": { "file": "Tutorial 11.pdf", "loc": "trang 2–3" } },
+    { "id": "se1-tut-q03", "stem": "Annotation Spring Data JPA nào sinh khóa tự tăng cho id?", "options": ["@GeneratedValue(strategy = GenerationType.IDENTITY)", "@Column", "@NotEmpty", "@PathVariable"], "answer": 0, "explanation": "Employee dùng @Id với @GeneratedValue(strategy = GenerationType.IDENTITY).", "source": { "file": "Tutorial 7.pdf", "loc": "trang 3" } }
+  ]
+}

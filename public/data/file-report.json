@@ -1,0 +1,325 @@
+{
+  "generatedAt": "2026-11-13T03:16:38.237Z",
+  "subjects": {
+    "dbs": {
+      "name": "DBS",
+      "total": 19,
+      "files": [
+        {
+          "file": "1791184980251_2287926346835723288_g7644320767961835470_cde4df6ccdbde03218d7d7622b75b7b3.jpg",
+          "ext": ".jpg",
+          "size": 106366,
+          "status": "image",
+          "note": ""
+        },
+        {
+          "file": "8.4.jpg",
+          "ext": ".jpg",
+          "size": 271569,
+          "status": "image",
+          "note": ""
+        },
+        {
+          "file": "838362449_945188051537703_2571160256995451982_n.jpg",
+          "ext": ".jpg",
+          "size": 104845,
+          "status": "image",
+          "note": ""
+        },
+        {
+          "file": "Advanced SQL and Join 10.10.sql",
+          "ext": ".sql",
+          "size": 2269,
+          "status": "readable",
+          "note": ""
+        },
+        {
+          "file": "Basic select statement.sql",
+          "ext": ".sql",
+          "size": 2209,
+          "status": "readable",
+          "note": ""
+        },
+        {
+          "file": "Chapter 04.pdf",
+          "ext": ".pdf",
+          "size": 19039024,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Chapter 05.pdf",
+          "ext": ".pdf",
+          "size": 13738974,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Chapter 06.pdf",
+          "ext": ".pdf",
+          "size": 4623575,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Chapter 07.pdf",
+          "ext": ".pdf",
+          "size": 5100998,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "hoffer_mdm12e_pp_ch01.pdf",
+          "ext": ".pdf",
+          "size": 15925394,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "hoffer_mdm12e_pp_ch02.pdf",
+          "ext": ".pdf",
+          "size": 14167050,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "hoffer_mdm12e_pp_ch03.pdf",
+          "ext": ".pdf",
+          "size": 9095153,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "hoffer_mdm12e_pp_ch08.pdf",
+          "ext": ".pdf",
+          "size": 3082898,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Lab 7 - 8.pdf",
+          "ext": ".pdf",
+          "size": 1066341,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "MySQL Lab 5-6.pdf",
+          "ext": ".pdf",
+          "size": 1097988,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Subquerries, view and stored procedures.pdf",
+          "ext": ".pdf",
+          "size": 620290,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "TUT06 DDL basic_building themeparkDB.pdf",
+          "ext": ".pdf",
+          "size": 456086,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tut9_DML and select statement.pdf",
+          "ext": ".pdf",
+          "size": 788323,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "[studocu.com] - DBS - Midterm Exam Review - Key Concepts and SQL Questions.pdf",
+          "ext": ".pdf",
+          "size": 128980,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        }
+      ]
+    },
+    "se1": {
+      "name": "SE1-2026",
+      "total": 25,
+      "files": [
+        {
+          "file": "Resources/CS605-Software Engineering Practitioner’s Approach  by Roger S. Pressman (8th Edition).pdf",
+          "ext": ".pdf",
+          "size": 24046416,
+          "status": "reference-skipped",
+          "note": "Sách tham khảo dày, không nạp (nội dung cốt lõi nằm trong Lecture)"
+        },
+        {
+          "file": "Resources/Lecture 1.pdf",
+          "ext": ".pdf",
+          "size": 618235,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Resources/Lecture 10.pdf",
+          "ext": ".pdf",
+          "size": 1749593,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Resources/Lecture 11.pdf",
+          "ext": ".pdf",
+          "size": 694344,
+          "status": "image-only",
+          "note": "PDF dạng ảnh 1 trang dài, không có text layer; nội dung biên soạn từ slide, trích nguồn theo số slide"
+        },
+        {
+          "file": "Resources/Lecture 12.pdf",
+          "ext": ".pdf",
+          "size": 1846218,
+          "status": "image-only",
+          "note": "PDF dạng ảnh 1 trang dài, không có text layer; nội dung biên soạn từ slide, trích nguồn theo số slide"
+        },
+        {
+          "file": "Resources/Lecture 2.pdf",
+          "ext": ".pdf",
+          "size": 559365,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Resources/Lecture 3.pdf",
+          "ext": ".pdf",
+          "size": 811932,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Resources/Lecture 4_5.pdf",
+          "ext": ".pdf",
+          "size": 485546,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Resources/Lecture 6.pdf",
+          "ext": ".pdf",
+          "size": 480018,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Resources/Lecture 7.pdf",
+          "ext": ".pdf",
+          "size": 2135760,
+          "status": "image-only",
+          "note": "PDF dạng ảnh 1 trang dài, không có text layer; nội dung biên soạn từ slide, trích nguồn theo số slide"
+        },
+        {
+          "file": "Resources/Lecture 8.pdf",
+          "ext": ".pdf",
+          "size": 2455438,
+          "status": "image-only",
+          "note": "PDF dạng ảnh 1 trang dài, không có text layer; nội dung biên soạn từ slide, trích nguồn theo số slide"
+        },
+        {
+          "file": "Resources/Lecture 9.pdf",
+          "ext": ".pdf",
+          "size": 1073920,
+          "status": "image-only",
+          "note": "PDF dạng ảnh 1 trang dài, không có text layer; nội dung biên soạn từ slide, trích nguồn theo số slide"
+        },
+        {
+          "file": "Resources/mastering-software-testing-with-junit-5-comprehensive-guide-to-develop-high-quality-java-applications-9781787285736.pdf",
+          "ext": ".pdf",
+          "size": 14419313,
+          "status": "reference-skipped",
+          "note": "Sách tham khảo dày, không nạp (nội dung cốt lõi nằm trong Lecture)"
+        },
+        {
+          "file": "Resources/Object Oriented Program Development.pdf",
+          "ext": ".pdf",
+          "size": 5973946,
+          "status": "reference-skipped",
+          "note": "Sách tham khảo dày, không nạp (nội dung cốt lõi nằm trong Lecture)"
+        },
+        {
+          "file": "Resources/Sommerville - 2011 - Software Engineering.pdf",
+          "ext": ".pdf",
+          "size": 5285635,
+          "status": "reference-skipped",
+          "note": "Sách tham khảo dày, không nạp (nội dung cốt lõi nằm trong Lecture)"
+        },
+        {
+          "file": "Resources/Textbook - Guttag, Liskov - Program Development in Java.pdf",
+          "ext": ".pdf",
+          "size": 2649982,
+          "status": "reference-skipped",
+          "note": "Sách tham khảo dày, không nạp (nội dung cốt lõi nằm trong Lecture)"
+        },
+        {
+          "file": "Tut12.pdf",
+          "ext": ".pdf",
+          "size": 82054,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tut3.pdf",
+          "ext": ".pdf",
+          "size": 83689,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tut4.pdf",
+          "ext": ".pdf",
+          "size": 84314,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tut5.pdf",
+          "ext": ".pdf",
+          "size": 84376,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tutorial 10.pdf",
+          "ext": ".pdf",
+          "size": 1263187,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tutorial 11.pdf",
+          "ext": ".pdf",
+          "size": 925350,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tutorial 7.pdf",
+          "ext": ".pdf",
+          "size": 775553,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tutorial 8.pdf",
+          "ext": ".pdf",
+          "size": 691367,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        },
+        {
+          "file": "Tutorial 9.pdf",
+          "ext": ".pdf",
+          "size": 672709,
+          "status": "readable-pdf",
+          "note": "PDF có text layer"
+        }
+      ]
+    }
+  }
+}

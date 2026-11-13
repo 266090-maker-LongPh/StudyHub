@@ -1,0 +1,23 @@
+{
+  "id": "se1-l02", "order": 2,
+  "title": "Lecture 2: Exceptions",
+  "summary": [
+    { "h": "Robust procedure", "text": "Thủ tục robust hành xử xác định khi có lỗi, không dừng đột ngột, đưa ra xấp xỉ hành vi bình thường. Hai giải pháp cho input không hợp lệ: trả về giá trị đặc biệt (hạn chế: không mang chi tiết lỗi, một số thủ tục như boolean isSorted(int[]) không có giá trị đặc biệt, caller có thể bỏ qua, cần kiểm tra thêm) hoặc phát tín hiệu (exception): không cần giá trị trả về đặc biệt, dừng thực thi tới khi xử lý, buộc caller xử lý, mang chi tiết lỗi." },
+    { "h": "Phân cấp exception", "text": "Throwable → Error (lỗi môi trường) và Exception (lỗi chương trình) → RuntimeException (unchecked) và các subtype Exception khác (checked). Checked exception phải khai báo trong throws hoặc bắt bằng try...catch, nếu không sẽ lỗi biên dịch. Unchecked (subtype của RuntimeException) không bắt buộc. Chỉ dùng unchecked khi người dùng thường viết code đảm bảo exception không xảy ra vì có cách tránh tiện lợi, rẻ và ngữ cảnh dùng cục bộ; ngược lại dùng checked." },
+    { "h": "Đặt tên và khai báo", "text": "Tên = loại lỗi + 'Exception' (NullPointerException). Khai báo bằng cách extend Exception (checked) hoặc RuntimeException (unchecked) với constructor mặc định super() và constructor String super(s)." },
+    { "h": "Ba kỹ thuật xử lý", "text": "Logging: in/ghi chi tiết lỗi (System.err.println, printStackTrace). Masking: exception là một phần logic dự kiến, xử lý rồi tiếp tục luồng bình thường (ví dụ ghi lỗi và trả -1). Reflecting: truyền exception lên caller, tự động hoặc bắt rồi ném exception khác mức cao hơn (bắt NonPositiveException ném NotPossibleException)." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 2.pdf", "loc": "Slides 1–31" }],
+  "cards": [
+    { "id": "se1-l02-c01", "front": "Checked và unchecked exception khác nhau thế nào?", "back": "Checked: subtype của Exception (không phải RuntimeException), phải khai báo throws hoặc catch. Unchecked: subtype của RuntimeException, không bắt buộc.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 13" } },
+    { "id": "se1-l02-c02", "front": "Khi nào dùng unchecked exception?", "back": "Chỉ khi người dùng thường viết code bảo đảm exception không xảy ra: có cách tránh tiện lợi và rẻ, và ngữ cảnh dùng cục bộ.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 17" } },
+    { "id": "se1-l02-c03", "front": "Ba kỹ thuật xử lý exception?", "back": "Logging, Masking, Reflecting.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 25–30" } },
+    { "id": "se1-l02-c04", "front": "Reflecting exception là gì?", "back": "Truyền exception lên caller (tự động) hoặc bắt rồi ném exception khác mức cao hơn, ví dụ bắt NonPositiveException và ném NotPossibleException.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 29–30" } },
+    { "id": "se1-l02-c05", "front": "Giới hạn của việc trả về special value để báo lỗi?", "back": "Không mang chi tiết lỗi; có thủ tục không có giá trị đặc biệt (isSorted); caller có thể bỏ qua; cần kiểm tra thêm.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 6–8" } }
+  ],
+  "questions": [
+    { "id": "se1-l02-q01", "stem": "Lớp nào là checked exception?", "options": ["RuntimeException", "NullPointerException", "Một subtype của Exception không phải RuntimeException", "Error"], "answer": 2, "explanation": "Checked exception là subtype của Exception ngoại trừ RuntimeException.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 13" } },
+    { "id": "se1-l02-q02", "stem": "Xử lý exception như computeFact1 (ghi lỗi rồi trả về -1 và chạy tiếp) thuộc kỹ thuật nào?", "options": ["Logging", "Masking", "Reflecting", "Propagating tự động"], "answer": 1, "explanation": "Masking: xử lý exception dự kiến và tiếp tục luồng bình thường.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 27–28" } },
+    { "id": "se1-l02-q03", "stem": "Quy ước đặt tên exception đúng là?", "options": ["'Exception' + loại lỗi", "Loại lỗi + 'Exception'", "'Err' + loại lỗi", "Tùy ý"], "answer": 1, "explanation": "Ví dụ NullPointerException, DivideByZeroException.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 18" } }
+  ]
+}

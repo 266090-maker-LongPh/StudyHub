@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-13T03:20:10.732Z",
+  "dbs": {
+    "completedChapterIds": [],
+    "cards": {},
+    "quizHistory": [
+      {
+        "id": "1794540010731-62cd8",
+        "chapterId": "mixed",
+        "chapterTitle": "Trộn ngẫu nhiên",
+        "score": 0,
+        "total": 15,
+        "timestamp": "2026-11-13T03:20:10.732Z",
+        "wrongChapterIds": [
+          "dbs-ch06",
+          "dbs-ch07",
+          "dbs-ch05",
+          "dbs-lab-ddl-dml",
+          "dbs-ch03",
+          "dbs-ch02",
+          "dbs-lab-adv",
+          "dbs-ch04",
+          "dbs-ch08",
+          "dbs-view-proc"
+        ]
+      }
+    ],
+    "studyDates": [
+      "2026-11-13"
+    ]
+  },
+  "se1": {
+    "completedChapterIds": [],
+    "cards": {},
+    "quizHistory": [],
+    "studyDates": []
+  }
+}

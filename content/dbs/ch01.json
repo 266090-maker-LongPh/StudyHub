@@ -1,0 +1,26 @@
+{
+  "id": "dbs-ch01", "order": 1,
+  "title": "Chương 1: The Database Environment and Development Process",
+  "summary": [
+    { "h": "Data, Information, Metadata", "text": "Database là tập hợp dữ liệu có tổ chức, liên quan logic với nhau. Data là biểu diễn lưu trữ của đối tượng/sự kiện có ý nghĩa (structured: số, text, ngày; unstructured: ảnh, video, tài liệu). Information là dữ liệu đã xử lý để tăng hiểu biết cho người dùng. Metadata mô tả thuộc tính và ngữ cảnh của dữ liệu: kiểu dữ liệu, kích thước field, giá trị cho phép (min/max), mô tả, nguồn." },
+    { "h": "File processing truyền thống và 5 nhược điểm", "text": "1) Program-data dependence (mỗi chương trình tự giữ metadata cho từng file). 2) Duplication of data (data redundancy; nguy cơ inconsistency, mất data integrity). 3) Limited data sharing. 4) Lengthy development times. 5) Excessive program maintenance (chiếm 80% ngân sách hệ thống thông tin)." },
+    { "h": "Database approach và DBMS", "text": "Kho dữ liệu dùng chung, quản lý bởi một tác nhân điều khiển và cần DBMS. DBMS là hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới database. Ưu điểm gồm 10 mục (program-data independence, planned data redundancy, improved data consistency, sharing, productivity, enforcement of standards, data quality, accessibility, reduced maintenance, decision support). Chi phí/rủi ro gồm 5 mục (personnel mới, chi phí cài đặt/quản lý, chi phí chuyển đổi, backup/recovery tường minh, xung đột tổ chức)." },
+    { "h": "9 thành phần của database environment", "text": "CASE tools, Repository (kho metadata), DBMS, Database, Application programs, User interface, Data/Database administrators, System developers, End users." },
+    { "h": "SDLC, Prototyping, Agile", "text": "SDLC có 6 pha: Planning, Analysis, Logical Design, Physical Design, Implementation, Maintenance. Prototyping (RAD): làm conceptual data modeling sơ lược, định nghĩa database trong lúc làm prototype đầu tiên, lặp lại. Agile nhấn mạnh con người, phần mềm chạy được, hợp tác với khách hàng, đáp ứng thay đổi (ví dụ XP, Scrum, DSDM, FDD)." },
+    { "h": "Three-schema architecture", "text": "External schema (user views) ⊂ Conceptual schema (mô hình E-R) → Internal schema gồm logical schema (Chương 4) và physical schema (Chương 5)." }
+  ],
+  "sources": [{ "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 1–55" }],
+  "cards": [
+    { "id": "dbs-ch01-c01", "front": "Metadata là gì?", "back": "Dữ liệu mô tả thuộc tính và ngữ cảnh của dữ liệu người dùng: kiểu dữ liệu, kích thước field, giá trị cho phép, mô tả, nguồn.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 3, 6" } },
+    { "id": "dbs-ch01-c02", "front": "5 nhược điểm của file processing truyền thống?", "back": "Program-data dependence; duplication of data; limited data sharing; lengthy development times; excessive program maintenance (80% ngân sách IS).", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slide 9" } },
+    { "id": "dbs-ch01-c03", "front": "DBMS là gì?", "back": "Hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới user databases.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slide 13" } },
+    { "id": "dbs-ch01-c04", "front": "Enterprise Data Model khác Project Data Model thế nào?", "back": "Enterprise: entity và relationship mức cao cho toàn tổ chức. Project: góc nhìn chi tiết hơn, khớp cấu trúc dữ liệu trong database/data warehouse.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 14–15" } },
+    { "id": "dbs-ch01-c05", "front": "Ba tầng của three-schema architecture?", "back": "External schema (user views), Conceptual schema (E-R), Internal schema (logical + physical).", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 42–43" } },
+    { "id": "dbs-ch01-c06", "front": "Sáu pha của SDLC theo thứ tự?", "back": "Planning → Analysis → Logical Design → Physical Design → Implementation → Maintenance.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 29–35" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch01-q01", "stem": "Vấn đề lớn nhất của data redundancy trong file processing là gì?", "options": ["Tốn băng thông mạng", "Thay đổi dữ liệu ở một file có thể gây inconsistency và ảnh hưởng data integrity", "Chương trình chạy chậm hơn", "Không thể backup"], "answer": 1, "explanation": "Slide 11 nêu 'biggest problem' là thay đổi ở một file có thể dẫn tới inconsistency và compromise data integrity.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slide 11" } },
+    { "id": "dbs-ch01-q02", "stem": "Thành phần nào của database environment là 'centralized storehouse of metadata'?", "options": ["DBMS", "Repository", "CASE tool", "User interface"], "answer": 1, "explanation": "Repository là kho tập trung chứa metadata.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 24–25" } },
+    { "id": "dbs-ch01-q03", "stem": "Trong three-schema architecture, user views thuộc schema nào?", "options": ["External schema", "Conceptual schema", "Internal schema", "Physical schema"], "answer": 0, "explanation": "User views (report, màn hình, form) là external schema, là tập con của conceptual schema.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 42–43" } }
+  ]
+}

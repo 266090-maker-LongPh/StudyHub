@@ -1,0 +1,24 @@
+{
+  "id": "se1-l01", "order": 1,
+  "title": "Lecture 1: Review of OOP",
+  "summary": [
+    { "h": "Procedural vs OOP", "text": "Procedural programming dùng danh sách thủ tục để chỉ máy làm từng bước; OOP dùng tập đối tượng tương tác với nhau. Thêm hình Amoeba (phát .mp3, xoay quanh một đầu) vào code thủ tục phải sửa và test lại các thủ tục cũ; trong OOP chỉ thêm/sửa lớp Amoeba. Lợi ích OOP: dữ liệu an toàn hơn, dễ bảo trì, dễ mở rộng, tái sử dụng qua inheritance và polymorphism." },
+    { "h": "Encapsulation", "text": "Giữ instance variable ẩn (thường private) và cung cấp accessor public set<Property>/get<Property>; khi yêu cầu đổi (ví dụ size > 0) chỉ cần sửa setSize()." },
+    { "h": "Inheritance và type hierarchy", "text": "Đưa thuộc tính chung (address, name, phone) của Programmer và Manager lên superclass Employee. Lợi ích: lớp nhỏ gọn, dễ sửa thuộc tính chung, mở rộng, tái sử dụng, loại trùng lặp. Một subtype có thể kế thừa nhiều supertype nhưng chỉ một supertype là class, còn lại là interface. IS-A dựa trên inheritance/interface (Horse IS-A Animal); HAS-A dựa trên composition (Horse HAS-A Hat)." },
+    { "h": "Polymorphism và reference variable", "text": "Polymorphism là nhiều dạng: một đối tượng có hành vi khác nhau tùy ngữ cảnh. Kiểu khai báo của reference variable quyết định method gọi được lúc compile; biến có thể trỏ tới đối tượng cùng kiểu hoặc bất kỳ subtype. Dynamic method dispatching chọn cài đặt theo kiểu thực tế (runtime type) của đối tượng khi method bị override." },
+    { "h": "Liskov Substitution Principle", "text": "Đối tượng của superclass có thể được thay bằng đối tượng của subclass mà không làm sai chương trình. Ba quy tắc: Signature rule (subtype có đủ method của supertype; kiểu trả về cùng hoặc là subtype; ném ít exception hơn hoặc hẹp hơn); Methods rule (subtype có thể làm yếu precondition và làm mạnh postcondition); Properties rule (subtype phải bảo toàn các invariant của supertype)." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 1.pdf", "loc": "Slides 1–36" }],
+  "cards": [
+    { "id": "se1-l01-c01", "front": "Lợi ích của OOP so với procedural?", "back": "Dữ liệu an toàn hơn, dễ bảo trì, dễ mở rộng, tái sử dụng code qua inheritance và polymorphism.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 10" } },
+    { "id": "se1-l01-c02", "front": "IS-A và HAS-A khác nhau thế nào?", "back": "IS-A dựa trên inheritance hoặc cài đặt interface (Horse IS-A Animal). HAS-A dựa trên sử dụng/composition (Horse HAS-A Hat).", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 25" } },
+    { "id": "se1-l01-c03", "front": "Dynamic method dispatching là gì?", "back": "Cơ chế runtime chọn phiên bản method bị override theo kiểu thực tế (runtime type) của đối tượng, không theo kiểu khai báo.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 34" } },
+    { "id": "se1-l01-c04", "front": "Ba quy tắc của Liskov Substitution Principle?", "back": "Signature rule, Methods rule (làm yếu precondition, làm mạnh postcondition), Properties rule (bảo toàn invariant).", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slides 30–33" } },
+    { "id": "se1-l01-c05", "front": "Subtype có thể có bao nhiêu supertype là class?", "back": "Nhiều supertype nhưng chỉ một là class, các supertype còn lại phải là interface.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 22" } }
+  ],
+  "questions": [
+    { "id": "se1-l01-q01", "stem": "Theo Signature rule của LSP, method override ở subtype phải thế nào về exception?", "options": ["Ném nhiều exception hơn", "Ném ít (hoặc hẹp hơn) exception so với supertype", "Không được ném exception", "Tùy ý"], "answer": 1, "explanation": "Slide 31: exception được ném phải ít hơn (hoặc hẹp hơn) method của supertype.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 31" } },
+    { "id": "se1-l01-q02", "stem": "Methods rule cho phép subtype method làm gì với precondition và postcondition?", "options": ["Làm mạnh precondition, làm yếu postcondition", "Làm yếu precondition, làm mạnh postcondition", "Giữ nguyên cả hai bắt buộc", "Bỏ cả hai"], "answer": 1, "explanation": "Slide 32: weaken precondition và strengthen postcondition.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 32" } },
+    { "id": "se1-l01-q03", "stem": "Method nào được gọi khi Animal a = new Horse(); a.eat() và Horse override eat()?", "options": ["Animal.eat() vì kiểu khai báo", "Horse.eat() vì kiểu runtime", "Lỗi biên dịch", "Cả hai"], "answer": 1, "explanation": "Dynamic dispatch chọn theo actual (runtime) type.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 34" } }
+  ]
+}

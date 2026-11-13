@@ -1,0 +1,28 @@
+{
+  "id": "dbs-lab-ddl-dml", "order": 9,
+  "title": "Lab 2–4: DDL, DML và SELECT cơ bản (themepark)",
+  "summary": [
+    { "h": "CSDL THEMEPARK", "text": "Bảy bảng: THEMEPARK(PARK_CODE PK, PARK_NAME, PARK_CITY, PARK_COUNTRY), EMPLOYEE, TICKET, ATTRACTION, HOURS (PK ghép EMP_NUM, ATTRACT_NO, DATE_WORKED), SALES, SALES_LINE (PK ghép TRANSACTION_NO, LINE_NO; FK tới SALES ON DELETE CASCADE)." },
+    { "h": "Ràng buộc trong MySQL (Lab 2)", "text": "DEFAULT phải là hằng số. FOREIGN KEY cần engine InnoDB, cột được đánh index và cùng kiểu dữ liệu. Tài liệu lab ghi MySQL 5.0 không hỗ trợ CHECK. Xóa bảng theo thứ tự ngược phụ thuộc.", "code": { "lang": "sql", "text": "CREATE DATABASE themepark;\nUSE themepark;\nCREATE TABLE THEMEPARK (\n  PARK_CODE VARCHAR(10) PRIMARY KEY,\n  PARK_NAME VARCHAR(35) NOT NULL,\n  PARK_CITY VARCHAR(50) NOT NULL,\n  PARK_COUNTRY CHAR(2) NOT NULL\n);\nCREATE INDEX EMP_LNAME_INDEX ON EMPLOYEE(EMP_LNAME(8));\nALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);\nDROP TABLE SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK;" } },
+    { "h": "DML (Lab 3)", "text": "INSERT theo thứ tự thỏa referential integrity (bảng cha trước). UPDATE không có WHERE sẽ cập nhật mọi hàng. Dùng SET AUTOCOMMIT = 0 và ROLLBACK để khôi phục. INSERT ... SELECT chép dữ liệu từ bảng khác.", "code": { "lang": "sql", "text": "UPDATE ATTRACTION SET ATTRACT_AGE = 14;  -- thiếu WHERE: sửa mọi hàng\nSET AUTOCOMMIT = 0;\nROLLBACK;\nDELETE FROM PARK_COPY WHERE PARK_CODE = 'RL1';\nINSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;" } },
+    { "h": "SELECT cơ bản (Lab 4)", "text": "Toán tử số học và alias; so sánh (=, <, <=, >, >=, <>, !=); BETWEEN, IN, LIKE với % và _, IS NULL. Độ ưu tiên NOT > AND > OR.", "code": { "lang": "sql", "text": "SELECT TICKET_NO, ROUND(TICKET_PRICE * 0.1, 2) AS Discount FROM TICKET;\nSELECT * FROM EMPLOYEE WHERE EMP_FNAME LIKE '%n_';\nSELECT * FROM SECTION WHERE SECTIONNO BETWEEN 2713 AND 2717;" } }
+  ],
+  "sources": [
+    { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Lab 2 (20 trang)" },
+    { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3–4 (27 trang)" },
+    { "file": "Basic select statement.sql", "loc": "dòng 1–57" }
+  ],
+  "cards": [
+    { "id": "dbs-lab1-c01", "front": "UPDATE không có WHERE thì sao?", "back": "Cập nhật mọi hàng trong bảng (ví dụ UPDATE ATTRACTION SET ATTRACT_AGE = 14 đổi tuổi mọi attraction).", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.3" } },
+    { "id": "dbs-lab1-c02", "front": "Điều kiện để tạo FOREIGN KEY trong MySQL theo Lab 2?", "back": "Engine InnoDB, cột FK được đánh index, hai cột cùng kiểu dữ liệu.", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.4" } },
+    { "id": "dbs-lab1-c03", "front": "Vì sao phải DROP TABLE theo thứ tự ngược phụ thuộc?", "back": "Bảng con (có FK) phải xóa trước bảng cha: SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK.", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.5" } },
+    { "id": "dbs-lab1-c04", "front": "Lệnh sửa kiểu cột ATTRACT_CAPACITY thành NUMERIC(4)?", "back": "ALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.8" } },
+    { "id": "dbs-lab1-c05", "front": "Cách chép dữ liệu EMPLOYEE sang EMP_COPY?", "back": "INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.6" } },
+    { "id": "dbs-lab1-c06", "front": "Khôi phục dữ liệu sau khi thử UPDATE/DELETE?", "back": "SET AUTOCOMMIT = 0; thao tác; rồi ROLLBACK;", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.4" } }
+  ],
+  "questions": [
+    { "id": "dbs-lab1-q01", "stem": "Trong Lab 3, lệnh nào đổi ATTRACT_AGE của mọi attraction thành 14?", "options": ["UPDATE ATTRACTION SET ATTRACT_AGE = 14;", "ALTER TABLE ATTRACTION SET ATTRACT_AGE = 14;", "INSERT INTO ATTRACTION VALUES (14);", "SELECT 14 FROM ATTRACTION;"], "answer": 0, "explanation": "UPDATE không WHERE tác động lên mọi hàng.", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.3" } },
+    { "id": "dbs-lab1-q02", "stem": "Điều kiện nào KHÔNG thuộc yêu cầu tạo FOREIGN KEY trong MySQL (Lab 2)?", "options": ["Dùng engine InnoDB", "Cột FK được index", "Hai cột cùng kiểu dữ liệu", "Bảng phải có CHECK constraint"], "answer": 3, "explanation": "Lab 2 nêu InnoDB, index và cùng kiểu; không yêu cầu CHECK.", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.4" } },
+    { "id": "dbs-lab1-q03", "stem": "SELECT * FROM employee WHERE emp_fname LIKE '%n_' khớp tên nào?", "options": ["Tên kết thúc bằng n", "Tên có chữ n là ký tự kế cuối", "Tên bắt đầu bằng n", "Tên có đúng 2 ký tự"], "answer": 1, "explanation": "% khớp chuỗi bất kỳ, _ khớp đúng một ký tự, nên n là ký tự áp chót.", "source": { "file": "Basic select statement.sql", "loc": "dòng 24" } }
+  ]
+}

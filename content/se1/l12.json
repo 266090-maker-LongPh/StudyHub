@@ -1,0 +1,27 @@
+{
+  "id": "se1-l12", "order": 10,
+  "title": "Lecture 12: Testing",
+  "summary": [
+    { "h": "Định nghĩa", "text": "Software testing là đánh giá động (dynamic) hành vi chương trình trên một tập hữu hạn (finite) test case được chọn phù hợp (selected) từ miền thực thi thường vô hạn, so với hành vi mong đợi (expected). Phân loại 3 trục: mức (unit, integration, system, acceptance), phương pháp (black-box, white-box, non-functional), loại (manual, automated)." },
+    { "h": "Mức kiểm thử", "text": "Unit: kiểm tra mã nguồn (setup, exercise, verify, teardown). Integration: kiểm tra giao diện giữa các module. Top-down: bắt đầu từ main program, dùng stub thay module cấp dưới, thay dần bằng module thật (depth-first hoặc breadth-first), có regression testing. Bottom-up: bắt đầu từ module thấp nhất, gom thành cluster, dùng driver điều phối test, sau đó bỏ driver và đi lên. System testing: tích hợp tất cả thành phần. Acceptance: dùng dữ liệu thật của khách, đội phát triển không chịu trách nhiệm, thường là black-box." },
+    { "h": "Black-box", "text": "Equivalence partitioning: khoảng giá trị → 1 lớp hợp lệ và 2 không hợp lệ; một giá trị cụ thể → 1 hợp lệ và 2 không hợp lệ; thành viên của tập → 1 và 1; Boolean → 1 và 1; mảng/chuỗi → 1 hợp lệ và 2 không hợp lệ. Boundary value analysis: chọn test ở biên, ví dụ khoảng [a, b]: a, b và ngay trên/dưới a, b (cả đầu vào và đầu ra)." },
+    { "h": "White-box", "text": "Coverage: statement, decision, condition, paths, function, entry/exit. Basis path testing (McCabe): vẽ flow graph, tính cyclomatic complexity, tìm tập đường độc lập tuyến tính, soạn test cho mỗi đường. Compound condition (IF a OR b) cần predicate node riêng cho từng điều kiện. Công thức: V(G) = số region (gồm vùng ngoài) = E − N + 2 = P + 1 (P là số predicate node)." },
+    { "h": "Loop testing", "text": "Simple loop (tối đa n lần): bỏ qua vòng, 1 lần, 2 lần, m lần (m < n), n−1, n, n+1 lần. Nested: bắt đầu vòng trong cùng với vòng ngoài ở giá trị nhỏ nhất, rồi làm ngược ra ngoài. Concatenated: độc lập → test như simple; phụ thuộc → test như nested. Unstructured: nên thiết kế lại." },
+    { "h": "Non-functional", "text": "Performance, load, volume (tập trung khối lượng dữ liệu), stress (vượt công suất bình thường tới khi hỏng), security (6 khái niệm: confidentiality, integrity, authentication, authorization, availability, non-repudiation), usability, accessibility." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 12.pdf", "loc": "Slides 1–35 (PDF ảnh 1 trang)" }],
+  "cards": [
+    { "id": "se1-l12-c01", "front": "Bốn khái niệm then chốt trong định nghĩa software testing?", "back": "Dynamic, Finite, Selected, Expected.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 4" } },
+    { "id": "se1-l12-c02", "front": "Top-down khác bottom-up integration ở công cụ giả lập?", "back": "Top-down dùng stub thay module cấp dưới; bottom-up dùng driver điều phối test cho cluster.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slides 13–14" } },
+    { "id": "se1-l12-c03", "front": "Equivalence classes cho input là một khoảng giá trị?", "back": "1 lớp hợp lệ và 2 lớp không hợp lệ.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 21" } },
+    { "id": "se1-l12-c04", "front": "Ba công thức cyclomatic complexity V(G)?", "back": "V(G) = số region (gồm vùng ngoài) = E − N + 2 = P + 1 (P: predicate nodes).", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 27" } },
+    { "id": "se1-l12-c05", "front": "Các test case cho simple loop tối đa n lần?", "back": "0, 1, 2, m (m < n), n−1, n, n+1 lần.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 30" } },
+    { "id": "se1-l12-c06", "front": "Stress testing là gì?", "back": "Thực thi vượt công suất vận hành bình thường tới khi hệ thống hỏng để xác định ranh giới thực.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 33" } },
+    { "id": "se1-l12-c07", "front": "Sáu khái niệm của security testing?", "back": "Confidentiality, integrity, authentication, authorization, availability, non-repudiation.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 33" } }
+  ],
+  "questions": [
+    { "id": "se1-l12-q01", "stem": "Flow graph có E = 11 cạnh và N = 9 nút. V(G) bằng?", "options": ["2", "4", "6", "20"], "answer": 1, "explanation": "V(G) = E − N + 2 = 11 − 9 + 2 = 4.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 27" } },
+    { "id": "se1-l12-q02", "stem": "Với IF a OR b (compound condition) trong flow graph, cần bao nhiêu predicate node?", "options": ["1", "2", "3", "0"], "answer": 1, "explanation": "Mỗi điều kiện đơn (a và b) cần một predicate node riêng.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 26" } },
+    { "id": "se1-l12-q03", "stem": "Ai KHÔNG nên chịu trách nhiệm acceptance testing?", "options": ["Khách hàng", "Đội phát triển hệ thống", "Người dùng cuối", "Bên thứ ba độc lập"], "answer": 1, "explanation": "Slide 17: đội phát triển không nên chịu trách nhiệm acceptance testing.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 17" } }
+  ]
+}

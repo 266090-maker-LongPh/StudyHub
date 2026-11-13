@@ -1,0 +1,25 @@
+{
+  "id": "se1-l04-5", "order": 4,
+  "title": "Lecture 4–5: Unit test với JUnit 5 và Mockito",
+  "summary": [
+    { "h": "Mức kiểm thử và 4 pha unit test", "text": "Kim tự tháp: Unit → Integration → System → Acceptance. Unit/Integration/System là development testing (verification); Acceptance là user testing (validation). 4 pha của unit test case: Setup (@BeforeAll, @BeforeEach), Exercise (@Test), Verify (assertion), Teardown (@AfterEach, @AfterAll)." },
+    { "h": "Kiến trúc JUnit 5", "text": "JUnit do Kent Beck và Erich Gamma phát triển cuối 1995; JUnit 5 ra ngày 10/09/2017. Ba thành phần: Platform (nền tảng chạy testing framework trên JVM), Jupiter (mô hình lập trình/extension mới), Vintage (engine chạy test JUnit 3 và 4). Tương ứng annotation: @BeforeEach = @Before, @AfterEach = @After, @BeforeAll = @BeforeClass, @AfterAll = @AfterClass (hai cái sau phải static). Khác: @Disabled, @DisplayName, @Tag, @RepeatedTest." },
+    { "h": "Assertion", "text": "Một assertion gồm expected value, actual value, logic comparator → test verdict. assertAll chạy mọi assertion và báo lỗi gộp; assertThrows; assertTimeout chờ đến khi xong dù quá hạn; assertTimeoutPreemptively hủy ngay khi quá hạn.", "code": { "lang": "java", "text": "@Test\nvoid sumNull() {\n  Exception e = assertThrows(Exception.class, () -> ArraySum.sum(null));\n  assertEquals(\"Array is null\", e.getMessage());\n}" } },
+    { "h": "Dynamic và parameterized test", "text": "@TestFactory phương thức trả về Stream/Collection/Iterable/Iterator của DynamicTest (trả List<String> sẽ ném exception). @ParameterizedTest với nguồn đối số: @ValueSource, @EnumSource, @MethodSource (static method trả Stream), @CsvSource, @CsvFileSource, @ArgumentsSource (lớp implement ArgumentsProvider)." },
+    { "h": "Mockito", "text": "Cô lập SUT (System Under Test) khỏi DOC (Depended-On Components) qua 3 bước: mocking, setting expectations (stubbing), verification. Dùng @ExtendWith(MockitoExtension.class), @Mock cho DOC, @InjectMocks cho SUT. Stubbing: when(x).thenReturn(y), thenThrow, thenAnswer, thenCallRealMethod. Verification: verify(mock, mode) với times, never, atLeastOnce, atLeast, atMost, only, timeout." }
+  ],
+  "sources": [{ "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 1–44" }],
+  "cards": [
+    { "id": "se1-l04-c01", "front": "4 pha của một unit test case?", "back": "Setup, Exercise, Verify, Teardown.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 6, 11" } },
+    { "id": "se1-l04-c02", "front": "Ba thành phần của JUnit 5?", "back": "Platform, Jupiter, Vintage.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 8" } },
+    { "id": "se1-l04-c03", "front": "assertTimeout khác assertTimeoutPreemptively?", "back": "assertTimeout chờ thao tác xong dù vượt hạn; assertTimeoutPreemptively hủy thực thi ngay khi quá hạn.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 16" } },
+    { "id": "se1-l04-c04", "front": "@BeforeAll và @AfterAll có yêu cầu gì?", "back": "Phải là static method (tương đương @BeforeClass/@AfterClass của JUnit 4).", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 12" } },
+    { "id": "se1-l04-c05", "front": "@Mock và @InjectMocks khác nhau?", "back": "@Mock tạo mock cho DOC; @InjectMocks đánh dấu SUT được inject các @Mock.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 36" } },
+    { "id": "se1-l04-c06", "front": "@TestFactory phải trả về kiểu gì?", "back": "Stream, Collection, Iterable hoặc Iterator của DynamicTest; trả List<String> sẽ ném exception.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 20–22" } }
+  ],
+  "questions": [
+    { "id": "se1-l04-q01", "stem": "Annotation JUnit 5 nào tương đương @Before của JUnit 4?", "options": ["@BeforeAll", "@BeforeEach", "@Test", "@Setup"], "answer": 1, "explanation": "@BeforeEach = @Before; @BeforeAll = @BeforeClass.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 9–12" } },
+    { "id": "se1-l04-q02", "stem": "Annotation nào dùng với lớp tùy biến implement ArgumentsProvider?", "options": ["@ValueSource", "@MethodSource", "@ArgumentsSource", "@CsvSource"], "answer": 2, "explanation": "@ArgumentsSource dùng lớp ArgumentsProvider tự viết (provideArguments).", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 25–33" } },
+    { "id": "se1-l04-q03", "stem": "Acceptance testing thuộc nhóm nào?", "options": ["Development testing (verification)", "User testing (validation)", "Unit testing", "Integration testing"], "answer": 1, "explanation": "Slide 4: Acceptance là user testing (validation).", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 4" } }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "_comment": "Đường dẫn nguồn tài liệu. Đổi tại đây rồi chạy lại: npm run ingest",
+  "subjects": {
+    "dbs": { "name": "DBS", "path": "materials/DBS" },
+    "se1": { "name": "SE1-2026", "path": "materials/SE1-2026" }
+  },
+  "skipReferenceBooks": [
+    "CS605-Software Engineering Practitioner",
+    "Sommerville - 2011 - Software Engineering.pdf",
+    "Textbook - Guttag, Liskov - Program Development in Java.pdf",
+    "Object Oriented Program Development.pdf",
+    "mastering-software-testing-with-junit-5"
+  ],
+  "excludedFromQuiz": ["[studocu.com]"],
+  "imageStripPdfs": [
+    "Lecture 7.pdf", "Lecture 8.pdf", "Lecture 9.pdf", "Lecture 11.pdf", "Lecture 12.pdf"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dbs-ch02", "order": 2,
+  "title": "Chương 2: Modeling Data in the Organization (E-R)",
+  "summary": [
+    { "h": "Thành phần mô hình E-R", "text": "Entity instance (thường tương ứng một row), entity type (một table). Relationship instance là liên kết giữa các entity (tương ứng PK–FK), relationship type là loại liên kết giữa các entity type. Attribute là thuộc tính (một field)." },
+    { "h": "Ký hiệu cơ bản", "text": "Strong entity: hình chữ nhật nét đơn. Weak entity: nét đôi. Associative entity: hình chữ nhật bo tròn nằm trong hình chữ nhật. Identifier: đậm, gạch dưới đơn. Partial identifier: đậm, gạch dưới đôi. [Derived] trong ngoặc vuông, {Multivalued} trong ngoặc nhọn, Composite( , , ) trong ngoặc tròn. Cardinality: mandatory one (||), optional one (o|), mandatory many (|<), optional many (o<)." },
+    { "h": "Business rules", "text": "Phát biểu định nghĩa hoặc ràng buộc một khía cạnh của nghiệp vụ. Business rule tốt có 7 đặc tính: Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented." },
+    { "h": "Entity nên và không nên là gì", "text": "Nên là đối tượng có nhiều instance, gồm nhiều attribute, là thứ ta đang cần mô hình hóa. Không nên là user của hệ thống (ví dụ TREASURER) hoặc output của hệ thống (ví dụ EXPENSE REPORT)." },
+    { "h": "Phân loại attribute", "text": "5 cách phân loại: required/optional; simple/composite; single-valued/multivalued; stored/derived; identifier. Tiêu chí chọn identifier: giá trị không đổi, không null, tránh intelligent identifier, thay key phức hợp dài bằng key đơn mới." },
+    { "h": "Degree và cardinality", "text": "Degree = số entity type tham gia: unary (1), binary (2), ternary (3). Cardinality cơ bản: 1:1, 1:M, M:N. Cardinality constraint gồm minimum (0 = optional, ≥1 = mandatory) và maximum (1 hoặc many)." },
+    { "h": "Associative entity và time stamp", "text": "Quan hệ có thuộc tính nên thành associative entity khi: mọi quan hệ đều many, có ý nghĩa độc lập, ưu tiên có identifier riêng và thuộc tính khác, có thể tham gia quan hệ khác; quan hệ ternary nên chuyển thành associative entity. Time stamp lưu thời điểm sự kiện (cần cho HIPAA, Sarbanes-Oxley)." }
+  ],
+  "sources": [{ "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slides 1–49" }],
+  "cards": [
+    { "id": "dbs-ch02-c01", "front": "Weak entity khác strong entity thế nào?", "back": "Weak entity phụ thuộc strong entity (identifying owner), không có identifier riêng mà chỉ có partial identifier; vẽ hộp nét đôi, nối bằng identifying relationship (nét đôi).", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 14" } },
+    { "id": "dbs-ch02-c02", "front": "Ký hiệu derived và multivalued attribute?", "back": "Derived: [ngoặc vuông]. Multivalued: {ngoặc nhọn}.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slides 5, 20" } },
+    { "id": "dbs-ch02-c03", "front": "Degree của relationship là gì? Kể tên.", "back": "Số entity type tham gia: unary (1), binary (2), ternary (3).", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 28" } },
+    { "id": "dbs-ch02-c04", "front": "Minimum cardinality bằng 0 nghĩa là gì?", "back": "Optional (vẽ vòng tròn o); từ 1 trở lên là mandatory (vạch |).", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 34" } },
+    { "id": "dbs-ch02-c05", "front": "4 tiêu chí chọn identifier?", "back": "Không đổi giá trị; không null; tránh intelligent identifier; thay key phức hợp dài bằng key đơn mới.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 22" } },
+    { "id": "dbs-ch02-c06", "front": "7 đặc tính của business rule tốt?", "back": "Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 7" } },
+    { "id": "dbs-ch02-c07", "front": "Khi nào nên chuyển relationship có thuộc tính thành associative entity?", "back": "Mọi quan hệ đều many; có ý nghĩa độc lập; ưu tiên có identifier riêng và thuộc tính khác; có thể tham gia quan hệ khác; ternary nên chuyển thành associative entity.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 41" } }
+  ],
+  "questions": [
+    { "id": "dbs-ch02-q01", "stem": "Thực thể nào KHÔNG nên mô hình hóa thành entity?", "options": ["ORDER", "PRODUCT", "EXPENSE REPORT (output của hệ thống)", "CUSTOMER"], "answer": 2, "explanation": "Entity không nên là user hoặc output của hệ thống; ví dụ Figure 2-4 loại TREASURER và EXPENSE REPORT.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slides 12–13" } },
+    { "id": "dbs-ch02-q02", "stem": "Ký hiệu 'o<' trên đầu quan hệ có nghĩa là gì?", "options": ["Mandatory one", "Optional one", "Mandatory many", "Optional many"], "answer": 3, "explanation": "Vòng tròn = optional (min 0), chân chim = many.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 5" } },
+    { "id": "dbs-ch02-q03", "stem": "Attribute [Years Employed] tính từ Date Employed và ngày hiện tại thuộc loại nào?", "options": ["Multivalued", "Composite", "Derived", "Identifier"], "answer": 2, "explanation": "Giá trị tính được từ attribute khác, không lưu: derived, ký hiệu [ ].", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 20" } }
+  ]
+}
