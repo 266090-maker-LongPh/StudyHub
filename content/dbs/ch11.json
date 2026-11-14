@@ -1,22 +1,830 @@
 {
-  "id": "dbs-view-proc", "order": 11,
+  "id": "dbs-view-proc",
+  "order": 11,
   "title": "Subquery, View, Stored Procedure và Trigger (slide)",
-  "summary": [
-    { "h": "View", "text": "View là bảng ảo tạo động khi được yêu cầu, không lưu dữ liệu, giúp kiểm soát truy cập. Ưu điểm: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất lập trình, dữ liệu mới nhất, ít tốn chỗ, view tùy biến, physical data independence. Nhược điểm: tốn thời gian xử lý mỗi lần tham chiếu, có thể không update được trực tiếp.", "code": { "lang": "sql", "text": "CREATE VIEW display_employee AS\nSELECT * FROM employee NATURAL JOIN themepark;\nSELECT * FROM display_employee;" } },
-    { "h": "Stored procedure", "text": "Tập lệnh SQL lưu trên server, hữu ích khi nhiều ứng dụng khác ngôn ngữ/nền tảng cùng thực hiện một thao tác, hoặc khi cần bảo mật/ghi log. Lợi ích: giảm lưu lượng mạng, dễ bảo trì (tái sử dụng), an toàn (cấp quyền EXECUTE không cần quyền trực tiếp trên bảng, giúp ngăn SQL injection).", "code": { "lang": "sql", "text": "DELIMITER //\nCREATE PROCEDURE get_average_quantity(OUT average INT)\nBEGIN\n  SELECT AVG(line_qty) INTO average FROM sales_line;\nEND //\nDELIMITER ;\nCALL get_average_quantity(@average);\nSELECT @average, sales_line.* FROM sales_line WHERE line_qty < @average;" } },
-    { "h": "Trigger", "text": "Trigger tự động chạy khi có sự kiện; ví dụ ghi log sau khi thêm student.", "code": { "lang": "sql", "text": "CREATE TRIGGER myTrigger\nAFTER INSERT ON student\nFOR EACH ROW\nBEGIN\n  INSERT INTO student_log VALUES (new.id, 'add', now());\nEND" } }
+  "audit": {
+    "sourceFile": "Subquerries, view and stored procedures.pdf",
+    "totalPages": 17,
+    "extractedPages": 17,
+    "ocrNotes": [
+      "Slides 4, 5, 6, 9, 13, 14, 15 và 17 chứa các khối code SQL và chú thích ở dạng ảnh chụp trên slide gốc — đã chép nguyên văn từ ảnh từng trang.",
+      "Slide 17 minh họa trigger với kết thúc end&& và delimiter ; nhưng ảnh trên slide gốc thiếu dòng khai báo DELIMITER && ở đầu (giữ nguyên văn và giải thích chi tiết)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Subquerries, view and stored procedures.pdf",
+      "loc": "Slides 1–17 (đầy đủ 17/17 slides)"
+    }
   ],
-  "sources": [{ "file": "Subquerries, view and stored procedures.pdf", "loc": "Slides 1–17" }],
+  "summary": [
+    {
+      "h": "Giới thiệu & Mục tiêu bài học (Advanced SQL Cont.)",
+      "text": "Giới thiệu slide Advanced SQL (Cont) theo giáo trình Modern Database Management (12th Edition) và 4 mục tiêu trọng tâm: Subqueries, Views, ưu/nhược điểm của View và Stored Procedures.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slides 1–2"
+      },
+      "digest": {
+        "keyPoints": [
+          "Bài học tiếp nối phần SQL nâng cao (Advanced SQL) thuộc giáo trình Modern Database Management (12th Edition) của Hoffer, Venkataraman và Topi.",
+          "4 nội dung cốt lõi gồm: Subqueries (truy vấn lồng), Introduction to view (giới thiệu khung nhìn), Benefits and drawbacks of views (ưu/nhược điểm của View), và Stored procedures (thủ tục lưu trữ; slide cuối bổ sung ví dụ Trigger)."
+        ],
+        "terms": [
+          {
+            "term": "Advanced SQL",
+            "meaning": "Nhóm kỹ thuật SQL nâng cao giúp viết truy vấn lồng nhau (subquery), đóng gói câu truy vấn thành bảng ảo (view) và lưu sẵn logic xử lý trên máy chủ CSDL (stored procedure, trigger)."
+          }
+        ],
+        "pitfalls": [
+          "Mặc dù slide Objectives (Slide 2) chỉ liệt kê tới Stored procedures, Slide 17 ở cuối bài giảng có bổ sung thêm một ví dụ thực hành về Trigger (AFTER INSERT)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Advanced SQL (Cont)",
+          "paragraphs": [
+            "Advanced SQL (Cont)",
+            "Modern Database Management",
+            "12th Edition",
+            "Jeff Hoffer, Ramesh Venkataraman, Heikki Topi"
+          ],
+          "explanation": [
+            "Slide tiêu đề mở đầu phần tiếp theo của SQL nâng cao (Advanced SQL Cont.), trích từ giáo trình Modern Database Management ấn bản thứ 12 của ba tác giả Jeff Hoffer, Ramesh Venkataraman và Heikki Topi.",
+            "Nếu ở phần trước sinh viên đã học hàm tổng hợp (COUNT, SUM, AVG, MIN, MAX), GROUP BY, HAVING và các phép JOIN, thì phần này tập trung vào công cụ tổ chức và tái sử dụng truy vấn phức tạp trong DBMS."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Objectives",
+          "bullets": [
+            "Subqueries",
+            "Introduction to view",
+            "Benefits and drawbacks of views",
+            "Stored procedures"
+          ],
+          "explanation": [
+            "Slide liệt kê 4 mục tiêu học tập chính cần nắm sau buổi học: Subqueries (truy vấn con), định nghĩa & cú pháp View, ưu nhược điểm khi dùng View, và cách viết/gọi Stored Procedure trong MySQL.",
+            "Ngoài 4 mục tiêu trên, cuối bộ slide (Slide 17) giảng viên có minh họa thêm cú pháp Trigger trong MySQL để sinh viên biết cách tự động ghi log khi dữ liệu thay đổi."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 2"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Truy vấn con (Subqueries: Scalar, IN và HAVING)",
+      "text": "Phân loại 3 dạng kết quả trả về của subquery (1 giá trị đơn, 1 danh sách cột đơn, bảng ảo nhiều cột nhiều hàng) cùng ví dụ thực hành trên CSDL themepark.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slides 3–6"
+      },
+      "digest": {
+        "keyPoints": [
+          "Subquery là câu lệnh SELECT lồng bên trong một câu truy vấn khác, có thể trả về: (1) Một giá trị đơn (1 cột, 1 hàng — dùng với toán tử so sánh =, >, <...); (2) Một danh sách giá trị (1 cột, nhiều hàng — dùng với IN/ANY/ALL); (3) Một bảng ảo (nhiều cột, nhiều hàng — dùng trong mệnh đề FROM).",
+          "Scalar Subquery (Slide 4): dùng `(select min(ticket_price) from ticket)` ở vế phải dấu `=` để tìm vé có giá thấp nhất.",
+          "IN Subquery (Slide 5): dùng `emp_num in (select distinct emp_num from hours where hour_rate >6)` khi tập giá trị lọc chưa biết trước mà cần tính từ bảng khác.",
+          "HAVING Subquery (Slide 6): lọc từng nhóm `group by employee.emp_num` có tổng giờ làm `sum(hours_per_attract)` lớn hơn giá trị `max(HOURS_PER_ATTRACT)` của bảng `hours`."
+        ],
+        "terms": [
+          {
+            "term": "Scalar Subquery",
+            "meaning": "Truy vấn con trả về đúng 1 ô duy nhất (1 cột và 1 hàng), dùng ở nơi cần một giá trị đơn như vế phải của `=`, `>`, `<`, `>=`, `<=`."
+          },
+          {
+            "term": "IN Subquery",
+            "meaning": "Truy vấn con trả về 1 cột và nhiều hàng (danh sách giá trị), ghép với toán tử `IN` để kiểm tra thuộc tính có nằm trong tập kết quả đó không."
+          },
+          {
+            "term": "Virtual Table (Inline View / Derived Table)",
+            "meaning": "Truy vấn con trả về nhiều cột và nhiều hàng, được đặt trong mệnh đề `FROM` như một bảng tạm thời."
+          }
+        ],
+        "pitfalls": [
+          "Nếu dùng toán tử so sánh đơn (`=`, `>`, `<`) mà subquery lỡ trả về nhiều hơn 1 dòng, DBMS sẽ báo lỗi runtime (Subquery returns more than 1 row).",
+          "Lưu ý cú pháp Slide 6: `select employee.*, sum(hours_per_attract) ... group by employee.emp_num` — trong MySQL bật chế độ `ONLY_FULL_GROUP_BY` chặt chẽ, mọi cột không nằm trong hàm tổng hợp (ngoài khóa chính có phụ thuộc hàm) hoặc nên được liệt kê đầy đủ trong `GROUP BY`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "Subqueries",
+          "bullets": [
+            {
+              "text": "A subquery can return one value or multiple values. To be precise, the subquery can return:",
+              "subBullets": [
+                "One single value (one column and one row). This subquery is used anywhere a single value is expected, as in the right side of a comparison expression.",
+                "A list of values (one column and multiple rows). This type of subquery is used anywhere a list of values is expected, such as when using the IN clause",
+                "A virtual table (multicolumn, multirow set of values). This type of subquery can be used anywhere a table is expected, such as when using the FROM clause."
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide phân loại chuẩn 3 kiểu đầu ra của một Subquery — đây là câu hỏi lý thuyết rất hay gặp trong bài kiểm tra giữa kỳ/cuối kỳ DBS.",
+            "Dạng 1 (1 cột × 1 hàng): trả về giá trị vô hướng (scalar), dùng sau `=`, `<>`, `>`, `<`, `>=`, `<=`. Dạng 2 (1 cột × nhiều hàng): trả về danh sách, dùng với `IN`, `NOT IN`, `ANY`, `ALL`. Dạng 3 (nhiều cột × nhiều hàng): trả về bảng ảo (derived table), đặt trong mệnh đề `FROM`."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "Select subqueries",
+          "code": {
+            "lang": "sql",
+            "text": "-- find all tickets that have min/max ticket price\nselect * from ticket where ticket_price =\n(select min(ticket_price) from ticket);"
+          },
+          "ocrNote": "Đoạn code SQL trên slide được nhúng dưới dạng ảnh chụp màn hình và đã được chép lại nguyên văn.",
+          "explanation": [
+            "Ví dụ minh họa Scalar Subquery (1 cột, 1 hàng) trong mệnh đề `WHERE` để tìm toàn bộ thông tin vé có giá rẻ nhất trong bảng `ticket`.",
+            "Truy vấn con `(select min(ticket_price) from ticket)` chạy trước, trả về đúng 1 con số (ví dụ `10.99`), sau đó truy vấn ngoài lọc các dòng thỏa `ticket_price = 10.99` (nếu có nhiều vé cùng mức giá thấp nhất, cả hai đều được trả về — điều mà `ORDER BY ... LIMIT 1` không làm được).",
+            "Nhờ viết như vậy, ta không cần chạy 2 câu lệnh rời rạc và không bị cứng hóa (hard-code) giá trị."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "IN Subqueries",
+          "bullets": [
+            "Use IN to compare a single attribute to a list of values",
+            "When the condition values are not known before hand, but they can be derived using a query, you must use an IN subquery"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "select * from employee where emp_num in\n(select distinct emp_num from hours where hour_rate >6);"
+          },
+          "ocrNote": "Đoạn code SQL trên slide được nhúng dưới dạng ảnh chụp màn hình và đã được chép lại nguyên văn.",
+          "explanation": [
+            "Khi tập giá trị cần đối chiếu gồm nhiều phần tử (ví dụ danh sách mã nhân viên từng có mức lương giờ `hour_rate > 6`), không thể dùng dấu `=` mà phải dùng toán tử `IN` kết hợp với subquery trả về 1 cột nhiều dòng.",
+            "Truy vấn con `select distinct emp_num from hours where hour_rate >6` lấy ra danh sách mã nhân viên không trùng lặp, rồi truy vấn ngoài đối chiếu `emp_num in (...)` để lấy hồ sơ đầy đủ từ bảng `employee`.",
+            "Dùng `DISTINCT` trong subquery là thói quen tốt giúp thu gọn danh sách cần so khớp, cải thiện hiệu năng so với việc giữ trùng lặp `emp_num`."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Having subqueries",
+          "code": {
+            "lang": "sql",
+            "text": "select employee.*, sum(hours_per_attract)\nfrom employee natural join hours\ngroup by employee.emp_num\nhaving sum(hours_per_attract) >\n(select max(HOURS_PER_ATTRACT) from hours);"
+          },
+          "ocrNote": "Đoạn code SQL trên slide được nhúng dưới dạng ảnh chụp màn hình và đã được chép lại nguyên văn.",
+          "explanation": [
+            "Subquery cũng có thể nằm trong mệnh đề `HAVING` để lọc các nhóm sau khi `GROUP BY` theo điều kiện tính toán động.",
+            "Ở đây, `employee natural join hours` ghép nhân viên với lịch làm việc theo cột chung `emp_num`, gom nhóm theo từng nhân viên (`group by employee.emp_num`), tính tổng số giờ làm `sum(hours_per_attract)` và chỉ giữ lại những nhân viên có tổng giờ làm lớn hơn số giờ tối đa của một ca làm đơn lẻ `(select max(HOURS_PER_ATTRACT) from hours)`.",
+            "Lưu ý phân biệt: `WHERE` lọc từng dòng trước khi gom nhóm (không chứa hàm tổng hợp), còn `HAVING` lọc từng nhóm sau khi đã gom nhóm và tính xong `SUM(...)`."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 6"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Khung nhìn (Views): Khái niệm, Cú pháp, Ưu điểm & Nhược điểm",
+      "text": "Phân biệt Base Table và Dynamic View, cú pháp CREATE VIEW / SELECT từ view, ví dụ display_employee cùng 7 ưu điểm và 2 nhược điểm của View.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slides 7–11"
+      },
+      "digest": {
+        "keyPoints": [
+          "Base Table chứa dữ liệu gốc thực tế trên đĩa; Dynamic View là bảng ảo (virtual table) được tạo động khi có yêu cầu, không lưu dữ liệu mà đọc trực tiếp từ Base Table hoặc View khác thông qua câu lệnh SELECT.",
+          "Cú pháp: `CREATE VIEW viewname AS SELECT query;` và truy vấn như bảng bình thường bằng `SELECT * FROM viewname;`.",
+          "7 ưu điểm: đơn giản hóa câu lệnh truy vấn; hỗ trợ bảo mật dữ liệu (nhưng không phải lớp bảo mật duy nhất); tăng năng suất lập trình; luôn chứa dữ liệu mới nhất từ base table; tốn rất ít dung lượng lưu trữ; cung cấp góc nhìn tùy biến theo người dùng; thiết lập tính độc lập dữ liệu vật lý (physical data independence).",
+          "2 nhược điểm: tốn thời gian xử lý mỗi lần tham chiếu view (vì phải chạy lại câu SELECT nền); không phải lúc nào cũng cập nhật (INSERT/UPDATE/DELETE) trực tiếp qua view được."
+        ],
+        "terms": [
+          {
+            "term": "Base Table",
+            "meaning": "Bảng vật lý trong CSDL thực sự lưu trữ dữ liệu thô (raw data)."
+          },
+          {
+            "term": "Dynamic View",
+            "meaning": "Bảng ảo được tạo động theo yêu cầu dựa trên câu lệnh SQL SELECT; chỉ lưu định nghĩa truy vấn chứ không nhân bản dữ liệu gốc."
+          },
+          {
+            "term": "Physical Data Independence",
+            "meaning": "Tính độc lập dữ liệu vật lý — cấu trúc lưu trữ/bảng gốc có thể thay đổi ở mức nhất định mà ứng dụng truy cập qua view không bị ảnh hưởng."
+          }
+        ],
+        "pitfalls": [
+          "View KHÔNG lưu trữ bản sao dữ liệu nên tốn ít dung lượng và dữ liệu luôn cập nhật (most current), nhưng đổi lại mỗi lần gọi view đều tốn chi phí CPU/I/O thực thi lại câu lệnh SELECT nền.",
+          "Slide 10 nhấn mạnh: View hỗ trợ bảo mật (chỉ lộ cột/hàng cần thiết), nhưng không được chỉ dựa vào view để bảo mật (cần kết hợp phân quyền GRANT/REVOKE và các biện pháp bảo mật mạnh hơn).",
+          "Các view có JOIN nhiều bảng (như `display_employee`), có `GROUP BY`, `DISTINCT` hoặc hàm tổng hợp thường KHÔNG update/insert trực tiếp được."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Using and Defining Views",
+          "bullets": [
+            "Views provide users controlled access to tables",
+            "Base Table-table containing the raw data",
+            {
+              "text": "Dynamic View",
+              "subBullets": [
+                "A “virtual table” created dynamically upon request by a user",
+                "No data actually stored; instead data from base table made available to user",
+                "Based on SQL SELECT statement on base tables or other views"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide phân biệt hai khái niệm nền tảng: Base Table (bảng gốc thực sự lưu dữ liệu thô trên ổ đĩa) và Dynamic View (bảng ảo được dựng động mỗi khi người dùng truy vấn).",
+            "Vì Dynamic View không tự lưu bản sao dữ liệu mà chỉ lưu định nghĩa `SELECT` phía sau (lấy từ một/nhiều Base Table hoặc từ một View khác), nó đóng vai trò tầng trừu tượng kiểm soát quyền tiếp cận dữ liệu rất hiệu quả."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "SYNTAX TO CREATE A VIEW",
+          "paragraphs": [
+            "CREATE VIEW viewname  AS SELECT query"
+          ],
+          "bullets": [
+            "To display the contents of a view :"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE VIEW viewname  AS SELECT query\nSELECT * FROM viewname;"
+          },
+          "explanation": [
+            "Cú pháp tổng quát tạo View trong SQL rất gọn: `CREATE VIEW <tên_view> AS <câu_lệnh_SELECT>;` (lưu ý `viewname` là tên định danh bạn đặt cho bảng ảo).",
+            "Sau khi tạo thành công, người dùng hoặc ứng dụng có thể truy vấn view bằng `SELECT * FROM viewname;` hoặc thêm `WHERE`, `ORDER BY` giống hệt như đang đọc một bảng thật."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Sample CREATE VIEW",
+          "paragraphs": [
+            "To create a view:",
+            "To call a view:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "create view display_employee\nas\nselect * from employee natural join themepark;\n\nselect * from display_employee;"
+          },
+          "diagramText": [
+            "display_employee → View's name",
+            "select * from employee natural join themepark; → View is based on a SELECT statement."
+          ],
+          "diagramNote": "Hình chụp trên slide khoanh khung cam tên view 'display_employee' (View's name) và mệnh đề 'select * from employee natural join themepark;' (View is based on a SELECT statement).",
+          "ocrNote": "Hai đoạn code SQL và các khung chú thích mũi tên màu cam là ảnh chụp trên slide gốc (đã trích xuất nguyên văn).",
+          "explanation": [
+            "Ví dụ thực tế trên CSDL `themepark`: tạo view `display_employee` đóng gói phép `NATURAL JOIN` giữa bảng `employee` và bảng `themepark` (ghép theo cột chung `park_code`).",
+            "Khi cần xem nhân viên kèm tên công viên/thành phố nơi họ làm việc, lập trình viên chỉ cần gõ `select * from display_employee;` thay vì phải nhớ và viết lại phép nối bảng nhiều lần.",
+            "Nếu `employee` hay `themepark` vừa được cập nhật thêm nhân viên mới, câu lệnh `select * from display_employee;` sẽ phản ánh ngay dữ liệu mới nhất."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "Advantages of Views",
+          "bullets": [
+            "Simplify query commands",
+            "Assist with data security (but don't rely on views for security, there are more important security measures)",
+            "Enhance programming productivity",
+            "Contain most current base table data",
+            "Use little storage space",
+            "Provide customized view for user",
+            "Establish physical data independence"
+          ],
+          "explanation": [
+            "Slide tổng hợp 7 ưu điểm cốt lõi của View (rất thường được hỏi ở dạng liệt kê hoặc chọn phát biểu đúng/sai):",
+            "1–3) Đơn giản hóa câu lệnh phức tạp, giấu bớt cột nhạy cảm (như lương, ngày sinh) để hỗ trợ bảo mật và giúp lập trình viên làm việc nhanh hơn.",
+            "4–7) Luôn chứa dữ liệu mới nhất từ bảng gốc, hầu như không tốn dung lượng đĩa (chỉ lưu định nghĩa SQL), tùy biến góc nhìn riêng cho từng nhóm người dùng và tạo lớp ngăn cách độc lập dữ liệu vật lý (physical data independence)."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Disadvantages of Views",
+          "bullets": [
+            "Use processing time each time view is referenced",
+            "May or may not be directly updateable"
+          ],
+          "explanation": [
+            "Bên cạnh 7 ưu điểm, Dynamic View có 2 nhược điểm quan trọng cần cân nhắc khi thiết kế hệ thống:",
+            "Thứ nhất, mỗi lần view được tham chiếu trong truy vấn, DBMS phải biên dịch và chạy lại câu `SELECT` nền nên tiêu tốn thời gian xử lý (processing time), đặc biệt nếu view lồng view hoặc join nhiều bảng lớn.",
+            "Thứ hai, view có thể không cho phép cập nhật dữ liệu trực tiếp (`INSERT`/`UPDATE`/`DELETE`) nếu câu định nghĩa view chứa `JOIN`, `GROUP BY`, `DISTINCT`, hàm tổng hợp (`SUM`, `COUNT`...) hoặc thiếu cột khóa chính/cột `NOT NULL`."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 11"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Thủ tục lưu trữ (Stored Procedures: Cú pháp, Tham số IN/OUT & Lợi ích)",
+      "text": "Định nghĩa Stored Routine/Procedure, khi nào sử dụng, cơ chế đổi DELIMITER trong MySQL, ví dụ tham số IN (`find_theme_park`) và tham số OUT (`get_average_quantity`), cùng 3 nhóm lợi ích.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slides 12–16"
+      },
+      "digest": {
+        "keyPoints": [
+          "Stored procedure (stored routine) là tập hợp câu lệnh SQL được lưu sẵn trên server; client chỉ cần gọi tên và truyền tham số thay vì gửi lại từng câu lệnh rời.",
+          "Hai trường hợp nên dùng: (1) Nhiều ứng dụng viết bằng ngôn ngữ/nền tảng khác nhau cùng thực hiện một nghiệp vụ CSDL; (2) Khi yêu cầu bảo mật cao và cần đảm bảo mọi thao tác được ghi log nhất quán.",
+          "Trong MySQL, phải dùng `DELIMITER //` (hoặc `DELIMITER &&`) trước `CREATE PROCEDURE` để dấu `;` bên trong thân `BEGIN ... END` không làm kết thúc sớm lệnh tạo procedure, sau đó trả về `DELIMITER ;`.",
+          "Tham số `IN` truyền dữ liệu vào procedure (`find_theme_park`), còn tham số `OUT` nhận kết quả trả ra vào biến phiên như `@average` khi gọi `CALL get_average_quantity(@average);`.",
+          "3 lợi ích lớn: Giảm lưu lượng mạng (Reduce Network Traffic); Dễ bảo trì do tái sử dụng tại một nơi (Easy to maintain); Bảo mật hơn nhờ cấp quyền EXECUTE không cần cấp quyền trực tiếp trên bảng và chống SQL Injection (Secure)."
+        ],
+        "terms": [
+          {
+            "term": "Stored Procedure (Stored Routine)",
+            "meaning": "Tập hợp các câu lệnh SQL được biên dịch/lưu trữ ngay trên database server để client gọi thực thi bằng lệnh `CALL`."
+          },
+          {
+            "term": "DELIMITER",
+            "meaning": "Lệnh của MySQL client dùng để tạm đổi ký tự kết thúc câu lệnh (từ `;` sang `//` hoặc `&&`) khi định nghĩa khối `BEGIN ... END` chứa nhiều dấu `;` bên trong."
+          },
+          {
+            "term": "IN / OUT Parameter",
+            "meaning": "`IN` là tham số đầu vào truyền giá trị cho procedure; `OUT` là tham số đầu ra ghi kết quả từ procedure (thường dùng `SELECT ... INTO`) ra biến session (ví dụ `@average`)."
+          }
+        ],
+        "pitfalls": [
+          "Quên đổi `DELIMITER` trước khi tạo stored procedure có nhiều lệnh bên trong `BEGIN ... END` sẽ gây lỗi cú pháp ngay ở dấu `;` đầu tiên.",
+          "Đừng quên khôi phục `DELIMITER ;` sau `END //` để các câu lệnh SQL tiếp theo thực thi bình thường.",
+          "Biến `@average` khi gọi `CALL get_average_quantity(@average);` là session variable của MySQL (bắt đầu bằng `@`), tồn tại trong suốt phiên làm việc hiện tại."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Stored Procedure (Stored routine)",
+          "bullets": [
+            "A stored routine is a set of SQL statements that can be stored in the server.",
+            "Once this has been done, clients don't need to keep reissuing the individual statements but can refer to the stored routine instead.",
+            {
+              "text": "When to use:",
+              "subBullets": [
+                "When multiple client applications are written in different languages or work on different platforms but need to perform the same database operations.",
+                "When security is paramount: This provides a consistent and secure environment, and routines can ensure that each operation is properly logged"
+              ]
+            }
+          ],
+          "explanation": [
+            "Stored Procedure (còn gọi là Stored Routine) là một chương trình con gồm nhiều câu lệnh SQL được lưu sẵn ngay trong Database Server.",
+            "Thay vì mỗi ứng dụng tự viết và gửi đi lặp lại chuỗi SQL giống nhau, client chỉ việc gọi tên thủ tục. Cách này đặc biệt hữu ích khi hệ thống có nhiều app (Web PHP, Mobile Java/Swift, Desktop C#) cùng thao tác một nghiệp vụ chung, hoặc khi cần kiểm soát bảo mật chặt chẽ và ghi log tập trung."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Syntax to create a Stored procedure",
+          "code": {
+            "lang": "sql",
+            "text": "DELIMITER //\n\nCREATE PROCEDURE procedure_name (IN parameter1 datatype, OUT parameter2 datatype, ...)\nBEGIN\n  -- Procedure logic goes here\n  -- For example, select or update statements, conditional logic, etc.\nEND //\n\nDELIMITER ;"
+          },
+          "diagramText": [
+            "DELIMITER // → changes the default delimiter",
+            "DELIMITER ; → reset the default delimiter"
+          ],
+          "diagramNote": "Slide dùng hai khung màu cam nhấn mạnh lệnh DELIMITER // ở đầu để đổi dấu phân cách mặc định và DELIMITER ; ở cuối để khôi phục về dấu chấm phẩy.",
+          "ocrNote": "Khối cú pháp mẫu trên slide gốc là ảnh chụp kèm chú thích mũi tên (đã trích xuất nguyên văn).",
+          "explanation": [
+            "Mặc định MySQL coi dấu `;` là kết thúc một câu lệnh và thực thi ngay. Tuy nhiên, bên trong thân `BEGIN ... END` của Stored Procedure thường có nhiều câu lệnh SQL kết thúc bằng `;`.",
+            "Vì vậy bước 1 phải chạy `DELIMITER //` (hoặc `&&`, `$$`) để tạm đổi dấu kết thúc lệnh thành `//`, sau đó viết `CREATE PROCEDURE ... BEGIN ... END //`, rồi cuối cùng bắt buộc chạy `DELIMITER ;` để trả dấu phân cách về `;` cho các truy vấn bình thường."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Stored procedure (IN parameter)",
+          "paragraphs": [
+            "Stored procedure with IN parameter"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "DELIMITER &&\ncreate procedure find_theme_park\n(in a_code varchar(30))\nbegin\n    select * from themepark\n    where park_code like a_code;\nend&&\nDELIMITER ;"
+          },
+          "ocrNote": "Đoạn code SQL trên slide được nhúng dưới dạng ảnh chụp màn hình và đã được chép lại nguyên văn.",
+          "explanation": [
+            "Ví dụ tạo thủ tục `find_theme_park` nhận 1 tham số đầu vào kiểu `IN` là `a_code VARCHAR(30)` dùng để tìm công viên theo mẫu mã (`LIKE a_code`).",
+            "Lưu ý thay vì dùng `//`, slide này chọn `&&` làm delimiter tạm (`DELIMITER &&` ... `end&&` ... `DELIMITER ;`) — miễn nhất quán cặp mở và đóng đều hợp lệ trong MySQL.",
+            "Khi sử dụng, ta gọi bằng `CALL find_theme_park('UK%');` hoặc `CALL find_theme_park('FR1001');` để nhận kết quả các công viên khớp mẫu."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Stored procedure (OUT parameter)",
+          "paragraphs": [
+            "Stored procedure with OUT parameter"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "## procedure with OUT parameters\ndelimiter //\ncreate procedure get_average_quantity(out average int)\nbegin\n    select avg(line_qty) into average from sales_line;\nend //\ndelimiter ;\n#call the procedure\ncall get_average_quantity(@average);\n# use the result of procedure\nselect @average, sales_line.* from sales_line\nwhere line_qty < @average;"
+          },
+          "ocrNote": "Đoạn code SQL trên slide được nhúng dưới dạng ảnh chụp màn hình và đã được chép lại nguyên văn.",
+          "explanation": [
+            "Ví dụ tạo thủ tục `get_average_quantity` có tham số đầu ra `(out average int)`. Bên trong thân thủ tục, cú pháp `select avg(line_qty) into average from sales_line;` gán giá trị trung bình cột `line_qty` vào biến đầu ra `average` (lưu ý kiểu `INT` sẽ làm tròn số nguyên).",
+            "Khi gọi thủ tục, ta truyền vào một biến phiên (session variable) có tiền tố `@`: `call get_average_quantity(@average);`.",
+            "Ngay sau đó, biến `@average` giữ giá trị vừa nhận từ thủ tục và có thể dùng trực tiếp trong các câu truy vấn tiếp theo như `select @average, sales_line.* from sales_line where line_qty < @average;`."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Benefit of stored procedures",
+          "bullets": [
+            {
+              "text": "Reduce the Network Traffic:",
+              "subBullets": [
+                "Multiple SQL Statements are encapsulated in a stored procedure.",
+                "When executing it, instead of sending multiple queries, only the name and the parameters of the stored procedure are sent"
+              ]
+            },
+            {
+              "text": "Easy to maintain:",
+              "subBullets": [
+                "The stored procedure are reusable.",
+                "If any change is required, you need to make a change in the stored procedure only"
+              ]
+            },
+            {
+              "text": "Secure:",
+              "subBullets": [
+                "The permission can be granted to the user to execute the stored procedure without giving permission to the tables used in the stored procedure.",
+                "The stored procedure helps to prevent the database from SQL Injection"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide tổng kết 3 nhóm lợi ích trọng tâm của Stored Procedure:",
+            "1) Giảm lưu lượng mạng: nhiều câu SQL được gói gọn trên server; client chỉ truyền tên thủ tục và tham số ngắn gọn qua mạng.",
+            "2) Dễ bảo trì: tái sử dụng cho nhiều ứng dụng; khi cần sửa logic nghiệp vụ chỉ cần sửa đúng 1 chỗ trong stored procedure mà không phải sửa lại code ở từng client.",
+            "3) Bảo mật: quản trị viên chỉ cần cấp quyền `EXECUTE` trên thủ tục cho user mà không cần cấp quyền đọc/ghi trực tiếp lên bảng gốc, đồng thời tham số hóa giúp hạn chế nguy cơ SQL Injection."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 16"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Trigger tự động theo sự kiện (AFTER INSERT)",
+      "text": "Ví dụ tạo Trigger `myTrigger` kích hoạt tự động sau mỗi thao tác INSERT trên bảng `student` để ghi lịch sử vào `student_log`.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 17"
+      },
+      "digest": {
+        "keyPoints": [
+          "Trigger là khối lệnh SQL tự động kích hoạt khi có sự kiện `INSERT`, `UPDATE` hoặc `DELETE` xảy ra trên bảng gắn kèm (trước `BEFORE` hoặc sau `AFTER`).",
+          "Ví dụ `myTrigger`: chạy `AFTER INSERT ON student FOR EACH ROW`, tự động chèn bản ghi `(new.id, 'add', now())` vào bảng `student_log`."
+        ],
+        "terms": [
+          {
+            "term": "Trigger",
+            "meaning": "Thủ tục đặc biệt gắn với một bảng, tự động thực thi khi xảy ra sự kiện `INSERT`/`UPDATE`/`DELETE` (theo từng dòng `FOR EACH ROW`)."
+          },
+          {
+            "term": "NEW / OLD",
+            "meaning": "Từ khóa tham chiếu bản ghi mới (`NEW.col` trong INSERT/UPDATE) hoặc bản ghi cũ (`OLD.col` trong UPDATE/DELETE) bên trong trigger."
+          }
+        ],
+        "pitfalls": [
+          "Khi chạy thử ví dụ Slide 17 trên MySQL thực tế, cần thêm `DELIMITER &&` ở dòng đầu trước `create trigger myTrigger` vì ảnh trên slide gốc bị khuyết dòng mở này."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Trigger",
+          "code": {
+            "lang": "sql",
+            "text": "create trigger myTrigger\nafter insert\non student\nfor each row\n    begin\n        insert into student_log values (new.id,'add',now());\n    end&&\ndelimiter ;"
+          },
+          "ocrNote": "Đoạn code Trigger là ảnh chụp trên slide gốc (đã chép nguyên văn); ảnh gốc thiếu dòng 'DELIMITER &&' ở đầu trước 'create trigger'.",
+          "explanation": [
+            "Trigger khác Stored Procedure ở chỗ không gọi bằng lệnh `CALL`, mà DBMS tự động kích hoạt mỗi khi sự kiện tương ứng xảy ra trên bảng.",
+            "Cụ thể, `myTrigger` gắn với sự kiện `after insert on student` và chạy cho từng dòng mới chèn (`for each row`): mỗi lần thêm 1 sinh viên mới vào bảng `student`, hệ thống tự động ghi 1 dòng log gồm mã sinh viên mới (`new.id`), hành động `'add'` và thời điểm hiện tại (`now()`) vào bảng `student_log`.",
+            "Lưu ý thực hành: khi gõ vào MySQL, bạn phải thêm `DELIMITER &&` ở ngay trước dòng `create trigger myTrigger` thì `end&&` và `delimiter ;` ở cuối mới chạy không lỗi."
+          ],
+          "source": {
+            "file": "Subquerries, view and stored procedures.pdf",
+            "loc": "Slide 17"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-vp-c01", "front": "Base table khác dynamic view?", "back": "Base table chứa dữ liệu thật; dynamic view là bảng ảo tạo động, không lưu dữ liệu.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 7" } },
-    { "id": "dbs-vp-c02", "front": "Hai nhược điểm của view?", "back": "Tốn thời gian xử lý mỗi lần tham chiếu; có thể không update trực tiếp được.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 11" } },
-    { "id": "dbs-vp-c03", "front": "Khi nào nên dùng stored procedure?", "back": "Khi nhiều ứng dụng ở các ngôn ngữ/nền tảng khác nhau thực hiện cùng thao tác CSDL, hoặc khi bảo mật và ghi log là ưu tiên.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 12" } },
-    { "id": "dbs-vp-c04", "front": "Ba lợi ích của stored procedure?", "back": "Giảm lưu lượng mạng; dễ bảo trì (tái sử dụng); an toàn (cấp EXECUTE không cần quyền bảng, giúp ngăn SQL injection).", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 16" } },
-    { "id": "dbs-vp-c05", "front": "Cú pháp bọc procedure trong MySQL?", "back": "DELIMITER // ... CREATE PROCEDURE name (IN/OUT params) BEGIN ... END // ... DELIMITER ;", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 13" } }
+    {
+      "id": "dbs-vp-c01",
+      "front": "Base table khác dynamic view?",
+      "back": "Base table chứa dữ liệu thật; dynamic view là bảng ảo tạo động khi truy vấn, không lưu dữ liệu mà đọc từ base table hoặc view khác.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "dbs-vp-c02",
+      "front": "Hai nhược điểm của view?",
+      "back": "Tốn thời gian xử lý mỗi lần tham chiếu; có thể không update trực tiếp được.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-vp-c03",
+      "front": "Khi nào nên dùng stored procedure?",
+      "back": "Khi nhiều ứng dụng ở các ngôn ngữ/nền tảng khác nhau thực hiện cùng thao tác CSDL, hoặc khi bảo mật và ghi log là ưu tiên hàng đầu.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "dbs-vp-c04",
+      "front": "Ba lợi ích của stored procedure?",
+      "back": "Giảm lưu lượng mạng (Reduce Network Traffic); dễ bảo trì (tái sử dụng tại một nơi); an toàn (chỉ cần cấp quyền EXECUTE không cần quyền bảng, giúp ngăn SQL injection).",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "dbs-vp-c05",
+      "front": "Cú pháp bọc stored procedure trong MySQL?",
+      "back": "DELIMITER // ... CREATE PROCEDURE name (IN/OUT params) BEGIN ... END // ... DELIMITER ;",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "dbs-vp-c06",
+      "front": "Ba kiểu kết quả trả về của Subquery?",
+      "back": "1) Một giá trị đơn (1 cột, 1 hàng — dùng với `=`, `>`, `<`...); 2) Danh sách giá trị (1 cột, nhiều hàng — dùng với `IN`); 3) Bảng ảo (nhiều cột, nhiều hàng — dùng trong mệnh đề `FROM`).",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-vp-c07",
+      "front": "Truy vấn tìm tất cả vé có giá thấp nhất bằng Scalar Subquery?",
+      "back": "SELECT * FROM ticket WHERE ticket_price = (SELECT MIN(ticket_price) FROM ticket);",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-vp-c08",
+      "front": "Khi nào bắt buộc dùng IN Subquery thay cho dấu `=`?",
+      "back": "Khi điều kiện đối chiếu gồm nhiều giá trị chưa biết trước và được sinh ra từ một câu SELECT trả về 1 cột nhiều dòng (ví dụ `WHERE emp_num IN (SELECT DISTINCT emp_num FROM hours WHERE hour_rate > 6)`).",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 5"
+      }
+    },
+    {
+      "id": "dbs-vp-c09",
+      "front": "Bảy ưu điểm của View theo slide?",
+      "back": "1) Simplify query commands; 2) Assist with data security; 3) Enhance programming productivity; 4) Contain most current base table data; 5) Use little storage space; 6) Provide customized view for user; 7) Establish physical data independence.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 10"
+      }
+    },
+    {
+      "id": "dbs-vp-c10",
+      "front": "Cú pháp tạo và truy vấn view `display_employee`?",
+      "back": "CREATE VIEW display_employee AS SELECT * FROM employee NATURAL JOIN themepark; rồi gọi SELECT * FROM display_employee;",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slides 8–9"
+      }
+    },
+    {
+      "id": "dbs-vp-c11",
+      "front": "Khác biệt giữa tham số IN và OUT trong Stored Procedure?",
+      "back": "`IN` truyền giá trị từ ngoài vào procedure (ví dụ `find_theme_park(IN a_code VARCHAR(30))`); `OUT` trả giá trị từ procedure ra biến phiên (ví dụ `SELECT AVG(line_qty) INTO average ...` rồi gọi `CALL get_average_quantity(@average);`).",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slides 14–15"
+      }
+    },
+    {
+      "id": "dbs-vp-c12",
+      "front": "Từ khóa `new.id` trong Trigger `AFTER INSERT` có ý nghĩa gì?",
+      "back": "`NEW` tham chiếu hàng dữ liệu vừa được chèn vào bảng (ở đây lấy giá trị cột `id` của dòng mới trong `student` để ghi vào `student_log`).",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 17"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-vp-q01", "stem": "Lệnh nào gọi procedure có tham số OUT 'average' và đọc kết quả?", "options": ["CALL get_average_quantity(@average); SELECT @average;", "EXEC average;", "SELECT get_average_quantity;", "RUN get_average_quantity;"], "answer": 0, "explanation": "Slide 15 gọi bằng CALL với biến session @average rồi dùng @average trong SELECT.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 15" } },
-    { "id": "dbs-vp-q02", "stem": "Phát biểu nào về view đúng theo slide?", "options": ["View lưu bản sao dữ liệu", "View là virtual table tạo động, không lưu dữ liệu", "View luôn update được", "View không giúp bảo mật"], "answer": 1, "explanation": "Slide 7: dynamic view là virtual table, không lưu dữ liệu.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 7" } },
-    { "id": "dbs-vp-q03", "stem": "Trigger myTrigger trong slide kích hoạt khi nào?", "options": ["Sau khi insert vào student", "Trước khi xóa student", "Khi tạo view", "Khi gọi CALL"], "answer": 0, "explanation": "AFTER INSERT ON student FOR EACH ROW.", "source": { "file": "Subquerries, view and stored procedures.pdf", "loc": "Slide 17" } }
+    {
+      "id": "dbs-vp-q01",
+      "stem": "Lệnh nào gọi procedure có tham số OUT 'average' và đọc kết quả?",
+      "options": [
+        "CALL get_average_quantity(@average); SELECT @average;",
+        "EXEC average;",
+        "SELECT get_average_quantity;",
+        "RUN get_average_quantity;"
+      ],
+      "answer": 0,
+      "explanation": "Slide 15 gọi procedure bằng `CALL get_average_quantity(@average);` rồi dùng biến session `@average` trong câu `SELECT`.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "dbs-vp-q02",
+      "stem": "Phát biểu nào về view đúng theo slide?",
+      "options": [
+        "View lưu bản sao dữ liệu",
+        "View là virtual table tạo động, không lưu dữ liệu",
+        "View luôn update được",
+        "View không giúp bảo mật"
+      ],
+      "answer": 1,
+      "explanation": "Slide 7: Dynamic View là virtual table được tạo động khi có yêu cầu, không lưu dữ liệu thực tế.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "dbs-vp-q03",
+      "stem": "Trigger myTrigger trong slide kích hoạt khi nào?",
+      "options": [
+        "Sau khi insert vào student",
+        "Trước khi xóa student",
+        "Khi tạo view",
+        "Khi gọi CALL"
+      ],
+      "answer": 0,
+      "explanation": "Slide 17 định nghĩa `after insert on student for each row`, nên trigger tự động chạy sau mỗi dòng được thêm vào `student`.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "dbs-vp-q04",
+      "stem": "Loại subquery nào có thể đặt trực tiếp vào mệnh đề FROM của câu truy vấn ngoài?",
+      "options": [
+        "Chỉ subquery trả về 1 ô duy nhất",
+        "Subquery trả về một virtual table (nhiều cột, nhiều hàng)",
+        "Chỉ subquery chứa hàm COUNT(*)",
+        "Không thể đặt subquery trong mệnh đề FROM"
+      ],
+      "answer": 1,
+      "explanation": "Slide 3: Virtual table (multicolumn, multirow set of values) có thể dùng ở bất kỳ chỗ nào mong đợi một bảng, như trong mệnh đề FROM.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-vp-q05",
+      "stem": "Trong câu truy vấn Slide 6 (`HAVING SUM(hours_per_attract) > (SELECT MAX(HOURS_PER_ATTRACT) FROM hours)`), kết quả trả về cho biết điều gì?",
+      "options": [
+        "Các nhân viên có lương giờ cao nhất",
+        "Các nhân viên có tổng số giờ làm việc lớn hơn số giờ làm đơn lẻ lớn nhất trong bảng hours",
+        "Các trò chơi có sức chứa lớn nhất",
+        "Trung bình số giờ làm của toàn bộ nhân viên"
+      ],
+      "answer": 1,
+      "explanation": "Slide 6 gom nhóm theo `employee.emp_num`, tính `sum(hours_per_attract)` rồi dùng `HAVING` so sánh với `max(HOURS_PER_ATTRACT)`.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 6"
+      }
+    },
+    {
+      "id": "dbs-vp-q06",
+      "stem": "Ý nào sau đây là MỘT TRONG HAI nhược điểm của View được nêu trong Slide 11?",
+      "options": [
+        "Chiếm gấp đôi dung lượng đĩa so với Base Table",
+        "Dữ liệu trong View bị cũ so với Base Table",
+        "Tốn thời gian xử lý (processing time) mỗi lần View được tham chiếu",
+        "Không thể dùng SELECT * trên View"
+      ],
+      "answer": 2,
+      "explanation": "Slide 11 nêu 2 nhược điểm: (1) Use processing time each time view is referenced; (2) May or may not be directly updateable.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-vp-q07",
+      "stem": "Vì sao phải viết `DELIMITER //` trước khi tạo Stored Procedure trong MySQL?",
+      "options": [
+        "Để mã hóa mật khẩu người dùng",
+        "Để dấu `;` bên trong thân `BEGIN ... END` không làm MySQL kết thúc sớm lệnh CREATE PROCEDURE",
+        "Để tăng tốc độ JOIN bảng",
+        "Để tự động cấp quyền EXECUTE cho mọi user"
+      ],
+      "answer": 1,
+      "explanation": "Slide 13 chú thích `DELIMITER //` đổi dấu phân cách mặc định (`;`) tạm thời để toàn bộ thân thủ tục được gửi trọn vẹn, sau đó `DELIMITER ;` khôi phục lại.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "dbs-vp-q08",
+      "stem": "Về mặt bảo mật, lợi thế của Stored Procedure được nêu ở Slide 16 là gì?",
+      "options": [
+        "Tự động xóa bảng log sau mỗi lần chạy",
+        "Cấp quyền EXECUTE thủ tục cho user mà không cần cấp quyền trực tiếp trên các bảng liên quan, giúp ngăn SQL Injection",
+        "Cho phép user sửa thẳng định nghĩa bảng mà không cần DBA",
+        "Ẩn hoàn toàn tên các tham số đầu vào"
+      ],
+      "answer": 1,
+      "explanation": "Slide 16: quyền thực thi (execute) có thể cấp riêng cho stored procedure mà không cần cấp quyền trực tiếp lên bảng, đồng thời giúp ngăn chặn SQL Injection.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "dbs-vp-q09",
+      "stem": "Trong Slide 10 (Advantages of Views), lưu ý nào được nhấn mạnh về vấn đề bảo mật (data security)?",
+      "options": [
+        "View là cơ chế bảo mật mạnh nhất và duy nhất cần dùng",
+        "View hỗ trợ bảo mật nhưng không nên chỉ dựa vào view mà cần có các biện pháp bảo mật quan trọng hơn",
+        "View không có tác dụng gì với bảo mật",
+        "View tự động mã hóa toàn bộ cột kiểu VARCHAR"
+      ],
+      "answer": 1,
+      "explanation": "Slide 10 ghi rõ: 'Assist with data security (but don't rely on views for security, there are more important security measures)'.",
+      "source": {
+        "file": "Subquerries, view and stored procedures.pdf",
+        "loc": "Slide 10"
+      }
+    }
   ]
 }

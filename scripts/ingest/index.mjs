@@ -122,6 +122,12 @@ for (const key of Object.keys(cfg.subjects)) {
     if (ids.has(c.id)) fail(`trùng id chương ${c.id}`)
     ids.add(c.id)
     ;(c.sources || []).forEach((s, i) => chk(s, `${c.id}.sources[${i}]`))
+    for (const sec of c.summary || []) {
+      if (sec.source) chk(sec.source, `${c.id}.summary(${sec.h}).source`)
+      for (const sl of sec.slides || []) {
+        chk(sl.source, `${c.id}.${sl.slideNumber || sl.title}`)
+      }
+    }
     for (const card of c.cards || []) { if (ids.has(card.id)) fail(`trùng id ${card.id}`); ids.add(card.id); chk(card.source, card.id) }
     for (const q of c.questions || []) {
       if (ids.has(q.id)) fail(`trùng id ${q.id}`); ids.add(q.id); chk(q.source, q.id)

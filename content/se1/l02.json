@@ -1,23 +1,1121 @@
 {
-  "id": "se1-l02", "order": 2,
+  "id": "se1-l02",
+  "order": 2,
   "title": "Lecture 2: Exceptions",
-  "summary": [
-    { "h": "Robust procedure", "text": "Thủ tục robust hành xử xác định khi có lỗi, không dừng đột ngột, đưa ra xấp xỉ hành vi bình thường. Hai giải pháp cho input không hợp lệ: trả về giá trị đặc biệt (hạn chế: không mang chi tiết lỗi, một số thủ tục như boolean isSorted(int[]) không có giá trị đặc biệt, caller có thể bỏ qua, cần kiểm tra thêm) hoặc phát tín hiệu (exception): không cần giá trị trả về đặc biệt, dừng thực thi tới khi xử lý, buộc caller xử lý, mang chi tiết lỗi." },
-    { "h": "Phân cấp exception", "text": "Throwable → Error (lỗi môi trường) và Exception (lỗi chương trình) → RuntimeException (unchecked) và các subtype Exception khác (checked). Checked exception phải khai báo trong throws hoặc bắt bằng try...catch, nếu không sẽ lỗi biên dịch. Unchecked (subtype của RuntimeException) không bắt buộc. Chỉ dùng unchecked khi người dùng thường viết code đảm bảo exception không xảy ra vì có cách tránh tiện lợi, rẻ và ngữ cảnh dùng cục bộ; ngược lại dùng checked." },
-    { "h": "Đặt tên và khai báo", "text": "Tên = loại lỗi + 'Exception' (NullPointerException). Khai báo bằng cách extend Exception (checked) hoặc RuntimeException (unchecked) với constructor mặc định super() và constructor String super(s)." },
-    { "h": "Ba kỹ thuật xử lý", "text": "Logging: in/ghi chi tiết lỗi (System.err.println, printStackTrace). Masking: exception là một phần logic dự kiến, xử lý rồi tiếp tục luồng bình thường (ví dụ ghi lỗi và trả -1). Reflecting: truyền exception lên caller, tự động hoặc bắt rồi ném exception khác mức cao hơn (bắt NonPositiveException ném NotPossibleException)." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 2.pdf",
+    "totalPages": 31,
+    "extractedPages": 31,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 2.pdf có đúng 31 trang (Slides 1–31), đầy đủ text layer và ảnh code minh họa.",
+      "Slide 15: Đoạn code minh họa khai báo biến int f; ở ngoài try và khai báo lại int f = fact(n); bên trong khối try (giữ nguyên văn theo slide)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 2.pdf",
+      "loc": "Slides 1–31 (đầy đủ 31/31 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 2.pdf", "loc": "Slides 1–31" }],
+  "summary": [
+    {
+      "h": "Giới thiệu bài giảng & Mục tiêu thủ tục bền vững (Why Exceptions)",
+      "text": "Giới thiệu Lecture 2 về Exceptions, mục tiêu thiết kế thủ tục bền vững (robust procedures), bài toán invalid input của isSorted và so sánh hai giải pháp: trả về giá trị đặc biệt vs phát tín hiệu Exception.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 1–10"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thủ tục robust hành xử xác định khi gặp lỗi, không dừng đột ngột, báo lỗi để người dùng tiếp tục làm việc với phương án thay thế và cung cấp xấp xỉ hành vi bình thường.",
+          "Giải pháp 1 (trả về giá trị đặc biệt như false/-1) trộn lẫn lỗi vào luồng xử lý bình thường và có 4 hạn chế: không mang chi tiết lỗi, một số thủ tục như boolean isSorted(int[]) không có giá trị đặc biệt để phân biệt lỗi với false, caller có thể lờ đi mã lỗi, và phải tốn code kiểm tra bổ sung.",
+          "Giải pháp 2 (Exception) tách biệt lỗi khỏi luồng chuẩn: không cần giá trị trả về đặc biệt, dừng thực thi ngay tới khi lỗi được xử lý, có thể ép caller phải xử lý, và bản thân Exception là một kiểu dữ liệu mang thông tin chi tiết lỗi."
+        ],
+        "terms": [
+          {
+            "term": "Robust procedure",
+            "meaning": "Thủ tục hành xử một cách xác định, có kiểm soát khi xảy ra lỗi thay vì sập/dừng đột ngột."
+          },
+          {
+            "term": "Exception",
+            "meaning": "Một 'special signal' và cũng là một kiểu dữ liệu mang chi tiết lỗi, làm gián đoạn luồng bình thường cho tới khi được xử lý."
+          }
+        ],
+        "pitfalls": [
+          "Với hàm trả về boolean như isSorted(int[] a), việc trả về false khi a == null gây nhập nhằng giữa 'mảng chưa sắp xếp' và 'đầu vào null không hợp lệ'."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 2: Exceptions",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 2",
+            "Exceptions"
+          ],
+          "explanation": [
+            "Slide mở đầu bài giảng số 2 về cơ chế xử lý ngoại lệ (Exceptions) trong Java và vai trò của nó trong thiết kế thủ tục tin cậy.",
+            "Nếu Lecture 1 ôn tập OOP và hợp đồng LSP, thì Lecture 2 giải quyết phần 'hành vi khi hợp đồng bị vi phạm hoặc đầu vào không hợp lệ'."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Outline",
+          "bullets": [
+            "Why exceptions?",
+            {
+              "text": "Java error handling mechanism",
+              "subBullets": [
+                "Checked & unchecked exceptions"
+              ]
+            },
+            "Working with exceptions",
+            "Design issues"
+          ],
+          "explanation": [
+            "Bố cục bài giảng gồm 4 phần: động lực dùng exception (Why exceptions?), cơ chế xử lý lỗi trong Java (Checked & unchecked), cách đặc tả/ném/bắt exception và các kỹ thuật xử lý khi thiết kế.",
+            "Lưu ý trọng tâm thi cử thường rơi vào phân biệt Checked vs Unchecked (Slide 13, 17) và 3 kỹ thuật xử lý Logging/Masking/Reflecting (Slides 25–30)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "References",
+          "bullets": [
+            "Guttag, Liskov, Program development in Java, chapter 4"
+          ],
+          "explanation": [
+            "Toàn bộ khung lý thuyết về robust procedures, checked/unchecked exceptions và kỹ thuật masking/reflecting được trích từ Chương 4 sách 'Program Development in Java' của Liskov & Guttag.",
+            "Phong cách chú thích đặc tả `/** @effects ... */` trong các slide sau cũng tuân theo chuẩn của giáo trình này."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "Why exceptions?",
+          "bullets": [
+            {
+              "text": "Problem: how to design robust procedures",
+              "subBullets": [
+                "Robust procedures behave in a well-defined way when errors occur",
+                "Show error and let user continue working",
+                "Provide user with alternative options"
+              ]
+            },
+            {
+              "text": "Requirements",
+              "subBullets": [
+                "Not to terminate abruptly",
+                "Provides an approximation of the normal behavior"
+              ]
+            }
+          ],
+          "explanation": [
+            "Đặt bài toán thiết kế: làm sao để hàm/thủ tục trở nên bền vững (**robust**) khi gặp dữ liệu xấu hoặc sự cố chạy thay vì crash đột ngột.",
+            "Hai yêu cầu cốt lõi của thủ tục robust là: (1) không kết thúc đột ngột (not to terminate abruptly) và (2) cung cấp một xấp xỉ hợp lý của hành vi bình thường (ví dụ thông báo lỗi và cho người dùng nhập lại)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "Example: invalid input problem",
+          "bullets": [
+            "A behavior is required for invalid input.",
+            "Do you notice any problem?"
+          ],
+          "code": {
+            "lang": "java",
+            "text": "/**\n *\n * if a is sorted in ascending order\n *   return true\n * else\n *   return false\n */\npublic boolean isSorted(int[] a) {\n    int prev = a[0];\n    for (int i = 1; i < a.length; i++) {\n        if (prev <= a[i])\n            prev = a[i];\n        else\n            return false;\n    }\n    return true;\n}"
+          },
+          "explanation": [
+            "Ví dụ hàm `isSorted(int[] a)` kiểm tra mảng tăng dần: nhìn qua có vẻ đúng với mảng thông thường, nhưng không có hành vi xác định cho đầu vào không hợp lệ.",
+            "Nếu `a == null`, dòng `int prev = a[0];` sẽ văng `NullPointerException`; nếu `a` rỗng (`a.length == 0`), nó sẽ văng `ArrayIndexOutOfBoundsException` làm chương trình sập ngoài dự kiến."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Two solutions",
+          "bullets": [
+            {
+              "text": "(1) Return a 'special' value to indicate failure",
+              "subBullets": [
+                "Error is treated as part of the normal flow"
+              ]
+            },
+            {
+              "text": "(2) Generate a special 'signal'",
+              "subBullets": [
+                "Error is an exceptional case",
+                "Separate from the normal flow"
+              ]
+            }
+          ],
+          "explanation": [
+            "Giới thiệu 2 hướng giải quyết bài toán báo lỗi: (1) trả về một giá trị đặc biệt (ví dụ `-1`, `null`, `false`) — coi lỗi nằm trong luồng trả về bình thường.",
+            "(2) Phát ra một 'tín hiệu đặc biệt' (Exception) — tách hẳn trường hợp ngoại lệ ra khỏi luồng thực thi bình thường của hàm."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Solution 1 example",
+          "code": {
+            "lang": "java",
+            "text": "public boolean isSorted(int[] a) {\n    if (a == null) return false;\n    if (a.length <= 1) return true;\n    int prev = a[0];\n    for (int i = 1; i < a.length; i++) {\n        if (prev <= a[i])\n            prev = a[i];\n        else\n            return false;\n    }\n    return true;\n}"
+          },
+          "explanation": [
+            "Minh họa Giải pháp 1 cho `isSorted`: thêm kiểm tra `if (a == null) return false;` và `if (a.length <= 1) return true;` để tránh crash.",
+            "Tuy nhiên cách này có lỗ hổng ngữ nghĩa: khi hàm trả về `false`, caller không biết mảng thực sự chưa được sắp xếp hay do truyền nhầm `null`!"
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Limitations of solution 1",
+          "bullets": [
+            "Returned value does not carry error details",
+            "Some procedures cannot have special return values",
+            "Error code may be ignored by caller",
+            "Additional check is required to detect an error"
+          ],
+          "explanation": [
+            "Liệt kê 4 nhược điểm kinh điển của việc trả về giá trị đặc biệt: (1) không mang được thông tin chi tiết lỗi (message, nguyên nhân, stack trace); (2) nhiều hàm như `boolean` hoặc `int` trả về toàn bộ miền giá trị nên không còn giá trị đặc biệt trống nào để dành cho lỗi.",
+            "(3) Người gọi (caller) rất dễ quên kiểm tra mã lỗi trả về; (4) ngay cả khi nhớ kiểm tra, code caller vẫn bị rối bởi các khối `if` kiểm tra lỗi đan xen với nghiệp vụ chính."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Solution 2: Exception",
+          "bullets": [
+            {
+              "text": "The ‘special signal’ is called Exception",
+              "subBullets": [
+                "No returned values needed",
+                "Halt execution until error is recovered"
+              ]
+            },
+            {
+              "text": "Caller can be forced to handle exceptions",
+              "subBullets": [
+                "This makes sure the error is always handled"
+              ]
+            },
+            "Exception is a data type that carry error details"
+          ],
+          "explanation": [
+            "Giải pháp 2 khắc phục triệt để cả 4 nhược điểm của Giải pháp 1: hàm không phải hy sinh giá trị trả về, và ngay khi lỗi xảy ra thì luồng thực thi bị chặn lại cho tới khi có nơi xử lý/khôi phục.",
+            "Nhờ cơ chế kiểm tra lúc biên dịch (với checked exception), caller có thể bị bắt buộc phải xử lý lỗi; đồng thời đối tượng exception mang đầy đủ kiểu lỗi, thông điệp và dấu vết ngăn xếp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "Solution 2 example",
+          "code": {
+            "lang": "java",
+            "text": "public static boolean isSorted(int[] a)\n                        throws NullPointerException {\n    if (a == null)\n        throw new NullPointerException(\"array is null\");\n    if (a.length <= 1)\n        return true;\n    int prev = a[0];\n    for (int i = 1; i < a.length; i++) {\n        if (prev <= a[i])\n            prev = a[i];\n        else\n            return false;\n    }\n    return true;\n}"
+          },
+          "explanation": [
+            "Viết lại `isSorted` theo Giải pháp 2: khai báo `throws NullPointerException` ở phần đầu hàm và chủ động `throw new NullPointerException(\"array is null\");` khi `a == null`.",
+            "Lúc này kết quả `false` chỉ còn mang một nghĩa duy nhất là mảng không tăng dần, còn trường hợp truyền `null` được tách bạch rõ ràng kèm thông điệp mô tả lỗi."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 10"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Cơ chế xử lý lỗi Java & Phân biệt Checked vs Unchecked Exceptions",
+      "text": "Phân cấp Throwable → Error / Exception → RuntimeException, bảng so sánh Checked vs Unchecked exceptions và 2 cách xử lý cơ bản (try...catch và propagate).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 11–15"
+      },
+      "digest": {
+        "keyPoints": [
+          "Lỗi thực thi gồm Environmental errors (kế thừa từ Error) và Program errors (Exceptions).",
+          "Checked exceptions là các lớp con của Exception (trừ RuntimeException): bắt buộc phải liệt kê trong header (throws) nếu hàm có thể ném và bắt buộc caller phải xử lý (try...catch hoặc throws tiếp), nếu không sẽ lỗi biên dịch.",
+          "Unchecked exceptions là các lớp con của RuntimeException: không bắt buộc liệt kê trong header và không bắt buộc caller xử lý lúc compile.",
+          "Hai cách xử lý khi gọi hàm có thể ném exception: bọc trong khối try...catch hoặc propagate (lan truyền) lên caller."
+        ],
+        "terms": [
+          {
+            "term": "Checked exception",
+            "meaning": "Subtype của Exception (ngoại trừ RuntimeException); trình biên dịch ép buộc phải khai báo throws hoặc xử lý bằng try...catch."
+          },
+          {
+            "term": "Unchecked exception",
+            "meaning": "Subtype của RuntimeException; không bị trình biên dịch ép buộc khai báo hay bắt."
+          },
+          {
+            "term": "Propagate the exception",
+            "meaning": "Không bắt exception tại chỗ để Java tự động chuyển tiếp nó lên cho phương thức caller của P xử lý."
+          }
+        ],
+        "pitfalls": [
+          "Coi chừng bẫy trong Slide 13: 'Checked exceptions are subtype of Exception class' — nói chính xác hơn theo sơ đồ Slide 12 là subtype của Exception NHƯNG không thuộc nhánh RuntimeException.",
+          "Ở Slide 15 có lỗi nhỏ trong slide mẫu: khai báo `int f;` bên ngoài `try` rồi lại khai báo `int f = fact(n);` bên trong `try` (trong Java sẽ báo lỗi duplicate local variable)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Java error handling mechanism",
+          "bullets": [
+            "Use special 'signal'",
+            {
+              "text": "Execution errors include:",
+              "subBullets": [
+                "Environmental errors: derived from Error class",
+                "Program errors: Exceptions"
+              ]
+            },
+            {
+              "text": "New exception types can be created:",
+              "subBullets": [
+                "Checked or unchecked"
+              ]
+            },
+            "Methods are specified with exceptions"
+          ],
+          "explanation": [
+            "Giới thiệu kiến trúc xử lý lỗi của Java: chia lỗi thực thi làm 2 nhóm lớn là lỗi môi trường (`Error`, như hết bộ nhớ JVM) và lỗi chương trình (`Exception`).",
+            "Lập trình viên có thể tự định nghĩa kiểu exception mới (dạng checked hoặc unchecked) và phải đặc tả chúng trong chữ ký phương thức."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Java Exception type hierarchy",
+          "diagramText": [
+            "package: java.lang",
+            "Throwable",
+            "  ├── Error",
+            "  └── Exception",
+            "        ├── RuntimeException",
+            "        │     └── [ ] ... [ ]  (Unchecked exceptions)",
+            "        └── [ ] ... [ ]  (Checked exceptions)"
+          ],
+          "diagramNote": "Sơ đồ cây phân cấp ngoại lệ trong java.lang: Throwable là gốc, chia thành Error và Exception; nhánh RuntimeException là Unchecked exceptions, các nhánh còn lại dưới Exception là Checked exceptions.",
+          "explanation": [
+            "Nắm vững sơ đồ cây `java.lang.Throwable`: cả `Error` và `Exception` đều là lớp con của `Throwable`.",
+            "Nhánh `RuntimeException` và mọi lớp con của nó (như `NullPointerException`, `IndexOutOfBoundsException`) thuộc nhóm Unchecked; các lớp kế thừa `Exception` mà không qua `RuntimeException` thuộc nhóm Checked."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Checked vs. unchecked exception",
+          "table": {
+            "headers": [
+              "Checked exceptions",
+              "Unchecked exceptions"
+            ],
+            "rows": [
+              [
+                "If a procedure might throw a checked exception, Java requires that the exception be listed in the procedure’s header; otherwise, there will be a compile-time error.",
+                "If a procedure might throw an unchecked exception, unchecked exceptions need not be listed in the header."
+              ],
+              [
+                "If code calls a procedure that might throw a checked exception, Java requires that it handles the exception; otherwise, there will be a compile-time error.",
+                "If code calls a procedure that might throw a unchecked exception, unchecked exceptions need not be handled in the calling code"
+              ],
+              [
+                "Checked exceptions are subtype of Exception class",
+                "Unchecked exceptions are  subtype of RuntimeException class"
+              ]
+            ]
+          },
+          "explanation": [
+            "Bảng so sánh trực diện 3 điểm khác nhau giữa Checked và Unchecked exceptions: (1) nghĩa vụ khai báo `throws` ở header hàm ném, (2) nghĩa vụ xử lý/khai báo tiếp ở code gọi hàm (caller), và (3) lớp cha kế thừa.",
+            "Hãy lưu ý bản chất ràng buộc: Checked exception được kiểm tra ngay tại **compile-time** nên không xử lý sẽ không biên dịch được."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Handle an exception",
+          "bullets": [
+            {
+              "text": "Deals with an exception in two ways:",
+              "subBullets": [
+                "Surrounds the using code with try...catch",
+                {
+                  "text": "Propagate the exception: This occurs when a call within some procedure P signals an exception that is not handled by a catch clause of any containing try statement in P. In this case, Java automatically propagates the exception to P’s caller provided one of the following is true:",
+                  "subBullets": [
+                    "that exception type or one of its supertypes is listed in P’s header",
+                    "the exception type is unchecked."
+                  ]
+                }
+              ]
+            }
+          ],
+          "explanation": [
+            "Hai cách xử lý tại chỗ khi một lời gọi có thể ném exception: dùng khối `try...catch` để bắt và xử lý ngay, hoặc để mặc nó lan truyền (**propagate**) lên caller của thủ tục `P`.",
+            "Điều kiện để Java tự động propagate khỏi `P`: hoặc kiểu exception (hay lớp cha của nó) đã được liệt kê trong mệnh đề `throws` ở header của `P`, hoặc đó là unchecked exception."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Example: try…catch",
+          "code": {
+            "lang": "java",
+            "text": "int n = 10;\nint f;\ntry {\n    int f = fact(n);\n    System.out.println(\"fact(\" + n + \"): \" + f);\n} catch (NonPositiveException e) {\n    // handle exception\n}"
+          },
+          "ocrNote": "Code minh họa trên slide khai báo 'int f;' ở ngoài rồi viết lại 'int f = fact(n);' bên trong try (trong Java thật dòng trong try nên viết 'f = fact(n);' để tránh lỗi trùng tên biến cục bộ).",
+          "explanation": [
+            "Ví dụ cú pháp cơ bản của `try...catch`: đặt lời gọi `fact(n)` vào khối `try` và bắt ngoại lệ `NonPositiveException` ở khối `catch`.",
+            "Lưu ý thực hành Java: trên slide vô tình khai báo `int f` hai lần; khi code thật bạn chỉ khai báo `int f;` bên ngoài rồi gán `f = fact(n);` bên trong khối `try`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 15"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Tạo kiểu Exception mới (Create, Name & Declare)",
+      "text": "Quy trình 3 bước tạo exception mới: xác định loại checked/unchecked theo tiêu chí Liskov, đặt tên chuẩn <TypeOfError>Exception và khai báo lớp kế thừa với 2 constructor chuẩn.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 16–20"
+      },
+      "digest": {
+        "keyPoints": [
+          "3 bước tạo exception mới: (1) Determine the exception type (checked vs unchecked), (2) Name an exception, (3) Declare a new exception type.",
+          "Tiêu chí dùng Unchecked exception (Slide 17): CHỈ dùng khi bạn kỳ vọng người dùng thường viết code đảm bảo exception không xảy ra — vì (a) có cách tránh tiện lợi và ít tốn kém (convenient and inexpensive) VÀ (b) ngữ cảnh sử dụng mang tính cục bộ (local). Ngược lại, phải dùng Checked exception.",
+          "Quy ước đặt tên: Exception name = type of error + \"Exception\" (ví dụ NullPointerException, DivideByZeroException, DiskAccessException).",
+          "Khai báo lớp mới: extends Exception (checked) hoặc RuntimeException (unchecked), ưu tiên đặt ở package riêng hoặc cùng package, cài đặt default constructor `super()` và single-argument constructor nhận `String s` gọi `super(s)`."
+        ],
+        "terms": [
+          {
+            "term": "Checked vs Unchecked choice rule",
+            "meaning": "Chỉ chọn Unchecked khi có cách tránh rẻ/tiện và ngữ cảnh cục bộ; mọi trường hợp còn lại chọn Checked và ưu tiên tái sử dụng exception có sẵn."
+          }
+        ],
+        "pitfalls": [
+          "Slide 17 hay bị hỏi trực tiếp trong đề thi SE1: cả 2 điều kiện dùng unchecked đều phải thỏa mãn ('convenient and inexpensive way to avoid' VÀ 'context of use is local')."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Create a new exception in Java",
+          "bullets": [
+            "Determine the exception type",
+            "Name an exception",
+            "Declare a new exception type"
+          ],
+          "explanation": [
+            "Slide liệt kê quy trình 3 bước chuẩn khi bạn cần định nghĩa thêm một ngoại lệ mới trong dự án Java.",
+            "Ba bước này lần lượt được giải thích chi tiết ở Slides 17, 18 và 19–20."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Determine the exception type",
+          "bullets": [
+            {
+              "text": "Types of error:",
+              "subBullets": [
+                "Invalid input: e.g. array is null",
+                "Logic: e.g. division by zero",
+                "Others: e.g. disk access failure"
+              ]
+            },
+            {
+              "text": "You should use an unchecked exception only if you expect that users will usually write code that ensures the exception will not happen, because",
+              "subBullets": [
+                "There is a convenient and inexpensive way to avoid the exception.",
+                "The context of use is local."
+              ]
+            },
+            "Otherwise, you should use a checked exception.",
+            "Reuse exceptions where possible"
+          ],
+          "explanation": [
+            "Đây là slide quy tắc thiết kế quan trọng nhất của Lecture 2: khi nào tạo unchecked exception thay vì checked exception? Chỉ chọn **unchecked** nếu thỏa đủ 2 điều kiện: (1) caller có cách kiểm tra phòng tránh vừa tiện vừa rẻ (ví dụ `if (a != null)`), và (2) ngữ cảnh sử dụng mang tính cục bộ.",
+            "Ngược lại (ví dụ đọc file/mạng dễ hỏng ngoài ý muốn, hoặc caller khó tự kiểm tra trước), hãy dùng **checked exception** để trình biên dịch buộc caller xử lý; đồng thời ưu tiên tái sử dụng các lớp exception chuẩn có sẵn nếu phù hợp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Create a new exception name",
+          "paragraphs": [
+            "How to name an exception?"
+          ],
+          "bullets": [
+            "Exception name = type of error + “Exception”",
+            {
+              "text": "Examples:",
+              "subBullets": [
+                "array is null → NullPointerException",
+                "division by zero → DivideByZeroException",
+                "disk access failure → DiskAccessException"
+              ]
+            }
+          ],
+          "explanation": [
+            "Quy ước đặt tên nhất quán giúp đọc code và stack trace biết ngay nguyên nhân lỗi: ghép tên loại lỗi với hậu tố `Exception`.",
+            "Ví dụ: thiếu bộ nhớ con trỏ `null` -> `NullPointerException`, chia cho 0 -> `DivideByZeroException`, lỗi truy cập đĩa -> `DiskAccessException`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Declare a new exception type",
+          "bullets": [
+            "Create a subtype of Exception (if checked) or RuntimeException (if unchecked)",
+            "Placed in the same or a separate package (better)",
+            {
+              "text": "Implement constructor method(s):",
+              "subBullets": [
+                "Default constructor",
+                "Single-argument constructor: error message",
+                "Invoke suitable super constructors"
+              ]
+            },
+            "Add new methods (if needed)"
+          ],
+          "explanation": [
+            "Hướng dẫn cấu trúc một lớp exception tự định nghĩa: chọn lớp cha là `Exception` (nếu muốn checked) hoặc `RuntimeException` (nếu muốn unchecked), nên đặt ở một package riêng để gom nhóm sạch sẽ.",
+            "Bắt buộc nên viết đủ 2 constructor cơ bản gọi lên `super()` và `super(s)` (để hàm `getMessage()` hoạt động), và có thể thêm thuộc tính/method riêng nếu cần mang thêm ngữ cảnh lỗi."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "public class NewKindOfException extends Exception { \n    public NewKindOfException( ) { super( ); } \n    public NewKindOfException(String s) { super(s); } \n}"
+          },
+          "explanation": [
+            "Mẫu code chuẩn cho một checked exception tự định nghĩa: `NewKindOfException` kế thừa `Exception` và cung cấp cả constructor rỗng `super()` lẫn constructor nhận thông điệp lỗi `String s` gọi `super(s)`.",
+            "Nếu muốn biến `NewKindOfException` thành unchecked exception, bạn chỉ cần đổi `extends Exception` thành `extends RuntimeException`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 20"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Đặc tả, Ném & Ba kỹ thuật xử lý Exception (Logging, Masking, Reflecting)",
+      "text": "Cách đặc tả exception cho thủ tục (throws) và kiểu dữ liệu, câu lệnh throw, cùng 3 kỹ thuật xử lý ngoại lệ thực tế: Logging, Masking và Reflecting (tổng kết bài).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 21–31"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thủ tục có thể kết thúc ngoại lệ được đặc tả bằng mệnh đề `throws <list_of_types>` ở header (có thể liệt kê nhiều kiểu exception).",
+          "Với một kiểu dữ liệu (ADT/class), cần gắn exception phù hợp cho Constructor, Setter và thao tác Data validation (tùy chọn).",
+          "Bên trong thân hàm dùng câu lệnh `throw new ...` để ném exception.",
+          "Ba kỹ thuật xử lý exception: (1) Logging (ghi lỗi qua System.err.println / printStackTrace); (2) Masking (exception là một phần dự kiến của logic → xử lý, thường kết hợp log, trả về giá trị ngoại lệ như -1 rồi tiếp tục luồng bình thường); (3) Reflecting (chuyển tiếp lỗi lên caller bằng automatic propagation hoặc catch rồi throw lại một exception mức cao/phù hợp hơn)."
+        ],
+        "terms": [
+          {
+            "term": "Logging",
+            "meaning": "Ghi/in thông tin chi tiết ngoại lệ (e.getMessage(), e.printStackTrace()) ra luồng lỗi hoặc file log để phục vụ gỡ lỗi."
+          },
+          {
+            "term": "Masking",
+            "meaning": "Che giấu/xử lý ngoại lệ dự kiến tại chỗ (thường kèm log), trả về giá trị đặc biệt nếu cần rồi tiếp tục luồng bình thường."
+          },
+          {
+            "term": "Reflecting",
+            "meaning": "Truyền exception lên caller qua lan truyền tự động hoặc bắt ngoại lệ cấp thấp rồi ném ra một ngoại lệ cấp cao hơn (ví dụ bắt NonPositiveException, ném NotPossibleException)."
+          }
+        ],
+        "pitfalls": [
+          "Phân biệt câu lệnh `throws` (ở header khai báo phương thức) với `throw` (bên trong thân phương thức để ném đối tượng exception).",
+          "So sánh `computeFact1` (Slide 28: bắt NonPositiveException, log và return -1 → Masking) với `computeFact2` (Slide 30: bắt NonPositiveException rồi throw new NotPossibleException → Reflecting)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Working with exceptions",
+          "bullets": [
+            "Specify a procedure with exceptions",
+            "Specify a type with exceptions",
+            "Throw an exception in the code",
+            "Handle an exception techniques"
+          ],
+          "explanation": [
+            "Slide chuyển sang phần thực hành làm việc với exception qua 4 khía cạnh: đặc tả ở mức thủ tục, đặc tả ở mức lớp/kiểu dữ liệu, ném ngoại lệ trong thân hàm và các kỹ thuật xử lý ở nơi gọi.",
+            "Mỗi gạch đầu dòng tương ứng với một cụm slide chi tiết từ Slide 22 đến Slide 30."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "Specify a procedure with exceptions",
+          "paragraphs": [
+            "throws < list_of_types >"
+          ],
+          "bullets": [
+            "A procedure that can terminate exceptionally is indicated by having a throws clause in its header:",
+            "A procedure can throw more than one type of exception"
+          ],
+          "code": {
+            "lang": "java",
+            "text": "public static int fact(int n)\n                        throws NonPositiveException\npublic static int search(int[] a, int x)\n    throws NullPointerException, NotFoundException"
+          },
+          "explanation": [
+            "Cách khai báo ở chữ ký phương thức: dùng từ khóa `throws` theo sau là một hoặc nhiều tên lớp exception cách nhau bởi dấu phẩy.",
+            "Ví dụ `search` có thể kết thúc bất thường theo 2 tình huống khác nhau: mảng null (`NullPointerException`) hoặc không tìm thấy `x` (`NotFoundException`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Specify a type with exceptions",
+          "bullets": [
+            {
+              "text": "Add suitable exceptions to these operations of a type:",
+              "subBullets": [
+                "Constructor",
+                "Setter",
+                "Data validation (optional)"
+              ]
+            }
+          ],
+          "explanation": [
+            "Khi thiết kế một lớp (ADT) thay vì chỉ một hàm lẻ, các điểm cần gắn kiểm tra và ném ngoại lệ là **Constructor** (ngăn khởi tạo đối tượng sai trạng thái ngay từ đầu), **Setter** (ngăn cập nhật giá trị vi phạm bất biến) và các hàm **Data validation**.",
+            "Điều này liên kết trực tiếp với Encapsulation ở Lecture 1: thay vì âm thầm bỏ qua `setSize(-5)`, setter tốt có thể ném exception để báo sai hợp đồng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Throw an exception",
+          "bullets": [
+            "A Java procedure can terminate by throwing an exception. It does this by using the throw statement",
+            "Example:"
+          ],
+          "code": {
+            "lang": "java",
+            "text": "public static int fact(int n) throws NonPositiveException {\n    if (n < 0) {\n        throw new NonPositiveException(\n                \"fact(): Input is not positive: \" + n);\n    }\n    return calcFact(n);\n}"
+          },
+          "explanation": [
+            "Cú pháp ném lỗi bên trong hàm: tạo đối tượng exception bằng `new` (kèm chuỗi mô tả rõ tên hàm và giá trị đầu vào sai `n`) rồi kết thúc hàm ngay lập tức bằng từ khóa `throw`.",
+            "Nếu `n >= 0`, câu lệnh `throw` không chạy và hàm tiếp tục trả về `calcFact(n)`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Handle exception techniques",
+          "bullets": [
+            {
+              "text": "Three techniques:",
+              "subBullets": [
+                "Logging",
+                "Masking",
+                "Reflecting"
+              ]
+            },
+            "A combination of the above three techniques is also common"
+          ],
+          "explanation": [
+            "Tổng hợp 3 kỹ thuật xử lý khi bắt hoặc đối mặt với exception trong phần mềm: **Logging** (ghi nhận thông tin lỗi), **Masking** (che lỗi và chạy tiếp luồng bình thường) và **Reflecting** (đẩy/dịch lỗi lên tầng gọi cao hơn).",
+            "Trong thực tế, lập trình viên rất hay phối hợp chúng (chẳng hạn vừa Logging vừa Masking, hoặc vừa Logging vừa Reflecting)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "Example: Exception logging",
+          "code": {
+            "lang": "java",
+            "text": "int n = 10;\ntry {\n    int f = fact(n);\n    System.out.println(\"fact(\" + n + \") = \" + f);\n} catch (NonPositiveException e) {\n    System.err.println(\"Error: \" + e.getMessage());\n    // more details\n    e.printStackTrace();\n}"
+          },
+          "explanation": [
+            "Minh họa kỹ thuật **Logging**: trong khối `catch`, ta dùng `System.err.println` in thông điệp `e.getMessage()` ra luồng lỗi chuẩn và gọi `e.printStackTrace()` để in đầy đủ dấu vết các lời gọi hàm dẫn tới lỗi.",
+            "Lưu ý: nếu chỉ log mà không ném lại hoặc trả giá trị dự phòng, luồng điều khiển sau khối `try...catch` sẽ tiếp tục chạy."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "Mask an exception",
+          "bullets": [
+            "When exceptions are expected as part of the logic",
+            {
+              "text": "Handle the exception and then continue with normal flow",
+              "subBullets": [
+                "(if required) return an exceptional value"
+              ]
+            },
+            "Often used together with logging"
+          ],
+          "explanation": [
+            "Kỹ thuật **Masking** được dùng khi ngoại lệ là tình huống đã lường trước trong logic nghiệp vụ và tầng hiện tại có đủ khả năng tự xử lý dứt điểm.",
+            "Thay vì để lỗi văng tiếp ra ngoài, ta xử lý nó (thường log lại), có thể trả về một giá trị ngoại lệ quy ước (như `-1` hoặc giá trị mặc định) rồi tiếp tục luồng bình thường."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "Example: Masking",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @effects\n *  if n is non-positive\n *    log error and return -1\n *  else\n *    return the factorial of n\n */\npublic static int computeFact1(int n) {\n    try {\n        int f = fact(n);\n        return f;\n    } catch (NonPositiveException e) {\n        // log exception\n        System.err.println(\"Error: \" + e.getMessage());\n        // mask using value -1\n        return -1;\n    }\n}"
+          },
+          "explanation": [
+            "Ví dụ `computeFact1(int n)` thể hiện rõ Masking kết hợp Logging: hàm gọi `fact(n)`, nếu gặp `NonPositiveException` thì in lỗi ra `System.err` và trả về `-1` (thay vì khai báo `throws`).",
+            "Nhờ đó chữ ký `computeFact1(int n)` không còn `throws`, đúng với đặc tả `@effects` ghi ở Javadoc phía trên."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Reflect an exception",
+          "bullets": [
+            {
+              "text": "Reflecting an exception can be accomplished by:",
+              "subBullets": [
+                "automatic propagation",
+                "explicitly catching an exception and then throwing an exception"
+              ]
+            }
+          ],
+          "explanation": [
+            "Kỹ thuật **Reflecting** chuyển trách nhiệm xử lý lỗi lên tầng caller theo 2 cách: (1) để Java tự lan truyền lên (automatic propagation qua `throws`), hoặc (2) chủ động `catch` ngoại lệ cấp thấp rồi `throw` một ngoại lệ khác phù hợp với mức trừu tượng của hàm hiện tại.",
+            "Cách thứ 2 rất hữu ích để giữ tính trừu tượng: tầng cao không bị lộ chi tiết kỹ thuật tầng dưới (ví dụ bắt `NonPositiveException` hoặc `SQLException` rồi ném `NotPossibleException`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "Example: Delegating exception handling",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @effects\n *  if n is non-positive\n *    throw NotPossibleException\n *  else\n *    return the factorial of n\n */\npublic static void computeFact2(int n)\n                        throws NotPossibleException {\n    try {\n        int f = fact(n);\n        System.out.println(\"fact(\" + n + \"): \" + f);\n    } catch (NonPositiveException e) {\n        throw new NotPossibleException(\n                \"Could not compute fact(\" + n + \")\");\n    }\n}"
+          },
+          "explanation": [
+            "Ví dụ `computeFact2(int n)` minh họa kỹ thuật **Reflecting** dạng catch-and-rethrow: bắt `NonPositiveException` từ `fact(n)` nhưng không xử lý dứt điểm mà ném ra `NotPossibleException` mang ngữ nghĩa tổng quát hơn cho caller.",
+            "Chú ý header của `computeFact2` khai báo `throws NotPossibleException` khớp chính xác với ngoại lệ được ném ra trong khối `catch`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "Summary",
+          "bullets": [
+            "Exceptions are needed in robust programs",
+            "Exceptions can be checked or unchecked",
+            "Procedures/operations are specified with exceptions",
+            "Implementations must throw the specified exceptions",
+            "Exceptions are handled in the code by a combination of logging and masking or reflecting"
+          ],
+          "explanation": [
+            "Slide tổng kết 5 ý cốt lõi của Lecture 2: vai trò của exception trong chương trình bền vững, hai loại checked/unchecked, đặc tả `throws` ở chữ ký, ném `throw` trong cài đặt và phối hợp Logging với Masking hoặc Reflecting.",
+            "Khi làm bài tập hoặc đề thi viết đặc tả/cài đặt lớp Java, hãy kiểm tra đủ cả 3 khâu: đặc tả `throws` + câu lệnh `throw` + chiến lược xử lý ở nơi gọi."
+          ],
+          "source": {
+            "file": "Resources/Lecture 2.pdf",
+            "loc": "Slide 31"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l02-c01", "front": "Checked và unchecked exception khác nhau thế nào?", "back": "Checked: subtype của Exception (không phải RuntimeException), phải khai báo throws hoặc catch. Unchecked: subtype của RuntimeException, không bắt buộc.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 13" } },
-    { "id": "se1-l02-c02", "front": "Khi nào dùng unchecked exception?", "back": "Chỉ khi người dùng thường viết code bảo đảm exception không xảy ra: có cách tránh tiện lợi và rẻ, và ngữ cảnh dùng cục bộ.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 17" } },
-    { "id": "se1-l02-c03", "front": "Ba kỹ thuật xử lý exception?", "back": "Logging, Masking, Reflecting.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 25–30" } },
-    { "id": "se1-l02-c04", "front": "Reflecting exception là gì?", "back": "Truyền exception lên caller (tự động) hoặc bắt rồi ném exception khác mức cao hơn, ví dụ bắt NonPositiveException và ném NotPossibleException.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 29–30" } },
-    { "id": "se1-l02-c05", "front": "Giới hạn của việc trả về special value để báo lỗi?", "back": "Không mang chi tiết lỗi; có thủ tục không có giá trị đặc biệt (isSorted); caller có thể bỏ qua; cần kiểm tra thêm.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 6–8" } }
+    {
+      "id": "se1-l02-c01",
+      "front": "Checked và Unchecked exception khác nhau thế nào?",
+      "back": "Checked: subtype của Exception (trừ RuntimeException), bắt buộc liệt kê throws ở header và caller bắt buộc phải xử lý (nếu không lỗi compile). Unchecked: subtype của RuntimeException, không bắt buộc.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "se1-l02-c02",
+      "front": "Khi nào nên dùng Unchecked exception (2 điều kiện)?",
+      "back": "Chỉ dùng khi kỳ vọng user thường viết code đảm bảo exception không xảy ra, vì: (1) có cách tránh tiện lợi và ít tốn kém (convenient & inexpensive), và (2) ngữ cảnh sử dụng là cục bộ (local). Ngược lại dùng Checked.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l02-c03",
+      "front": "Ba kỹ thuật xử lý exception?",
+      "back": "Logging (ghi chi tiết lỗi), Masking (xử lý lỗi dự kiến và chạy tiếp luồng bình thường), Reflecting (lan truyền hoặc bắt rồi ném exception khác lên caller).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 25–30"
+      }
+    },
+    {
+      "id": "se1-l02-c04",
+      "front": "Reflecting exception là gì và thực hiện bằng 2 cách nào?",
+      "back": "Truyền exception lên caller qua: (1) automatic propagation (liệt kê throws hoặc là unchecked), hoặc (2) bắt exception rồi ném một exception khác phù hợp hơn (ví dụ bắt NonPositiveException, ném NotPossibleException).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 29–30"
+      }
+    },
+    {
+      "id": "se1-l02-c05",
+      "front": "4 hạn chế của việc trả về special value để báo lỗi?",
+      "back": "1) Giá trị trả về không mang chi tiết lỗi; 2) Một số thủ tục (như boolean isSorted) không có giá trị đặc biệt; 3) Caller có thể bỏ qua mã lỗi; 4) Cần thêm câu lệnh kiểm tra để phát hiện lỗi.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 6–8"
+      }
+    },
+    {
+      "id": "se1-l02-c06",
+      "front": "Hai yêu cầu của một Robust procedure?",
+      "back": "Không kết thúc đột ngột (not to terminate abruptly) và cung cấp một xấp xỉ của hành vi bình thường (provides an approximation of the normal behavior).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "se1-l02-c07",
+      "front": "Cây phân cấp Java Exception trong gói java.lang?",
+      "back": "Throwable → Error (lỗi môi trường) và Exception (lỗi chương trình). Dưới Exception gồm RuntimeException (Unchecked) và các subtype Exception khác (Checked).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 11–12"
+      }
+    },
+    {
+      "id": "se1-l02-c08",
+      "front": "Quy ước đặt tên và 2 constructor chuẩn khi khai báo exception mới?",
+      "back": "Tên = loại lỗi + 'Exception' (vd DivideByZeroException). Cài 2 constructor: mặc định gọi super() và nhận String s gọi super(s).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 18–20"
+      }
+    },
+    {
+      "id": "se1-l02-c09",
+      "front": "Trong một kiểu dữ liệu (type/class), cần gắn exception cho các thao tác nào?",
+      "back": "Constructor, Setter, và Data validation (tùy chọn).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "se1-l02-c10",
+      "front": "Masking exception khác Logging thuần túy chỗ nào?",
+      "back": "Logging chỉ ghi/in lỗi (System.err.println, printStackTrace); Masking coi ngoại lệ là một phần logic dự kiến, xử lý (thường kèm log), trả về giá trị đặc biệt nếu cần (vd -1) và tiếp tục luồng bình thường.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 26–28"
+      }
+    },
+    {
+      "id": "se1-l02-c11",
+      "front": "Điều kiện để Java tự động propagate exception từ thủ tục P lên caller của P?",
+      "back": "Exception không bị bắt bởi try...catch trong P, VÀ hoặc kiểu exception (hoặc supertype của nó) có trong header `throws` của P, hoặc exception đó là unchecked.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 14"
+      }
+    },
+    {
+      "id": "se1-l02-c12",
+      "front": "Ưu điểm của Solution 2 (Exception) so với trả về special value?",
+      "back": "Không cần giá trị trả về đặc biệt; dừng thực thi tới khi lỗi được khôi phục; có thể ép caller phải xử lý; và là một kiểu dữ liệu mang đầy đủ chi tiết lỗi.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 9"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l02-q01", "stem": "Lớp nào là checked exception?", "options": ["RuntimeException", "NullPointerException", "Một subtype của Exception không phải RuntimeException", "Error"], "answer": 2, "explanation": "Checked exception là subtype của Exception ngoại trừ RuntimeException.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 13" } },
-    { "id": "se1-l02-q02", "stem": "Xử lý exception như computeFact1 (ghi lỗi rồi trả về -1 và chạy tiếp) thuộc kỹ thuật nào?", "options": ["Logging", "Masking", "Reflecting", "Propagating tự động"], "answer": 1, "explanation": "Masking: xử lý exception dự kiến và tiếp tục luồng bình thường.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slides 27–28" } },
-    { "id": "se1-l02-q03", "stem": "Quy ước đặt tên exception đúng là?", "options": ["'Exception' + loại lỗi", "Loại lỗi + 'Exception'", "'Err' + loại lỗi", "Tùy ý"], "answer": 1, "explanation": "Ví dụ NullPointerException, DivideByZeroException.", "source": { "file": "Resources/Lecture 2.pdf", "loc": "Slide 18" } }
+    {
+      "id": "se1-l02-q01",
+      "stem": "Lớp nào sau đây là Checked exception?",
+      "options": [
+        "RuntimeException",
+        "NullPointerException",
+        "Một subtype của Exception không phải RuntimeException",
+        "Error"
+      ],
+      "answer": 2,
+      "explanation": "Slides 12–13: Checked exceptions là các lớp con của Exception nằm ngoài nhánh RuntimeException.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 12–13"
+      }
+    },
+    {
+      "id": "se1-l02-q02",
+      "stem": "Xử lý exception như computeFact1 (ghi lỗi rồi trả về -1 và chạy tiếp) thuộc kỹ thuật nào?",
+      "options": [
+        "Logging",
+        "Masking",
+        "Reflecting",
+        "Automatic propagation"
+      ],
+      "answer": 1,
+      "explanation": "Slides 27–28: Masking xử lý exception dự kiến, thường kết hợp log lỗi rồi trả về giá trị ngoại lệ (-1) để tiếp tục luồng bình thường.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 27–28"
+      }
+    },
+    {
+      "id": "se1-l02-q03",
+      "stem": "Quy ước đặt tên exception đúng theo bài giảng là gì?",
+      "options": [
+        "'Exception' + loại lỗi",
+        "Loại lỗi + 'Exception'",
+        "'Err' + loại lỗi",
+        "Đặt tên tùy ý không cần hậu tố"
+      ],
+      "answer": 1,
+      "explanation": "Slide 18: Exception name = type of error + \"Exception\" (ví dụ NullPointerException, DivideByZeroException, DiskAccessException).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 18"
+      }
+    },
+    {
+      "id": "se1-l02-q04",
+      "stem": "Đâu KHÔNG phải là hạn chế của giải pháp trả về giá trị đặc biệt (Solution 1)?",
+      "options": [
+        "Giá trị trả về không mang chi tiết lỗi",
+        "Một số thủ tục không có giá trị trả về đặc biệt",
+        "Mã lỗi có thể bị caller bỏ qua",
+        "Luôn gây lỗi biên dịch nếu caller không kiểm tra giá trị trả về"
+      ],
+      "answer": 3,
+      "explanation": "Slide 8: Solution 1 không ép được caller kiểm tra lúc biên dịch (trái lại error code có thể bị caller bỏ qua).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l02-q05",
+      "stem": "Vì sao hàm `public boolean isSorted(int[] a)` ở Slide 5–7 minh họa rõ nhược điểm của việc trả về giá trị đặc biệt?",
+      "options": [
+        "Vì boolean chỉ có true/false nên trả về false khi a == null gây lẫn lộn với trường hợp mảng hợp lệ nhưng chưa sắp xếp",
+        "Vì Java không cho phép return false trong vòng lặp for",
+        "Vì mảng int[] không thể truyền null vào hàm",
+        "Vì hàm isSorted bắt buộc phải trả về số nguyên"
+      ],
+      "answer": 0,
+      "explanation": "Slides 5–8: Một số thủ tục (như hàm boolean isSorted) không có giá trị trả về đặc biệt tách biệt được giữa lỗi input và kết quả false thông thường.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 5–8"
+      }
+    },
+    {
+      "id": "se1-l02-q06",
+      "stem": "Theo Slide 17, khi nào ta mới nên dùng Unchecked exception?",
+      "options": [
+        "Mọi lúc để đỡ phải viết try...catch",
+        "Khi lỗi liên quan đến đọc/ghi ổ đĩa hoặc mạng",
+        "Khi có cách tránh tiện lợi và ít tốn kém, đồng thời ngữ cảnh sử dụng mang tính cục bộ",
+        "Khi phương thức trả về kiểu void"
+      ],
+      "answer": 2,
+      "explanation": "Slide 17: Chỉ dùng unchecked khi người dùng thường viết code tránh được lỗi vì có cách tránh tiện lợi, rẻ và ngữ cảnh dùng mang tính cục bộ.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l02-q07",
+      "stem": "Trong Slide 14, điều kiện nào cho phép Java tự động propagate một exception chưa được catch bên trong thủ tục P lên caller của P?",
+      "options": [
+        "Mọi exception đều tự động propagate mà không cần khai báo gì",
+        "Exception đó (hoặc supertype của nó) được liệt kê trong header của P, HOẶC exception đó là unchecked",
+        "P phải là hàm static",
+        "Exception đó phải kế thừa lớp Error"
+      ],
+      "answer": 1,
+      "explanation": "Slide 14: Java tự propagate lên caller của P nếu kiểu exception (hoặc supertype) có trong header của P, hoặc kiểu exception là unchecked.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 14"
+      }
+    },
+    {
+      "id": "se1-l02-q08",
+      "stem": "Đoạn code `computeFact2` ở Slide 30 (catch NonPositiveException rồi throw new NotPossibleException) minh họa kỹ thuật nào?",
+      "options": [
+        "Logging",
+        "Masking",
+        "Reflecting",
+        "Swallowing"
+      ],
+      "answer": 2,
+      "explanation": "Slides 29–30: Reflecting có thể thực hiện bằng cách bắt một exception rồi ném một exception khác phù hợp hơn lên caller.",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 29–30"
+      }
+    },
+    {
+      "id": "se1-l02-q09",
+      "stem": "Theo Slide 23, khi đặc tả một kiểu dữ liệu (type/class) với exceptions, ta thường thêm exception phù hợp vào các thao tác nào?",
+      "options": [
+        "Chỉ hàm main()",
+        "Constructor, Setter và Data validation (tùy chọn)",
+        "Chỉ hàm toString() và equals()",
+        "Chỉ các biến private"
+      ],
+      "answer": 1,
+      "explanation": "Slide 23: Specify a type with exceptions — add suitable exceptions to Constructor, Setter, Data validation (optional).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "se1-l02-q10",
+      "stem": "Trong sơ đồ phân cấp Java Exception (Slides 11–12), các lỗi môi trường (Environmental errors) bắt nguồn từ lớp nào?",
+      "options": [
+        "RuntimeException",
+        "Error",
+        "IOException",
+        "CheckedException"
+      ],
+      "answer": 1,
+      "explanation": "Slides 11–12: Execution errors gồm Environmental errors (derived from Error class) và Program errors (Exceptions).",
+      "source": {
+        "file": "Resources/Lecture 2.pdf",
+        "loc": "Slides 11–12"
+      }
+    }
   ]
 }

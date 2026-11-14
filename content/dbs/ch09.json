@@ -1,28 +1,2650 @@
 {
-  "id": "dbs-lab-ddl-dml", "order": 9,
+  "id": "dbs-lab-ddl-dml",
+  "order": 9,
   "title": "Lab 2–4: DDL, DML và SELECT cơ bản (themepark)",
-  "summary": [
-    { "h": "CSDL THEMEPARK", "text": "Bảy bảng: THEMEPARK(PARK_CODE PK, PARK_NAME, PARK_CITY, PARK_COUNTRY), EMPLOYEE, TICKET, ATTRACTION, HOURS (PK ghép EMP_NUM, ATTRACT_NO, DATE_WORKED), SALES, SALES_LINE (PK ghép TRANSACTION_NO, LINE_NO; FK tới SALES ON DELETE CASCADE)." },
-    { "h": "Ràng buộc trong MySQL (Lab 2)", "text": "DEFAULT phải là hằng số. FOREIGN KEY cần engine InnoDB, cột được đánh index và cùng kiểu dữ liệu. Tài liệu lab ghi MySQL 5.0 không hỗ trợ CHECK. Xóa bảng theo thứ tự ngược phụ thuộc.", "code": { "lang": "sql", "text": "CREATE DATABASE themepark;\nUSE themepark;\nCREATE TABLE THEMEPARK (\n  PARK_CODE VARCHAR(10) PRIMARY KEY,\n  PARK_NAME VARCHAR(35) NOT NULL,\n  PARK_CITY VARCHAR(50) NOT NULL,\n  PARK_COUNTRY CHAR(2) NOT NULL\n);\nCREATE INDEX EMP_LNAME_INDEX ON EMPLOYEE(EMP_LNAME(8));\nALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);\nDROP TABLE SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK;" } },
-    { "h": "DML (Lab 3)", "text": "INSERT theo thứ tự thỏa referential integrity (bảng cha trước). UPDATE không có WHERE sẽ cập nhật mọi hàng. Dùng SET AUTOCOMMIT = 0 và ROLLBACK để khôi phục. INSERT ... SELECT chép dữ liệu từ bảng khác.", "code": { "lang": "sql", "text": "UPDATE ATTRACTION SET ATTRACT_AGE = 14;  -- thiếu WHERE: sửa mọi hàng\nSET AUTOCOMMIT = 0;\nROLLBACK;\nDELETE FROM PARK_COPY WHERE PARK_CODE = 'RL1';\nINSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;" } },
-    { "h": "SELECT cơ bản (Lab 4)", "text": "Toán tử số học và alias; so sánh (=, <, <=, >, >=, <>, !=); BETWEEN, IN, LIKE với % và _, IS NULL. Độ ưu tiên NOT > AND > OR.", "code": { "lang": "sql", "text": "SELECT TICKET_NO, ROUND(TICKET_PRICE * 0.1, 2) AS Discount FROM TICKET;\nSELECT * FROM EMPLOYEE WHERE EMP_FNAME LIKE '%n_';\nSELECT * FROM SECTION WHERE SECTIONNO BETWEEN 2713 AND 2717;" } }
-  ],
+  "audit": {
+    "sourceFile": "TUT06 DDL basic_building themeparkDB.pdf (20 trang) + Tut9_DML and select statement.pdf (27 trang) + Basic select statement.sql (57 dòng)",
+    "totalPages": 47,
+    "extractedPages": 47,
+    "ocrNotes": [
+      "Đã trích xuất đầy đủ 20/20 trang từ TUT06 DDL basic_building themeparkDB.pdf (Lab 2, trang sách 16–35), 27/27 trang từ Tut9_DML and select statement.pdf (Lab 3–4, trang sách 36–62) và toàn bộ 57 dòng nguyên văn từ Basic select statement.sql.",
+      "Các lỗi đánh máy nhỏ trong tài liệu gốc (ví dụ `themepark.sq`, `FKP_EMP_PARK`, `AUTO_INCREMEMNT`, bảng `TIMESTAMP`/`DATETIME` đảo cột Example ở Lab 2 tr.7, chú thích `Figure 13` ghi THEMEPARK dù lệnh là `describe employee;`, prose `from 34, to 38` nhưng SQL ghi `= 34` ở Lab 3 tr.6) được giữ nguyên văn ở nội dung gốc và chỉ rõ trong phần giải thích."
+    ]
+  },
   "sources": [
-    { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Lab 2 (20 trang)" },
-    { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3–4 (27 trang)" },
-    { "file": "Basic select statement.sql", "loc": "dòng 1–57" }
+    {
+      "file": "TUT06 DDL basic_building themeparkDB.pdf",
+      "loc": "Lab 2 — Trang 1–20 (sách tr. 16–35)"
+    },
+    {
+      "file": "Tut9_DML and select statement.pdf",
+      "loc": "Lab 3–4 — Trang 1–27 (sách tr. 36–62)"
+    },
+    {
+      "file": "Basic select statement.sql",
+      "loc": "Dòng 1–57 (script thực hành trên lớp)"
+    }
+  ],
+  "summary": [
+    {
+      "h": "Lab 2 (Phần 1): Giới thiệu Theme Park DB, ERD, Data Dictionary & Kiểu dữ liệu MySQL",
+      "text": "Giới thiệu bài toán CSDL Theme Park, sơ đồ ERD (Figure 11) gồm 7 bảng, Từ điển dữ liệu chi tiết (Table 2.1) và bảng các kiểu dữ liệu phổ biến trong MySQL (Table 2.2).",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 1–7 (sách tr. 16–22)"
+      },
+      "digest": {
+        "keyPoints": [
+          "CSDL `themepark` gồm 7 bảng: `THEMEPARK`, `EMPLOYEE`, `TICKET`, `ATTRACTION`, `HOURS`, `SALES` và `SALES_LINE` (Table 2.1 viết `SALESLINE`, lệnh SQL tạo tên `SALES_LINE`).",
+          "Khóa chính ghép (composite PK): `HOURS(EMP_NUM, ATTRACT_NO, DATE_WORKED)` và `SALES_LINE(TRANSACTION_NO, LINE_NO)`.",
+          "Kiểu dữ liệu MySQL khác Oracle ở nhiều điểm: chuỗi (`CHAR`, `VARCHAR`, `TEXT` các cỡ, `ENUM`), số nguyên (`TINYINT`, `MEDIUMINT`, `INT`, `BIGINT` kèm `UNSIGNED`/`ZEROFILL`/`AUTO_INCREMENT`), số thực (`FLOAT`, `DOUBLE`, `NUMERIC`), ngày giờ (`DATE` lưu `YYYY-MM-DD`, `DATETIME`, `TIMESTAMP`, `TIME`, `YEAR`)."
+        ],
+        "terms": [
+          {
+            "term": "Data Dictionary",
+            "meaning": "Từ điển dữ liệu mô tả tên bảng, tên cột, kiểu dữ liệu, định dạng, miền giá trị, bắt buộc (Required), khóa chính/ngoại (PK/FK) và bảng tham chiếu."
+          },
+          {
+            "term": "CHAR vs VARCHAR",
+            "meaning": "`CHAR(size)` có độ dài cố định (đệm khoảng trắng ở cuối nếu ngắn hơn); `VARCHAR(size)` có độ dài biến đổi (không đệm khoảng trắng cuối)."
+          },
+          {
+            "term": "AUTO_INCREMENT",
+            "meaning": "Thuộc tính dùng cho các kiểu số nguyên (INT...) để tự động tăng giá trị khóa chính khi chèn dòng mới."
+          }
+        ],
+        "pitfalls": [
+          "Trong Table 2.1 gốc: cột `TICKET_NO` bị bỏ trống ô `PK or FK` dù ở Figure 11 và Task 2.4 nó là `PRIMARY KEY`; cột khu vực nhân viên ghi `EMP_AREACODE` ở Table 2.1 nhưng khi tạo bảng ở Task 2.3 lại đặt tên `EMP_AREA_CODE`.",
+          "Trong Table 2.2 gốc (trang 7): cột Example của `TIMESTAMP(size)` và `DATETIME` bị tác giả đặt chéo cho nhau (`TIMESTAMP(size)` ghi ví dụ `fieldName DATETIME`, còn `DATETIME` ghi `fieldName TIMESTAMP(14)`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 2 • Trang 1",
+          "pageNumber": 1,
+          "title": "Lab 2: Building a database: Table by Table — Introduction",
+          "paragraphs": [
+            "MySQL Lab Guide",
+            "Lab 2: Building a database: Table by Table",
+            "The learning objectives of this lab are to",
+            "2.1 Introduction",
+            "In this section you will learn how to create a small database called Theme Park from the ERD shown in Figure 11. This will involve you creating the table structures in MySQL using the CREATE TABLE command. In order to do this, appropriate data types will need to be selected from the data dictionary for each table structure along with any constraints that have been imposed (e.g. primary and foreign key). Converting any ER model to a set of tables in a database requires following specific rules that govern the conversion. The application of those rules requires an understanding of the effects of updates and deletions on the tables in the database. You can read more about these rules in Chapter 8, Introduction to Structured Query Language, and Appendix D, Converting an ER Model into a Database Structure.",
+            "2.2 The Theme Park Database",
+            "Figure 11 shows the ERD for the Theme Park database which will be used throughout this lab guide."
+          ],
+          "bullets": [
+            "Create table structures using MySQL data types",
+            "Apply SQL constraints to MySQL tables",
+            "Create a simple index"
+          ],
+          "explanation": [
+            "Trang mở đầu Lab 2 đặt 3 mục tiêu thực hành DDL cốt lõi trên MySQL: chọn kiểu dữ liệu tạo bảng (`CREATE TABLE`), áp dụng ràng buộc toàn vẹn (`PRIMARY KEY`, `FOREIGN KEY`, `NOT NULL`, `DEFAULT`) và tạo chỉ mục đơn giản (`CREATE INDEX`).",
+            "Quy trình chuyển đổi từ sơ đồ ER (ERD ở Figure 11) sang các bảng quan hệ luôn đi kèm Data Dictionary (Table 2.1) để xác định chính xác kiểu dữ liệu, ràng buộc bắt buộc và ảnh hưởng của thao tác cập nhật/xóa (như `ON DELETE CASCADE`)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 1 (sách tr. 16)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 2",
+          "pageNumber": 2,
+          "title": "Figure 11 The Theme park Database ERD",
+          "paragraphs": [
+            "Figure 11 The Theme park Database ERD",
+            "Table 2.1 Shows the Data Dictionary for the Theme Park database which will be used to create each table structure."
+          ],
+          "diagramText": [
+            "Các bảng & thuộc tính trong Figure 11:",
+            "• THEMEPARK: PARK_CODE {PK}, PARK_NAME, PARK_CITY, PARK_COUNTRY",
+            "• ATTRACTION: ATTRACT_NO {PK}, PARK_CODE {FK1}, ATTRACT_NAME, ATTRACT_AGE, ATTRACT_CAPACITY",
+            "• TICKET: TICKET_NO {PK}, TICKET_PRICE, TICKET_TYPE, PARK_CODE {FK1}",
+            "• HOURS: EMP_NUM {PK}{FK1}, ATTRACT_NO {PK}{FK2}, HOURS_PER_ATTRACT, HOUR_RATE, DATE_WORKED",
+            "• EMPLOYEE: EMP_NUM {PK}, EMP_TITLE, EMP_LNAME, EMP_FNAME, EMP_DOB, EMP_HIRE_DATE, EMP_AREACODE, EMP_PHONE, PARK_CODE {FK}",
+            "• SALES: TRANSACTION_NO {PK}, PARK_CODE {FK1}, SALE_DATE",
+            "• SALES_LINE: TRANSACTION_NO {PK}{FK1}, LINE_NO {PK}, TICKET_NO {FK2}, LINE_QTY, LINE_PRICE",
+            "Các mối quan hệ (Cardinality):",
+            "• THEMEPARK (1..1) ◀ belongs_to — (0..*) ATTRACTION",
+            "• THEMEPARK (1..1) — issues ▶ (0..*) TICKET",
+            "• THEMEPARK (1..1) — makes ▶ (0..*) SALES",
+            "• THEMEPARK (1..1) — works_in ▶ (0..*) EMPLOYEE",
+            "• ATTRACTION (1..1) — generates ▶ (0..*) HOURS",
+            "• EMPLOYEE (1..1) — is_employed_for ▶ (0..*) HOURS",
+            "• SALES (1..1) — contains ▶ (1..*) SALES_LINE",
+            "• TICKET (1..1) — contains ▶ (0..*) SALES_LINE"
+          ],
+          "diagramNote": "Sơ đồ thực thể liên kết (UML-style ERD) của toàn bộ CSDL themepark gồm 7 bảng liên kết xoay quanh bảng gốc THEMEPARK.",
+          "ocrNote": "Trên ảnh ERD gốc, nhãn '1..1' và 'generates' phía trên bảng HOURS cùng nhãn '0..*' và 'is_employed_for' phía dưới HOURS hơi chồng chữ lên nhau; đã đọc đối chiếu chính xác theo bản số 1..1 đến 0..*.",
+          "explanation": [
+            "Đây là sơ đồ tổng thể (ERD) dùng xuyên suốt toàn bộ các bài Lab 2 đến Lab 8 và slide bài giảng. Bảng trung tâm ở cấp cao nhất là `THEMEPARK`, liên kết 1–nhiều (`1..1` → `0..*`) tới `ATTRACTION`, `TICKET`, `SALES` và `EMPLOYEE`.",
+            "Hai bảng giao dịch/kết hợp giải quyết quan hệ nhiều–nhiều nằm ở giữa và dưới: `HOURS` (kết nối `EMPLOYEE` và `ATTRACTION`, khóa chính gồm `EMP_NUM`, `ATTRACT_NO`, `DATE_WORKED` khi cài đặt) và `SALES_LINE` (kết nối `SALES` và `TICKET`, khóa chính ghép `TRANSACTION_NO`, `LINE_NO`).",
+            "Thứ tự tạo bảng và chèn dữ liệu sau này bắt buộc tuân theo chiều mũi tên phụ thuộc: `THEMEPARK` phải có trước `EMPLOYEE`/`TICKET`/`ATTRACTION`/`SALES`; rồi mới tới `HOURS` và `SALES_LINE`."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 2 (sách tr. 17)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 3",
+          "pageNumber": 3,
+          "title": "Table 2.1 Data Dictionary — THEMEPARK & EMPLOYEE",
+          "paragraphs": [
+            "Table 2.1 Data Dictionary for the Theme Park Database"
+          ],
+          "table": {
+            "caption": "Table 2.1 Data Dictionary (Phần 1: THEMEPARK & EMPLOYEE)",
+            "headers": [
+              "Table Name",
+              "Attribute Name",
+              "Contents",
+              "Data Type",
+              "Format",
+              "Range",
+              "Required",
+              "PK or FK",
+              "FK Referenced Table"
+            ],
+            "rows": [
+              [
+                "THEMEPARK",
+                "PARK_CODE",
+                "Park code",
+                "VARCHAR(10)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "PK",
+                ""
+              ],
+              [
+                "",
+                "PARK_NAME",
+                "Park Name",
+                "VARCHAR(35)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "PARK_CITY",
+                "City",
+                "VARCHAR(50)",
+                "",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "PARK_COUNTRY",
+                "Country",
+                "CHAR(2)",
+                "XX",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "EMPLOYEE",
+                "EMP_NUM",
+                "Employee number",
+                "NUMERIC(4)",
+                "##",
+                "0000 – 9999",
+                "Y",
+                "PK",
+                ""
+              ],
+              [
+                "",
+                "EMP_TITLE",
+                "Employee title",
+                "VARCHAR(4)",
+                "XXXX",
+                "NA",
+                "N",
+                "",
+                ""
+              ],
+              [
+                "",
+                "EMP_LNAME",
+                "Last name",
+                "VARCHAR(15)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "EMP_FNAME",
+                "First Name",
+                "VARCHAR(15)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "EMP_DOB",
+                "Date of Birth",
+                "DATE",
+                "DD-MON-YY",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "EMP_HIRE_DATE",
+                "Hire date",
+                "DATE",
+                "DD-MON-YY",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "EMP_AREACODE",
+                "Area code",
+                "VARCHAR(4)",
+                "XXXX",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "EMP_PHONE",
+                "Phone",
+                "VARCHAR(12)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "PARK_CODE",
+                "Park code",
+                "VARCHAR(10)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "FK",
+                "THEMEPARK"
+              ]
+            ]
+          },
+          "explanation": [
+            "Phần đầu của Data Dictionary quy định cấu trúc chi tiết hai bảng nền: `THEMEPARK` (mã công viên `PARK_CODE` là khóa chính, mã quốc gia cố định 2 ký tự `CHAR(2)`) và `EMPLOYEE` (`EMP_NUM` kiểu `NUMERIC(4)` phạm vi `0000 – 9999`).",
+            "Chú ý cột `Required`: giá trị `Y` tương ứng ràng buộc `NOT NULL` khi viết SQL (`PARK_NAME`, `EMP_LNAME`, `EMP_DOB`...), còn `N` cho phép `NULL` (như `EMP_TITLE`).",
+            "Lưu ý chênh lệch nhỏ giữa tài liệu thiết kế và script thực hành: bảng ghi `EMP_AREACODE` (liền nhau) và `EMP_HIRE_DATE` là `Required = Y`, nhưng ở Task 2.3 lệnh `CREATE TABLE` dùng `EMP_AREA_CODE` (có dấu gạch dưới) và để `EMP_HIRE_DATE DATE` (cho phép NULL)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 3 (sách tr. 18)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 4",
+          "pageNumber": 4,
+          "title": "Table 2.1 Data Dictionary — TICKET, ATTRACTION & HOURS",
+          "table": {
+            "caption": "Table 2.1 Data Dictionary (Phần 2: TICKET, ATTRACTION & HOURS)",
+            "headers": [
+              "Table Name",
+              "Attribute Name",
+              "Contents",
+              "Data Type",
+              "Format",
+              "Range",
+              "Required",
+              "PK or FK",
+              "FK Referenced Table"
+            ],
+            "rows": [
+              [
+                "TICKET",
+                "TICKET_NO",
+                "Ticket number",
+                "NUMERIC(10)",
+                "##########",
+                "NA",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "TICKET_PRICE",
+                "Price",
+                "NUMERIC(4,2)",
+                "####.##",
+                "0.00 – 0000.00",
+                "",
+                "",
+                ""
+              ],
+              [
+                "",
+                "TICKET_TYPE",
+                "Type of ticket",
+                "VARCHAR(10)",
+                "XXXXXXXXXX",
+                "Adult, Child,Senior,Other",
+                "",
+                "",
+                ""
+              ],
+              [
+                "",
+                "PARK_CODE",
+                "Park code",
+                "VARCHAR(10)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "FK",
+                "THEMEPARK"
+              ],
+              [
+                "ATTRACTION",
+                "ATTRACT_NO",
+                "Attraction number",
+                "NUMERIC(10)",
+                "##########",
+                "N/A",
+                "Y",
+                "PK",
+                ""
+              ],
+              [
+                "",
+                "PARK_CODE",
+                "Park code",
+                "VARCHAR(10)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "FK",
+                "THEMEPARK"
+              ],
+              [
+                "",
+                "ATTRACT_NAME",
+                "Name",
+                "VARCHAR(35)",
+                "XXXXXXX",
+                "N/A",
+                "N",
+                "",
+                ""
+              ],
+              [
+                "",
+                "ATTRACT_AGE",
+                "Age",
+                "NUMERIC(3)",
+                "###",
+                "Default 0",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "ATTRACT_CAPACITY",
+                "Capacity",
+                "NUMERIC(3)",
+                "###",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "HOURS",
+                "EMP_NUM",
+                "Employee number",
+                "NUMERIC(4)",
+                "##",
+                "0000 – 9999",
+                "Y",
+                "PK / FK",
+                "EMPLOYEE"
+              ],
+              [
+                "",
+                "ATTRACT_NO",
+                "Attraction number",
+                "NUMERIC(10)",
+                "##########",
+                "N/A",
+                "Y",
+                "PK / FK",
+                "ATTRACTION"
+              ],
+              [
+                "",
+                "HOURS_PER_ATTRACT",
+                "Number of hours",
+                "NUMERIC(2)",
+                "##",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "HOUR_RATE",
+                "Hourly Rate",
+                "NUMERIC(4,2)",
+                "####.##",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "DATE_WORKED",
+                "Date worked",
+                "DATE",
+                "DD-MON-YY",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ]
+            ]
+          },
+          "explanation": [
+            "Phần giữa Data Dictionary định nghĩa 3 bảng: `TICKET`, `ATTRACTION` và `HOURS`. Để ý cột `ATTRACT_NAME` của `ATTRACTION` có `Required = N`, giải thích vì sao trong các bài Lab sau luôn có đúng 1 trò chơi (`ATTRACT_NO = 10082`) mang giá trị `NULL` ở tên để minh họa `IS NULL` và `COUNT(col)` vs `COUNT(*)`.",
+            "Cần lưu ý vài lỗi in trong bảng gốc: `TICKET_NO` bị bỏ trống nhãn `PK` (thực tế là PK); `TICKET_PRICE` ghi nhầm range `0.00 – 0000.00` (tô vàng từ bản nháp gốc; với `NUMERIC(4,2)` thì tối đa là `99.99`); `HOURS.DATE_WORKED` để trống cột `PK or FK` dù khi tạo bảng (Task 2.6) khóa chính là bộ 3 `(EMP_NUM, ATTRACT_NO, DATE_WORKED)`."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 4 (sách tr. 19)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 5",
+          "pageNumber": 5,
+          "title": "Table 2.1 (Sales) & 2.3 Data Types in MySQL (Table 2.2 start)",
+          "paragraphs": [
+            "2.3 Data Types in MySQL",
+            "In order to build tables in MySQL you will need to specify the data type for each column. Table 2.2 shows some of the most common data types. If you have previously used an ORACLE DBMS, you will notice that the syntax is different.",
+            "Table 2.2 Common MySQL data types¹",
+            "¹ This table was adapted from the web site http://www.developerfusion.co.uk/. A comprehensive and complete list of types can be taken from the MySQL Reference Manual."
+          ],
+          "table": {
+            "caption": "Table 2.1 Data Dictionary (Phần 3: SALES & SALESLINE)",
+            "headers": [
+              "Table Name",
+              "Attribute Name",
+              "Contents",
+              "Data Type",
+              "Format",
+              "Range",
+              "Required",
+              "PK or FK",
+              "FK Referenced Table"
+            ],
+            "rows": [
+              [
+                "SALES",
+                "TRANSACTION_NO",
+                "Transaction No",
+                "NUMERIC",
+                "###########",
+                "N/A",
+                "Y",
+                "PK",
+                ""
+              ],
+              [
+                "",
+                "PARK_CODE",
+                "Park code",
+                "VARCHAR(10)",
+                "XXXXXXXX",
+                "NA",
+                "Y",
+                "FK",
+                "THEMEPARK"
+              ],
+              [
+                "",
+                "SALE_DATE",
+                "Date of Sale",
+                "DATE",
+                "DD-MON-YY",
+                "SYSDATE",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "SALESLINE",
+                "TRANSACTION_NO",
+                "Transaction No",
+                "NUMERIC",
+                "###########",
+                "N/A",
+                "Y",
+                "PK / FK",
+                "SALES"
+              ],
+              [
+                "",
+                "LINE_NO",
+                "Line number",
+                "NUMERIC(2)",
+                "##",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "TICKET_NO",
+                "Ticket number",
+                "NUMERIC(10)",
+                "##########",
+                "NA",
+                "Y",
+                "FK",
+                "TICKET"
+              ],
+              [
+                "",
+                "LINE_QTY",
+                "Quantity",
+                "NUMERIC(4)",
+                "####",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ],
+              [
+                "",
+                "LINE_PRICE",
+                "Price of line",
+                "NUMERIC(9,2)",
+                "#########.##",
+                "N/A",
+                "Y",
+                "",
+                ""
+              ]
+            ]
+          },
+          "bullets": [
+            "Table 2.2 (tiếp nối sang trang 6–7):",
+            "CHAR(size) | Example: fieldName CHAR(10) — Stores up to 255 characters. If the content is smaller than the field size, the content will have trailing spaces appended.",
+            "VARCHAR(size) | Example: fieldName VARCHAR(100) — Stores up to 255 characters, and a minimum of 4 characters. No trailing spaces are appended to the end of this datatype."
+          ],
+          "explanation": [
+            "Phần cuối Table 2.1 mô tả bảng hóa đơn `SALES` và chi tiết hóa đơn `SALESLINE` (trong câu lệnh SQL tạo bảng ở Task 2.8 tên bảng được viết là `SALES_LINE`). Lưu ý `SALE_DATE` ghi `Range = SYSDATE` theo thói quen Oracle, nhưng MySQL không cho dùng hàm làm `DEFAULT` cho kiểu `DATE` (được giải thích rõ ở trang 8).",
+            "Mục 2.3 chuyển sang giới thiệu các kiểu dữ liệu MySQL (Table 2.2), bắt đầu bằng cặp kiểu chuỗi kinh điển `CHAR(size)` (cố định độ dài, tự thêm khoảng trắng đệm nếu chuỗi ngắn hơn) và `VARCHAR(size)` (độ dài động, không đệm khoảng trắng cuối)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 5 (sách tr. 20)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 6",
+          "pageNumber": 6,
+          "title": "Table 2.2 Common MySQL data types (String, Enum & Integer types)",
+          "table": {
+            "caption": "Table 2.2 Common MySQL data types (tiếp)",
+            "headers": [
+              "Data Type",
+              "Example",
+              "Description"
+            ],
+            "rows": [
+              [
+                "(VARCHAR cont.)",
+                "",
+                "MySQL keeps track of a delimiter to keep track of the end of the field."
+              ],
+              [
+                "TINYTEXT",
+                "fieldName TINYTEXT",
+                "Stores up to 255 characters. Equivalent to VARCHAR(255)."
+              ],
+              [
+                "TEXT",
+                "fieldName TEXT",
+                "Stores up to 65,535 characters. An Index can be created on the first 255 characters of a field with this data type."
+              ],
+              [
+                "MEDIUMTEXT",
+                "fieldName MEDIUMTEXT",
+                "Stores up to 16,777,215 characters. An Index can be created on the first 255 characters of a field with this data type."
+              ],
+              [
+                "LONGTEXT",
+                "fieldName LONGTEXT",
+                "Stores up to 4,294,967,295 characters. An Index can be created on the first 255 characters of a field with this data type. Note: The maximum size of a string in MySQL is currently 16 million bytes, so this data types is not useful at the moment."
+              ],
+              [
+                "ENUM",
+                "fieldName ENUM('Yes', 'No')",
+                "Stores up to 65,535 enumerated types. The DEFAULT modifier may be used to specify the default value for this field."
+              ],
+              [
+                "INT",
+                "fieldName INT / fieldName INT UNSIGNED / fieldName INT ZEROFILL / fieldName INT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
+                "Stores a signed or unsigned integer number. Unsigned integers have a range of 0 to 4,294,967,295, and signed integers have a range of -2,147,438,648 to 2,147,438,647. By default, the INT data type is signed. To create an unsigned integer, use the UNSIGNED attribute. The ZEROFILL attribute may be used to left-pad any of the integer with zero's. The AUTO_INCREMENT attribute may be used with any of the Integer data types. The following example could be used to create a primary key using the AUTO_INCREMEMNT attribute."
+              ],
+              [
+                "TINYINT",
+                "fieldName TINYINT",
+                "Stores a signed or unsigned byte. Unsigned bytes have a range of 0 to 255, and signed bytes have a range of -128 to 127. By default, the TINYINT data type is signed."
+              ],
+              [
+                "MEDIUMINT",
+                "fieldName MEDIUMINT",
+                "Stores a signed or unsigned medium sized integer. Unsigned fields of this type have a range of 0 to 1,677,215, and signed fields of this type have a range of -8,388,608 to 8,388,607. By default, the MEDIUMINT data type is signed."
+              ],
+              [
+                "BIGINT",
+                "fieldName BIGINT",
+                "Stores a signed or unsigned big integer. Unsigned fields of this type have a range of 0 to 18,446,744,073,709,551,615, and signed fields of this type have a range of -9,223,372,036,854,775,808 to 9,223,327,036,854,775,807. By default, the BIGINT data type is signed."
+              ]
+            ]
+          },
+          "explanation": [
+            "Trang này liệt kê nhóm kiểu văn bản mở rộng (`TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`), kiểu liệt kê `ENUM('Yes', 'No')` và nhóm số nguyên (`TINYINT`, `MEDIUMINT`, `INT`, `BIGINT`).",
+            "Chú ý ba thuộc tính bổ sung rất hữu ích của số nguyên trong MySQL: `UNSIGNED` (chỉ lưu số không âm để nhân đôi ngưỡng dương), `ZEROFILL` (điền thêm số 0 bên trái khi hiển thị) và `AUTO_INCREMENT` (tự tăng làm khóa chính; lưu ý tài liệu gốc viết sai chính tả thành `AUTO_INCREMEMNT` trong đoạn mô tả)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 6 (sách tr. 21)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 7",
+          "pageNumber": 7,
+          "title": "Table 2.2 (Float, Date/Time) & 2.4 Creating the Table Structures",
+          "table": {
+            "caption": "Table 2.2 Common MySQL data types (hết)",
+            "headers": [
+              "Data Type",
+              "Example",
+              "Description"
+            ],
+            "rows": [
+              [
+                "FLOAT",
+                "fieldName FLOAT",
+                "Used for single precision floating point numbers."
+              ],
+              [
+                "DOUBLE",
+                "fieldName DOUBLE",
+                "Used for double precision floating point numbers."
+              ],
+              [
+                "DATE",
+                "fieldName DATE",
+                "Stores dates in the format YYYY-MM-DD."
+              ],
+              [
+                "TIMESTAMP(size)",
+                "fieldName DATETIME",
+                "Stores dates and times in the format YYYY-MM-DD HH:MM:SS."
+              ],
+              [
+                "DATETIME",
+                "fieldName TIMESTAMP(14)",
+                "Automatically keeps track of the time the record was last ammended. The following table shows the formats depending on the size of TIMESTAMP: Size 2=YY, Size 4=YYMM, Size 6=YYMMDD, Size 8=YYYYMMDD, Size 10=YYYYMMDDHH, Size 12=YYYYMMDDHHMM, Size 14=YYYYMMDDHHMMSS"
+              ],
+              [
+                "TIME",
+                "fieldName TIME",
+                "Stores times in the format HH:MM:SS."
+              ],
+              [
+                "YEAR(size)",
+                "fieldName YEAR(4)",
+                "Stores the year as either a 2 digit number, or a 4 digit number, depending on the size provided."
+              ]
+            ]
+          },
+          "paragraphs": [
+            "2.4 Creating the Table Structures",
+            "Use the following SQL commands to create the table structures for the Theme Park database. Enter each one separately to ensure that you have no errors. Successful table creation will prompt MySQL to say “Query OK”. It is useful to store each correct table structure in a script file, in case the entire database needs to be recreated again at a later date. You can use a simple text editor such as notepad in order to do this. Save the file as themepark.sql. Note that the table-creating SQL commands used in this example are based on the data dictionary shown in Table 2.1 and the MySQL data types in Table 2.2."
+          ],
+          "explanation": [
+            "Trang 7 hoàn tất Table 2.2 với các kiểu số dấu phẩy động (`FLOAT`, `DOUBLE`) và kiểu ngày giờ (`DATE`, `DATETIME`, `TIMESTAMP`, `TIME`, `YEAR`). Cần chú ý hai hàng `TIMESTAMP(size)` và `DATETIME` trong bảng gốc bị đặt nhầm chéo cột Example/Description cho nhau (`DATETIME` lưu dạng `YYYY-MM-DD HH:MM:SS`, còn `TIMESTAMP(size)` mới tự ghi dấu thời gian sửa đổi bản ghi theo các cỡ 2..14).",
+            "Mục 2.4 bắt đầu phần tạo cấu trúc bảng với lời khuyên thực hành quan trọng: nên lưu toàn bộ lệnh `CREATE TABLE` đúng vào một file script `themepark.sql` để có thể chạy tái tạo lại toàn bộ CSDL nhanh chóng về sau."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 7 (sách tr. 22)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 2 (Phần 2): Ràng buộc DDL, InnoDB Foreign Key & Tạo 7 bảng Theme Park",
+      "text": "Các nguyên tắc ràng buộc trong MySQL (NOT NULL, UNIQUE, PRIMARY KEY, DEFAULT phải là hằng số, 3 điều kiện của FOREIGN KEY với InnoDB, hạn chế CHECK ở MySQL 5.0) và lệnh CREATE TABLE cho cả 7 bảng.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 8–16 (sách tr. 23–31)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Trong MySQL (bản lab guide 5.0): giá trị `DEFAULT` phải là hằng số (không dùng được hàm như `SYSDATE` của Oracle); `CHECK` constraint không được MySQL 5.0 hỗ trợ thực thi.",
+          "3 điều kiện bắt buộc để tạo `FOREIGN KEY` trong MySQL: (1) Cả hai bảng phải dùng storage engine `InnoDB` (hỗ trợ ACID, commit, rollback); (2) Các cột tham gia khóa ngoại phải được đánh `INDEX`; (3) Hai cột khóa chính/khóa ngoại phải có kiểu dữ liệu tương thích (giống nhau).",
+          "Thứ tự tạo bảng: `THEMEPARK` trước, rồi tới `EMPLOYEE`, `TICKET`, `ATTRACTION`, `SALES`, sau cùng mới tới `HOURS` (tham chiếu `EMPLOYEE` & `ATTRACTION`) và `SALES_LINE` (tham chiếu `SALES` với `ON DELETE CASCADE` và `TICKET`)."
+        ],
+        "terms": [
+          {
+            "term": "InnoDB",
+            "meaning": "Storage engine của MySQL tuân thủ ACID (Atomicity, Consistency, Isolation, Durability), hỗ trợ FOREIGN KEY, COMMIT và ROLLBACK."
+          },
+          {
+            "term": "ON DELETE CASCADE",
+            "meaning": "Tùy chọn trên khóa ngoại (`FK_SALES_LINE_SALES`) khiến khi xóa một dòng ở bảng cha `SALES`, toàn bộ các dòng con tương ứng ở `SALES_LINE` cũng tự động bị xóa theo."
+          },
+          {
+            "term": "Entity Integrity vs Referential Integrity",
+            "meaning": "Entity integrity đảm bảo khóa chính không trùng và không NULL; Referential integrity đảm bảo khóa ngoại phải trỏ tới khóa chính tồn tại ở bảng cha (hoặc NULL)."
+          }
+        ],
+        "pitfalls": [
+          "Mẹo nhớ thi trắc nghiệm Lab 2: `DEFAULT` ở MySQL phải là constant, và 3 điều kiện của Foreign Key là InnoDB + Index + cùng kiểu dữ liệu.",
+          "Trong đề bài Lab 2, tên ràng buộc FK của `EMPLOYEE` trong code là `FK_EMP_PARK`, nhưng phần giải thích bên dưới in nhầm thành `FKP_EMP_PARK`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 2 • Trang 8",
+          "pageNumber": 8,
+          "title": "Table-creating Constraints: NOT NULL, UNIQUE, PRIMARY KEY & DEFAULT",
+          "paragraphs": [
+            "As you examine each of the SQL table-creating command sequences in the following tasks, note the following features:"
+          ],
+          "bullets": [
+            "The NOT NULL specifications for the attributes ensure that a data entry will be made. When it is crucial to have the data available, the NOT NULL specification will not allow the end user to leave the attribute empty (with no data entry at all)..",
+            "The UNIQUE specification creates a unique index in the respective attribute. Use it to avoid duplicated values in a column.",
+            "The primary key attributes contain both a NOT NULL and a UNIQUE specification. Those specifications enforce the entity integrity requirements. If the NOT NULL and UNIQUE specifications are not supported, use PRIMARY KEY without the specifications.",
+            "The entire table definition is enclosed in parentheses. A comma is used to separate each table element (attributes, primary key, and foreign key) definition.",
+            "The DEFAULT constraint is used to assign a value to an attribute when a new row is added to a table. The end user may, of course, enter a value other than the default value. In MYSQL the default value must be a constant; it cannot be a function or an expression. This means, for example, that you cannot set the default for a date column to be the value of a function such as the system date like you can do in an ORACLE DBMS."
+          ],
+          "explanation": [
+            "Trang này tổng hợp 5 quy tắc cốt lõi khi viết `CREATE TABLE`: `NOT NULL` cấm bỏ trống giá trị; `UNIQUE` tạo chỉ mục duy nhất tránh trùng lặp; `PRIMARY KEY` thực thi toàn vẹn thực thể (gồm cả `NOT NULL` và `UNIQUE`); mọi phần tử cột/ràng buộc được bọc trong ngoặc đơn và ngăn cách bởi dấu phẩy.",
+            "Điểm rất hay ra thi: ràng buộc `DEFAULT` trong MySQL bắt buộc là một hằng số (constant) như `0` hay `00.00`, KHÔNG được phép là hàm hay biểu thức (ví dụ không gán được hàm ngày hệ thống làm mặc định cho cột `DATE` như trong Oracle)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 8 (sách tr. 23)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 9",
+          "pageNumber": 9,
+          "title": "InnoDB Storage Engine & Foreign Key Conditions",
+          "paragraphs": [
+            "Note: You will have learnt in Chapter 8 that referential integrity is usually implemented through the use of foreign keys. For a long time, the open-source MySQL RDBMS did not support the use of foreign keys. However, given the importance of maintaining referential integrity within the database this feature was introduced in later versions through the InnoDB table engine. The InnoDB engine provides MySQL with an ACID (Atomicity, Consistency, Isolation, Durability) compliant storage engine that has facilities such as commit and rollback. Full information about the InnoDB engine can be found in the MySQL Reference manual 5.0."
+          ],
+          "bullets": [
+            {
+              "text": "The FOREIGN KEY CONSTRAINT is used to enforce referential integrity. In order to set up a foreign key relationship between two MySQL tables, three conditions must be met:",
+              "subBullets": [
+                "1. Both tables must be of the InnoDB table type - see the note box.",
+                "2. The fields used in the foreign key relationship must be indexed.",
+                "3. The fields used in the foreign key relationship must be similar in data type."
+              ]
+            }
+          ],
+          "explanation": [
+            "Hộp Note giải thích vì sao tài liệu MySQL nhấn mạnh engine `InnoDB`: các engine cũ (như MyISAM) không hỗ trợ khóa ngoại hay giao dịch; chỉ `InnoDB` mới đảm bảo chuẩn ACID (Atomicity, Consistency, Isolation, Durability) cùng `COMMIT`/`ROLLBACK` và kiểm tra khóa ngoại.",
+            "Ghi nhớ thuộc lòng 3 điều kiện thiết lập `FOREIGN KEY` trong MySQL ở Lab 2: (1) Cả hai bảng phải dùng `InnoDB`; (2) Cột dùng làm khóa ngoại phải được đánh chỉ mục (`INDEX`); (3) Kiểu dữ liệu của khóa ngoại và khóa chính tham chiếu phải tương đồng nhau."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 9 (sách tr. 24)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 10",
+          "pageNumber": 10,
+          "title": "CHECK Constraint Note, Create Database (Task 2.1) & THEMEPARK Start",
+          "paragraphs": [
+            "Note: MySQL 5.0 does not support the use of CHECK constraints which is used to validate data when an attribute value is entered.",
+            "2.4.1 Creating the THEMEPARK Database.",
+            "Task 2.1 At the MySQL prompt; create a database called Theme Park as shown in Lab 1. Then select the database for use as shown in Figure 12.",
+            "Figure 12 Creating and using the Theme Park Database.",
+            "2.4.2 Creating the THEMEPARK TABLE",
+            "Task 2.2 Enter the following SQL command to create the THEMEPARK table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE DATABASE themepark;\nUSE themepark;\n\nCREATE TABLE THEMEPARK ("
+          },
+          "diagramText": [
+            "Figure 12 (MySQL Command Line Client):",
+            "mysql> create database themepark;",
+            "Query OK, 1 row affected (0.00 sec)",
+            "",
+            "mysql> use themepark;",
+            "Database changed"
+          ],
+          "diagramNote": "Ảnh chụp cửa sổ MySQL Command Line Client minh họa tạo mới CSDL themepark và chuyển phiên làm việc vào CSDL đó bằng USE themepark.",
+          "explanation": [
+            "Lưu ý quan trọng đầu trang: phiên bản MySQL 5.0 được dùng khi biên soạn giáo trình lab KHÔNG hỗ trợ thực thi ràng buộc `CHECK` (khác với MySQL 8.0.16+ hiện đại — nên trong đề thi theo sách, `CHECK` không nằm trong điều kiện tạo khóa ngoại và không dùng để validate ở MySQL 5.0).",
+            "Task 2.1 hướng dẫn hai lệnh cơ bản nhất trước khi tạo bất kỳ bảng nào: `CREATE DATABASE themepark;` để tạo schema và `USE themepark;` để chọn CSDL hiện hành. Cuối trang mở đầu lệnh `CREATE TABLE THEMEPARK (` (tiếp tục ở trang 11)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 10 (sách tr. 25)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 11",
+          "pageNumber": 11,
+          "title": "2.4.2 THEMEPARK Table & 2.4.3 EMPLOYEE Table (Start)",
+          "paragraphs": [
+            "Notice that when you create the THEMEPARK table structure you set the stage for the enforcement of entity integrity rules by using: PARK_CODE VARCHAR(10) PRIMARY KEY,",
+            "As you create this structure, also notice that the NOT NULL constraint is used to ensure that the columns PARK_NAME, PARK_CITY and PARK_COUNTRY does not accept nulls.",
+            "Remember to store this CREATE TABLE structure in your themepark.sq script.",
+            "2.4.3 Creating the EMPLOYEE TABLE",
+            "Task 2.3 Enter the following SQL command to create the EMPLOYEE table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Phần tiếp theo của Task 2.2 (THEMEPARK):\nCREATE TABLE THEMEPARK (\nPARK_CODE VARCHAR(10) PRIMARY KEY,\nPARK_NAME VARCHAR(35) NOT NULL,\nPARK_CITY VARCHAR(50) NOT NULL,\nPARK_COUNTRY CHAR(2) NOT NULL);\n\n-- Phần đầu của Task 2.3 (EMPLOYEE, tiếp ở trang 12):\nCREATE TABLE EMPLOYEE (\nEMP_NUM NUMERIC(4) PRIMARY KEY,\nEMP_TITLE VARCHAR(4),\nEMP_LNAME VARCHAR(15) NOT NULL,\nEMP_FNAME VARCHAR(15) NOT NULL,\nEMP_DOB DATE NOT NULL,\nEMP_HIRE_DATE DATE,"
+          },
+          "explanation": [
+            "Hoàn chỉnh bảng cha đầu tiên `THEMEPARK`: `PARK_CODE` làm khóa chính (`PRIMARY KEY`) để đảm bảo entity integrity; 3 cột còn lại đều gắn `NOT NULL` vì tên, thành phố và mã quốc gia của công viên không được phép để trống.",
+            "Bắt đầu Task 2.3 tạo bảng `EMPLOYEE`: `EMP_TITLE` không có `NOT NULL` (vì danh xưng Mr/Ms/Mrs có thể bỏ trống), tương tự `EMP_HIRE_DATE DATE` cũng không bắt buộc khi nhập dữ liệu mẫu trong lab. Lưu ý tài liệu viết nhầm đuôi file `themepark.sq` thay vì `themepark.sql`."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 11 (sách tr. 26)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 12",
+          "pageNumber": 12,
+          "title": "2.4.3 EMPLOYEE Table (End) & 2.4.4 TICKET Table (Start)",
+          "paragraphs": [
+            "As you look at the CREATE TABLE sequence, note that referential integrity has been enforced by specifying a constraint called FKP_EMP_PARK. In order to use foreign key constraints in MySQL, notice that the PARK_CODE column is first indexed. This foreign key constraint definition ensures that you cannot delete a Theme Park from the THEMEPARK table if at least one employee row references that Theme Park and that you cannot have an invalid entry in the foreign key column.",
+            "Remember to store this CREATE TABLE structure in your themepark.sql script.",
+            "2.4.4 Creating the TICKET TABLE",
+            "Task 2.4 Enter the following SQL command to create the TICKET table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Phần tiếp của Task 2.3 (EMPLOYEE):\nEMP_AREA_CODE VARCHAR(4) NOT NULL,\nEMP_PHONE VARCHAR(12) NOT NULL,\nPARK_CODE VARCHAR(10),\nINDEX (PARK_CODE),\nCONSTRAINT FK_EMP_PARK FOREIGN KEY(PARK_CODE) REFERENCES THEMEPARK(PARK_CODE));\n\n-- Phần đầu của Task 2.4 (TICKET, tiếp ở trang 13):\nCREATE TABLE TICKET (\nTICKET_NO NUMERIC(10) PRIMARY KEY,"
+          },
+          "explanation": [
+            "Phần cuối lệnh tạo `EMPLOYEE` minh họa cách khai báo khóa ngoại chuẩn trong tài liệu lab MySQL: trước khi viết `CONSTRAINT FK_EMP_PARK FOREIGN KEY(PARK_CODE) REFERENCES THEMEPARK(PARK_CODE)`, phải có dòng `INDEX (PARK_CODE)` ngay trong định nghĩa bảng.",
+            "Ràng buộc khóa ngoại này bảo vệ toàn vẹn tham chiếu theo 2 chiều: không thể nhập mã `PARK_CODE` không tồn tại ở bảng `THEMEPARK` cho nhân viên, và mặc định (`RESTRICT`) không cho xóa công viên khỏi `THEMEPARK` nếu vẫn còn nhân viên đang làm việc tại đó. (Lưu ý lỗi đánh máy tên constraint trong đoạn văn là `FKP_EMP_PARK`)."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 12 (sách tr. 27)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 13",
+          "pageNumber": 13,
+          "title": "2.4.4 TICKET Table (End) & 2.4.5 ATTRACTION Table (Start)",
+          "paragraphs": [
+            "As you create the TICKET table, notice that both PRIMARY and FOREIGN KEY constraints have been applied. Remember to store this CREATE TABLE structure in your themepark.sq script.",
+            "2.4.5 Creating the ATTRACTION TABLE",
+            "Task 2.5 Enter the following SQL command to create the ATTRACTION table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Phần tiếp của Task 2.4 (TICKET):\nTICKET_PRICE NUMERIC(4,2) DEFAULT 00.00 NOT NULL,\nTICKET_TYPE VARCHAR(10),\nPARK_CODE VARCHAR(10),\nINDEX (PARK_CODE),\nCONSTRAINT FK_TICKET_PARK FOREIGN KEY(PARK_CODE)\nREFERENCES THEMEPARK(PARK_CODE));\n\n-- Phần đầu của Task 2.5 (ATTRACTION, tiếp ở trang 14):\nCREATE TABLE ATTRACTION (\nATTRACT_NO NUMERIC(10) PRIMARY KEY,\nATTRACT_NAME VARCHAR(35),\nATTRACT_AGE NUMERIC(3) DEFAULT 0 NOT NULL,\nATTRACT_CAPACITY NUMERIC(3) NOT NULL,\nPARK_CODE VARCHAR(10),\nINDEX (PARK_CODE),"
+          },
+          "explanation": [
+            "Bảng `TICKET` áp dụng cả `DEFAULT 00.00 NOT NULL` cho `TICKET_PRICE` (nếu bỏ qua giá khi thêm vé, giá mặc định là 0.00) và khóa ngoại `FK_TICKET_PARK` nối `PARK_CODE` về `THEMEPARK(PARK_CODE)` kèm `INDEX (PARK_CODE)`.",
+            "Bảng `ATTRACTION` (Task 2.5) đặt `ATTRACT_NO` làm khóa chính, để `ATTRACT_NAME` cho phép NULL (không có `NOT NULL`), đặt `ATTRACT_AGE` mặc định là `0` và `ATTRACT_CAPACITY` bắt buộc `NOT NULL`."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 13 (sách tr. 28)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 14",
+          "pageNumber": 14,
+          "title": "2.4.5 ATTRACTION Table (End) & 2.4.6 HOURS Table (Start)",
+          "paragraphs": [
+            "Remember to store this CREATE TABLE structure in your themepark.sq script.",
+            "2.4.6 Creating the HOURS TABLE",
+            "Task 2.6 Enter the following SQL command to create the HOURS table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Phần cuối của Task 2.5 (ATTRACTION):\nCONSTRAINT FK_ATTRACT_PARK FOREIGN KEY(PARK_CODE)\nREFERENCES THEMEPARK(PARK_CODE));\n\n-- Phần đầu của Task 2.6 (HOURS, tiếp ở trang 15):\nCREATE TABLE HOURS (\nEMP_NUM NUMERIC(4),\nATTRACT_NO NUMERIC(10),\nHOURS_PER_ATTRACT NUMERIC(2) NOT NULL,\nHOUR_RATE NUMERIC(4,2) NOT NULL,\nDATE_WORKED DATE NOT NULL,\nINDEX (EMP_NUM),\nINDEX (ATTRACT_NO),\nCONSTRAINT PK_HOURS PRIMARY KEY(EMP_NUM, ATTRACT_NO, DATE_WORKED),\nCONSTRAINT FK_HOURS_EMP FOREIGN KEY (EMP_NUM)\nREFERENCES EMPLOYEE(EMP_NUM),"
+          },
+          "explanation": [
+            "Bảng `HOURS` là thực thể kết hợp (associative entity) ghi nhận lịch trực trò chơi theo ngày của nhân viên, nên phải dùng cú pháp table-level `CONSTRAINT PK_HOURS PRIMARY KEY(EMP_NUM, ATTRACT_NO, DATE_WORKED)` để tạo khóa chính ghép 3 cột.",
+            "Vì `HOURS` tham chiếu hai bảng cha (`EMPLOYEE` và `ATTRACTION`), ta phải khai báo cả hai chỉ mục `INDEX (EMP_NUM)` và `INDEX (ATTRACT_NO)` trước hai ràng buộc `FOREIGN KEY`."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 14 (sách tr. 29)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 15",
+          "pageNumber": 15,
+          "title": "2.4.6 HOURS (End), 2.4.7 SALES Table & 2.4.8 SALESLINE Intro",
+          "paragraphs": [
+            "As you create the HOURS table, notice that the HOURS table contains FOREIGN KEYS to both the ATTRACTION and the EMPLOYEE table.",
+            "Remember to store this CREATE TABLE structure in your themepark.sq script.",
+            "2.4.7 Creating the SALES TABLE",
+            "Task 2.7 Enter the following SQL command to create the SALES table.",
+            "Remember to store this CREATE TABLE structure in your themepark.sq script.",
+            "2.4.8 Creating the SALESLINE TABLE",
+            "Task 2.8 Enter the following SQL command to create the SALES_LINE table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Phần cuối của Task 2.6 (HOURS):\nCONSTRAINT FK_HOURS_ATTRACT FOREIGN KEY (ATTRACT_NO)\nREFERENCES ATTRACTION(ATTRACT_NO));\n\n-- Task 2.7 (SALES):\nCREATE TABLE SALES (\nTRANSACTION_NO NUMERIC PRIMARY KEY,\nPARK_CODE VARCHAR(10),\nSALE_DATE DATE NOT NULL,\nINDEX (PARK_CODE),\nCONSTRAINT FK_SALES_PARK FOREIGN KEY(PARK_CODE)\nREFERENCES THEMEPARK(PARK_CODE));"
+          },
+          "explanation": [
+            "Hoàn tất khóa ngoại thứ hai `FK_HOURS_ATTRACT` cho bảng `HOURS` và tạo bảng `SALES` (Task 2.7) lưu thông tin từng giao dịch bán vé (`TRANSACTION_NO`, `PARK_CODE`, `SALE_DATE`).",
+            "Chú ý `TRANSACTION_NO` khai báo là `NUMERIC` (không ghi độ dài cụ thể nên MySQL dùng mặc định `DECIMAL(10,0)`), do đó ở bảng `SALES_LINE` khóa ngoại `TRANSACTION_NO` cũng phải khai báo `NUMERIC` để khớp kiểu dữ liệu theo đúng điều kiện số 3 của FK."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 15 (sách tr. 30)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 16",
+          "pageNumber": 16,
+          "title": "2.4.8 Creating the SALES_LINE Table (ON DELETE CASCADE)",
+          "paragraphs": [
+            "As you create the SALES_LINE table, examine the constraint called FK_SALES_LINE_SALES. What is the purpose of ON DELETE CASCADE?",
+            "Remember to store this CREATE TABLE structure in your themepark.sq script.",
+            "2.5. Creating Indexes"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE SALES_LINE (\nTRANSACTION_NO NUMERIC,\nLINE_NO NUMERIC(2,0) NOT NULL,\nTICKET_NO NUMERIC(10) NOT NULL,\nLINE_QTY NUMERIC(4) DEFAULT 0 NOT NULL,\nLINE_PRICE NUMERIC(9,2) DEFAULT 0.00 NOT NULL,\nINDEX (TRANSACTION_NO),\nINDEX (TICKET_NO),\nCONSTRAINT PK_SALES_LINE PRIMARY KEY\n(TRANSACTION_NO,LINE_NO),\nCONSTRAINT FK_SALES_LINE_SALES FOREIGN KEY\n(TRANSACTION_NO) REFERENCES SALES(TRANSACTION_NO) ON DELETE\nCASCADE,\nCONSTRAINT FK_SALES_LINE_TICKET FOREIGN KEY (TICKET_NO)\nREFERENCES TICKET(TICKET_NO));"
+          },
+          "explanation": [
+            "Bảng thứ 7 là `SALES_LINE` có khóa chính ghép `(TRANSACTION_NO, LINE_NO)` và hai khóa ngoại trỏ về `SALES` và `TICKET`.",
+            "Trả lời câu hỏi cuối Task 2.8: `ON DELETE CASCADE` trên `FK_SALES_LINE_SALES` quy định rằng khi một giao dịch hóa đơn bị xóa khỏi bảng cha `SALES`, toàn bộ các dòng chi tiết vé thuộc hóa đơn đó trong `SALES_LINE` sẽ tự động bị xóa theo — tránh phát sinh dữ liệu mồ côi (orphan rows) mà không cần xóa thủ công bảng con trước."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 16 (sách tr. 31)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 2 (Phần 3): Index, DROP TABLE, DESCRIBE, SHOW TABLES & ALTER TABLE",
+      "text": "Tạo chỉ mục dẫn đầu (prefix index) với CREATE INDEX, quy tắc xóa bảng theo thứ tự ngược phụ thuộc với DROP TABLE, kiểm tra cấu trúc bằng DESCRIBE/SHOW TABLES và sửa bảng bằng ALTER TABLE.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 17–20 (sách tr. 32–35)"
+      },
+      "digest": {
+        "keyPoints": [
+          "`CREATE INDEX EMP_LNAME_INDEX ON EMPLOYEE(EMP_LNAME(8));` tạo chỉ mục dựa trên 8 ký tự đầu của cột `EMP_LNAME` để tăng tốc tìm kiếm.",
+          "Khi `DROP TABLE`, ràng buộc khóa ngoại bắt buộc phải xóa bảng con trước bảng cha (thứ tự ngược lúc tạo): `SALES_LINE` → `SALES` → `HOURS` → `ATTRACTION` → `TICKET` → `EMPLOYEE` → `THEMEPARK`.",
+          "`DESCRIBE <table>;` liệt kê các cột, kiểu, Null, Key (`PRI`, `MUL`), Default, Extra; `SHOW TABLES;` liệt kê 7 bảng trong CSDL hiện tại.",
+          "`ALTER TABLE` hỗ trợ 3 thao tác chính: `ADD`, `MODIFY`, `DROP` (ví dụ `ALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);`)."
+        ],
+        "terms": [
+          {
+            "term": "Prefix Index",
+            "meaning": "Chỉ mục đánh trên `N` ký tự đầu tiên của cột chuỗi (ví dụ `EMP_LNAME(8)`) nhằm tiết kiệm dung lượng chỉ mục mà vẫn tăng tốc tra cứu."
+          },
+          {
+            "term": "DESCRIBE / SHOW TABLES",
+            "meaning": "Lệnh kiểm tra cấu trúc cột của một bảng (`DESCRIBE`) và xem danh sách toàn bộ bảng trong schema đang chọn (`SHOW TABLES`)."
+          }
+        ],
+        "pitfalls": [
+          "Trong `Figure 13` (trang 18), câu lệnh chạy là `describe employee;` nhưng chú thích ảnh của tài liệu lại ghi nhầm là `Describing the structure of the THEMEPARK Table`.",
+          "Không phải lúc nào cũng `ALTER TABLE ... MODIFY` hoặc `DROP` cột được tự do: nhiều DBMS từ chối thu hẹp kiểu hoặc xóa cột nếu cột đó đang chứa dữ liệu hoặc dính khóa ngoại."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 2 • Trang 17",
+          "pageNumber": 17,
+          "title": "2.5 Creating Indexes & DROP TABLE Order (Part 1)",
+          "paragraphs": [
+            "You learned in Chapter 3, “The Relational Database Model,” that indexes can be used to improve the efficiency of searches and to avoid duplicate column values. Using the CREATE INDEX command, SQL indexes can be created on the basis of any selected attribute. For example, based on the attribute EMP_LNAME stored in the EMPLOYEE table, the following command creates an index named EMP_LNAME_INDEX:",
+            "In MySQL, indexes can only be created using only the leading part of column values. So in the example an index is created using the first 8 characters of the EMP_LNAM column.",
+            "Task 2.9 Create the EMP_LNAME_INDEX shown above. Add the CREATE INDEX SQL command to your script file themepark.sql.",
+            "The DROP TABLE command permanently deletes a table (and thus its data) from the database schema. When you write a script file to create a database schema, it is useful to add DROP TABLE commands at the start of the file. If you need to amend the table structures in any way, just one script can then be run to re-create all the database structures. Primary and foreign key constraints control the order in which you drop the tables – generally you drop in the reverse order of creation. The DROP commands for the Theme Park database are:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE INDEX EMP_LNAME_INDEX ON EMPLOYEE(EMP_LNAME(8));\n\nDROP TABLE SALES_LINE;\nDROP TABLE SALES;"
+          },
+          "explanation": [
+            "Task 2.9 tạo chỉ mục `EMP_LNAME_INDEX` trên 8 ký tự đầu tiên của `EMP_LNAME` (`EMP_LNAME(8)`). Trên thực tế với cột `VARCHAR(15)` có thể index cả cột, nhưng tài liệu nhấn mạnh khái niệm prefix index dùng phần đầu chuỗi.",
+            "Đoạn sau giải thích mẹo thực tế khi viết file script tạo CSDL (`themepark.sql`): luôn đặt chuỗi lệnh `DROP TABLE` ở đầu file theo **thứ tự ngược lúc tạo** (xóa bảng con có khóa ngoại trước, bảng cha sau) để chạy lại script từ đầu không bị vướng lỗi ràng buộc khóa ngoại."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 17 (sách tr. 32)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 18",
+          "pageNumber": 18,
+          "title": "DROP TABLE Order (Part 2) & 2.6 Display a table's structure (DESCRIBE)",
+          "paragraphs": [
+            "Task 2.10. Add the DROP commands to the start of your script file and then run the themepark.sql script.",
+            "2.6 Display a table’s structure",
+            "The command DESCRIBE is used to display the structure of an individual table. To see the structure of the EMPLOYEE table you would enter the command:",
+            "DESCRIBE EMPLOYEE as shown in Figure 13.",
+            "Figure 13 Describing the structure of the THEMEPARK Table"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "DROP TABLE HOURS;\nDROP TABLE ATTRACTION;\nDROP TABLE TICKET;\nDROP TABLE EMPLOYEE;\nDROP TABLE THEMEPARK;\n\nDESCRIBE EMPLOYEE;"
+          },
+          "diagramText": [
+            "Figure 13 (MySQL Command Line Client):",
+            "mysql> describe employee;",
+            "+---------------+-------------+------+-----+---------+-------+",
+            "| Field         | Type        | Null | Key | Default | Extra |",
+            "+---------------+-------------+------+-----+---------+-------+",
+            "| EMP_NUM       | decimal(4,0)| NO   | PRI |         |       |",
+            "| EMP_TITLE     | varchar(4)  | YES  |     | NULL    |       |",
+            "| EMP_LNAME     | varchar(15) | NO   | MUL |         |       |",
+            "| EMP_FNAME     | varchar(15) | NO   |     |         |       |",
+            "| EMP_DOB       | date        | NO   |     |         |       |",
+            "| EMP_HIRE_DATE | date        | YES  |     | NULL    |       |",
+            "| EMP_AREA_CODE | varchar(4)  | NO   |     |         |       |",
+            "| EMP_PHONE     | varchar(12) | NO   |     |         |       |",
+            "| PARK_CODE     | varchar(10) | YES  | MUL | NULL    |       |",
+            "+---------------+-------------+------+-----+---------+-------+",
+            "9 rows in set (0.11 sec)"
+          ],
+          "diagramNote": "Kết quả lệnh DESCRIBE EMPLOYEE cho thấy NUMERIC(4) được MySQL lưu thành decimal(4,0), khóa chính mang Key = PRI, còn cột có index/FK mang Key = MUL.",
+          "ocrNote": "Chú thích Figure 13 trong PDF gốc ghi nhầm 'THEMEPARK Table' dù lệnh và 9 cột hiển thị thuộc bảng EMPLOYEE.",
+          "explanation": [
+            "Hoàn chỉnh danh sách `DROP TABLE` theo đúng trình tự ngược phụ thuộc: `SALES_LINE`, `SALES`, `HOURS`, `ATTRACTION`, `TICKET`, `EMPLOYEE`, cuối cùng là `THEMEPARK`.",
+            "Quan sát kết quả `describe employee;` ở Figure 13 giúp hiểu hai chi tiết quan trọng của MySQL: `NUMERIC(4)` tự ánh xạ thành `decimal(4,0)`; cột `EMP_LNAME` và `PARK_CODE` hiện `Key = MUL` (multiple/non-unique index) vì đã được tạo chỉ mục bằng `CREATE INDEX` và `INDEX (PARK_CODE)`."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 18 (sách tr. 33)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 19",
+          "pageNumber": 19,
+          "title": "2.7 Listing all tables (SHOW TABLES) & 2.8 Altering the table structure",
+          "paragraphs": [
+            "Task 2.10 Use the DESCRIBE command to view the structure of the other database tables that you have created in this lab.",
+            "2.7 Listing all tables",
+            "Task 2.11 Use the SHOW TABLES command as shown in Figure 14, to list all tables that have been created within the THEMEPARK database.",
+            "Figure 14 Displaying all tables",
+            "2.8 Altering the table structure",
+            "All changes in the table structure are made by using the ALTER TABLE command, followed by a keyword that produces the specific change you want to make. Three options are available: ADD, MODIFY, and DROP. ADD enables you to add a column, and MODIFY enables you to change column characteristics. Most RDBMSs do not allow you to delete a column (unless the column does not contain any values) because such an action may delete crucial data that are used by other tables."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SHOW TABLES;"
+          },
+          "diagramText": [
+            "Figure 14 (MySQL Command Line Client):",
+            "mysql> show tables;",
+            "+---------------------+",
+            "| Tables_in_themepark |",
+            "+---------------------+",
+            "| attraction          |",
+            "| employee            |",
+            "| hours               |",
+            "| sales               |",
+            "| sales_line          |",
+            "| themepark           |",
+            "| ticket              |",
+            "+---------------------+",
+            "7 rows in set (0.02 sec)"
+          ],
+          "diagramNote": "Lệnh SHOW TABLES liệt kê đủ 7 bảng trong CSDL themepark theo thứ tự bảng chữ cái (chữ thường trên Windows).",
+          "explanation": [
+            "Task 2.11 kiểm tra lại bằng `SHOW TABLES;` để xác nhận đủ 7 bảng (`attraction`, `employee`, `hours`, `sales`, `sales_line`, `themepark`, `ticket`) đã được tạo thành công. (Lưu ý tài liệu gốc đánh nhầm số `Task 2.10` lặp lại 2 lần ở trang 18 và 19).",
+            "Mục 2.8 giới thiệu lệnh `ALTER TABLE` với 3 từ khóa tùy chọn cơ bản: `ADD` (thêm cột mới), `MODIFY` (đổi kiểu dữ liệu/ràng buộc cột) và `DROP` (xóa cột). Lưu ý không nên xóa cột đang chứa dữ liệu hoặc đang bị bảng khác tham chiếu."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 19 (sách tr. 34)"
+          }
+        },
+        {
+          "slideNumber": "Lab 2 • Trang 20",
+          "pageNumber": 20,
+          "title": "2.8 Altering the table structure — ALTER TABLE MODIFY & Restrictions",
+          "paragraphs": [
+            "Supposing you wanted to modify the column ATTRACT_CAPACITY in the ATTRACTION table by changing the date characteristics from NUMERIC(3) to NUMERIC(4). You would execute the following command:",
+            "Note: Some DBMSs impose limitations on when it’s possible to change attribute characteristics. The reason for this restriction is that an attribute modification will affect the integrity of the data in the database. In fact, some attribute changes can be done only when there are no data in any rows for the affected attribute.",
+            "You can learn more about altering a table’s structure in Chapter 8, “Introduction to Structured Query Language”.",
+            "You have now reached the end of the first MySQL lab. The tables that you have created will be used in the rest of this lab guide to explore the use of SQL in MySQL in more detail."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "ALTER TABLE ATTRACTION\nMODIFY ATTRACT_CAPACITY NUMERIC(4);"
+          },
+          "explanation": [
+            "Ví dụ minh họa cách nới rộng độ lớn cột `ATTRACT_CAPACITY` từ `NUMERIC(3)` (tối đa 999) lên `NUMERIC(4)` (tối đa 9999) bằng `ALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);` (trong bài viết in nhầm thành `date characteristics` thay cho `data characteristics`).",
+            "Nới rộng kích thước cột thường an toàn khi bảng đã có dữ liệu, nhưng nếu thu hẹp kiểu hoặc đổi sang kiểu không tương thích (ví dụ chữ sang số), DBMS có thể từ chối để bảo vệ tính toàn vẹn dữ liệu trừ khi cột đang trống hoàn toàn."
+          ],
+          "source": {
+            "file": "TUT06 DDL basic_building themeparkDB.pdf",
+            "loc": "Trang 20 (sách tr. 35)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 3: Data Manipulation Commands (INSERT, SELECT, UPDATE, ROLLBACK, DELETE)",
+      "text": "Các thao tác DML trên CSDL themepark: thêm dữ liệu đúng thứ tự khóa ngoại (INSERT), lưu giao dịch (COMMIT), truy vấn cơ bản (SELECT), cập nhật có/không có WHERE (UPDATE), khôi phục bằng SET AUTOCOMMIT = 0 & ROLLBACK, xóa dòng (DELETE), sao chép từ bảng khác (INSERT ... SELECT) và bài tập PARK_COPY.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 1–11 (sách tr. 36–46)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thứ tự `INSERT` phải tôn trọng referential integrity: chèn bảng cha `THEMEPARK` trước rồi mới chèn bảng con `TICKET`.",
+          "`UPDATE` và `DELETE` là thao tác theo tập hợp (set-oriented): nếu BỎ QUÊN mệnh đề `WHERE`, lệnh sẽ sửa hoặc xóa TOÀN BỘ các dòng trong bảng!",
+          "Để dùng được `ROLLBACK` (hoàn tác thay đổi chưa `COMMIT`) trong MySQL, trước hết phải tắt chế độ tự lưu bằng `SET AUTOCOMMIT = 0;` (mỗi phiên chạy 1 lần).",
+          "`INSERT INTO target_table SELECT ... FROM source_table;` cho phép sao chép hàng loạt bản ghi từ bảng này sang bảng khác (ví dụ `EMP_COPY` từ `EMPLOYEE`, hoặc chọn cột sang `PARK_COPY`)."
+        ],
+        "terms": [
+          {
+            "term": "COMMIT & ROLLBACK",
+            "meaning": "`COMMIT` ghi vĩnh viễn các thay đổi trong giao dịch xuống đĩa; `ROLLBACK` hủy các thay đổi chưa commit để khôi phục trạng thái trước đó (yêu cầu `AUTOCOMMIT = 0` và engine InnoDB)."
+          },
+          {
+            "term": "Set-oriented Operator",
+            "meaning": "Toán tử tác động lên cả tập hợp các dòng thỏa điều kiện (như `UPDATE`, `DELETE`); nếu thiếu `WHERE`, tập hợp đó chính là toàn bộ bảng."
+          }
+        ],
+        "pitfalls": [
+          "Mặc định MySQL bật `AUTOCOMMIT = 1` (chạy xong câu nào lưu vĩnh viễn ngay câu đó), nên nếu không chạy `SET AUTOCOMMIT = 0;` trước khi `UPDATE`/`DELETE` nhầm thì `ROLLBACK;` sẽ không khôi phục lại được dữ liệu cũ.",
+          "Trang 6 (sách tr. 41) nói muốn đổi sức chứa trò 10034 từ 34 lên 38, nhưng lệnh SQL ví dụ lại gõ `SET ATTRACT_CAPACITY = 34` khiến MySQL báo `Rows matched: 1 Changed: 0`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 3 • Trang 1",
+          "pageNumber": 1,
+          "title": "Lab 3: Data Manipulation Commands — 3.1 Adding Table Rows",
+          "paragraphs": [
+            "Lab 3: Data Manipulation Commands",
+            "3.1 Adding Table Rows",
+            "SQL requires the use of the INSERT command to enter data into a table. The INSERT command’s basic syntax looks like this:",
+            "INSERT INTO tablename VALUES (value1, value2, ... , valuen).",
+            "Note: In MySQL there are a number of versions of the INSERT statement. As well as the basic INSERT which inserts rows into a table, the INSERT ... VALUES and INSERT ... SET forms of the statement insert rows based on explicitly specified values. For example, the INSERT ... SELECT form inserts rows selected from another table or tables. You can read more about this in the MySQL Reference manual 5.0.",
+            "The order in which you insert data is important. For example, because the TICKET uses its PARK_CODE to reference the THEMEPARK table’s PARK_CODE, an integrity violation will occur if those THEMEPARK table PARK_CODE values don’t yet exist."
+          ],
+          "bullets": [
+            "To know how to insert, update and delete data from within a table",
+            "To learn how to retrieve data from a table using the SELECT statement"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "INSERT INTO tablename VALUES (value1, value2, ... , valuen);"
+          },
+          "explanation": [
+            "Lab 3 chuyển sang nhóm lệnh thao tác dữ liệu (DML): `INSERT`, `UPDATE`, `DELETE` cùng câu lệnh truy vấn `SELECT`. Tài liệu nhắc đến 3 biến thể `INSERT` trong MySQL: `INSERT ... VALUES`, `INSERT ... SET`, và `INSERT ... SELECT`.",
+            "Quy tắc sống còn khi chèn dữ liệu có khóa ngoại: luôn phải chèn bảng cha trước, bảng con sau. Vì `TICKET.PARK_CODE` tham chiếu tới `THEMEPARK.PARK_CODE`, nếu chèn vé trước khi có công viên tương ứng trong `THEMEPARK`, MySQL sẽ báo lỗi vi phạm toàn vẹn tham chiếu (integrity violation)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 1 (Lab 3, sách tr. 36)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 2",
+          "pageNumber": 2,
+          "title": "Tasks 3.1–3.2: Inserting Rows into THEMEPARK & TICKET + COMMIT",
+          "paragraphs": [
+            "Therefore, you need to enter the THEMEPARK rows before the TICKET rows. Complete the following tasks to insert data into the THEMEPARK and TICKET tables:",
+            "Task 3.1 Enter the first two rows of data into the THEMEPARK table using the following SQL insert commands;",
+            "Task 3.2 Enter the following corresponding rows of data into the TICKET table using the following SQL insert commands.",
+            "Any changes made to the table contents are not physically saved on disk until you close the database, close the program you are using, or use the COMMIT command. The COMMIT command will permanently save any changes—such as rows added, attributes modified, and rows deleted—made to any table in the database. Therefore, if you intend"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Task 3.1\nINSERT INTO THEMEPARK VALUES ('FR1001','FairyLand','PARIS','FR');\nINSERT INTO THEMEPARK VALUES ('UK3452','PleasureLand','STOKE','UK');\n\n-- Task 3.2\nINSERT INTO TICKET VALUES (13001,18.99,'Child','FR1001');\nINSERT INTO TICKET VALUES (13002,34.99,'Adult','FR1001');\nINSERT INTO TICKET VALUES (13003,20.99,'Senior','FR1001');\nINSERT INTO TICKET VALUES (88567,22.50,'Child','UK3452');\nINSERT INTO TICKET VALUES (88568,42.10,'Adult','UK3452');\nINSERT INTO TICKET VALUES (89720,10.99,'Senior','UK3452');"
+          },
+          "explanation": [
+            "Task 3.1 thêm 2 công viên cha (`FR1001` ở Paris và `UK3452` ở Stoke), sau đó Task 3.2 mới thêm 6 loại vé (Child, Adult, Senior) thuộc hai mã công viên đó.",
+            "Khi dùng `INSERT INTO table VALUES (...)` không liệt kê danh sách cột, thứ tự và số lượng giá trị trong ngoặc phải khớp chính xác 100% với thứ tự cột lúc tạo bảng; chuỗi ký tự bọc trong dấu nháy đơn `'...'`, còn số để trần."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 2 (Lab 3, sách tr. 37)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 3",
+          "pageNumber": 3,
+          "title": "Tasks 3.3–3.4 (COMMIT, themeparkdata.sql) & 3.2 Basic SELECT",
+          "paragraphs": [
+            "to make your changes to the THEMEPARK and TICKET tables permanent, it is a good idea to save those changes by using COMMIT;",
+            "Task 3.3 COMMIT the changes to the THEMEPARK and TICKET tables to the database.",
+            "Task 3.4 Run the script file themeparkdata.sql to insert the rest of the data into the Theme Park database. This script file is available on the CD-ROM companion. Ensure you COMMIT the changes to the database.",
+            "3.2 Retrieving data from a table using the SELECT Statement",
+            "In Chapter 8, Introduction to Structured Query Language, you studied the SELECT command. The SELECT command has many optional clauses but in its simplest can be written as",
+            "SELECT columnlist / FROM tablelist / [WHERE conditionlist ];",
+            "Notice that the command must finish with a semi-colon, and will be executed when the Enter key is pressed at the end of the command.",
+            "The simplest query involves viewing all columns in one table. To display the details of all Theme Parks in the Theme Park database type the following:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "COMMIT;\n\nSELECT columnlist\nFROM tablelist\n[WHERE conditionlist ];\n\nSELECT *\nFROM THEMEPARK;"
+          },
+          "explanation": [
+            "Sau khi nạp thêm phần dữ liệu mẫu còn lại bằng script `themeparkdata.sql` (Task 3.4) và chạy `COMMIT;`, CSDL có đầy đủ dữ liệu cho 7 bảng để bắt đầu thực hành truy vấn.",
+            "Mục 3.2 giới thiệu cú pháp tối giản của `SELECT`: mệnh đề `SELECT` (chọn cột, dùng `*` để lấy mọi cột) và `FROM` (chọn bảng) là bắt buộc, `WHERE` là tùy chọn; mọi câu lệnh trong MySQL CLI kết thúc bằng dấu chấm phẩy `;`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 3 (Lab 3, sách tr. 38)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 4",
+          "pageNumber": 4,
+          "title": "Figure 15 (SELECT * FROM THEMEPARK) & Task 3.5",
+          "paragraphs": [
+            "FROM THEMEPARK;",
+            "You should see the output displayed in Figure 15.",
+            "Figure 15: Displaying all columns from the THEMEPARK Table",
+            "The SELECT command and the FROM clause are necessary for any SQL query, and must always be included so that the DBMS knows which columns we want to display and which table they come from.",
+            "Task 3.5. Type in the following examples of the SELECT statement and check your results with those provided in Figures 16 and 17. In these two examples you are selecting specific columns from a single table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Example 1\nSELECT ATTRACT_NO, ATTRACT_NAME, ATTRACT_CAPACITY\nFROM ATTRACTION;\n\n-- Example 2\nSELECT EMP_NUM, EMP_LNAME, EMP_FNAME, EMP_HIRE_DATE\nFROM EMPLOYEE;"
+          },
+          "diagramText": [
+            "Figure 15 (MySQL Command Line Client):",
+            "mysql> SELECT *",
+            "    -> FROM THEMEPARK;",
+            "+-----------+---------------+--------------+--------------+",
+            "| PARK_CODE | PARK_NAME     | PARK_CITY    | PARK_COUNTRY |",
+            "+-----------+---------------+--------------+--------------+",
+            "| FR1001    | FairyLand     | PARIS        | FR           |",
+            "| NL1202    | Efling        | NOORD        | NL           |",
+            "| SP4533    | AdventurePort | BARCELONA    | SP           |",
+            "| SW2323    | Labyrinthe    | LAUSANNE     | SW           |",
+            "| UK2622    | MiniLand      | WINDSOR      | UK           |",
+            "| UK3452    | PleasureLand  | STOKE        | UK           |",
+            "| ZA1342    | GoldTown      | JOHANNESBURG | ZA           |",
+            "+-----------+---------------+--------------+--------------+",
+            "7 rows in set (0.06 sec)"
+          ],
+          "diagramNote": "7 dòng dữ liệu chuẩn của bảng THEMEPARK (FR1001, NL1202, SP4533, SW2323, UK2622, UK3452, ZA1342).",
+          "explanation": [
+            "Figure 15 cho biết bảng `THEMEPARK` chuẩn trong bộ lab có đúng 7 công viên thuộc 6 quốc gia (`FR`, `NL`, `SP`, `SW`, `UK` × 2, `ZA`).",
+            "Task 3.5 minh họa phép chiếu (projection) trong SQL: liệt kê tên các cột cần thiết thay vì dùng `SELECT *` để gọn kết quả và giảm băng thông."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 4 (Lab 3, sách tr. 39)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 5",
+          "pageNumber": 5,
+          "title": "Figures 16–17 (SELECT Examples) & 3.3 Updating table rows",
+          "paragraphs": [
+            "Figure 16: Output for Example 1",
+            "Figure 17: Output for Example 2",
+            "3.3 Updating table rows",
+            "The UPDATE command is used to modify data in a table. The syntax for this command is:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "UPDATE tablename\nSET columnname = expression [, columnname = expression]\n[WHERE conditionlist ];"
+          },
+          "diagramText": [
+            "Figure 16 — Example 1 (ATTRACTION, 11 rows):",
+            "+------------+-----------------+------------------+",
+            "| ATTRACT_NO | ATTRACT_NAME    | ATTRACT_CAPACITY |",
+            "+------------+-----------------+------------------+",
+            "|      10034 | ThunderCoaster  |               34 |",
+            "|      10056 | SpinningTeacups |               62 |",
+            "|      10067 | FlightToStars   |               24 |",
+            "|      10078 | Ant-Trap        |               30 |",
+            "|      10082 | NULL            |               40 |",
+            "|      10098 | Carnival        |              120 |",
+            "|      20056 | 3D-Lego_Show    |              200 |",
+            "|      30011 | BlackHole2      |               34 |",
+            "|      30012 | Pirates         |               42 |",
+            "|      30044 | UnderSeaWord    |               80 |",
+            "|      98764 | GoldRush        |               80 |",
+            "+------------+-----------------+------------------+",
+            "11 rows in set (0.03 sec)",
+            "",
+            "Figure 17 — Example 2 (EMPLOYEE, 7 rows):",
+            "+---------+------------+-----------+---------------+",
+            "| EMP_NUM | EMP_LNAME  | EMP_FNAME | EMP_HIRE_DATE |",
+            "+---------+------------+-----------+---------------+",
+            "|     100 | Calderdale | Emma      | 1992-03-15    |",
+            "|     101 | Ricardo    | Marshel   | 1996-04-25    |",
+            "|     102 | Arshad     | Arif      | 1990-12-20    |",
+            "|     103 | Roberts    | Anne      | 1994-08-16    |",
+            "|     104 | Denver     | Enrica    | 2001-10-20    |",
+            "|     105 | Namowa     | Mirrelle  | 2006-11-08    |",
+            "|     106 | Smith      | Gemma     | 1989-01-05    |",
+            "+---------+------------+-----------+---------------+"
+          ],
+          "diagramNote": "Hai bảng kết quả chuẩn của ATTRACTION (11 trò chơi, mã 10082 có tên NULL) và EMPLOYEE (7 nhân viên mã 100–106).",
+          "explanation": [
+            "Hai ảnh kết quả Figure 16 và 17 rất hữu ích để đối chiếu cho toàn bộ các lab sau: `ATTRACTION` có 11 hàng (trong đó `10082` có `ATTRACT_NAME` là `NULL`), còn `EMPLOYEE` có 7 nhân viên từ `100` đến `106`.",
+            "Mục 3.3 trình bày cú pháp lệnh `UPDATE`: `SET` có thể gán nhiều cột cách nhau bằng dấu phẩy, còn `[WHERE ...]` là tùy chọn — nhưng rất nguy hiểm nếu thiếu."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 5 (Lab 3, sách tr. 40)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 6",
+          "pageNumber": 6,
+          "title": "UPDATE with WHERE (Figure 18) & Set-Oriented Warning",
+          "paragraphs": [
+            "For example, if you want to change the attraction capacity of the attraction number 10034 from 34, to 38. The primary key, ATTRACT_NO would be used to locate the correct (second) row, you would type:",
+            "The output is shown in Figure 18.",
+            "Figure 18: Updating the attraction capacity",
+            "Note: If more than one attribute is to be updated in the row, separate each attribute with commas.",
+            "Remember, the UPDATE command is a set-oriented operator. Therefore, if you don’t specify a WHERE condition, the UPDATE command will apply the changes to all rows in the specified table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "UPDATE ATTRACTION\nSET ATTRACT_CAPACITY = 34\nWHERE ATTRACT_NO= 10034;"
+          },
+          "diagramText": [
+            "Figure 18 (MySQL Command Line Client):",
+            "mysql> UPDATE  ATTRACTION",
+            "    -> SET     ATTRACT_CAPACITY = 34",
+            "    -> WHERE   ATTRACT_NO= 10034;",
+            "Query OK, 0 rows affected (0.73 sec)",
+            "Rows matched: 1  Changed: 0  Warnings: 0"
+          ],
+          "diagramNote": "Lệnh UPDATE khớp 1 dòng (Rows matched: 1) nhưng Changed: 0 vì giá trị cũ của 10034 vốn đã là 34.",
+          "ocrNote": "Đoạn văn trong PDF gốc nói đổi từ 34 sang 38 nhưng lệnh SQL và ảnh chụp Figure 18 đều ghi `SET ATTRACT_CAPACITY = 34` (nên báo `0 rows affected`).",
+          "explanation": [
+            "Khi cập nhật đúng một bản ghi cụ thể, nên lọc theo khóa chính (`WHERE ATTRACT_NO = 10034`) để tránh sửa nhầm nhiều dòng cùng lúc.",
+            "Lưu ý chi tiết thú vị ở Figure 18: lời dẫn nói đổi từ 34 lên 38 nhưng câu lệnh ví dụ lại gán `= 34`, vì vậy MySQL hiển thị `Rows matched: 1 Changed: 0` (tìm thấy 1 dòng nhưng giá trị mới trùng giá trị cũ nên không ghi lại). Cũng cần ghi nhớ: quên `WHERE` sẽ làm `UPDATE` sửa toàn bộ các dòng trong bảng."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 6 (Lab 3, sách tr. 41)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 7",
+          "pageNumber": 7,
+          "title": "Task 3.6 (UPDATE without WHERE) & 3.4 Restoring table contents",
+          "paragraphs": [
+            "Task 3.6 Enter the following SQL UPDATE command to update the age a person can go on a specific ride in a Theme Park.",
+            "Confirm the update by using this command to check the ATTRACTION table’s listing:",
+            "Notice that all the values of ATTRACT_AGE have the same value.",
+            "3.4 Restoring table contents",
+            "Supposing you decided you have made a mistake in updating the attraction age to be the same for all attractions within the Theme Park. Assuming you have not yet used the COMMIT command to store the changes permanently in the database, you can restore the database to its previous condition with the ROLLBACK command. ROLLBACK undoes any changes and brings the data back to the values that existed before the changes were made. In order to use the ROLLBACK (and COMMIT) commands in MySQL, you first need to change the value for the AUTOCOMMIT to 0 by typing the following command:",
+            "This command needs only to be executed once in a session."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "UPDATE ATTRACTION\nSET ATTRACT_AGE = 14;\n\nSELECT * FROM ATTRACTION;\n\nSET AUTOCOMMIT = 0;"
+          },
+          "explanation": [
+            "Task 3.6 cố tình cho sinh viên chạy `UPDATE ATTRACTION SET ATTRACT_AGE = 14;` KHÔNG có `WHERE` để chứng kiến tận mắt hậu quả của toán tử tập hợp: toàn bộ 11 trò chơi đều bị đổi `ATTRACT_AGE` thành `14`.",
+            "Để sửa sai bằng `ROLLBACK`, MySQL yêu cầu bảng dùng engine InnoDB và phải chạy `SET AUTOCOMMIT = 0;` trước khi thực hiện thao tác thay đổi dữ liệu (lệnh này chỉ cần chạy một lần trong phiên làm việc)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 7 (Lab 3, sách tr. 42)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 8",
+          "pageNumber": 8,
+          "title": "Task 3.7 (ROLLBACK) & 3.5 Deleting table rows (DELETE)",
+          "paragraphs": [
+            "Task 3.7 To restore the data to their “pre-change” condition set the value, type the following commands;",
+            "Use the SELECT statement again to see that the ROLLBACK did, in fact, restore the data to their original values.",
+            "Note: For more information about ROLLBACK, See section 8.3.5, Restoring Table Contents in Chapter 8, “Introduction to Structured Query Language”",
+            "3.5 Deleting table rows",
+            "It is easy to delete a table row using the DELETE statement; the syntax is:",
+            "For example, if you want to delete a specific theme park from the THEMEPARK table you could use the PARK_CODE as shown in the following SQL command:",
+            "In that example, the primary key value lets SQL find the exact record to be deleted. However, deletions are not limited to a primary key match; any attribute may be used."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Task 3.7\nSET AUTOCOMMIT = 0;\nROLLBACK;\n\n-- 3.5 Syntax\nDELETE FROM tablename\n[WHERE conditionlist ];\n\n-- Example\nDELETE FROM THEMEPARK\nWHERE PARK_CODE = 'SW2323';"
+          },
+          "explanation": [
+            "Task 3.7 dùng `ROLLBACK;` để hoàn tác dữ liệu `ATTRACTION` về trạng thái trước lúc bị `UPDATE` nhầm. (Lưu ý trên thực tế nếu bạn đã chạy Task 3.6 trước khi tắt `AUTOCOMMIT = 0`, dữ liệu đã tự commit rồi nên cần chạy `SET AUTOCOMMIT = 0;` ngay từ đầu phiên).",
+            "Mục 3.5 giới thiệu lệnh `DELETE FROM tablename [WHERE conditionlist];`. Ví dụ xóa công viên `'SW2323'` chạy thành công nếu không có bảng con nào tham chiếu tới `'SW2323'`; bất kỳ thuộc tính nào cũng dùng được trong `WHERE` chứ không chỉ khóa chính."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 8 (Lab 3, sách tr. 43)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 9",
+          "pageNumber": 9,
+          "title": "DELETE Warning & 3.6 Inserting Table rows with a subquery",
+          "paragraphs": [
+            "If you do not specify a WHERE condition, all rows from the specified table will be deleted!",
+            "Note: If you make a mistake while working through this lab, use the themepark.sql script to re-create the database schema and insert the sample data.",
+            "3.6 Inserting Table rows with a subquery",
+            "Subqueries are often used to add multiple rows to a table, using another table as the source of the data. The syntax for the INSERT statement is:",
+            "In that case, the INSERT statement uses a SELECT subquery. A subquery, also known as a nested query or an inner query, is a query that is embedded (or nested) inside another query. The inner query is always executed first by the RDBMS. Given the previous SQL statement, the INSERT portion represents the outer query and the SELECT portion represents the inner query, or subquery.",
+            "Task 3.8 Use the following steps to populate your EMPLOYEE table."
+          ],
+          "bullets": [
+            "Run the script emp_copy.sql which is available on the accompanying CD-ROM. This script creates a table called EMP_COPY which we will populate using data from the EMPLOYEE table in the THEMEPARK database."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "INSERT INTO tablename SELECT columnlist FROM tablename;"
+          },
+          "explanation": [
+            "Cảnh báo đỏ: `DELETE FROM tablename;` không có `WHERE` sẽ xóa sạch toàn bộ dữ liệu mọi dòng trong bảng (dù cấu trúc bảng vẫn còn, khác với `DROP TABLE` xóa cả bảng lẫn cấu trúc).",
+            "Mục 3.6 giới thiệu `INSERT ... SELECT` — một ví dụ sớm của subquery: truy vấn trong (`SELECT`) chạy trước lấy tập bản ghi nguồn, sau đó truy vấn ngoài (`INSERT`) chèn hàng loạt bản ghi đó vào bảng đích."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 9 (Lab 3, sách tr. 44)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 10",
+          "pageNumber": 10,
+          "title": "Task 3.8 (EMP_COPY) & 3.7 Exercises E3.1–E3.5",
+          "paragraphs": [
+            "If you followed those steps correctly, you now have the EMP_COPY table populated with the data that will be used in the remaining sections of this lab guide.",
+            "3.7 Exercises",
+            "E3.1 Load and run the script park_copy.sql which creates the PARK_COPY table.",
+            "E3.2 Describe the PARK_COPY and THEMEPARK tables and notice that they are different.",
+            "E3.3 Write a subquery to populate the fields PARK_CODE, PARK_NAME and PARK_COUNTRY in the PARK_COPY using data from the THEMEPARK table. Display the contents of the PARK_COPY table;",
+            "E3.4 Update the AREA_CODE and PARK_PHONEs fields in the PARK_COPY table with the following values.",
+            "E3.5 Add the following new theme parks to the PARK_COPY TABLE. (Header cột cuối trang: PARK_CODE | PARK_NAME | PARK_COUNTRY | PARK_AREA_CODE | PARK_PHONE — tiếp dữ liệu ở trang 11)"
+          ],
+          "bullets": [
+            "Add the rows to EMP_COPY table by copying all rows from EMPLOYEE: INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;",
+            "Permanently save the changes: COMMIT;"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;\nCOMMIT;"
+          },
+          "table": {
+            "caption": "Dữ liệu cập nhật cho E3.4 (bảng PARK_COPY)",
+            "headers": [
+              "PARK_CODE",
+              "PARK_AREA_CODE",
+              "PARK_PHONE"
+            ],
+            "rows": [
+              [
+                "FR1001",
+                "5678",
+                "223-556"
+              ],
+              [
+                "UK3452",
+                "0181",
+                "678-789"
+              ],
+              [
+                "ZA1342",
+                "8789",
+                "797-121"
+              ]
+            ]
+          },
+          "explanation": [
+            "Lệnh `INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;` sao chép y nguyên toàn bộ 7 dòng nhân viên sang bảng `EMP_COPY` (với điều kiện hai bảng có số cột và kiểu dữ liệu khớp thứ tự nhau).",
+            "Bài tập E3.3 minh họa trường hợp hai bảng KHÔNG giống nhau hoàn toàn về số cột (`PARK_COPY` có thêm `PARK_AREA_CODE`, `PARK_PHONE` và bỏ `PARK_CITY`), nên phải viết rõ danh sách cột ở cả hai vế: `INSERT INTO PARK_COPY (PARK_CODE, PARK_NAME, PARK_COUNTRY) SELECT PARK_CODE, PARK_NAME, PARK_COUNTRY FROM THEMEPARK;`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 10 (Lab 3, sách tr. 45)"
+          }
+        },
+        {
+          "slideNumber": "Lab 3 • Trang 11",
+          "pageNumber": 11,
+          "title": "3.7 Exercises E3.5 (Table) & E3.6",
+          "paragraphs": [
+            "E3.6 Delete the Theme Park called RoboLand."
+          ],
+          "table": {
+            "caption": "Dữ liệu thêm mới cho E3.5 (tiếp từ trang 10; cột PARK_AREA_CODE bị ngắt dòng phần đuôi 'DE')",
+            "headers": [
+              "PARK_CODE",
+              "PARK_NAME",
+              "PARK_COUNTRY",
+              "PARK_AREA_CODE",
+              "PARK_PHONE"
+            ],
+            "rows": [
+              [
+                "AU1001",
+                "SkiWorld",
+                "AU",
+                "1212",
+                "440-232"
+              ],
+              [
+                "GR5001",
+                "RoboLand",
+                "GR",
+                "4565",
+                "123-123"
+              ]
+            ]
+          },
+          "ocrNote": "Đầu trang 11 bị rớt chữ 'DE' (phần cuối của tiêu đề `PARK_AREA_CODE` ở trang 10) vào hàng đầu bảng; đã ghép đúng tên cột `PARK_AREA_CODE`.",
+          "explanation": [
+            "Để giải E3.5, ta dùng hai lệnh `INSERT INTO PARK_COPY VALUES ('AU1001','SkiWorld','AU','1212','440-232');` và tương tự cho `'GR5001'` (hoặc gộp 2 bộ giá trị sau `VALUES`).",
+            "Để giải E3.6 (xóa theo tên công viên chứ không phải mã), ta viết: `DELETE FROM PARK_COPY WHERE PARK_NAME = 'RoboLand';` — minh họa ý đã nêu ở mục 3.5 là điều kiện `WHERE` có thể dùng bất kỳ cột nào, không nhất thiết là khóa chính."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 11 (Lab 3, sách tr. 46)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 4 (Phần 1): Toán tử số học, Alias & Toán tử so sánh (BETWEEN, IN, LIKE, IS NULL)",
+      "text": "Thứ tự ưu tiên phép tính số học, đặt bí danh cột (AS), bảng toán tử so sánh (Table 1) và ví dụ/bài tập cho >, <, so sánh chuỗi ASCII, BETWEEN, IN, LIKE (%, _) và IS NULL.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 12–21 (sách tr. 47–56)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thứ tự ưu tiên tính toán số học trong SQL: (1) Ngoặc đơn `()` → (2) Lũy thừa → (3) Nhân/Chia `* /` → (4) Cộng/Trừ `+ -`.",
+          "Alias cột có thể viết `expr ALIAS` hoặc `expr AS \"ALIAS CÓ KHOẢNG TRẮNG\"`.",
+          "So sánh chuỗi tuân theo thứ tự mã ASCII (`'FR1001' < 'UK2262'`).",
+          "`BETWEEN a AND b` bao gồm cả hai đầu mút `a` và `b`; `IN (...)` khớp bất kỳ giá trị nào trong danh sách; `LIKE` dùng `%` (0 hoặc nhiều ký tự bất kỳ) và `_` (đúng 1 ký tự bất kỳ); kiểm tra rỗng bắt buộc dùng `IS NULL` / `IS NOT NULL` (không dùng `= NULL`)."
+        ],
+        "terms": [
+          {
+            "term": "Column Alias",
+            "meaning": "Tên hiển thị tạm thời cho cột hoặc biểu thức tính toán trong kết quả `SELECT`, khai báo bằng `AS` (từ khóa `AS` có thể lược bỏ nếu tên không chứa khoảng trắng)."
+          },
+          {
+            "term": "Wildcard (`%` và `_`)",
+            "meaning": "Ký tự đại diện dùng với `LIKE`: `%` khớp chuỗi độ dài 0..n bất kỳ; `_` khớp đúng 1 ký tự đơn."
+          }
+        ],
+        "pitfalls": [
+          "Không bao giờ viết `WHERE ATTRACT_NAME = NULL` vì phép so sánh với `NULL` luôn trả về UNKNOWN — phải dùng `IS NULL` hoặc `IS NOT NULL`.",
+          "Trong Task 4.5 (trang 17–18), đề bài yêu cầu hiển thị cả `date worked` (`DATE_WORKED`), nhưng ảnh đáp án Figure 23 chỉ chọn 3 cột `EMP_NUM, ATTRACT_NO, HOURS_PER_ATTRACT`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 4 • Trang 12",
+          "pageNumber": 12,
+          "title": "Lab 4: Basic SELECT statements — 4.1 Arithmetic Operators & Precedence",
+          "paragraphs": [
+            "Lab 4: Basic SELECT statements",
+            "4.1 Using arithmetic operators in SQL statements",
+            "SQL commands are often used in conjunction with arithmetic operators. As you perform mathematical operations on attributes, remember the rules of precedence. As the name suggests, the rules of precedence are the rules that establish the order in which computations are completed. For example, note the order of the following computational sequence:",
+            "Task 4.1 Suppose the owners of all the theme parks wanted to compare the current ticket prices, with an increase in the price of each ticket by 10%. To generate this query type:"
+          ],
+          "bullets": [
+            "Use arithmetic operators in SQL statements",
+            "Select rows from a table with conditional restrictions",
+            "Apply logical operators to have multiple conditions",
+            "1. Perform operations within parentheses",
+            "2. Perform power operations",
+            "3. Perform multiplications and divisions",
+            "4. Perform additions and subtractions"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_CODE, TICKET_NO, TICKET_TYPE, TICKET_PRICE,\nTICKET_PRICE + ROUND((TICKET_PRICE *0.1),2)\nFROM TICKET;"
+          },
+          "explanation": [
+            "Lab 4 đi sâu vào các phép tính và lọc điều kiện trong câu lệnh `SELECT`. Thứ tự ưu tiên toán học giống toán phổ thông: ngoặc đơn → lũy thừa → nhân/chia → cộng/trừ.",
+            "Task 4.1 minh họa cột tính toán (computed column) tăng giá vé thêm 10% kết hợp hàm `ROUND(..., 2)` để làm tròn phần tăng thêm tới 2 chữ số thập phân."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 12 (Lab 4, sách tr. 47)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 13",
+          "pageNumber": 13,
+          "title": "Figure 19 (10% Ticket Price Increase) & Column Alias",
+          "paragraphs": [
+            "FROM TICKET;",
+            "The output for this query is shown in Figure 19. The ROUND function is used to ensure the result is displayed to two decimal places.",
+            "Figure 19: Output showing 10% increase in ticket prices",
+            "You will see in Figure 19 that the last column is named after the arithmetic expression in the query. To rename the column heading, a column alias needs to be used. Modify the query as follows and note that the name of the heading has changed to PRICE_INCREASE when you execute the following query."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_CODE, TICKET_NO, TICKET_TYPE, TICKET_PRICE,\nTICKET_PRICE + ROUND((TICKET_PRICE *0.1),2) PRICE_INCREASE\nFROM TICKET;"
+          },
+          "diagramText": [
+            "Figure 19 (MySQL Command Line Client):",
+            "+-----------+-----------+-------------+--------------+-------------------------------------------+",
+            "| PARK_CODE | TICKET_NO | TICKET_TYPE | TICKET_PRICE | TICKET_PRICE + ROUND((TICKET_PRICE *0.1),2) |",
+            "+-----------+-----------+-------------+--------------+-------------------------------------------+",
+            "| SP4533    |     11001 | Adult       |        24.99 |                                     27.49 |",
+            "| SP4533    |     11002 | Child       |        14.99 |                                     16.49 |",
+            "| SP4533    |     11003 | Senior      |        10.99 |                                     12.09 |",
+            "| FR1001    |     13001 | Child       |        18.99 |                                     20.89 |",
+            "| FR1001    |     13002 | Adult       |        34.99 |                                     38.49 |",
+            "| FR1001    |     13003 | Senior      |        20.99 |                                     23.09 |",
+            "| ZA1342    |     67832 | Child       |        18.56 |                                     20.42 |",
+            "| ZA1342    |     67833 | Adult       |        28.67 |                                     31.54 |",
+            "| ZA1342    |     67855 | Senior      |        12.12 |                                     13.33 |",
+            "| UK3452    |     88567 | Child       |        22.50 |                                     24.75 |",
+            "| UK3452    |     88568 | Adult       |        42.10 |                                     46.31 |",
+            "| UK3452    |     89720 | Senior      |        10.99 |                                     12.09 |",
+            "+-----------+-----------+-------------+--------------+-------------------------------------------+",
+            "12 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "12 loại vé của bảng TICKET kèm cột biểu thức giá mới tăng 10%.",
+          "explanation": [
+            "Khi không đặt bí danh (alias), tiêu đề cột hiển thị nguyên chuỗi biểu thức dài `TICKET_PRICE + ROUND((TICKET_PRICE *0.1),2)` rất khó đọc.",
+            "Đặt thêm `PRICE_INCREASE` ngay sau biểu thức (không có dấu phẩy giữa biểu thức và alias!) giúp đổi tên cột kết quả thành `PRICE_INCREASE`. Lưu ý `SELECT` chỉ tính toán hiển thị ra màn hình chứ KHÔNG làm thay đổi dữ liệu thật lưu trong bảng `TICKET`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 13 (Lab 4, sách tr. 48)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 14",
+          "pageNumber": 14,
+          "title": "Column Alias with AS & 4.2 Comparison Operators (Table 1)",
+          "paragraphs": [
+            "Note: When dealing with column names that require spaces, the optional keyword AS can be used. For example:",
+            "4.2 Selecting rows with conditional restrictions",
+            "Numerous conditional restrictions can be placed on the selected table contents in the WHERE clause of the SELECT statement. For example, the comparison operators shown in Table 1 can be used to restrict output."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_CODE, TICKET_NO, TICKET_TYPE, TICKET_PRICE,\nTICKET_PRICE + ROUND((TICKET_PRICE *0.1),2) AS\n\"PRICE INCREASE\"\nFROM TICKET;"
+          },
+          "table": {
+            "caption": "Table 1 Comparison Operators (Phần 1)",
+            "headers": [
+              "SYMBOL",
+              "MEANING"
+            ],
+            "rows": [
+              [
+                "=",
+                "Equal to"
+              ],
+              [
+                "<",
+                "Less than"
+              ],
+              [
+                "<=",
+                "Less than or equal to"
+              ],
+              [
+                ">",
+                "Greater than"
+              ],
+              [
+                ">=",
+                "Greater than or equal to"
+              ],
+              [
+                "<> or !=",
+                "Not equal to"
+              ],
+              [
+                "BETWEEN",
+                "Used to check if an attribute is within a range."
+              ],
+              [
+                "IN",
+                "Used to check if an attribute value matches any value within a list."
+              ]
+            ]
+          },
+          "explanation": [
+            "Nếu tên alias chứa khoảng trắng (như `\"PRICE INCREASE\"`) hoặc ký tự đặc biệt/tiếng Việt, bắt buộc phải bọc trong dấu ngoặc kép (hoặc backtick trong MySQL); từ khóa `AS` mang tính tùy chọn nhưng nên viết tường minh để code dễ đọc và dễ phân biệt với việc thiếu dấu phẩy giữa hai cột.",
+            "Table 1 liệt kê bộ toán tử so sánh trong mệnh đề `WHERE`: cả `<>` (chuẩn SQL) và `!=` đều có nghĩa 'khác'; `BETWEEN` kiểm tra miền liên tục và `IN` kiểm tra tập rời rạc."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 14 (Lab 4, sách tr. 49)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 15",
+          "pageNumber": 15,
+          "title": "Table 1 (End) & Greater Than (`>`) — Figure 20, Task 4.2",
+          "paragraphs": [
+            "We will now explore some of these conditional operators using examples.",
+            "Greater than",
+            "The following example uses the “greater than” operator to display the theme park code, ticket price and ticket type of all tickets where the ticket price is greater than €20.00.",
+            "The output is shown in Figure 20.",
+            "Figure 20: Tickets costing greater than €20.00",
+            "Task 4.2 Type in and execute the query and test out the greater than operator. Do you get the same results has shown in Figure 20?"
+          ],
+          "table": {
+            "caption": "Table 1 Comparison Operators (hết)",
+            "headers": [
+              "SYMBOL",
+              "MEANING"
+            ],
+            "rows": [
+              [
+                "LIKE",
+                "Used to check if an attribute value matches a given string pattern."
+              ],
+              [
+                "IS NULL / IS NOT NULL",
+                "Used to check if an attribute is NULL / is not NULL."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_CODE, TICKET_TYPE, TICKET_PRICE\nFROM TICKET\nWHERE TICKET_PRICE > 20;"
+          },
+          "diagramText": [
+            "Figure 20 (MySQL Command Line Client):",
+            "+-----------+-------------+--------------+",
+            "| PARK_CODE | TICKET_TYPE | TICKET_PRICE |",
+            "+-----------+-------------+--------------+",
+            "| SP4533    | Adult       |        24.99 |",
+            "| FR1001    | Adult       |        34.99 |",
+            "| FR1001    | Senior      |        20.99 |",
+            "| ZA1342    | Adult       |        28.67 |",
+            "| UK3452    | Child       |        22.50 |",
+            "| UK3452    | Adult       |        42.10 |",
+            "+-----------+-------------+--------------+",
+            "6 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "6 loại vé có giá lớn hơn €20.00 trong tổng số 12 vé.",
+          "explanation": [
+            "Hoàn tất Table 1 với `LIKE` (so khớp mẫu chuỗi) và `IS NULL / IS NOT NULL` (kiểm tra giá trị trống).",
+            "Ví dụ toán tử `>`: lọc `WHERE TICKET_PRICE > 20` trả về đúng 6 dòng thỏa điều kiện chặt lớn hơn 20 (không gồm giá trị bằng 20 nếu có)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 15 (Lab 4, sách tr. 50)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 16",
+          "pageNumber": 16,
+          "title": "Task 4.3, Character Comparisons (Task 4.4, Figure 21) & BETWEEN",
+          "paragraphs": [
+            "Task 4.3 Modify the query you have just executed to display tickets that are less than €30.00.",
+            "Character comparisons",
+            "Comparison operators may even be used to place restrictions on character-based attributes.",
+            "Task 4.4 Execute the following query which produces a list of all rows in which the PARK_CODE is alphabetically less than UK2262. (Because the ASCII code value for the letter B is greater than the value of the letter A, it follows that A is less than B.) Therefore, the output will be generated as shown in Figure 21.",
+            "Figure 21: Example of character comparison",
+            "BETWEEN"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_CODE, PARK_NAME, PARK_COUNTRY\nFROM THEMEPARK\nWHERE PARK_CODE < 'UK2262';"
+          },
+          "diagramText": [
+            "Figure 21 (MySQL Command Line Client):",
+            "+-----------+---------------+--------------+",
+            "| PARK_CODE | PARK_NAME     | PARK_COUNTRY |",
+            "+-----------+---------------+--------------+",
+            "| FR1001    | FairyLand     | FR           |",
+            "| NL1202    | Efling        | NL           |",
+            "| SP4533    | AdventurePort | SP           |",
+            "| SW2323    | Labyrinthe    | SW           |",
+            "+-----------+---------------+--------------+",
+            "4 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "4 công viên có mã đứng trước 'UK2262' theo thứ tự từ điển ASCII (FR, NL, SP, SW < UK).",
+          "explanation": [
+            "Task 4.3 chỉ cần sửa điều kiện thành `WHERE TICKET_PRICE < 30;`.",
+            "Task 4.4 chứng minh các toán tử `<`, `>`, `<=`, `>=` cũng áp dụng được cho chuỗi ký tự dựa trên mã ASCII theo thứ tự từ điển từng ký tự từ trái sang phải: `'FR1001'`, `'NL1202'`, `'SP4533'`, `'SW2323'` đều nhỏ hơn `'UK2262'`, còn `'UK2622'`, `'UK3452'`, `'ZA1342'` lớn hơn."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 16 (Lab 4, sách tr. 51)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 17",
+          "pageNumber": 17,
+          "title": "BETWEEN Operator (Figure 22) & Task 4.5",
+          "paragraphs": [
+            "The operator BETWEEN may be used to check whether an attribute value is within a range of values. For example, if you want to see a listing for all tickets whose prices are between €30 and €50, use the following command sequence:",
+            "Figure 22 shows the output you should see for this query.",
+            "Figure 22: Displaying ticket prices BETWEEN two values.",
+            "Task 4.5 Write a query which displays the employee number, attraction no, the hours worked per attraction and the date worked where the hours worked per attraction is between 5 and 10. Hint you will need to select data from the HOURS table. The output for the query is shown in Figure 23."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT *\nFROM TICKET\nWHERE TICKET_PRICE BETWEEN 30.00 AND 50.00;"
+          },
+          "diagramText": [
+            "Figure 22 (MySQL Command Line Client):",
+            "+-----------+--------------+-------------+-----------+",
+            "| TICKET_NO | TICKET_PRICE | TICKET_TYPE | PARK_CODE |",
+            "+-----------+--------------+-------------+-----------+",
+            "|     13002 |        34.99 | Adult       | FR1001    |",
+            "|     88568 |        42.10 | Adult       | UK3452    |",
+            "+-----------+--------------+-------------+-----------+",
+            "2 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "2 loại vé có giá nằm trong khoảng [30.00, 50.00].",
+          "explanation": [
+            "Toán tử `BETWEEN a AND b` tương đương `col >= a AND col <= b` (tức tính cả hai biên `a` và `b`, và luôn phải đặt giá trị nhỏ `a` trước giá trị lớn `b`).",
+            "Task 4.5 yêu cầu tìm các ca làm việc trong bảng `HOURS` có `HOURS_PER_ATTRACT BETWEEN 5 AND 10` (chú ý đề viết hiển thị thêm `DATE_WORKED`, xem đối chiếu ở Figure 23 trang sau)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 17 (Lab 4, sách tr. 52)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 18",
+          "pageNumber": 18,
+          "title": "Figure 23 (Task 4.5 Output) & IN Operator",
+          "paragraphs": [
+            "Figure 23: Output for Task 4.5",
+            "IN",
+            "The IN operator is used to test for values which are in a list. The following query finds only the rows in the SALES_LINE table that match up to a specific sales transaction. i.e. TRANSACTION_NO is either 12781 or 67593.",
+            "The result of this query is shown in Figure 24."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Query trong Figure 23 (Task 4.5):\nSELECT EMP_NUM, ATTRACT_NO, HOURS_PER_ATTRACT\nFROM HOURS\nWHERE HOURS_PER_ATTRACT BETWEEN 5 AND 10;\n\n-- Ví dụ toán tử IN:\nSELECT *\nFROM SALES_LINE\nWHERE TRANSACTION_NO IN (12781, 67593);"
+          },
+          "diagramText": [
+            "Figure 23 (MySQL Command Line Client):",
+            "+---------+------------+-------------------+",
+            "| EMP_NUM | ATTRACT_NO | HOURS_PER_ATTRACT |",
+            "+---------+------------+-------------------+",
+            "|     100 |      10034 |                 6 |",
+            "|     100 |      10034 |                 6 |",
+            "|     101 |      10034 |                 6 |",
+            "|     102 |      30044 |                 6 |",
+            "|     104 |      30011 |                 6 |",
+            "|     104 |      30012 |                 6 |",
+            "|     105 |      10098 |                 6 |",
+            "+---------+------------+-------------------+",
+            "7 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "Figure 23 cho thấy 7 dòng trong HOURS có HOURS_PER_ATTRACT = 6 (nằm trong đoạn 5..10).",
+          "explanation": [
+            "Lưu ý chênh lệch nhỏ giữa đề Task 4.5 và ảnh đáp án Figure 23: đề bài bảo hiển thị thêm cột `date worked`, nhưng ảnh Figure 23 chỉ select 3 cột `EMP_NUM, ATTRACT_NO, HOURS_PER_ATTRACT`.",
+            "Toán tử `IN (12781, 67593)` là cách viết gọn và sạch hơn nhiều so với `TRANSACTION_NO = 12781 OR TRANSACTION_NO = 67593`, đặc biệt khi danh sách giá trị dài hoặc được sinh ra từ subquery."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 18 (Lab 4, sách tr. 53)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 19",
+          "pageNumber": 19,
+          "title": "Figure 24, Task 4.6 (Figure 25) & LIKE Intro",
+          "paragraphs": [
+            "Figure 24 Selecting rows using the IN command",
+            "Task 4.6 Write a query to display all tickets that are of type Senior or Child. Hint: Use the TICKET table. The output you should see is shown in Figure 25.",
+            "Figure 25. Output for Task 4.6",
+            "LIKE",
+            "The LIKE operator is used to find patterns within string attributes. Standard SQL allows you to use the percent sign (%) and underscore (_) wildcard characters to make matches"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Task 4.6 (từ Figure 25):\nSELECT *\nFROM TICKET\nWHERE TICKET_TYPE IN ('Child', 'Senior');"
+          },
+          "diagramText": [
+            "Figure 24 (SALES_LINE với TRANSACTION_NO IN (12781, 67593)):",
+            "+----------------+---------+-----------+----------+------------+",
+            "| TRANSACTION_NO | LINE_NO | TICKET_NO | LINE_QTY | LINE_PRICE |",
+            "+----------------+---------+-----------+----------+------------+",
+            "|          12781 |       1 |     13002 |        2 |      69.98 |",
+            "|          12781 |       2 |     13001 |        1 |      14.99 |",
+            "|          67593 |       1 |     67833 |        2 |      57.34 |",
+            "|          67593 |       2 |     67832 |        2 |      37.12 |",
+            "+----------------+---------+-----------+----------+------------+",
+            "4 rows in set (0.06 sec)",
+            "",
+            "Figure 25 (Task 4.6):",
+            "+-----------+--------------+-------------+-----------+",
+            "| TICKET_NO | TICKET_PRICE | TICKET_TYPE | PARK_CODE |",
+            "+-----------+--------------+-------------+-----------+",
+            "|     11002 |        14.99 | Child       | SP4533    |",
+            "|     11003 |        10.99 | Senior      | SP4533    |",
+            "|     13001 |        18.99 | Child       | FR1001    |",
+            "|     13003 |        20.99 | Senior      | FR1001    |",
+            "|     67832 |        18.56 | Child       | ZA1342    |",
+            "|     67855 |        12.12 | Senior      | ZA1342    |",
+            "|     88567 |        22.50 | Child       | UK3452    |",
+            "|     89720 |        10.99 | Senior      | UK3452    |",
+            "+-----------+--------------+-------------+-----------+",
+            "8 rows in set (0.01 sec)"
+          ],
+          "diagramNote": "Figure 24 trả về 4 dòng chi tiết giao dịch; Figure 25 trả về 8 vé loại Child hoặc Senior.",
+          "explanation": [
+            "Khi dùng `IN` với chuỗi ký tự (như Task 4.6), từng phần tử trong danh sách phải bọc dấu nháy đơn: `IN ('Child', 'Senior')`.",
+            "Cuối trang giới thiệu `LIKE` để tìm kiếm chuỗi theo mẫu (pattern matching) bằng hai ký tự đại diện `%` và `_`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 19 (Lab 4, sách tr. 54)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 20",
+          "pageNumber": 20,
+          "title": "LIKE Wildcards (`%` and `_`) — Tasks 4.7 & 4.8",
+          "paragraphs": [
+            "when the entire string is not known. % means any and all following characters are eligible while _ means any one character may be substituted for the underscore.",
+            "Task 4.7 Enter the following query which finds all EMPLOYEE rows whose first names begin with the letter A.",
+            "Figure 26 shows the output you should see for this query.",
+            "Figure 26 Query using the LIKE command",
+            "Task 4.8 Write a query which finds all Theme Parks that have a name ending in ‘Land’. The output you should see is shown in Figure 27."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT EMP_LNAME, EMP_FNAME, EMP_NUM\nFROM EMPLOYEE\nWHERE EMP_FNAME LIKE 'A%';"
+          },
+          "diagramText": [
+            "Figure 26 (MySQL Command Line Client):",
+            "+-----------+-----------+---------+",
+            "| EMP_LNAME | EMP_FNAME | EMP_NUM |",
+            "+-----------+-----------+---------+",
+            "| Arshad    | Arif      |     102 |",
+            "| Roberts   | Anne      |     103 |",
+            "+-----------+-----------+---------+",
+            "2 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "2 nhân viên có tên (EMP_FNAME) bắt đầu bằng chữ A là Arif (102) và Anne (103).",
+          "explanation": [
+            "Phân biệt kỹ hai ký tự đại diện trong `LIKE`: `%` khớp 0, 1 hoặc nhiều ký tự bất kỳ; còn `_` khớp đúng **1** ký tự duy nhất (hay ra câu hỏi như `LIKE '%n_'` nghĩa là ký tự kế cuối là `'n'`).",
+            "Lưu ý trong MySQL, so khớp chuỗi thông thường (`latin1_swedish_ci` / `utf8mb4_general_ci`) mặc định không phân biệt hoa/thường (case-insensitive), nhưng một số hệ QTCSDL khác (như Oracle/PostgreSQL) phân biệt hoa thường nên cần viết đúng `'A%'` và `'%Land'`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 20 (Lab 4, sách tr. 55)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 21",
+          "pageNumber": 21,
+          "title": "Figure 27 (Task 4.8) & NULL / IS NULL (Figure 28)",
+          "paragraphs": [
+            "Figure 27 Solution to Task 4.8",
+            "NULL and IS NULL",
+            "IS NULL is used to check for a null attribute value. In the following example, the query lists all attractions that do not have an attraction name assigned (ATTRACT_NAME is null). The query could be written as:",
+            "The output for this query is shown in Figure 28."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Task 4.8 (từ Figure 27):\nselect * from themepark\nWHERE PARK_NAME LIKE '%Land';\n\n-- IS NULL example:\nSELECT *\nFROM ATTRACTION\nWHERE ATTRACT_NAME IS NULL;"
+          },
+          "diagramText": [
+            "Figure 27 (Task 4.8):",
+            "+-----------+--------------+---------+--------------+",
+            "| PARK_CODE | PARK_NAME    | PARK_CITY | PARK_COUNTRY |",
+            "+-----------+--------------+---------+--------------+",
+            "| FR1001    | FairyLand    | PARIS   | FR           |",
+            "| UK2622    | MiniLand     | WINDSOR | UK           |",
+            "| UK3452    | PleasureLand | STOKE   | UK           |",
+            "+-----------+--------------+---------+--------------+",
+            "3 rows in set (0.00 sec)",
+            "",
+            "Figure 28 (ATTRACT_NAME IS NULL):",
+            "+------------+--------------+-------------+------------------+-----------+",
+            "| ATTRACT_NO | ATTRACT_NAME | ATTRACT_AGE | ATTRACT_CAPACITY | PARK_CODE |",
+            "+------------+--------------+-------------+------------------+-----------+",
+            "|      10082 | NULL         |          10 |               40 | ZA1342    |",
+            "+------------+--------------+-------------+------------------+-----------+",
+            "1 row in set (0.01 sec)"
+          ],
+          "diagramNote": "Figure 27 trả về 3 công viên kết thúc bằng 'Land'; Figure 28 trả về trò chơi 10082 có tên NULL.",
+          "explanation": [
+            "Task 4.8 dùng mẫu `'%Land'` để khớp mọi công viên kết thúc bằng chữ `'Land'` (FairyLand, MiniLand, PleasureLand).",
+            "Trong SQL, `NULL` biểu thị giá trị chưa xác định chứ không phải chuỗi `'NULL'` hay số `0`; do đó bắt buộc phải kiểm tra bằng toán tử `IS NULL` (hoặc `IS NOT NULL`), tuyệt đối không viết `ATTRACT_NAME = NULL`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 21 (Lab 4, sách tr. 56)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 4 (Phần 2): Toán tử logic (AND, OR, NOT) & Bài tập E4.1–E4.5",
+      "text": "Độ ưu tiên NOT > AND > OR, khuyến nghị dùng ngoặc đơn để tường minh, ví dụ kết hợp điều kiện ngày tháng, AND/OR, NOT và 5 bài tập tổng hợp E4.1–E4.5.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 22–27 (sách tr. 57–62)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Độ ưu tiên toán tử logic trong SQL: `NOT` (cao nhất) → `AND` → `OR` (thấp nhất). Luôn dùng dấu ngoặc đơn `()` khi trộn `AND` và `OR` để tránh sai logic.",
+          "Trong MySQL, chuỗi ngày chuẩn là `'YYYY-MM-DD'`; nếu truyền `'18-MAY-07'` (định dạng kiểu Oracle), MySQL sẽ báo `1 warning` như trong Figure 29.",
+          "Kết hợp `NOT (EMP_NUM = 106)` tương đương `EMP_NUM <> 106` hoặc `EMP_NUM != 106`."
+        ],
+        "terms": [
+          {
+            "term": "Logical Operator Precedence",
+            "meaning": "Thứ tự thực thi `NOT` trước `AND`, rồi mới đến `OR` khi một mệnh đề `WHERE` có nhiều điều kiện ghép."
+          }
+        ],
+        "pitfalls": [
+          "Ví dụ `WHERE DATE_WORKED > '18-MAY-07'` trong tài liệu dùng kiểu ngày Oracle nên MySQL báo `1 warning (0.00 sec)` và đánh giá sai định dạng ngày — khi viết thực tế trên MySQL luôn dùng `'2007-05-18'`!",
+          "Khi đề yêu cầu điều kiện phủ định `NOT` hoặc khác `<>` trên cột có thể chứa `NULL`, các dòng `NULL` cũng bị loại trừ vì `NULL` không đánh giá thành TRUE."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 4 • Trang 22",
+          "pageNumber": 22,
+          "title": "Logical Operators (NOT > AND > OR) & AND Example",
+          "paragraphs": [
+            "Figure 28 Listing all Attractions with no name",
+            "Logical Operators",
+            "SQL allows you to have multiple conditions in a query through the use of logical operators: AND, OR and NOT. NOT has the highest precedence, followed by AND, and then followed by OR. However, you are strongly recommended to use parentheses to clarify the intended meaning of the query.",
+            "AND",
+            "This logical AND connective is used to set up a query where there are two conditions which must be met for the query to return the required row(s). The following query displays the employee number (EMP_NUM) and the attraction number (ATTRACT_NUM) for which the numbers of hours worked (HOURS_PER_ATTRACT) by the employee is greater than 3 and the date worked (DATE_WORKED) is after 18th May 2007.",
+            "This query will produce the output shown in Figure 29."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT EMP_NUM, ATTRACT_NO\nFROM HOURS\nWHERE HOURS_PER_ATTRACT > 3\nAND DATE_WORKED > '18-MAY-07';"
+          },
+          "explanation": [
+            "Ghi nhớ thứ tự ưu tiên chuẩn của toán tử logic: `NOT` > `AND` > `OR`. Tuy nhiên khi kết hợp nhiều điều kiện, luôn nên đóng ngoặc đơn tường minh để tránh lỗi ngữ nghĩa ngoài ý muốn.",
+            "Toán tử `AND` yêu cầu đồng thời cả hai vế cùng đúng. Lưu ý chuỗi `'18-MAY-07'` viết theo thói quen Oracle (trong khi tên cột ở bảng `HOURS` là `ATTRACT_NO` dù đoạn văn viết nhầm thành `ATTRACT_NUM`); chuẩn MySQL phải là `'2007-05-18'`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 22 (Lab 4, sách tr. 57)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 23",
+          "pageNumber": 23,
+          "title": "Figure 29, Task 4.9 & Task 4.10 (Figure 30)",
+          "paragraphs": [
+            "Figure 29 Query results using the AND operator",
+            "Task 4.9 Enter the query above and check you results with those shown in Figure 29.",
+            "Task 4.10 Write a query which displays the details of all attractions which are suitable for children aged 10 or under and have a capacity of less than 100. You should not display any information for attractions which currently have no name. Your output should correspond to that shown in Figure 30.",
+            "Figure 30: Query results for Task 4.10"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Task 4.10 (từ Figure 30):\nSELECT *\nFROM ATTRACTION\nWHERE ATTRACT_AGE <= 10\nAND ATTRACT_CAPACITY < 100\nAND ATTRACT_NAME IS NOT NULL;"
+          },
+          "diagramText": [
+            "Figure 29 (HOURS_PER_ATTRACT > 3 AND DATE_WORKED > '18-MAY-07'):",
+            "+---------+------------+",
+            "| EMP_NUM | ATTRACT_NO |",
+            "+---------+------------+",
+            "|     100 |      10034 |",
+            "|     100 |      10034 |",
+            "|     101 |      10034 |",
+            "|     102 |      30044 |",
+            "|     104 |      30011 |",
+            "|     104 |      30012 |",
+            "|     105 |      10098 |",
+            "+---------+------------+",
+            "7 rows in set, 1 warning (0.00 sec)",
+            "",
+            "Figure 30 (Task 4.10):",
+            "+------------+-----------------+-------------+------------------+-----------+",
+            "| ATTRACT_NO | ATTRACT_NAME    | ATTRACT_AGE | ATTRACT_CAPACITY | PARK_CODE |",
+            "+------------+-----------------+-------------+------------------+-----------+",
+            "|      10056 | SpinningTeacups |           4 |               62 | FR1001    |",
+            "|      30012 | Pirates         |          10 |               42 | UK3452    |",
+            "|      30044 | UnderSeaWord    |           4 |               80 | ZA1342    |",
+            "|      98764 | GoldRush        |           5 |               80 | ZA1342    |",
+            "+------------+-----------------+-------------+------------------+-----------+",
+            "4 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "Figure 29 hiện '1 warning' do định dạng ngày '18-MAY-07'; Figure 30 trả về 4 trò chơi tuổi <= 10, sức chứa < 100 và có tên khác NULL (loại 10082).",
+          "ocrNote": "Trên ảnh Figure 30 dòng `30044 | UnderSeaWord`, cột `PARK_CODE` hiển thị `UK3452` (lọc từ ảnh chụp Figure 30 rõ là `UK3452`).",
+          "explanation": [
+            "Quan sát Figure 29 thấy dòng `7 rows in set, 1 warning (0.00 sec)` — cảnh báo này xảy ra chính vì chuỗi `'18-MAY-07'` không đúng chuẩn `'YYYY-MM-DD'` nên MySQL quy về ngày zero khi so sánh, làm lọt cả những ngày trước 18/05/2007 nếu có.",
+            "Task 4.10 (Figure 30) kết hợp 3 điều kiện bằng `AND`: `ATTRACT_AGE <= 10` ('10 or under'), `ATTRACT_CAPACITY < 100` ('less than 100') và `ATTRACT_NAME IS NOT NULL` (loại bỏ dòng `10082` có tên `NULL`)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 23 (Lab 4, sách tr. 58)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 24",
+          "pageNumber": 24,
+          "title": "OR Operator (Figure 31) & Task 4.11 Intro",
+          "paragraphs": [
+            "OR",
+            "If you wanted to list the names and countries of all Theme parks where of invoice numbers where PARK_COUNTRY = 'FR' OR PARK_COUNTRY = 'UK' you would write the following query.",
+            "The output is shown in Figure 31.",
+            "Figure 31: Query results using the OR operator;",
+            "When using AND and OR in the same query it is advisable to use parentheses to make explicit the precedence.",
+            "Task 4.11 Test the following query and check your output with that shown in Figure 32. Can you work out what this query is doing?"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_NAME, PARK_COUNTRY\nFROM THEMEPARK\nWHERE PARK_COUNTRY = 'FR'\nOR PARK_COUNTRY = 'UK';"
+          },
+          "diagramText": [
+            "Figure 31 (MySQL Command Line Client):",
+            "+--------------+--------------+",
+            "| PARK_NAME    | PARK_COUNTRY |",
+            "+--------------+--------------+",
+            "| FairyLand    | FR           |",
+            "| MiniLand     | UK           |",
+            "| PleasureLand | UK           |",
+            "+--------------+--------------+",
+            "3 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "Toán tử OR trả về 3 công viên thuộc Pháp (FR) hoặc Anh (UK).",
+          "explanation": [
+            "Toán tử `OR` trả về bản ghi nếu ít nhất một điều kiện đúng (ở đây là các công viên ở Pháp hoặc Anh — tương đương viết gọn `WHERE PARK_COUNTRY IN ('FR', 'UK')`).",
+            "Ghi chú ở cuối trang nhắc lại quy tắc an toàn khi viết truy vấn nhiều điều kiện: luôn đặt dấu ngoặc đơn khi trộn `AND` và `OR` (như Task 4.11 ở trang 25)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 24 (Lab 4, sách tr. 59)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 25",
+          "pageNumber": 25,
+          "title": "AND + OR Precedence (Figure 32) & NOT Operator",
+          "paragraphs": [
+            "Figure 32: AND and OR example",
+            "NOT",
+            "The logical operator NOT is used to negate the result of a conditional expression. If you want to see a listing of all rows for which EMP_NUM is not 106, the query would look like:",
+            "The results of this query are shown in Figure 33. Note that the condition is enclosed in parentheses; that practice is optional, but it is highly recommended for clarity."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Task 4.11:\nSELECT *\nFROM ATTRACTION\nWHERE (PARK_CODE LIKE 'FR%'\nAND ATTRACT_CAPACITY <50) OR (ATTRACT_CAPACITY > 100);\n\n-- NOT example:\nSELECT *\nFROM EMPLOYEE\nWHERE NOT (EMP_NUM = 106);"
+          },
+          "diagramText": [
+            "Figure 32 (Task 4.11):",
+            "+------------+---------------+-------------+------------------+-----------+",
+            "| ATTRACT_NO | ATTRACT_NAME  | ATTRACT_AGE | ATTRACT_CAPACITY | PARK_CODE |",
+            "+------------+---------------+-------------+------------------+-----------+",
+            "|      10034 | ThunderCoaster|          11 |               34 | FR1001    |",
+            "|      10067 | FlightToStars |          11 |               24 | FR1001    |",
+            "|      10078 | Ant-Trap      |          23 |               30 | FR1001    |",
+            "|      10098 | Carnival      |           3 |              120 | FR1001    |",
+            "|      20056 | 3D-Lego_Show  |           3 |              200 | UK3452    |",
+            "+------------+---------------+-------------+------------------+-----------+",
+            "5 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "Figure 32 trả về các trò chơi ở công viên mã bắt đầu bằng 'FR' có sức chứa < 50, HOẶC bất kỳ trò chơi nào có sức chứa > 100 (gồm Carnival ở FR1001 và 3D-Lego_Show ở UK3452).",
+          "explanation": [
+            "Phân tích Task 4.11: truy vấn tìm tất cả trò chơi thuộc nhóm công viên có mã bắt đầu bằng `'FR'` với sức chứa nhỏ hơn 50 (`10034`, `10067`, `10078`), cộng thêm (`OR`) bất kỳ trò chơi nào ở mọi công viên có sức chứa lớn hơn 100 (`10098` sức chứa 120, `20056` sức chứa 200).",
+            "Nếu không có ngoặc đơn mà viết `A AND B OR C`, `AND` vẫn ưu tiên hơn `OR` nên ý nghĩa không đổi ở ví dụ này, nhưng nếu muốn `A AND (B OR C)` thì bắt buộc phải có ngoặc đơn — nên tập thói quen luôn đóng ngoặc để đọc hiểu tức thì."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 25 (Lab 4, sách tr. 60)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 26",
+          "pageNumber": 26,
+          "title": "Figure 33 (NOT Operator) & Lab 4 Exercises E4.1–E4.5",
+          "paragraphs": [
+            "Figure 33: Listing all employees except EMP_NUM=106",
+            "Exercises",
+            "E4.1 Write a query to display all Theme Parks except those in the UK.",
+            "E4.2 Write a query to display all the sales that occurred on the 18th May 2007.",
+            "E4.3 Write a query to display the ticket prices between €20 AND €30.",
+            "E4.4 Display all attractions that have a capacity of more than 60 at the Theme Park FR1001.",
+            "E4.5 Write a query to display the hourly rate for each attraction where an employee had worked, along with the hourly rate increased by 20%. Your query should only"
+          ],
+          "diagramText": [
+            "Figure 33 (NOT (EMP_NUM = 106)):",
+            "+---------+-----------+------------+-----------+------------+---------------+---------------+-----------+-----------+",
+            "| EMP_NUM | EMP_TITLE | EMP_LNAME  | EMP_FNAME | EMP_DOB    | EMP_HIRE_DATE | EMP_AREA_CODE | EMP_PHONE | PARK_CODE |",
+            "+---------+-----------+------------+-----------+------------+---------------+---------------+-----------+-----------+",
+            "|     100 | Ms        | Calderdale | Emma      | 1972-06-15 | 1992-03-15    | 0181          | 324-9134  | FR1001    |",
+            "|     101 | Ms        | Ricardo    | Marshel   | 1978-03-19 | 1996-04-25    | 0181          | 324-4472  | UK3452    |",
+            "|     102 | Mr        | Arshad     | Arif      | 1969-11-14 | 1990-12-20    | 7253          | 675-8993  | FR1001    |",
+            "|     103 | Ms        | Roberts    | Anne      | 1974-10-16 | 1994-08-16    | 0181          | 898-3456  | UK3452    |",
+            "|     104 | Mr        | Denver     | Enrica    | 1980-11-20 | 2001-10-20    | 7253          | 504-4434  | ZA1342    |",
+            "|     105 | Ms        | Namowa     | Mirrelle  | 1990-03-14 | 2006-11-08    | 0181          | 890-3243  | FR1001    |",
+            "+---------+-----------+------------+-----------+------------+---------------+---------------+-----------+-----------+",
+            "6 rows in set (0.00 sec)"
+          ],
+          "diagramNote": "Figure 33 trả về 6 nhân viên (loại bỏ EMP_NUM = 106 Gemma Smith).",
+          "explanation": [
+            "Figure 33 hiển thị đầy đủ 9 cột của 6 nhân viên còn lại khi phủ định `NOT (EMP_NUM = 106)`. Có thể viết tương đương bằng `WHERE EMP_NUM <> 106` hoặc `WHERE EMP_NUM != 106`.",
+            "Hướng dẫn giải nhanh E4.1–E4.4: E4.1 dùng `WHERE PARK_COUNTRY <> 'UK'`; E4.2 dùng `SELECT * FROM SALES WHERE SALE_DATE = '2007-05-18'`; E4.3 dùng `WHERE TICKET_PRICE BETWEEN 20 AND 30`; E4.4 dùng `WHERE ATTRACT_CAPACITY > 60 AND PARK_CODE = 'FR1001'`."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 26 (Lab 4, sách tr. 61)"
+          }
+        },
+        {
+          "slideNumber": "Lab 4 • Trang 27",
+          "pageNumber": 27,
+          "title": "Lab 4 Exercises E4.5 (End)",
+          "paragraphs": [
+            "display the ATTRACT_NO, HOUR_RATE and the HOUR_RATE with the 20% increase."
+          ],
+          "explanation": [
+            "Trang cuối cùng của Lab 4 hoàn tất đề bài E4.5 trên bảng `HOURS`.",
+            "Câu SQL lời giải chuẩn cho E4.5: `SELECT ATTRACT_NO, HOUR_RATE, HOUR_RATE * 1.2 AS NEW_HOUR_RATE FROM HOURS;` (hoặc dùng `ROUND(HOUR_RATE * 1.2, 2)` để làm tròn 2 chữ số thập phân)."
+          ],
+          "source": {
+            "file": "Tut9_DML and select statement.pdf",
+            "loc": "Trang 27 (Lab 4, sách tr. 62)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Script thực hành trên lớp: Basic select statement.sql",
+      "text": "Toàn bộ 57 dòng nguyên văn trong file `Basic select statement.sql`: phần 1 thực hành `SELECT`, `ALIAS` tiếng Việt, `ORDER BY` nhiều cột, `WHERE` so sánh, `AND`/`OR`, `LIKE '%n_'`, phép toán số học trên `themepark`; phần 2 luyện tập truy vấn trên CSDL `ems` và 6 đề bài tự luyện cuối file.",
+      "source": {
+        "file": "Basic select statement.sql",
+        "loc": "Dòng 1–57"
+      },
+      "digest": {
+        "keyPoints": [
+          "File script thực hành trên lớp áp dụng trực tiếp kiến thức Lab 4 trên cả hai CSDL `themepark` (dòng 1–32) và `ems` (dòng 34–47).",
+          "Dòng 24 minh họa bẫy kinh điển của `LIKE`: `emp_fname LIKE '%n_'` tìm nhân viên có chữ cái **kế cuối** (áp chót) là `'n'` (ví dụ `Anne`, không khớp tên kết thúc bằng `'n'`).",
+          "Dòng 42–43 cho thấy `BETWEEN 2713 AND 2717` tương đương hoàn toàn với `sectionno >= 2713 AND sectionno <= 2717`.",
+          "Dòng 49–57 là 6 yêu cầu bài tập tự viết câu SQL trên các bảng `hours`, `themepark` và `attraction`."
+        ],
+        "terms": [
+          {
+            "term": "ORDER BY col1 ASC, col2 DESC",
+            "meaning": "Sắp xếp phân cấp: ưu tiên xếp tăng dần theo `col1`; những dòng có cùng `col1` mới xếp giảm dần theo `col2`."
+          },
+          {
+            "term": "CSDL `ems`",
+            "meaning": "CSDL quản lý đào tạo (student, course, faculty, section, registration, qualified) dùng song song với `themepark` trong các bài tập giảng viên giao thêm."
+          }
+        ],
+        "pitfalls": [
+          "Lưu ý ưu tiên `AND`/`OR` không có ngoặc (dòng 19–22) và lưu ý dòng 28 `line_qty * (line_price - 10) AS Total` có ngoặc đơn để trừ 10 trước rồi mới nhân số lượng.",
+          "Trong đề comment dòng 55: `age > 40 and capacity is > 100` là câu hỏi gài về điều kiện ghép `AND` trên bảng `attraction`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "SQL Script (1/2)",
+          "title": "Basic select statement.sql — SELECT, Alias, ORDER BY, WHERE, LIKE & Toán tử (dòng 1–32)",
+          "code": {
+            "lang": "sql",
+            "text": "##SELECT\nuse themepark;\nselect * from employee;\nselect emp_num,emp_title, emp_lname, emp_fname\nfrom employee;\n##ALIAS\nselect emp_num as \"Số thứ tự\", emp_lname as \"Last name\",\nemp_fname as \"First name\" from employee;\n##  order by \nselect * from employee order by emp_fname desc;\nselect * from employee order by emp_fname asc;\nselect * from employee order by emp_fname;\nselect * from employee \norder by emp_area_code, emp_fname desc;\n## Condition ( select + where + (<,>,= , !=, <>)\nselect * from employee where emp_fname = \"arif\";\nselect * from employee where emp_num >= 104;\n#AND/ OR\nselect * from employee where emp_fname = \"arif\" \nand  emp_num = 102;\nselect * from employee where emp_fname = \"arif\" \nor  emp_num = 103;\n## Condition ( select + where + like + wildcard(%,_)\nselect * from employee where emp_fname like \"%n_\";\n## Select + operators (+, -, *, /)\nselect * from sales_line;\nselect ticket_no, line_qty, line_price,\nline_qty * (line_price -10) as Total \nfrom sales_line \nwhere line_qty >1 \norder by line_price\n;"
+          },
+          "explanation": [
+            "Dòng 1–14 (trên `themepark`): minh họa `USE themepark;`, chọn tất cả hoặc vài cột cụ thể, đặt alias tiếng Việt bằng ngoặc kép (`AS \"Số thứ tự\"`) và sắp xếp `ORDER BY` mặc định (`ASC`), `DESC`, cũng như sắp xếp nhiều cột (`order by emp_area_code, emp_fname desc` — cùng mã vùng mới xét tên giảm dần).",
+            "Dòng 15–24: lọc điều kiện `WHERE` với `=`, `>=`, kết hợp `AND`/`OR` và mẫu kinh điển `emp_fname like \"%n_\"` — vì `%` đứng trước và đúng một `_` đứng sau `'n'`, mẫu này chỉ khớp tên có `'n'` nằm ở **vị trí kế cuối** (áp chót, ví dụ `'Anne'`).",
+            "Dòng 25–32: thao tác số học `line_qty * (line_price - 10) as Total` trên `sales_line` có lọc `line_qty > 1` và sắp tăng dần theo `line_price`."
+          ],
+          "source": {
+            "file": "Basic select statement.sql",
+            "loc": "Dòng 1–32"
+          }
+        },
+        {
+          "slideNumber": "SQL Script (2/2)",
+          "title": "Basic select statement.sql — Truy vấn CSDL `ems` & Đề bài tập (dòng 34–57)",
+          "code": {
+            "lang": "sql",
+            "text": "#a. List all students whoes names start with a\nuse ems;\nselect * from student where studentname like \"a%\";\n#b.\tList all courses whoes ids end with 12\nselect * from course  where courseid like \"%12\";\n#c.\tFind the faculty whoes name is Collins\nselect * from faculty where facultyname like \"Collins\";\n#d.\tFind all sections with section number from 2713 to 2717 \nselect * from section where sectionno between 2713 and 2717;\nselect * from section where sectionno >= 2713 and sectionno <= 2717;\n#e.\tFind all students who register courses in the first semester of 2008\nselect * from registration where semester = \"I-2008\";\n#f.\tList facultyid of all faculty who teach course ISM 3113\nselect * from qualified where courseid = \"ISM 3113\";\n\n#return all data from hours table.   \n#display all data from themepark in ascending order of city,\n# then ascending order of park_code give each column a full name.\n# display all attraction\n#display employee number, hours_per_attract, hour_rate, \n# and total day payment where:total day payment = hours_per_attract * hour_rate \n#display all attractions whoes age > 40 and capacity is > 100;\n\n#display the result with employee number in reverse order"
+          },
+          "explanation": [
+            "Dòng 34–47 chuyển sang CSDL `ems` (`use ems;`) để làm 6 câu a–f: tìm sinh viên tên bắt đầu bằng `'a'` (`like \"a%\"`), môn học mã kết thúc bằng `12` (`like \"%12\"`), giảng viên tên `Collins`, các lớp học phần từ `2713` đến `2717` (viết theo 2 cách `BETWEEN` và `>= ... AND <= ...`), sinh viên đăng ký học kỳ `'I-2008'`, và giảng viên dạy môn `'ISM 3113'`.",
+            "Dòng 49–57 là phần bài tập thực hành cuối buổi trên `themepark` (chưa có lời giải sẵn trong file). Lời giải chuẩn theo thứ tự từng comment:",
+            "1) `SELECT * FROM hours;` | 2) `SELECT park_code AS \"Park Code\", park_name AS \"Park Name\", park_city AS \"Park City\", park_country AS \"Park Country\" FROM themepark ORDER BY park_city ASC, park_code ASC;` | 3) `SELECT * FROM attraction;`",
+            "4) `SELECT emp_num, hours_per_attract, hour_rate, hours_per_attract * hour_rate AS \"total day payment\" FROM hours ORDER BY emp_num DESC;` (gộp thêm yêu cầu dòng 57 sắp ngược theo `emp_num`) | 5) `SELECT * FROM attraction WHERE attract_age > 40 AND attract_capacity > 100;`."
+          ],
+          "source": {
+            "file": "Basic select statement.sql",
+            "loc": "Dòng 34–57"
+          }
+        }
+      ]
+    }
   ],
   "cards": [
-    { "id": "dbs-lab1-c01", "front": "UPDATE không có WHERE thì sao?", "back": "Cập nhật mọi hàng trong bảng (ví dụ UPDATE ATTRACTION SET ATTRACT_AGE = 14 đổi tuổi mọi attraction).", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.3" } },
-    { "id": "dbs-lab1-c02", "front": "Điều kiện để tạo FOREIGN KEY trong MySQL theo Lab 2?", "back": "Engine InnoDB, cột FK được đánh index, hai cột cùng kiểu dữ liệu.", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.4" } },
-    { "id": "dbs-lab1-c03", "front": "Vì sao phải DROP TABLE theo thứ tự ngược phụ thuộc?", "back": "Bảng con (có FK) phải xóa trước bảng cha: SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK.", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.5" } },
-    { "id": "dbs-lab1-c04", "front": "Lệnh sửa kiểu cột ATTRACT_CAPACITY thành NUMERIC(4)?", "back": "ALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.8" } },
-    { "id": "dbs-lab1-c05", "front": "Cách chép dữ liệu EMPLOYEE sang EMP_COPY?", "back": "INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.6" } },
-    { "id": "dbs-lab1-c06", "front": "Khôi phục dữ liệu sau khi thử UPDATE/DELETE?", "back": "SET AUTOCOMMIT = 0; thao tác; rồi ROLLBACK;", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.4" } }
+    {
+      "id": "dbs-lab1-c01",
+      "front": "UPDATE không có WHERE thì sao?",
+      "back": "Cập nhật mọi hàng trong bảng (ví dụ `UPDATE ATTRACTION SET ATTRACT_AGE = 14;` đổi tuổi mọi attraction).",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 7 (Lab 3, mục 3.3)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c02",
+      "front": "Điều kiện để tạo FOREIGN KEY trong MySQL theo Lab 2?",
+      "back": "Cả hai bảng dùng engine InnoDB; cột FK được đánh index; hai cột khóa chính và khóa ngoại có kiểu dữ liệu tương đồng.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 9 (Lab 2, mục 2.4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c03",
+      "front": "Vì sao phải DROP TABLE theo thứ tự ngược phụ thuộc?",
+      "back": "Do ràng buộc khóa ngoại, bảng con phải xóa trước bảng cha: `SALES_LINE`, `SALES`, `HOURS`, `ATTRACTION`, `TICKET`, `EMPLOYEE`, `THEMEPARK`.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 17–18 (Lab 2, mục 2.5)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c04",
+      "front": "Lệnh sửa kiểu cột ATTRACT_CAPACITY thành NUMERIC(4)?",
+      "back": "`ALTER TABLE ATTRACTION MODIFY ATTRACT_CAPACITY NUMERIC(4);`",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 20 (Lab 2, mục 2.8)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c05",
+      "front": "Cách chép dữ liệu EMPLOYEE sang EMP_COPY?",
+      "back": "`INSERT INTO EMP_COPY SELECT * FROM EMPLOYEE;`",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 10 (Lab 3, mục 3.6)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c06",
+      "front": "Khôi phục dữ liệu sau khi thử UPDATE/DELETE?",
+      "back": "`SET AUTOCOMMIT = 0;` (bật trước khi thao tác trên bảng InnoDB), thao tác, rồi `ROLLBACK;`.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 7–8 (Lab 3, mục 3.4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c07",
+      "front": "Quy định đặc biệt của DEFAULT constraint trong MySQL (Lab 2)?",
+      "back": "Giá trị `DEFAULT` bắt buộc phải là hằng số (constant), không thể là hàm hay biểu thức (khác Oracle có thể dùng `SYSDATE`).",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 8 (Lab 2, mục 2.4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c08",
+      "front": "Tác dụng của `ON DELETE CASCADE` trong bảng `SALES_LINE`?",
+      "back": "Khi xóa một giao dịch trong bảng cha `SALES`, toàn bộ dòng chi tiết hóa đơn tương ứng trong `SALES_LINE` tự động bị xóa theo.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 16 (Lab 2, mục 2.4.8)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c09",
+      "front": "Prefix Index `CREATE INDEX EMP_LNAME_INDEX ON EMPLOYEE(EMP_LNAME(8));` làm gì?",
+      "back": "Tạo chỉ mục `EMP_LNAME_INDEX` chỉ dựa trên 8 ký tự đầu tiên của cột `EMP_LNAME` để tăng tốc tìm kiếm.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 17 (Lab 2, mục 2.5)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c10",
+      "front": "`CHAR(size)` khác `VARCHAR(size)` ở điểm nào?",
+      "back": "`CHAR` độ dài cố định (tự thêm khoảng trắng đệm ở cuối nếu chuỗi ngắn hơn); `VARCHAR` độ dài thay đổi, không thêm khoảng trắng đệm cuối.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 5 (Lab 2, Table 2.2)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c11",
+      "front": "Thứ tự ưu tiên toán tử số học và toán tử logic trong SQL?",
+      "back": "Số học: Ngoặc `()` → Lũy thừa → `* /` → `+ -`. Logic: `NOT` → `AND` → `OR`.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 12, 22 (Lab 4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c12",
+      "front": "Khác biệt giữa wildcard `%` và `_` trong `LIKE`?",
+      "back": "`%` khớp 0, 1 hoặc nhiều ký tự bất kỳ; `_` khớp đúng 1 ký tự duy nhất (ví dụ `'%n_'` khớp tên có `'n'` ở vị trí áp chót).",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 20 (Lab 4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c13",
+      "front": "Làm sao kiểm tra giá trị rỗng (NULL) trong mệnh đề WHERE?",
+      "back": "Dùng `IS NULL` hoặc `IS NOT NULL` (ví dụ `WHERE ATTRACT_NAME IS NULL;`), không dùng `= NULL`.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 21 (Lab 4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-c14",
+      "front": "Hai bảng nào trong CSDL `themepark` có khóa chính ghép (composite PK)?",
+      "back": "`HOURS(EMP_NUM, ATTRACT_NO, DATE_WORKED)` và `SALES_LINE(TRANSACTION_NO, LINE_NO)`.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 14, 16 (Lab 2)"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-lab1-q01", "stem": "Trong Lab 3, lệnh nào đổi ATTRACT_AGE của mọi attraction thành 14?", "options": ["UPDATE ATTRACTION SET ATTRACT_AGE = 14;", "ALTER TABLE ATTRACTION SET ATTRACT_AGE = 14;", "INSERT INTO ATTRACTION VALUES (14);", "SELECT 14 FROM ATTRACTION;"], "answer": 0, "explanation": "UPDATE không WHERE tác động lên mọi hàng.", "source": { "file": "Tut9_DML and select statement.pdf", "loc": "Lab 3, mục 3.3" } },
-    { "id": "dbs-lab1-q02", "stem": "Điều kiện nào KHÔNG thuộc yêu cầu tạo FOREIGN KEY trong MySQL (Lab 2)?", "options": ["Dùng engine InnoDB", "Cột FK được index", "Hai cột cùng kiểu dữ liệu", "Bảng phải có CHECK constraint"], "answer": 3, "explanation": "Lab 2 nêu InnoDB, index và cùng kiểu; không yêu cầu CHECK.", "source": { "file": "TUT06 DDL basic_building themeparkDB.pdf", "loc": "Mục 2.4" } },
-    { "id": "dbs-lab1-q03", "stem": "SELECT * FROM employee WHERE emp_fname LIKE '%n_' khớp tên nào?", "options": ["Tên kết thúc bằng n", "Tên có chữ n là ký tự kế cuối", "Tên bắt đầu bằng n", "Tên có đúng 2 ký tự"], "answer": 1, "explanation": "% khớp chuỗi bất kỳ, _ khớp đúng một ký tự, nên n là ký tự áp chót.", "source": { "file": "Basic select statement.sql", "loc": "dòng 24" } }
+    {
+      "id": "dbs-lab1-q01",
+      "stem": "Trong Lab 3, lệnh nào đổi ATTRACT_AGE của mọi attraction thành 14?",
+      "options": [
+        "UPDATE ATTRACTION SET ATTRACT_AGE = 14;",
+        "ALTER TABLE ATTRACTION SET ATTRACT_AGE = 14;",
+        "INSERT INTO ATTRACTION VALUES (14);",
+        "SELECT 14 FROM ATTRACTION;"
+      ],
+      "answer": 0,
+      "explanation": "UPDATE không có WHERE là toán tử set-oriented tác động lên mọi hàng trong bảng ATTRACTION.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 7 (Lab 3, Task 3.6)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q02",
+      "stem": "Điều kiện nào KHÔNG thuộc yêu cầu tạo FOREIGN KEY trong MySQL (Lab 2)?",
+      "options": [
+        "Dùng engine InnoDB",
+        "Cột FK được index",
+        "Hai cột cùng kiểu dữ liệu",
+        "Bảng phải có CHECK constraint"
+      ],
+      "answer": 3,
+      "explanation": "Lab 2 nêu 3 điều kiện là InnoDB, cột được index và tương đồng kiểu dữ liệu; MySQL 5.0 thậm chí không hỗ trợ CHECK constraint.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 9–10 (Lab 2, mục 2.4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q03",
+      "stem": "`SELECT * FROM employee WHERE emp_fname LIKE '%n_'` khớp tên nào?",
+      "options": [
+        "Tên kết thúc bằng n",
+        "Tên có chữ n là ký tự kế cuối",
+        "Tên bắt đầu bằng n",
+        "Tên có đúng 2 ký tự"
+      ],
+      "answer": 1,
+      "explanation": "`%` khớp chuỗi bất kỳ, `_` khớp đúng một ký tự đứng sau `n`, nên `n` phải nằm ở vị trí áp chót (ví dụ `Anne`).",
+      "source": {
+        "file": "Basic select statement.sql",
+        "loc": "Dòng 24"
+      }
+    },
+    {
+      "id": "dbs-lab1-q04",
+      "stem": "Khi viết script tạo CSDL `themepark`, thứ tự lệnh `DROP TABLE` nào hợp lệ mà không vướng lỗi khóa ngoại?",
+      "options": [
+        "THEMEPARK → EMPLOYEE → TICKET → ATTRACTION → HOURS → SALES → SALES_LINE",
+        "SALES_LINE → SALES → HOURS → ATTRACTION → TICKET → EMPLOYEE → THEMEPARK",
+        "EMPLOYEE → THEMEPARK → SALES → SALES_LINE → TICKET → ATTRACTION → HOURS",
+        "Thứ tự nào cũng được vì MySQL tự bỏ qua khóa ngoại khi DROP"
+      ],
+      "answer": 1,
+      "explanation": "Lab 2 mục 2.5 chỉ rõ phải xóa theo thứ tự ngược lúc tạo (bảng con có FK xóa trước bảng cha): SALES_LINE, SALES, HOURS, ATTRACTION, TICKET, EMPLOYEE, THEMEPARK.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 17–18 (Lab 2, mục 2.5)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q05",
+      "stem": "Phát biểu nào đúng về ràng buộc `DEFAULT` trong MySQL theo Lab 2?",
+      "options": [
+        "Có thể gán DEFAULT bằng hàm `SYSDATE` cho cột `SALE_DATE`",
+        "Giá trị DEFAULT bắt buộc phải là hằng số, không thể là hàm hay biểu thức",
+        "DEFAULT tự động ngăn người dùng nhập giá trị khác",
+        "Chỉ dùng được DEFAULT cho cột kiểu `VARCHAR`"
+      ],
+      "answer": 1,
+      "explanation": "Lab 2 trang 8 nêu: 'In MYSQL the default value must be a constant; it cannot be a function or an expression.'",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 8 (Lab 2, mục 2.4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q06",
+      "stem": "Vì sao khi xóa một giao dịch trong `SALES`, các dòng liên quan trong `SALES_LINE` cũng tự động mất theo (Task 2.8)?",
+      "options": [
+        "Do khóa ngoại `FK_SALES_LINE_SALES` khai báo `ON DELETE CASCADE`",
+        "Do bảng `SALES_LINE` có `DEFAULT 0`",
+        "Do đã chạy `CREATE INDEX` trên `SALES_LINE`",
+        "Do bảng `SALES` có `PRIMARY KEY`"
+      ],
+      "answer": 0,
+      "explanation": "Task 2.8 khai báo `CONSTRAINT FK_SALES_LINE_SALES FOREIGN KEY (TRANSACTION_NO) REFERENCES SALES(TRANSACTION_NO) ON DELETE CASCADE`.",
+      "source": {
+        "file": "TUT06 DDL basic_building themeparkDB.pdf",
+        "loc": "Trang 16 (Lab 2, mục 2.4.8)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q07",
+      "stem": "Vì sao trong Lab 3 phải chạy `INSERT` vào `THEMEPARK` trước khi `INSERT` vào `TICKET`?",
+      "options": [
+        "Vì bảng `THEMEPARK` có nhiều cột hơn",
+        "Vì `TICKET.PARK_CODE` là khóa ngoại tham chiếu `THEMEPARK.PARK_CODE`, chèn trước sẽ vi phạm toàn vẹn tham chiếu",
+        "Vì MySQL yêu cầu bảng có tên bắt đầu bằng T đứng sau xếp trước",
+        "Vì `TICKET` không có khóa chính"
+      ],
+      "answer": 1,
+      "explanation": "Lab 3 mục 3.1 giải thích: nếu giá trị `PARK_CODE` chưa tồn tại trong bảng cha `THEMEPARK`, chèn vào `TICKET` sẽ gây lỗi integrity violation.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 1–2 (Lab 3, mục 3.1)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q08",
+      "stem": "Để hoàn tác một lệnh `UPDATE` nhầm bằng `ROLLBACK;` trong MySQL (Lab 3), bước chuẩn bị nào là bắt buộc trước khi thao tác?",
+      "options": [
+        "Chạy `DESCRIBE ATTRACTION;`",
+        "Chạy `SET AUTOCOMMIT = 0;`",
+        "Chạy `COMMIT;` trước khi `ROLLBACK;`",
+        "Chạy `SHOW TABLES;`"
+      ],
+      "answer": 1,
+      "explanation": "Lab 3 mục 3.4 nêu rõ: để sử dụng `ROLLBACK` và `COMMIT` trong MySQL, trước hết phải gõ `SET AUTOCOMMIT = 0;`.",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 7–8 (Lab 3, mục 3.4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q09",
+      "stem": "Trong câu truy vấn `SELECT * FROM ATTRACTION WHERE ATTRACT_NAME = NULL;`, điều gì xảy ra?",
+      "options": [
+        "Trả về trò chơi `10082` có tên NULL",
+        "Trả về toàn bộ 11 trò chơi",
+        "Không khớp dòng nào vì so sánh `= NULL` không hợp lệ — phải dùng `IS NULL`",
+        "Tự động xóa giá trị NULL"
+      ],
+      "answer": 2,
+      "explanation": "Lab 4 trang 21 nêu muốn kiểm tra giá trị rỗng bắt buộc dùng toán tử `IS NULL` (như `WHERE ATTRACT_NAME IS NULL;`).",
+      "source": {
+        "file": "Tut9_DML and select statement.pdf",
+        "loc": "Trang 21 (Lab 4)"
+      }
+    },
+    {
+      "id": "dbs-lab1-q10",
+      "stem": "Trong `Basic select statement.sql` (dòng 13–14), lệnh `ORDER BY emp_area_code, emp_fname DESC` sắp xếp kết quả như thế nào?",
+      "options": [
+        "Cả `emp_area_code` và `emp_fname` đều giảm dần",
+        "`emp_area_code` tăng dần trước; các dòng có cùng `emp_area_code` mới xếp `emp_fname` giảm dần",
+        "`emp_fname` tăng dần trước, sau đó `emp_area_code` giảm dần",
+        "Báo lỗi cú pháp vì trộn tăng và giảm"
+      ],
+      "answer": 1,
+      "explanation": "Mỗi cột trong `ORDER BY` có hướng sắp xếp riêng (mặc định là `ASC`): `emp_area_code` xếp tăng dần (`ASC`), rồi trong cùng `emp_area_code` mới xếp `emp_fname` giảm dần (`DESC`).",
+      "source": {
+        "file": "Basic select statement.sql",
+        "loc": "Dòng 13–14"
+      }
+    }
   ]
 }

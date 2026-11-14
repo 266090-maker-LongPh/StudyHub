@@ -1,26 +1,1108 @@
 {
-  "id": "dbs-ch03", "order": 3,
+  "id": "dbs-ch03",
+  "order": 3,
   "title": "Chương 3: The Enhanced E-R Model",
-  "summary": [
-    { "h": "Supertype / Subtype", "text": "Subtype là nhóm con của entity type có thuộc tính riêng. Supertype là entity type tổng quát có quan hệ với một hay nhiều subtype. Subtype kế thừa (attribute inheritance) mọi attribute, kể cả identifier, của supertype; một instance của subtype cũng là instance của supertype. Quan hệ ở mức supertype áp dụng cho mọi subtype; quan hệ ở mức subtype chỉ áp dụng cho subtype đó (ví dụ chỉ RESIDENT PATIENT liên kết với BED)." },
-    { "h": "Generalization và Specialization", "text": "Generalization là bottom-up: định nghĩa entity type tổng quát từ nhiều entity type chuyên biệt (CAR, TRUCK, MOTORCYCLE → VEHICLE; MOTORCYCLE không có subtype vì không có thuộc tính hay quan hệ riêng). Specialization là top-down: định nghĩa subtype từ supertype (PART → MANUFACTURED PART, PURCHASED PART)." },
-    { "h": "Completeness constraint", "text": "Hỏi: một instance của supertype có bắt buộc thuộc ít nhất một subtype không? Total specialization: có (đường đôi). Partial specialization: không bắt buộc (đường đơn)." },
-    { "h": "Disjointness constraint", "text": "Hỏi: một instance của supertype có thể đồng thời thuộc 2 subtype trở lên không? Disjoint (d): chỉ một subtype. Overlap (o): có thể nhiều subtype." },
-    { "h": "Subtype discriminator", "text": "Attribute của supertype mà giá trị xác định subtype. Với disjoint: attribute đơn (ví dụ Employee Type = H, S, C). Với overlap: attribute composite gồm các thành phần Boolean Y/N (ví dụ Part Type(Manufactured?, Purchased?))." },
-    { "h": "Entity cluster và universal data model", "text": "Entity cluster gom nhiều entity và quan hệ thành một entity trừu tượng để sơ đồ dễ đọc. Universal (packaged) data model là mẫu mô hình dùng lại (pattern), ví dụ PARTY, PARTY ROLE, ROLE TYPE." }
+  "audit": {
+    "sourceFile": "hoffer_mdm12e_pp_ch03.pdf",
+    "totalPages": 32,
+    "extractedPages": 32,
+    "ocrNotes": []
+  },
+  "sources": [
+    {
+      "file": "hoffer_mdm12e_pp_ch03.pdf",
+      "loc": "Slides 1–32 (đầy đủ 32/32 slides)"
+    }
   ],
-  "sources": [{ "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 1–32" }],
+  "summary": [
+    {
+      "h": "Giới thiệu Chương 3 & Mục tiêu học tập (Objectives)",
+      "text": "Giới thiệu mô hình E-R mở rộng (Enhanced E-R / EER Model) bổ sung kế thừa supertype/subtype, entity clusters và packaged/universal data models cùng 8 mục tiêu học tập.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 1–2"
+      },
+      "digest": {
+        "keyPoints": [
+          "Chương 3 mở rộng mô hình E-R cơ bản (Chương 2) bằng các khái niệm hướng đối tượng: Supertype/Subtype, Attribute Inheritance, Specialization/Generalization và các ràng buộc Completeness/Disjointness.",
+          "Ngoài hệ phân cấp phân loại thực thể, Chương 3 còn dạy cách gom cụm sơ đồ lớn (Entity Clusters) và tận dụng mẫu mô hình chuẩn có sẵn (Universal/Packaged Data Models)."
+        ],
+        "terms": [
+          {
+            "term": "Enhanced E-R (EER) Model",
+            "meaning": "Mô hình E-R truyền thống được bổ sung thêm cấu trúc kế thừa supertype/subtype, ràng buộc chuyên biệt hóa và các cơ chế trừu tượng hóa mở rộng."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "title": "CHAPTER 3: THE ENHANCED E-R MODEL",
+          "paragraphs": [
+            "CHAPTER 3: THE ENHANCED E-R MODEL",
+            "Modern Database Management (12th Edition) — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 1"
+          },
+          "pageNumber": 1,
+          "explanation": [
+            "Slide mở đầu Chương 3: The Enhanced E-R Model (Mô hình E-R mở rộng). Khi nghiệp vụ có nhiều nhóm đối tượng vừa chia sẻ thuộc tính chung vừa có thuộc tính/quan hệ riêng biệt (ví dụ nhân viên trả lương giờ vs lương tháng vs tư vấn viên), mô hình E-R cơ bản ở Chương 2 trở nên dư thừa nếu tách thành các bảng rời rạc hoặc gộp chung gây nhiều giá trị NULL.",
+            "EER giải quyết bài toán này bằng cấu trúc phân cấp Supertype/Subtype."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "Understand use of supertype/subtype relationships",
+            "Use specialization and generalization techniques",
+            "Specify completeness and disjointness constraints",
+            "Develop supertype/subtype hierarchies for realistic business situations",
+            "Develop entity clusters",
+            "Explain universal (packaged) data model",
+            "Describe special features of data modeling project using packaged data model"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 2"
+          },
+          "pageNumber": 2,
+          "explanation": [
+            "8 mục tiêu học tập của Chương 3, trong đó trọng tâm thi cử cao nhất là: xác định đúng Completeness (Total/Partial), Disjointness (Disjoint/Overlap), chọn đúng loại Subtype Discriminator (đơn vs composite Boolean) và đọc/vẽ hệ phân cấp Supertype/Subtype.",
+            "Hai phần cuối (Entity Clusters và Packaged Data Model như PARTY) là kỹ thuật thực chiến giúp làm sạch sơ đồ doanh nghiệp lớn và tái sử dụng mô hình chuẩn."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Supertype, Subtype, Kế thừa thuộc tính & Quan hệ ở từng cấp",
+      "text": "Định nghĩa Supertype, Subtype, Attribute Inheritance, ký hiệu EER chuẩn vs Microsoft Visio (Figure 3-1a/b), ví dụ EMPLOYEE (Figure 3-2) và quan hệ riêng của subtype trong bệnh viện (Figure 3-3).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 3–8"
+      },
+      "digest": {
+        "keyPoints": [
+          "Subtype là nhóm con của một entity type có thuộc tính hoặc quan hệ riêng khác biệt với các nhóm con khác; Supertype là entity type tổng quát liên kết với một hoặc nhiều subtype.",
+          "Attribute Inheritance: mọi instance của subtype tự động kế thừa toàn bộ giá trị thuộc tính (kể cả identifier) và mọi quan hệ ở cấp supertype; bản thân một instance của subtype cũng là một instance của supertype.",
+          "Quan hệ đặt ở cấp supertype áp dụng cho TẤT CẢ các subtype; quan hệ đặt ở cấp subtype chỉ áp dụng riêng cho subtype đó (ví dụ chỉ RESIDENT PATIENT mới có quan hệ Is Assigned tới BED)."
+        ],
+        "terms": [
+          {
+            "term": "Attribute Inheritance",
+            "meaning": "Cơ chế subtype thừa hưởng toàn bộ thuộc tính (bao gồm khóa định danh) và mối quan hệ từ supertype của nó."
+          },
+          {
+            "term": "Supertype-level vs. Subtype-level Relationship",
+            "meaning": "Quan hệ nối với hộp supertype dùng chung cho mọi subtype; quan hệ nối trực tiếp vào hộp subtype chỉ dành riêng cho subtype đó."
+          }
+        ],
+        "pitfalls": [
+          "Không lặp lại các thuộc tính đã có ở Supertype (như Employee Number, Employee Name) vào bên trong các hộp Subtype — subtype tự động kế thừa chúng rồi, và khi nối nhánh nhớ vẽ dấu cung tập con (subset arc) hướng mũi cong ôm lấy subtype."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 3",
+          "title": "SUPERTYPES AND SUBTYPES",
+          "bullets": [
+            "Enhanced ER model – extends standard E-R notation with inheritance and abstraction constructs",
+            "Subtype – specialized subgrouping of entities within an entity type having distinct attributes or relationships",
+            "Supertype – generalized entity type linked to one or more specialized subtypes",
+            {
+              "text": "Attribute Inheritance",
+              "subBullets": [
+                "Subtype entities inherit all attribute values and identifiers defined on their supertype",
+                "Every instance of a subtype is simultaneously an instance of the supertype"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 3"
+          },
+          "pageNumber": 3,
+          "explanation": [
+            "Khái niệm Supertype/Subtype trong CSDL tương đồng trực tiếp với kế thừa lớp cha - lớp con (Inheritance / IS-A relationship) trong OOP: 'An Hourly Employee IS AN Employee'.",
+            "Nhờ Attribute Inheritance, ta chỉ cần khai báo các thuộc tính dùng chung một lần duy nhất ở Supertype (ví dụ Identifier, Name, Address), tránh lặp cấu trúc và tránh các cột toàn NULL cho những nhóm không áp dụng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "title": "Figure 3-1 Basic notation for supertype/subtype notation — a) EER notation",
+          "diagramText": [
+            "SUPERTYPE [General entity type]: 'Attributes shared by all entities (including identifier)'",
+            "Supertype-level relationship: nối trực tiếp với SUPERTYPE ('Relationships in which all instances participate')",
+            "Nhánh kế thừa EER: đường nối từ đáy SUPERTYPE -> vòng tròn phân loại -> phân nhánh có dấu cung tập con (subset symbol) tới SUBTYPE 1 ('Attributes unique to subtype 1'), SUBTYPE 2 ('Attributes unique to subtype 2'), đường nét đứt ('and so forth')",
+            "Subtype-level relationship: nối trực tiếp với SUBTYPE 2 ('Relationships in which only specialized versions participate')"
+          ],
+          "diagramNote": "Figure 3-1a trình bày ký hiệu EER chuẩn của giáo trình Hoffer cho mối quan hệ phân cấp supertype/subtype và vị trí đặt quan hệ mức tổng quát vs mức chuyên biệt.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 4"
+          },
+          "pageNumber": 4,
+          "explanation": [
+            "Chú ý hai chi tiết hình học của ký hiệu EER chuẩn: (1) vòng tròn nằm giữa Supertype và các Subtype (sẽ đặt chữ 'd' hoặc 'o' bên trong ở Slide 17); (2) trên mỗi nhánh đi tới từng Subtype có dấu cung tròn nhỏ (giống ký hiệu tập con trong toán học) hướng về phía Subtype.",
+            "Supertype giữ khóa định danh chung cho toàn bộ hệ phân cấp, các Subtype KHÔNG tự tạo khóa riêng mà dùng lại khóa của Supertype."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "title": "Figure 3-1 Basic notation for supertype/subtype notation (cont.) — b) Microsoft Visio Notation",
+          "diagramText": [
+            "SUPERTYPE [Visio box]: ngăn PK chứa Identifier, ngăn dưới chứa Shared attributes",
+            "Quan hệ nối từ SUPERTYPE và SUBTYPE 1 vẽ bằng đường nét đứt chuẩn Visio (|| ——— o<)",
+            "Cây kế thừa Visio: đường từ SUPERTYPE xuống vòng tròn, qua thanh ngang chia nhánh vuông góc tới SUBTYPE 1, SUBTYPE 2, • • • and so forth",
+            "Chú thích: Different modeling tools may have different notation for the same modeling constructs."
+          ],
+          "diagramNote": "Figure 3-1b minh họa cùng khái niệm supertype/subtype nhưng biểu diễn bằng ký hiệu cây nhánh vuông góc trong Microsoft Visio.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 5"
+          },
+          "pageNumber": 5,
+          "explanation": [
+            "Giáo trình lặp lại lưu ý quan trọng từ Chương 2: các công cụ vẽ khác nhau (EER hàn lâm vs Visio/MySQL Workbench/Draw.io) dùng hình dáng ký hiệu hơi khác nhau, nhưng bản chất logic Supertype – Subtype không hề thay đổi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "title": "Figure 3-2 Employee supertype with three subtypes",
+          "diagramText": [
+            "Supertype: EMPLOYEE (Employee Number [đậm, gạch dưới đơn], Employee Name, Address, Date Hired)",
+            "Chú thích: All employee subtypes will have employee number, name, address, and date hired",
+            "Nhánh từ vòng tròn tới 3 Subtypes ('Each employee subtype will also have its own attributes'):",
+            "• HOURLY EMPLOYEE: Hourly Rate",
+            "• SALARIED EMPLOYEE: Annual Salary, Stock Option",
+            "• CONSULTANT: Contract Number, Billing Rate"
+          ],
+          "diagramNote": "Figure 3-2 ví dụ chuẩn về EMPLOYEE phân thành 3 subtype (HOURLY EMPLOYEE, SALARIED EMPLOYEE, CONSULTANT) thừa kế 4 thuộc tính chung và giữ các thuộc tính lương/hợp đồng riêng.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 6"
+          },
+          "pageNumber": 6,
+          "explanation": [
+            "Nếu không tách subtype mà nhét tất cả vào một bảng EMPLOYEE duy nhất thì nhân viên làm theo giờ (HOURLY EMPLOYEE) sẽ bị NULL các cột Annual Salary, Stock Option, Contract Number, Billing Rate — vừa lãng phí vừa khó viết ràng buộc CHECK.",
+            "Khi dùng EER: mọi nhân viên đều có 4 cột ở EMPLOYEE, còn lương giờ nằm gọn ở HOURLY EMPLOYEE, lương năm + cổ phiếu ở SALARIED EMPLOYEE, số hợp đồng + giá thuê giờ ở CONSULTANT."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "title": "RELATIONSHIPS AND SUBTYPES",
+          "bullets": [
+            "Relationships attached to a supertype apply uniformly across all of its subtypes",
+            "Subtypes may also participate in specialized relationships unique to that specific subtype, modeled at the subtype level"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 7"
+          },
+          "pageNumber": 7,
+          "explanation": [
+            "Đây là lý do thứ hai (ngoài thuộc tính riêng) để tạo một Subtype: dù không có nhiều thuộc tính riêng, nhưng nếu một nhóm con tham gia vào một mối quan hệ đặc thù mà các nhóm khác KHÔNG tham gia, vẫn cần tách thành Subtype riêng.",
+            "Slide 8 ngay sau đây lấy ví dụ bệnh viện minh họa chính xác nguyên tắc này."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "title": "Figure 3-3 Supertype/subtype relationships in a hospital",
+          "diagramText": [
+            "Supertype: PATIENT (Patient ID [đậm, gạch dưới đơn], Patient Name, Admit Date) — 'Attributes for all types of patients'",
+            "Supertype-level relationship: PATIENT (o<) ——— Is Cared For ——— (||) RESPONSIBLE PHYSICIAN (Physician ID [đậm, gạch dưới đơn]) — 'Relationship for all types of patients'",
+            "2 Subtypes ('Attributes for certain types of patients'):",
+            "• OUTPATIENT: Checkback Date",
+            "• RESIDENT PATIENT: Date Discharged",
+            "Subtype-level relationship: RESIDENT PATIENT (o|) ——— Is Assigned ——— (||) BED (Bed ID [đậm, gạch dưới đơn]) — 'Relationship for certain types of patients'"
+          ],
+          "diagramNote": "Figure 3-3 minh họa bệnh nhân (PATIENT) nói chung đều có bác sĩ phụ trách (Is Cared For), nhưng chỉ bệnh nhân nội trú (RESIDENT PATIENT) mới được xếp giường bệnh (Is Assigned BED).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 8"
+          },
+          "pageNumber": 8,
+          "explanation": [
+            "Đọc kỹ bản số trên hình: mọi PATIENT phải có đúng 1 RESPONSIBLE PHYSICIAN (||), một bác sĩ có thể chăm sóc 0 hoặc nhiều bệnh nhân (o<). Đây là quan hệ chung cho cả ngoại trú và nội trú.",
+            "Chỉ RESIDENT PATIENT (bệnh nhân nằm viện) mới liên kết với BED: mỗi giường được gán cho 0 hoặc 1 bệnh nhân nội trú (o| phía RESIDENT PATIENT vì giường có thể đang trống), còn mỗi bệnh nhân nội trú bắt buộc được xếp đúng 1 giường (|| phía BED). OUTPATIENT không nằm giường nên không nối với BED."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Generalization (Bottom-Up) vs. Specialization (Top-Down)",
+      "text": "Phân biệt hai hướng thiết kế tạo hệ phân cấp EER: Generalization đi từ dưới lên (Figure 3-4 CAR/TRUCK/MOTORCYCLE -> VEHICLE) và Specialization đi từ trên xuống (Figure 3-5 PART -> MANUFACTURED/PURCHASED PART).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 9–13"
+      },
+      "digest": {
+        "keyPoints": [
+          "Generalization (Tổng quát hóa) là tiếp cận BOTTOM-UP: phát hiện nhiều entity type sẵn có chia sẻ các thuộc tính chung rồi gom phần chung đó lên một Supertype tổng quát hơn.",
+          "Specialization (Chuyên biệt hóa) là tiếp cận TOP-DOWN: bắt đầu từ một entity type tổng quát sẵn có rồi tách ra các Subtype cho những thuộc tính/quan hệ chỉ áp dụng với một nhóm con.",
+          "Trong ví dụ VEHICLE (Figure 3-4b), MOTORCYCLE không trở thành một subtype riêng dưới VEHICLE vì nó không có bất kỳ thuộc tính hay quan hệ riêng nào ngoài các thuộc tính chung đã đưa lên VEHICLE!",
+          "Trong ví dụ PART (Figure 3-5b), thuộc tính đa trị phức hợp {Supplier(Supplier ID, Unit Price)} của PART được thay bằng Associative Entity SUPPLIES nối giữa subtype PURCHASED PART và SUPPLIER."
+        ],
+        "terms": [
+          {
+            "term": "Generalization",
+            "meaning": "Quá trình bottom-up xây dựng supertype tổng quát từ tập hợp các entity type chuyên biệt có sẵn thuộc tính giống nhau."
+          },
+          {
+            "term": "Specialization",
+            "meaning": "Quá trình top-down phân chia một supertype thành một hoặc nhiều subtype chuyên biệt dựa trên thuộc tính/quan hệ đặc thù."
+          }
+        ],
+        "pitfalls": [
+          "Đừng tạo subtype 'rỗng' khi thực thể đó không có bất kỳ thuộc tính riêng và cũng không có quan hệ riêng nào (như MOTORCYCLE trong Figure 3-4b) — trừ trường hợp hiếm như PURCHASED PART có quan hệ riêng với SUPPLIER!"
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 9",
+          "title": "GENERALIZATION AND SPECIALIZATION",
+          "bullets": [
+            "Generalization (BOTTOM-UP): process of defining a more generalized supertype from a collection of existing specialized entity types",
+            "Specialization (TOP-DOWN): process of subdividing an existing supertype into one or more specialized subtypes and establishing supertype/subtype links"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 9"
+          },
+          "pageNumber": 9,
+          "explanation": [
+            "Hai khái niệm đối xứng nhau về hướng tư duy khi mô hình hóa: Generalization = gom từ dưới lên (Bottom-Up), còn Specialization = chẻ từ trên xuống (Top-Down).",
+            "Kết quả cuối cùng trên sơ đồ đều là quan hệ Supertype/Subtype, chỉ khác nhau ở xuất phát điểm của bài toán thiết kế."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "title": "Figure 3-4 Example of generalization — a) Three entity types: CAR, TRUCK, and MOTORCYCLE",
+          "diagramText": [
+            "3 entity type rời rạc ban đầu ('All these types of vehicles have common attributes'):",
+            "• CAR: Vehicle ID (đậm, gạch dưới), Price, Engine Displacement, Vehicle Name(Make, Model), No Of Passengers",
+            "• TRUCK: Vehicle ID (đậm, gạch dưới), Price, Engine Displacement, Vehicle Name(Make, Model), Capacity, Cab Type",
+            "• MOTORCYCLE: Vehicle ID (đậm, gạch dưới), Price, Engine Displacement, Vehicle Name(Make, Model)"
+          ],
+          "diagramNote": "Figure 3-4a cho thấy 3 thực thể CAR, TRUCK và MOTORCYCLE ban đầu lặp lại hoàn toàn 4 thuộc tính chung (Vehicle ID, Price, Engine Displacement, Vehicle Name).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 10"
+          },
+          "pageNumber": 10,
+          "explanation": [
+            "Khi nhìn thấy 3 bảng/thực thể cùng lặp lại bộ 4 thuộc tính giống hệt nhau, đó là tín hiệu kinh điển để thực hiện Generalization (tổng quát hóa).",
+            "Quan sát kỹ: CAR có riêng No Of Passengers; TRUCK có riêng Capacity và Cab Type; còn MOTORCYCLE KHÔNG có thêm thuộc tính nào khác ngoài 4 thuộc tính chung."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "title": "Figure 3-4 Example of generalization (cont.) — b) Generalization to VEHICLE supertype",
+          "diagramText": [
+            "Supertype VEHICLE ('So we put the shared attributes in a supertype'): Vehicle ID (đậm, gạch dưới), Price, Engine Displacement, Vehicle Name(Make, Model)",
+            "Chú thích tại VEHICLE: Vehicles of all types, including Motorcycles, which have no unique attributes or relationships",
+            "Đường nét đơn xuống vòng tròn phân nhánh tới 2 Subtypes: CAR (No Of Passengers) và TRUCK (Capacity, Cab Type)",
+            "Ghi chú: Note: no subtype for motorcycle, since it has no unique attributes"
+          ],
+          "diagramNote": "Figure 3-4b gom 4 thuộc tính chung lên supertype VEHICLE, chỉ tạo subtype cho CAR và TRUCK, đồng thời bỏ qua subtype cho MOTORCYCLE (dẫn tới Partial Specialization).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 11"
+          },
+          "pageNumber": 11,
+          "explanation": [
+            "Đây là ví dụ cực kỳ hay ra thi: vì MOTORCYCLE không có thuộc tính riêng cũng không tham gia quan hệ riêng nào, nên ta KHÔNG vẽ hộp subtype MOTORCYCLE mà để xe máy làm instance trực tiếp của VEHICLE!",
+            "Chính vì một VEHICLE có thể là Motorcycle (không thuộc CAR cũng không thuộc TRUCK), nên đường nối từ VEHICLE xuống vòng tròn là NÉT ĐƠN (Partial Specialization ở Slide 16)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "title": "Figure 3-5 Example of specialization — a) Entity type PART",
+          "diagramText": [
+            "Entity gốc PART: Part No (đậm, gạch dưới), Description, Qty On Hand, Location,",
+            "• Routing Number — nhãn 'Only applies to manufactured parts'",
+            "• {Supplier (Supplier ID, Unit Price)} — nhãn 'Applies only to purchased parts'"
+          ],
+          "diagramNote": "Figure 3-5a xuất phát từ một thực thể PART duy nhất chứa các thuộc tính chỉ áp dụng cho linh kiện tự sản xuất hoặc linh kiện mua ngoài.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 12"
+          },
+          "pageNumber": 12,
+          "explanation": [
+            "Ở ví dụ này ta đi theo hướng ngược lại (Top-Down Specialization): ban đầu chỉ có duy nhất một thực thể PART, nhưng phân tích kỹ thấy Routing Number (lộ trình gia công) chỉ dùng cho hàng tự sản xuất, còn danh sách nhà cung cấp {Supplier(Supplier ID, Unit Price)} chỉ dùng cho hàng mua ngoài.",
+            "Nếu để nguyên như 3-5a thì hàng tự sản xuất sẽ luôn để trống thông tin Supplier và ngược lại -> cần tách thành hai subtype."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "title": "Figure 3-5 Example of specialization (cont.) — b) Specialization to MANUFACTURED PART and PURCHASED PART",
+          "diagramText": [
+            "Supertype PART ('Created 2 subtypes'): Part No (đậm, gạch dưới), Description, Location, Qty On Hand",
+            "Đường nối từ PART xuống vòng tròn -> 2 Subtypes:",
+            "• MANUFACTURED PART: Routing Number",
+            "• PURCHASED PART (không có thuộc tính riêng, nhưng tham gia quan hệ riêng):",
+            "  PURCHASED PART (||) ——— (|<) SUPPLIES [Unit Price] (o<) ——— (||) SUPPLIER (Supplier ID [đậm, gạch dưới])",
+            "Chú thích: Entity types, attributes, and relationship associated with only Purchased Parts",
+            "Ghi chú: Note: multivalued composite attribute was replaced by an associative entity relationship to another entity"
+          ],
+          "diagramNote": "Figure 3-5b tách PART thành MANUFACTURED PART (giữ Routing Number) và PURCHASED PART (liên kết qua Associative Entity SUPPLIES tới SUPPLIER).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 13"
+          },
+          "pageNumber": 13,
+          "explanation": [
+            "Hãy đối chiếu tinh tế giữa Slide 11 (MOTORCYCLE) và Slide 13 (PURCHASED PART): hộp PURCHASED PART tuy KHÔNG có thuộc tính riêng nào bên trong nó, nhưng nó VẪN xứng đáng là một Subtype vì nó tham gia vào một QUAN HỆ RIÊNG (SUPPLIES – SUPPLIER) mà MANUFACTURED PART không có!",
+            "Ngoài ra, thuộc tính đa trị phức hợp {Supplier(Supplier ID, Unit Price)} ở Slide 12 đã được chuẩn hóa thành Associative Entity SUPPLIES nối PURCHASED PART và SUPPLIER (đúng kỹ thuật đã học ở Chương 2)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Ràng buộc Completeness, Disjointness, Subtype Discriminator & Hệ phân cấp",
+      "text": "Hai nhóm ràng buộc cốt lõi trên Supertype/Subtype: Completeness (Total nét đôi vs Partial nét đơn), Disjointness (Disjoint 'd' vs Overlap 'o'), thuộc tính Subtype Discriminator (đơn vs composite Boolean) và mô hình phân cấp nhiều tầng PERSON (Figure 3-10).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 14–23"
+      },
+      "digest": {
+        "keyPoints": [
+          "Completeness Constraint trả lời: một instance của supertype có BẮT BUỘC phải thuộc ít nhất một subtype hay không? Total specialization = Bắt buộc (đường nét ĐÔI); Partial specialization = Không bắt buộc (đường nét ĐƠN).",
+          "Disjointness Constraint trả lời: một instance của supertype có thể ĐỒNG THỜI thuộc nhiều subtype cùng lúc không? Disjoint ('d' trong vòng tròn) = Chỉ tối đa 1 subtype; Overlap ('o' trong vòng tròn) = Có thể thuộc >= 2 subtype đồng thời.",
+          "Subtype Discriminator là thuộc tính của supertype giúp nhận biết instance rơi vào subtype nào: với Disjoint là một thuộc tính ĐƠN (Employee Type = 'H'/'S'/'C'); với Overlap là thuộc tính COMPOSITE chứa các cờ Boolean (Part Type(Manufactured?, Purchased?)).",
+          "Một Subtype có thể tiếp tục làm Supertype cho các tầng Subtype sâu hơn tạo thành Supertype/Subtype Hierarchy (như PERSON -> EMPLOYEE/ALUMNUS/STUDENT -> FACULTY/STAFF & GRADUATE/UNDERGRAD STUDENT)."
+        ],
+        "terms": [
+          {
+            "term": "Total vs. Partial Specialization",
+            "meaning": "Total (đường đôi): mọi instance supertype phải thuộc >=1 subtype. Partial (đường đơn): có thể tồn tại instance không thuộc subtype nào."
+          },
+          {
+            "term": "Disjoint vs. Overlap Rule",
+            "meaning": "Disjoint (d): thuộc tối đa một subtype (loại trừ lẫn nhau). Overlap (o): có thể đồng thời thuộc nhiều subtype."
+          },
+          {
+            "term": "Subtype Discriminator",
+            "meaning": "Thuộc tính đặt trên supertype mà giá trị của nó quyết định instance thuộc subtype nào."
+          }
+        ],
+        "pitfalls": [
+          "Rất hay bị lộn 2 cặp ràng buộc độc lập này: Total/Partial (độ phủ: bắt buộc có subtype hay không -> vẽ 2 gạch hay 1 gạch) hoàn toàn độc lập với Disjoint/Overlap (chọn 1 hay nhiều subtype -> chữ 'd' hay 'o'). Một hệ có thể là Overlap + Total (PART ở Figure 3-7b, PERSON ở Figure 3-10), hoặc Disjoint + Partial (EMPLOYEE -> FACULTY/STAFF ở Figure 3-10)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 14",
+          "title": "CONSTRAINTS IN SUPERTYPE/SUBTYPE RELATIONSHIPS (Completeness)",
+          "bullets": [
+            {
+              "text": "Completeness Constraints – specifies whether every supertype instance must belong to at least one subtype",
+              "subBullets": [
+                "Total Specialization Rule: Yes — every instance must be a member of at least one subtype (drawn with a double line)",
+                "Partial Specialization Rule: No — an instance need not belong to any subtype (drawn with a single line)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 14"
+          },
+          "pageNumber": 14,
+          "explanation": [
+            "Để kiểm tra Completeness Constraint nhanh trong đề thi, hãy tự hỏi: 'Có tồn tại đối tượng Supertype nào mà không rơi vào bất kỳ Subtype nào đã vẽ không?'.",
+            "Nếu câu trả lời là 'Không, bắt buộc phải rơi vào ít nhất 1 subtype' -> Total Specialization (đường ĐÔI). Nếu 'Có thể không thuộc subtype nào' -> Partial Specialization (đường ĐƠN)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "title": "Figure 3-6 Examples of completeness constraints — a) Total specialization rule",
+          "diagramText": [
+            "PATIENT (|| đường nét đôi xuống vòng tròn) -> OUTPATIENT, RESIDENT PATIENT",
+            "Chú thích: Total Specialization: A Patient has to be either an Outpatient or a Resident Patient"
+          ],
+          "diagramNote": "Figure 3-6a dùng đường nét ĐÔI từ PATIENT xuống vòng tròn để biểu thị Total Specialization: mọi bệnh nhân đều phải là ngoại trú hoặc nội trú.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 15"
+          },
+          "pageNumber": 15,
+          "explanation": [
+            "Không có loại bệnh nhân thứ ba nào ngoài Outpatient (ngoại trú) và Resident Patient (nội trú) trong hệ thống bệnh viện này -> bắt buộc dùng Total Specialization (nét đôi)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "title": "Figure 3-6 Examples of completeness constraints (cont.) — b) Partial specialization rule",
+          "diagramText": [
+            "VEHICLE (| đường nét đơn xuống vòng tròn) -> CAR, TRUCK",
+            "Chú thích: Partial Specialization: A Vehicle can be a Car, or a Truck, but does not have to be either"
+          ],
+          "diagramNote": "Figure 3-6b dùng đường nét ĐƠN từ VEHICLE xuống vòng tròn để biểu thị Partial Specialization: một Vehicle (như Motorcycle) có thể không thuộc CAR hay TRUCK.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 16"
+          },
+          "pageNumber": 16,
+          "explanation": [
+            "Liên hệ lại Slide 11: vì Motorcycle cũng là một Vehicle nhưng không có subtype riêng, nên VEHICLE buộc phải vẽ đường ĐƠN (Partial Specialization)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "title": "CONSTRAINTS IN SUPERTYPE/SUBTYPE RELATIONSHIPS (Disjointness)",
+          "bullets": [
+            {
+              "text": "Disjointness Constraints – specifies whether a supertype instance can belong to two or more subtypes simultaneously",
+              "subBullets": [
+                "Disjoint Rule: an instance may belong to at most one subtype ('d' inside circle)",
+                "Overlap Rule: an instance may simultaneously belong to more than one subtype ('o' inside circle)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 17"
+          },
+          "pageNumber": 17,
+          "explanation": [
+            "Để kiểm tra Disjointness, hãy tự hỏi: 'Một thực thể cụ thể có thể ĐỒNG THỜI mang hai vai trò/nhóm con trở lên không?'.",
+            "Nếu không thể (loại trừ lẫn nhau) -> ghi chữ 'd' (Disjoint) vào giữa vòng tròn. Nếu có thể đồng thời thuộc nhiều nhóm -> ghi chữ 'o' (Overlap)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "title": "Figure 3-7 Examples of disjointness constraints — a) Disjoint rule",
+          "diagramText": [
+            "PATIENT == (d) -> OUTPATIENT, RESIDENT PATIENT",
+            "Chú thích: Disjoint rule: A Patient can be either an Outpatient or a Resident Patient, but not both at the same time"
+          ],
+          "diagramNote": "Figure 3-7a đặt chữ 'd' trong vòng tròn cùng đường nét đôi: một bệnh nhân phải là Outpatient HOẶC Resident Patient, không thể đồng thời là cả hai.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 18"
+          },
+          "pageNumber": 18,
+          "explanation": [
+            "Kết hợp Slide 15 + 18 trên ví dụ bệnh viện: PATIENT -> OUTPATIENT / RESIDENT PATIENT là mô hình (Total, Disjoint) — nghĩa là mỗi bệnh nhân thuộc ĐÚNG 1 trong 2 loại."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "title": "Figure 3-7 Examples of disjointness constraints (cont.) — b) Overlap rule",
+          "diagramText": [
+            "PART == (o) -> MANUFACTURED PART, PURCHASED PART (với SUPPLIES & SUPPLIER)",
+            "Chú thích: Overlap rule: A Part may be both a Manufactured Part and a Purchased Part at the same time, but it must be one or the other due to Total Specialization (double line)"
+          ],
+          "diagramNote": "Figure 3-7b minh họa cặp ràng buộc (Total, Overlap): một linh kiện có thể vừa được tự sản xuất vừa được mua thêm từ nhà cung cấp bên ngoài, nhưng bắt buộc thuộc ít nhất một trong hai loại.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 19"
+          },
+          "pageNumber": 19,
+          "explanation": [
+            "Trong thực tế sản xuất, khi nhu cầu tăng cao, nhà máy có thể vừa tự gia công một loại linh kiện (Manufactured Part) vừa đặt mua ngoài cùng mã linh kiện đó từ nhà cung cấp (Purchased Part) để bù sản lượng — do đó cần chữ 'o' (Overlap).",
+            "Đồng thời không có linh kiện nào không tự làm mà cũng chẳng mua nên đường nối là nét ĐÔI (Total)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "title": "CONSTRAINTS IN SUPERTYPE/SUBTYPE RELATIONSHIPS (Subtype Discriminator)",
+          "bullets": [
+            "Subtype Discriminator – an attribute placed on the supertype whose value indicates which subtype(s) an instance belongs to",
+            {
+              "text": "Disjoint subtypes",
+              "subBullets": [
+                "Modeled as a simple attribute on the supertype holding mutually exclusive category codes"
+              ]
+            },
+            {
+              "text": "Overlapping subtypes",
+              "subBullets": [
+                "Modeled as a composite attribute whose component subparts correspond to each subtype and hold Boolean flags indicating membership"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 20"
+          },
+          "pageNumber": 20,
+          "explanation": [
+            "Đây là câu hỏi cực kỳ phổ biến trong đề thi DBS: tại sao Disjoint chỉ cần attribute ĐƠN còn Overlap bắt buộc dùng attribute COMPOSITE?",
+            "Lý do: vì với Disjoint một instance chỉ thuộc tối đa 1 subtype nên 1 giá trị duy nhất (như 'H', 'S', hay 'C') đủ phân biệt; còn với Overlap một instance có thể thuộc nhiều subtype cùng lúc nên cần nhiều cờ Boolean Y/N độc lập gom thành một Composite attribute."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "title": "Figure 3-8 Introducing a subtype discriminator (disjoint rule)",
+          "diagramText": [
+            "EMPLOYEE bổ sung attribute: Employee Type",
+            "Đường nét đôi == (d) với nhãn 'Employee Type=' tại gốc phân nhánh:",
+            "• Nhánh 'H' -> HOURLY EMPLOYEE (Hourly Rate)",
+            "• Nhánh 'S' -> SALARIED EMPLOYEE (Annual Salary, Stock Option)",
+            "• Nhánh 'C' -> CONSULTANT (Contract Number, Billing Rate)",
+            "Chú thích: Subtype discriminator with values of H, S, or C for disjoint subtypes"
+          ],
+          "diagramNote": "Figure 3-8 gắn thuộc tính phân loại đơn Employee Type lên EMPLOYEE và ghi nhãn giá trị 'H', 'S', 'C' trên từng nhánh disjoint.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 21"
+          },
+          "pageNumber": 21,
+          "explanation": [
+            "Khi nhìn vào nhãn Employee Type = 'H', 'S', 'C' và đường nối nét đôi + chữ 'd', ta hiểu ngay: mọi nhân viên trong công ty phải có Employee Type là đúng một trong ba giá trị H, S hoặc C để ánh xạ vào đúng một bảng con tương ứng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "title": "Figure 3-9 Subtype discriminator (overlap rule)",
+          "diagramText": [
+            "PART bổ sung composite attribute: Part Type(Manufactured?, Purchased?)",
+            "Đường nét đôi == (o) với nhãn 'Part Type:' tại gốc phân nhánh:",
+            "• Nhánh Manufactured?='Y' -> MANUFACTURED PART (Routing Number)",
+            "• Nhánh Purchased?='Y' -> PURCHASED PART — SUPPLIES (Unit Price) — SUPPLIER",
+            "Chú thích: Subtype discriminator is a composite attribute when there is an overlap rule"
+          ],
+          "diagramNote": "Figure 3-9 dùng composite discriminator Part Type(Manufactured?, Purchased?) cho ràng buộc Overlap, nơi mỗi nhánh kiểm tra cờ ='Y'.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 22"
+          },
+          "pageNumber": 22,
+          "explanation": [
+            "Vì một PART có thể đồng thời tự sản xuất và mua ngoài, cả hai cờ Manufactured? và Purchased? đều có thể nhận giá trị 'Y' cùng lúc.",
+            "Cũng nhờ đường nét đôi (Total), có ràng buộc ngầm định rằng ít nhất một trong hai cờ phải bằng 'Y' (không được phép cả hai cùng bằng 'N')."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "title": "Figure 3-10 Example of supertype/subtype hierarchy",
+          "diagramText": [
+            "Tầng 1 — PERSON (SSN [đậm, gạch dưới], Name, Address, Gender, Date Of Birth) == (o) [Total, Overlap]:",
+            "• EMPLOYEE (Salary, Date Hired) — [Partial, Disjoint] (| nét đơn + d) -> FACULTY (Rank), STAFF (Position)",
+            "• ALUMNUS ({Degree(Year, Designation, Date)})",
+            "• STUDENT (Major Dept) == [Total, Disjoint] (|| nét đôi + d) -> GRADUATE STUDENT (Test Score), UNDERGRAD STUDENT (Class Standing)"
+          ],
+          "diagramNote": "Figure 3-10 là mô hình phân cấp đa tầng tại trường đại học, kết hợp cả Overlap/Total (tầng PERSON), Disjoint/Partial (tầng EMPLOYEE) và Disjoint/Total (tầng STUDENT).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 23"
+          },
+          "pageNumber": 23,
+          "explanation": [
+            "Hãy phân tích kỹ từng nhánh trong cây phân cấp đại học kinh điển này:",
+            "1) PERSON ==(o)==> EMPLOYEE, ALUMNUS, STUDENT: Một người trong trường có thể vừa là cựu sinh viên (ALUMNUS), vừa học cao học (STUDENT), vừa làm trợ giảng/giảng viên (EMPLOYEE) -> Overlap ('o'), và bất kỳ ai có hồ sơ phải thuộc ít nhất một vai trò -> Total (nét đôi).",
+            "2) EMPLOYEE —(d)—> FACULTY, STAFF: Nhân viên là giảng viên hoặc nhân viên hành chính (Disjoint 'd'), nhưng vẽ nét ĐƠN (Partial) vì có thể còn nhóm nhân viên khác (như lao động thời vụ) không thuộc FACULTY hay STAFF.",
+            "3) STUDENT ==(d)==> GRADUATE STUDENT, UNDERGRAD STUDENT: Mọi sinh viên bắt buộc thuộc đúng một hệ cao học hoặc đại học -> Total (nét đôi) + Disjoint ('d').",
+            "Cơ chế kế thừa: GRADUATE STUDENT kế thừa thuộc tính từ cả STUDENT (Major Dept) lẫn PERSON (SSN, Name, Address, Gender, Date Of Birth)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Entity Clusters (Gom cụm thực thể cho sơ đồ lớn)",
+      "text": "Kỹ thuật nhóm tập hợp entity và relationship liên quan thành một Entity Cluster trừu tượng nhằm đơn giản hóa EER diagram quy mô lớn (ví dụ Pine Valley Furniture qua Figures 3-13a, 3-13b và 3-14).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 24–27"
+      },
+      "digest": {
+        "keyPoints": [
+          "Khi hệ thống có hàng chục thực thể và quan hệ, sơ đồ EER trở nên rối và khó đọc với lãnh đạo hoặc các nhóm phát triển.",
+          "Entity cluster là tập hợp gồm một hoặc nhiều entity type cùng các relationship nội bộ được đóng gói thành một thực thể trừu tượng ở mức tổng quan.",
+          "Trong ví dụ Pine Valley Furniture (Figure 3-13a/b), toàn bộ mô hình chi tiết được gom thành 6 cụm: SELLING UNIT, CUSTOMER, ITEM, ITEM SALE, MATERIAL và MANUFACTURING, sau đó mỗi cụm có thể phóng to chi tiết riêng (Figure 3-14)."
+        ],
+        "terms": [
+          {
+            "term": "Entity Cluster",
+            "meaning": "Nhóm các entity type và relationship liên quan chặt chẽ được trừu tượng hóa thành một đơn vị hộp duy nhất để tăng tính dễ đọc cho sơ đồ lớn."
+          }
+        ],
+        "pitfalls": [
+          "Entity cluster KHÔNG làm thay đổi cấu trúc bảng vật lý cuối cùng — nó là công cụ trình bày và phân rã sơ đồ phân cấp (top-level summary vs detail view) cho dễ quản lý."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 24",
+          "title": "ENTITY CLUSTERS",
+          "bullets": [
+            "Large EER diagrams containing dozens of entities and relationships become visually cluttered and hard to read",
+            "Solution: abstract closely related entities and relationships into higher-level entity clusters",
+            "Entity cluster – a grouping of one or more entity types and their associated internal relationships treated as a single abstract entity type"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 24"
+          },
+          "pageNumber": 24,
+          "explanation": [
+            "Ý tưởng của Entity Cluster giống như đóng gói các hàm/lớp liên quan thành một Module/Package trong thiết kế phần mềm: ở bản vẽ tổng thể chỉ cần thấy các khối chức năng chính tương tác với nhau thế nào, còn chi tiết từng bảng thì xem ở bản vẽ riêng của từng cluster."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "title": "Figure 3-13a Possible entity clusters for Pine Valley Furniture in Microsoft Visio",
+          "diagramText": [
+            "6 vùng khoanh nét đứt ('Related groups of entities could become clusters'):",
+            "1) SELLING UNIT: SALESPERSON — Serves — SALES TERRITORY",
+            "2) CUSTOMER: CUSTOMER (Customer Type [National?, Regular?], (o) Overlap) -> REGULAR CUSTOMER, NATIONAL CUSTOMER (Account Manager)",
+            "3) ITEM: PRODUCT LINE — Includes — PRODUCT",
+            "4) ITEM SALE: ORDER — ORDER LINE",
+            "5) MATERIAL: VENDOR -> subtypes -> SUPPLIER (Contract Number) — SUPPLIES — RAW MATERIAL",
+            "6) MANUFACTURING: SKILL — HAS SKILL — EMPLOYEE (Employee Type, (d) 'M'/'U' -> MANAGEMENT EMPLOYEE, UNION EMPLOYEE, Supervises) — WORKS IN — WORK CENTER",
+            "Quan hệ liên cụm: DOES BUSINESS IN (SELLING UNIT–CUSTOMER), Submits (CUSTOMER–ITEM SALE), USES (MATERIAL–ITEM), PRODUCED IN (ITEM–MANUFACTURING)"
+          ],
+          "diagramNote": "Figure 3-13a vạch ranh giới 6 entity clusters trên sơ đồ EER chi tiết của Pine Valley Furniture (phiên bản Visio có bổ sung phân cấp subtype cho CUSTOMER, VENDOR và EMPLOYEE).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 25"
+          },
+          "pageNumber": 25,
+          "explanation": [
+            "Nhìn vào hai chi tiết kế thừa mới xuất hiện trong bản EER mở rộng này của Pine Valley Furniture:",
+            "- Trong cụm CUSTOMER: Customer Type [National?, Regular?] dùng ràng buộc Overlap (o), cho phép một khách hàng vừa là khách thường xuyên vừa là khách hàng cấp quốc gia.",
+            "- Trong cụm MANUFACTURING: Employee Type dùng ràng buộc Disjoint (d) với mã 'M' (Management Employee) và 'U' (Union Employee)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "title": "Figure 3-13b EER diagram of PVF entity clusters",
+          "diagramText": [
+            "Sơ đồ mức cụm ('More readable, isn't it?'):",
+            "• SELLING UNIT (||) — (|<) DOES BUSINESS IN (>o) — (||) CUSTOMER",
+            "• CUSTOMER (|| nét đứt Submits) ——— (o|<) ITEM SALE",
+            "• MATERIAL (||) — (|<) USES (>|) — (||) ITEM",
+            "• ITEM (|| nét đứt) ——— (o|<) ITEM SALE",
+            "• ITEM (||) — (|<) PRODUCED IN (>o) — (||) MANUFACTURING"
+          ],
+          "diagramNote": "Figure 3-13b rút gọn toàn bộ sơ đồ phức tạp ở Slide 25 xuống còn 6 hộp Entity Cluster và 5 liên kết cấp cao.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 26"
+          },
+          "pageNumber": 26,
+          "explanation": [
+            "Khi trình bày cho ban giám đốc hoặc người nghiệp vụ ở bước đầu, sơ đồ 6 cụm ở Figure 3-13b truyền đạt ngay bức tranh toàn cảnh dòng chảy dữ liệu của doanh nghiệp (Bán hàng -> Khách hàng -> Đơn hàng <-> Sản phẩm <-> Nguyên vật liệu & Sản xuất) mà không bị ngợp bởi hàng chục hộp chi tiết."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "title": "Figure 3-14 Manufacturing entity cluster",
+          "diagramText": [
+            "Phóng to chi tiết cụm MANUFACTURING ('Detail for a single cluster'):",
+            "• SKILL (||) ——— (o|<) HAS SKILL (o>|) ——— (||) EMPLOYEE (chứa Employee Type)",
+            "• EMPLOYEE -> (d) Employee Type: 'M' -> MANAGEMENT EMPLOYEE; 'U' -> UNION EMPLOYEE",
+            "• MANAGEMENT EMPLOYEE (|| nét đứt Supervises) ——— (|<) UNION EMPLOYEE",
+            "• UNION EMPLOYEE (||) ——— (|<) WORKS IN (>|) ——— (||) WORK CENTER"
+          ],
+          "diagramNote": "Figure 3-14 trình bày bản vẽ phóng to nội bộ riêng của một Entity Cluster (MANUFACTURING).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 27"
+          },
+          "pageNumber": 27,
+          "explanation": [
+            "Chú ý tinh tế trong cụm MANUFACTURING: trước đây ở Chương 2 EMPLOYEE tự giám sát (unary Supervises), nhưng nay khi chuyên biệt hóa thành MANAGEMENT EMPLOYEE và UNION EMPLOYEE thì quan hệ Supervises nối trực tiếp từ MANAGEMENT EMPLOYEE sang UNION EMPLOYEE, và chỉ UNION EMPLOYEE mới trực tiếp làm việc tại WORK CENTER (WORKS IN)!"
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Packaged Data Models (Universal Data Models) & Tổng kết",
+      "text": "Khái niệm Packaged / Universal Data Model (pattern), 10 lợi ích khi dùng mô hình đóng gói (Slide 29), nghiên cứu mẫu PARTY / PARTY ROLE / ROLE TYPE (Figures 3-15a và 3-15b) và trang kết chương.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 28–32"
+      },
+      "digest": {
+        "keyPoints": [
+          "Packaged Data Models là các mô hình dữ liệu định nghĩa sẵn (theo ngành cụ thể hoặc phổ quát Universal Data Model / Pattern) để dùng làm điểm xuất phát cho dự án mới.",
+          "Lợi ích nổi bật: dùng thành phần đã kiểm chứng, tiết kiệm thời gian & chi phí, giảm lỗi thiết kế, hỗ trợ thu thập yêu cầu, dễ mở rộng (nhờ supertype/subtype và quan hệ M:N linh hoạt) và dễ tích hợp liên doanh nghiệp.",
+          "Mẫu kinh điển PARTY / PARTY ROLE / ROLE TYPE tách biệt bản thân thực thể (PARTY: PERSON hoặc ORGANIZATION) khỏi các vai trò nó đảm nhiệm theo thời gian (PARTY ROLE với From Date, Thru Date và ROLE TYPE)."
+        ],
+        "terms": [
+          {
+            "term": "Universal (Packaged) Data Model",
+            "meaning": "Mô hình dữ liệu khuôn mẫu tổng quát (pattern) đã được thiết kế sẵn cho các bài toán phổ biến hoặc từng ngành nghề, có thể tùy biến theo business rule riêng."
+          },
+          {
+            "term": "PARTY Pattern",
+            "meaning": "Mẫu thiết kế phổ quát tách danh tính đối tác (PARTY: PERSON/ORGANIZATION) khỏi vai trò nghiệp vụ (PARTY ROLE như Employee, Customer, Supplier) theo khoảng thời gian."
+          }
+        ],
+        "pitfalls": [
+          "Packaged data model không tự chạy thay cho việc khảo sát yêu cầu: nhóm phân tích vẫn phải tùy biến (customize) tên gọi, ràng buộc bản số và ghi đè thuộc tính (như Bill To Customer Current Last Name) theo đúng nghiệp vụ công ty."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 28",
+          "title": "PACKAGED DATA MODELS",
+          "bullets": [
+            "Predefined reusable data models (available as universal cross-industry models or industry-specific blueprints)",
+            "Universal data model – a generic template data model adopted as the foundation for a new modeling project (frequently referred to as a data modeling pattern)"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 28"
+          },
+          "pageNumber": 28,
+          "explanation": [
+            "Thay vì thiết kế mọi hệ thống từ trang giấy trắng, hầu hết doanh nghiệp đều dùng chung các thực thể cốt lõi như Khách hàng, Nhân viên, Nhà cung cấp, Đơn hàng, Hóa đơn... Những cấu trúc lặp đi lặp lại này đã được tổng hợp thành Universal Data Models / Patterns (ví dụ sách của Len Silverston).",
+            "Các phần mềm ERP lớn (SAP, Oracle, Salesforce) cũng cung cấp sẵn industry-specific packaged models cho bán lẻ, ngân hàng, y tế, sản xuất."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "title": "ADVANTAGES OF PACKAGED DATA MODELS",
+          "bullets": [
+            "Leverage field-tested, proven model components",
+            "Reduce development time and modeling costs",
+            "Minimize the risk of structural data model errors",
+            "Easier to evolve and adapt as business needs change",
+            "Support and accelerate requirements gathering with stakeholders",
+            "Improve readability and standardization across teams",
+            "Promote component reuse through supertype/subtype hierarchies",
+            "Increase structural flexibility via many-to-many relationships",
+            "Vendor-provided models streamline integration with commercial software suites",
+            "Universal templates facilitate inter-organizational data exchange"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 29"
+          },
+          "pageNumber": 29,
+          "explanation": [
+            "10 ưu điểm này giải thích vì sao doanh nghiệp ưa chuộng khởi đầu từ pattern chuẩn. Chú ý đặc biệt hai yếu tố kỹ thuật giúp packaged model linh hoạt: (1) dùng nhiều hệ phân cấp Supertype/Subtype để mở rộng kiểu đối tượng, và (2) ưu tiên quan hệ M:N (thay vì khóa cứng 1:1 hay 1:M chật hẹp) để đáp ứng nhiều kịch bản thực tế."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "title": "Figure 3-15 PARTY, PARTY ROLE, and ROLE TYPE in a universal data model — (a) Basic PARTY universal data model",
+          "diagramText": [
+            "PARTY (Party ID [PK]) chứa hai subtype lồng nhau: PERSON (Current First Name, Current Last Name, Social Security Number) và ORGANIZATION (Organization Name)",
+            "PARTY (||) ——— For / Acting As ——— (o|<) PARTY ROLE (From Date [PK], Thru Date) (>o|<) ——— Of / Used to Identify ——— (||) ROLE TYPE (Role Type ID [PK], Description)",
+            "Bên trong PARTY ROLE chứa các phân cấp vai trò lồng nhau:",
+            "• PERSON ROLE (Current First Name, Current Last Name) chứa EMPLOYEE, CONTACT",
+            "• ORGANIZATION ROLE chứa SUPPLIER",
+            "• ORGANIZATION UNIT chứa DEPARTMENT",
+            "• CUSTOMER chứa BILL TO CUSTOMER (Current Last Name — ghi đè/override tên trên PERSON ROLE)",
+            "Chú thích: Packaged data models are generic models that can be customized for a particular organization's business rules; From Date ghi nhận ngày bắt đầu đóng vai trò; Person Role có thể dùng tên khác với hồ sơ chung ở Person."
+          ],
+          "diagramNote": "Figure 3-15a minh họa mẫu Universal Data Model kinh điển cho PARTY, tách thực thể người/tổ chức (PARTY) khỏi vai trò có hiệu lực theo thời gian (PARTY ROLE) và danh mục loại vai trò (ROLE TYPE).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 30"
+          },
+          "pageNumber": 30,
+          "explanation": [
+            "Vì sao mẫu PARTY cực kỳ mạnh? Nếu tách rời bảng EMPLOYEE, CUSTOMER, SUPPLIER, thì một cá nhân vừa là nhân viên công ty vừa mua hàng của công ty sẽ bị lưu trùng tên/địa chỉ ở hai bảng khác nhau.",
+            "Nhờ mẫu PARTY, người đó chỉ lưu 1 bản ghi duy nhất trong PARTY -> PERSON, rồi gắn thêm các dòng PARTY ROLE (Employee từ ngày X, Customer từ ngày Y), thậm chí Bill To Customer có thể ghi đè (override) Current Last Name riêng trên hóa đơn thanh toán!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "title": "Figure 3-15 PARTY, PARTY ROLE, and ROLE TYPE in a universal data model — (b) PARTY supertype/subtype hierarchy",
+          "diagramText": [
+            "PARTY (Party ID [PK]) chứa hai nhánh cây supertype/subtype đầy đủ:",
+            "1) PERSON (Current First Name, Current Last Name, Social Security Number) chứa: EMPLOYEE, CONTACT, CUSTOMER -> BILL TO CUSTOMER (Current Last Name)",
+            "2) ORGANIZATION (Organization Name) chứa: SUPPLIER, ORGANIZATION UNIT -> DEPARTMENT, CUSTOMER -> BILL TO CUSTOMER (Current Last Name)"
+          ],
+          "diagramNote": "Figure 3-15b minh họa cách biến thể thứ hai gộp thẳng các vai trò làm subtype bên trong hai nhánh PERSON và ORGANIZATION của PARTY khi một tổ chức hoặc cá nhân đóng vai trò ổn định hơn.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 31"
+          },
+          "pageNumber": 31,
+          "explanation": [
+            "So sánh (a) và (b): ở (b) CUSTOMER và BILL TO CUSTOMER xuất hiện dưới cả PERSON (khách hàng cá nhân) lẫn ORGANIZATION (khách hàng doanh nghiệp) mà không dùng bảng PARTY ROLE riêng với From Date/Thru Date.",
+            "Thiết kế (a) linh hoạt hơn cho lịch sử vai trò theo thời gian và việc ghi đè thuộc tính theo từng vai trò; thiết kế (b) gọn hơn khi doanh nghiệp chỉ cần phân cấp tĩnh dưới PARTY."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "title": "Copyright Notice (Pearson Education)",
+          "paragraphs": [
+            "Instructor copyright and distribution notice slide (Pearson Education, Inc., 2016)."
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch03.pdf",
+            "loc": "Slide 32"
+          },
+          "pageNumber": 32,
+          "explanation": [
+            "Trang 32 (3-32) là trang thông báo bản quyền tiêu chuẩn của nhà xuất bản Pearson Education ở cuối bộ slide Chương 3, không chứa thêm kiến thức chuyên môn mới."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch03-c01", "front": "Generalization và specialization khác nhau thế nào?", "back": "Generalization: bottom-up, tạo supertype tổng quát từ các entity chuyên biệt. Specialization: top-down, tạo subtype từ supertype.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 9" } },
-    { "id": "dbs-ch03-c02", "front": "Total specialization vẽ thế nào và nghĩa là gì?", "back": "Đường đôi từ supertype tới vòng tròn; mọi instance của supertype phải thuộc ít nhất một subtype.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 14–15" } },
-    { "id": "dbs-ch03-c03", "front": "Disjoint rule và overlap rule?", "back": "Disjoint (d): instance thuộc đúng một subtype. Overlap (o): có thể thuộc nhiều subtype cùng lúc.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 17–19" } },
-    { "id": "dbs-ch03-c04", "front": "Subtype discriminator là gì?", "back": "Attribute của supertype có giá trị xác định instance thuộc subtype nào. Disjoint: attribute đơn; overlap: attribute composite gồm các cờ Boolean.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 20–22" } },
-    { "id": "dbs-ch03-c05", "front": "Vì sao MOTORCYCLE không thành subtype của VEHICLE trong ví dụ?", "back": "Vì nó không có thuộc tính hay quan hệ riêng.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 11" } },
-    { "id": "dbs-ch03-c06", "front": "Entity cluster dùng để làm gì?", "back": "Gom nhiều entity và quan hệ thành một entity trừu tượng để EER diagram dễ đọc.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 24" } }
+    {
+      "id": "dbs-ch03-c01",
+      "front": "Generalization và Specialization khác nhau thế nào?",
+      "back": "Generalization là hướng BOTTOM-UP: tạo một supertype tổng quát hơn từ nhiều entity type chuyên biệt có thuộc tính chung. Specialization là hướng TOP-DOWN: tách một supertype sẵn có thành các subtype chuyên biệt.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 9–13"
+      }
+    },
+    {
+      "id": "dbs-ch03-c02",
+      "front": "Total specialization vẽ thế nào và nghĩa là gì?",
+      "back": "Vẽ bằng đường NÉT ĐÔI từ supertype tới vòng tròn; mọi instance của supertype BẮT BUỘC phải thuộc ít nhất một subtype. (Partial specialization vẽ nét đơn: không bắt buộc).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 14–16"
+      }
+    },
+    {
+      "id": "dbs-ch03-c03",
+      "front": "Disjoint rule và Overlap rule khác nhau thế nào?",
+      "back": "Disjoint (chữ 'd' trong vòng tròn): mỗi instance chỉ thuộc TỐI ĐA MỘT subtype. Overlap (chữ 'o' trong vòng tròn): một instance có thể ĐỒNG THỜI thuộc hai hay nhiều subtype.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 17–19"
+      }
+    },
+    {
+      "id": "dbs-ch03-c04",
+      "front": "Subtype discriminator là gì? Khác nhau giữa Disjoint và Overlap ra sao?",
+      "back": "Là thuộc tính đặt trên supertype mà giá trị của nó xác định instance thuộc subtype nào. Với Disjoint: là thuộc tính ĐƠN (như Employee Type = 'H', 'S', 'C'). Với Overlap: là thuộc tính COMPOSITE gồm các cờ Boolean (như Part Type(Manufactured?, Purchased?)).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 20–22"
+      }
+    },
+    {
+      "id": "dbs-ch03-c05",
+      "front": "Vì sao MOTORCYCLE không thành subtype của VEHICLE trong Figure 3-4b?",
+      "back": "Vì MOTORCYCLE không có thuộc tính riêng cũng không tham gia quan hệ riêng nào ngoài các thuộc tính chung đã đưa lên supertype VEHICLE (dẫn tới VEHICLE dùng Partial Specialization).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 10–11, 16"
+      }
+    },
+    {
+      "id": "dbs-ch03-c06",
+      "front": "Entity cluster dùng để làm gì?",
+      "back": "Gom một nhóm entity type và các relationship liên quan thành một thực thể trừu tượng duy nhất để giảm độ rối, giúp sơ đồ EER quy mô lớn dễ đọc hơn (như 6 cụm của Pine Valley Furniture).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 24–27"
+      }
+    },
+    {
+      "id": "dbs-ch03-c07",
+      "front": "Attribute Inheritance trong mô hình EER là gì?",
+      "back": "Cơ chế cho phép mọi subtype tự động thừa hưởng toàn bộ thuộc tính (bao gồm khóa định danh identifier) và các mối quan hệ ở cấp supertype; đồng thời mỗi instance của subtype cũng là một instance của supertype.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-ch03-c08",
+      "front": "Khi nào một nhóm con dù không có thuộc tính riêng vẫn cần tách thành Subtype?",
+      "back": "Khi nhóm con đó tham gia vào một mối QUAN HỆ RIÊNG biệt với thực thể khác mà các nhóm con còn lại không tham gia (ví dụ PURCHASED PART trong Figure 3-5b nối với SUPPLIER qua SUPPLIES).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 7–8, 13"
+      }
+    },
+    {
+      "id": "dbs-ch03-c09",
+      "front": "Trong Figure 3-3 (Bệnh viện), quan hệ nào nằm ở cấp Supertype và cấp Subtype?",
+      "back": "Cấp Supertype: PATIENT 'Is Cared For' RESPONSIBLE PHYSICIAN (mọi bệnh nhân đều cần bác sĩ). Cấp Subtype: chỉ RESIDENT PATIENT 'Is Assigned' BED (chỉ bệnh nhân nội trú mới xếp giường).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "dbs-ch03-c10",
+      "front": "Universal (Packaged) Data Model là gì và ưu điểm chính ra sao?",
+      "back": "Là mô hình dữ liệu khuôn mẫu (pattern) được thiết kế sẵn (chung mọi ngành hoặc chuyên ngành) làm điểm khởi đầu dự án. Ưu điểm: dùng cấu trúc đã kiểm chứng, tiết kiệm thời gian/chi phí, ít lỗi, dễ mở rộng nhờ supertype/subtype và M:N.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 28–29"
+      }
+    },
+    {
+      "id": "dbs-ch03-c11",
+      "front": "Cấu trúc cốt lõi của mẫu Universal Data Model PARTY gồm những thực thể nào?",
+      "back": "Gồm PARTY (chứa PERSON và ORGANIZATION) liên kết với PARTY ROLE (lưu From Date, Thru Date cùng phân cấp Person Role, Organization Role, Customer...) và ROLE TYPE (loại vai trò).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 30–31"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch03-q01", "stem": "Instance của supertype chỉ có thể thuộc đúng một subtype, và không bắt buộc thuộc subtype nào. Ràng buộc là gì?", "options": ["Overlap, total", "Disjoint, total", "Overlap, partial", "Disjoint, partial"], "answer": 3, "explanation": "'Chỉ một subtype' = disjoint; 'không bắt buộc' = partial specialization (đường đơn).", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 14–19" } },
-    { "id": "dbs-ch03-q02", "stem": "Ký hiệu 'o' trong vòng tròn của quan hệ supertype/subtype nghĩa là gì?", "options": ["Optional", "Overlap", "Ordered", "Owner"], "answer": 1, "explanation": "Chữ o là overlap rule; chữ d là disjoint.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slide 17" } },
-    { "id": "dbs-ch03-q03", "stem": "Việc gom CAR, TRUCK thành VEHICLE từ các entity có sẵn gọi là gì?", "options": ["Specialization", "Generalization", "Normalization", "Clustering"], "answer": 1, "explanation": "Bottom-up từ nhiều entity chuyên biệt lên supertype là generalization.", "source": { "file": "hoffer_mdm12e_pp_ch03.pdf", "loc": "Slides 9–11" } }
+    {
+      "id": "dbs-ch03-q01",
+      "stem": "Instance của supertype chỉ có thể thuộc đúng một subtype, và không bắt buộc thuộc subtype nào. Ràng buộc là gì?",
+      "options": [
+        "Overlap, total",
+        "Disjoint, total",
+        "Overlap, partial",
+        "Disjoint, partial"
+      ],
+      "answer": 3,
+      "explanation": "Slide 14–19: 'Chỉ tối đa một subtype' = Disjoint (d); 'không bắt buộc thuộc subtype nào' = Partial specialization (đường nét đơn).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 14–19"
+      }
+    },
+    {
+      "id": "dbs-ch03-q02",
+      "stem": "Ký hiệu 'o' trong vòng tròn của quan hệ supertype/subtype nghĩa là gì?",
+      "options": [
+        "Optional",
+        "Overlap",
+        "Ordered",
+        "Owner"
+      ],
+      "answer": 1,
+      "explanation": "Slide 17: Chữ 'o' biểu thị Overlap rule (có thể thuộc nhiều subtype đồng thời); chữ 'd' biểu thị Disjoint rule.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "dbs-ch03-q03",
+      "stem": "Việc gom CAR, TRUCK thành VEHICLE từ các entity có sẵn gọi là gì?",
+      "options": [
+        "Specialization",
+        "Generalization",
+        "Normalization",
+        "Clustering"
+      ],
+      "answer": 1,
+      "explanation": "Slide 9–11: Generalization là quá trình bottom-up xây dựng supertype tổng quát từ các entity type chuyên biệt sẵn có.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 9–11"
+      }
+    },
+    {
+      "id": "dbs-ch03-q04",
+      "stem": "Trong Figure 3-4b, vì sao MOTORCYCLE KHÔNG được tạo thành một hộp Subtype dưới VEHICLE?",
+      "options": [
+        "Vì số lượng xe máy quá ít",
+        "Vì MOTORCYCLE không có thuộc tính hay mối quan hệ riêng nào ngoài các thuộc tính chung ở VEHICLE",
+        "Vì EER chỉ cho phép tối đa 2 subtype",
+        "Vì MOTORCYCLE phải đặt dưới TRUCK"
+      ],
+      "answer": 1,
+      "explanation": "Slide 11: 'Note: no subtype for motorcycle, since it has no unique attributes' (và cũng không có unique relationship).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-ch03-q05",
+      "stem": "Khi thiết kế Subtype Discriminator cho trường hợp OVERLAP rule (như PART -> MANUFACTURED PART, PURCHASED PART), ta phải mô hình hóa discriminator như thế nào?",
+      "options": [
+        "Một thuộc tính đơn lưu chuỗi 'M' hoặc 'P'",
+        "Một thuộc tính composite chứa các thành phần con kiểu Boolean cho từng subtype",
+        "Một weak entity riêng biệt",
+        "Không thể dùng subtype discriminator với overlap"
+      ],
+      "answer": 1,
+      "explanation": "Slide 20 & 22 (Figure 3-9): Khi dùng Overlap rule, subtype discriminator phải là một composite attribute chứa cờ Boolean ứng với mỗi subtype, ví dụ Part Type(Manufactured?, Purchased?).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 20, 22"
+      }
+    },
+    {
+      "id": "dbs-ch03-q06",
+      "stem": "Trong Figure 3-10 (hệ phân cấp PERSON tại trường đại học), cặp ràng buộc nào áp dụng giữa PERSON và ba subtype EMPLOYEE, ALUMNUS, STUDENT?",
+      "options": [
+        "Partial, Disjoint",
+        "Partial, Overlap",
+        "Total, Disjoint",
+        "Total, Overlap"
+      ],
+      "answer": 3,
+      "explanation": "Slide 23: Đường từ PERSON xuống vòng tròn là nét ĐÔI (Total) và trong vòng tròn ghi chữ 'o' (Overlap) — một người có thể vừa là Alumnus vừa là Employee hay Student.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "dbs-ch03-q07",
+      "stem": "Cũng trong Figure 3-10, thuộc tính nào sau đây KHÔNG được thừa kế bởi GRADUATE STUDENT?",
+      "options": [
+        "SSN và Name (từ PERSON)",
+        "Major Dept (từ STUDENT)",
+        "Salary (từ EMPLOYEE)",
+        "Date Of Birth (từ PERSON)"
+      ],
+      "answer": 2,
+      "explanation": "Slide 23: GRADUATE STUDENT chỉ là subtype của STUDENT (và gián tiếp của PERSON), nên kế thừa từ STUDENT và PERSON chứ KHÔNG kế thừa Salary của EMPLOYEE.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "dbs-ch03-q08",
+      "stem": "Trong Figure 3-5b, tuy PURCHASED PART không có thuộc tính riêng nào bên trong hộp subtype, tại sao nó vẫn được tách thành một subtype dưới PART?",
+      "options": [
+        "Vì mọi specialization bắt buộc có ít nhất 2 hộp có tên",
+        "Vì nó tham gia vào quan hệ riêng với SUPPLIER (thông qua associative entity SUPPLIES) mà MANUFACTURED PART không có",
+        "Để lưu Routing Number",
+        "Vì tổng quát hóa bắt buộc tách theo chiều ngang"
+      ],
+      "answer": 1,
+      "explanation": "Slide 7 & 13: Subtype không nhất thiết phải có thuộc tính riêng — chỉ cần tham gia vào relationship riêng biệt (PURCHASED PART nối SUPPLIES–SUPPLIER) là đủ điều kiện tạo subtype.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 7, 13"
+      }
+    },
+    {
+      "id": "dbs-ch03-q09",
+      "stem": "Mục đích chính của Entity Cluster trong Figure 3-13a/b là gì?",
+      "options": [
+        "Gộp nhiều bảng vật lý thành một bảng duy nhất trong MySQL",
+        "Gom các entity và relationship liên quan thành khối trừu tượng để giảm độ rối cho EER diagram lớn",
+        "Thay thế hoàn toàn nhu cầu dùng khóa chính",
+        "Chuyển quan hệ 1:1 thành quan hệ M:N"
+      ],
+      "answer": 1,
+      "explanation": "Slide 24–26: Entity cluster nhóm các thực thể và quan hệ liên quan thành một thực thể trừu tượng giúp EER diagram lớn dễ đọc hơn.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slides 24–26"
+      }
+    },
+    {
+      "id": "dbs-ch03-q10",
+      "stem": "Trong mẫu Universal Data Model PARTY (Figure 3-15a), vai trò của thực thể PARTY ROLE (có From Date, Thru Date) là gì?",
+      "options": [
+        "Xóa bỏ sự phân biệt giữa PERSON và ORGANIZATION",
+        "Cho phép cùng một PARTY đảm nhiệm nhiều vai trò (Employee, Customer, Supplier...) theo thời gian và ghi đè thuộc tính riêng theo vai trò đó",
+        "Thay thế khóa chính Party ID bằng tên viết tắt",
+        "Chỉ áp dụng cho bệnh viện"
+      ],
+      "answer": 1,
+      "explanation": "Slide 30: PARTY ROLE nối PARTY với ROLE TYPE giúp tách danh tính cố định (Person/Organization) khỏi các vai trò nghiệp vụ có thời hạn (From Date, Thru Date).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch03.pdf",
+        "loc": "Slide 30"
+      }
+    }
   ]
 }

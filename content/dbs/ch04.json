@@ -1,29 +1,1923 @@
 {
-  "id": "dbs-ch04", "order": 4,
+  "id": "dbs-ch04",
+  "order": 4,
   "title": "Chương 4: Logical Database Design and the Relational Model",
-  "summary": [
-    { "h": "Mô hình quan hệ", "text": "Logical design chuyển conceptual model (E-R/EER) thành relational schema, kết hợp top-down (biến đổi EER) và bottom-up (chuẩn hóa user view). Ba thành phần: data structure (relation/table, tuple/row, attribute/column), data manipulation (SQL), data integrity." },
-    { "h": "6 tính chất của relation", "text": "Tên relation duy nhất; giá trị attribute atomic; mỗi row duy nhất; tên attribute duy nhất; thứ tự cột không quan trọng; thứ tự hàng không quan trọng. Theo định nghĩa mọi relation đều ở 1NF." },
-    { "h": "Khóa và ràng buộc toàn vẹn", "text": "Candidate key phải có 2 tính chất: định danh duy nhất và không dư thừa (không bỏ được attribute nào). Primary key là candidate key được chọn; surrogate key là khóa do hệ thống gán. Foreign key khớp primary key của relation cha. Ràng buộc: domain constraint, entity integrity (PK không NULL), referential integrity (FK khớp PK hoặc NULL). Luật xóa: Restrict, Cascade, Set-to-Null." },
-    { "h": "7 bước biến đổi EER thành relation", "text": "1) Strong entity: composite chỉ lấy thành phần đơn; multivalued tạo relation riêng với PK ghép. 2) Weak entity: relation riêng, PK = PK owner + partial identifier. 3) Binary: 1:M đặt PK bên 1 làm FK bên M; M:N tạo relation trung gian; 1:1 đặt PK của bên mandatory làm FK ở bên optional. 4) Associative entity. 5) Unary: 1:M thêm FK đệ quy cùng bảng; M:N thêm relation thứ hai. 6) Ternary: một relation liên kết có FK tới mọi entity. 7) Supertype/subtype: mỗi loại một relation; PK của subtype vừa là PK vừa là FK tới supertype." },
-    { "h": "Anomaly và chuẩn hóa", "text": "Ba anomaly: insertion, deletion, modification. Functional dependency A → B: A (determinant) xác định duy nhất B. 2NF: 1NF và không có partial dependency (relation có PK đơn tự động đạt 2NF). 3NF: 2NF và không có transitive dependency. BCNF: mọi determinant là candidate key. 4NF loại multivalued dependency; 5NF loại join dependency còn lại." },
-    { "h": "Merging relations (view integration)", "text": "Gộp relation từ nhiều view có 4 vấn đề: synonyms, homonyms, transitive dependencies, supertype/subtype ẩn. Gộp hai quan hệ 3NF không bảo đảm kết quả 3NF." }
+  "audit": {
+    "sourceFile": "Chapter 04.pdf",
+    "totalPages": 57,
+    "extractedPages": 57,
+    "ocrNotes": [
+      "Chapter 04.pdf có tổng cộng 57 trang (Slides 4-1 đến 4-57, gồm trang cuối là thông báo bản quyền Pearson); toàn bộ 57/57 trang đã được trích xuất đầy đủ với pageNumber 1–57.",
+      "Slide 2 ghi mục tiêu 'List five properties of relations' nhưng Slide 4 thực tế liệt kê 6 gạch đầu dòng yêu cầu đối với một relation (giữ nguyên văn cả hai).",
+      "Slide 51 (Figure 4-27) viết phụ thuộc hàm 'OrderID, ProductID → OrderQuantity' trong khi tên cột trên bảng là 'OrderedQuantity'; Slide 54 in nhầm tiêu đề 'Figure 4-29 Removing partial dependencies' dù nội dung đang loại bỏ transitive dependencies để đạt 3NF (giữ nguyên văn và giải thích rõ).",
+      "Cuối chương tích hợp thêm 2 ảnh bài tập ghi chú viết tay (838362449_945188051537703_2571160256995451982_n.jpg và 1791184980251_2287926346835723288_g7644320767961835470_cde4df6ccdbde03218d7d7622b75b7b3.jpg); các chữ bị gạch xóa hoặc nét chữ dễ nhầm được gắn thẻ [?cần kiểm tra]."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Chapter 04.pdf",
+      "loc": "Slides 1–57 (đầy đủ 57/57 slides)"
+    },
+    {
+      "file": "838362449_945188051537703_2571160256995451982_n.jpg",
+      "loc": "Ảnh bài tập 1 (đề bài & ràng buộc nghiệp vụ Gym / Member–Branch–Exercise)"
+    },
+    {
+      "file": "1791184980251_2287926346835723288_g7644320767961835470_cde4df6ccdbde03218d7d7622b75b7b3.jpg",
+      "loc": "Ảnh bài tập 2 (bảng thuộc tính Exercise & yêu cầu tìm FD, vẽ ERD và 3NF)"
+    }
   ],
-  "sources": [{ "file": "Chapter 04.pdf", "loc": "Slides 1–57" }],
+  "summary": [
+    {
+      "h": "Giới thiệu chương, Mục tiêu & Mô hình Quan hệ (Relational Model)",
+      "text": "Giới thiệu Chương 4 từ giáo trình Modern Database Management (12th Edition), 8 mục tiêu học tập, 3 thành phần của mô hình quan hệ, 6 yêu cầu để một bảng là relation và phép đối chiếu với mô hình E-R.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 1–5"
+      },
+      "digest": {
+        "keyPoints": [
+          "Mô hình quan hệ gồm 3 thành phần: Data structure (bảng/relation, hàng/row, cột/column), Data manipulation (SQL) và Data integrity (ràng buộc bảo đảm nghiệp vụ).",
+          "Một bảng đạt chuẩn relation khi có tên duy nhất, giá trị thuộc tính nguyên tố (atomic — không đa trị, không phức hợp), mỗi hàng duy nhất, tên cột duy nhất, thứ tự cột và thứ tự hàng đều không quan trọng.",
+          "Theo định nghĩa, mọi relation đều tự động ở dạng chuẩn 1 (1st Normal Form — 1NF).",
+          "Thuật ngữ relation (bảng trong CSDL quan hệ) tương ứng với entity type và quan hệ M:N trong E-R model — KHÔNG đồng nghĩa với relationship."
+        ],
+        "terms": [
+          {
+            "term": "Relation",
+            "meaning": "Bảng dữ liệu 2 chiều có tên duy nhất gồm các hàng (records/tuples) và cột (attributes/fields) thỏa mãn đầy đủ tính chất 1NF."
+          },
+          {
+            "term": "Atomic Attribute Value",
+            "meaning": "Giá trị nguyên tố tại mỗi ô giao giữa hàng và cột — không chứa danh sách đa trị (multivalued) hay nhóm thuộc tính phức hợp (composite)."
+          }
+        ],
+        "pitfalls": [
+          "Slide 2 ghi 'List five properties of relations' nhưng Slide 4 lại liệt kê 6 tiêu chí — khi làm bài trắc nghiệm hãy nắm cả 6 tiêu chí cụ thể (tên bảng duy nhất, giá trị atomic, hàng duy nhất, tên cột duy nhất, thứ tự cột/hàng không quan trọng).",
+          "Cẩn thận bẫy thuật ngữ tiếng Anh: 'relation' = bảng, còn 'relationship' = mối liên kết trong sơ đồ E-R."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "CHAPTER 4: LOGICAL DATABASE DESIGN AND THE RELATIONAL MODEL",
+          "paragraphs": [
+            "CHAPTER 4: LOGICAL DATABASE DESIGN AND THE RELATIONAL MODEL",
+            "Modern Database Management 12th Edition — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi",
+            "Copyright © 2016 Pearson Education, Inc."
+          ],
+          "explanation": [
+            "Slide tiêu đề mở đầu Chương 4: Thiết kế cơ sở dữ liệu mức logic (Logical Database Design) và Mô hình quan hệ (The Relational Model), trích từ giáo trình Modern Database Management ấn bản thứ 12.",
+            "Nếu Chương 2–3 tập trung xây dựng mô hình khái niệm E-R/EER (Conceptual Schema), thì Chương 4 hướng dẫn bước chuyển đổi các sơ đồ đó thành tập hợp các bảng quan hệ chuẩn xác, cài đặt được trên DBMS."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "List five properties of relations",
+            "State two properties of candidate keys",
+            "Define first, second, and third normal form",
+            "Describe problems from merging relations",
+            "Transform E-R and EER diagrams to relations",
+            "Create tables with entity and relational integrity constraints",
+            "Use normalization to decompose anomalous relations to well-structured relations"
+          ],
+          "explanation": [
+            "Slide liệt kê 8 mục tiêu cốt lõi của Chương 4: định nghĩa thuật ngữ mô hình quan hệ, tính chất của relation và candidate key, các dạng chuẩn 1NF/2NF/3NF, vấn đề khi gộp relation (view integration), quy tắc ánh xạ E-R/EER sang bảng, cài đặt ràng buộc toàn vẹn và phân rã bảng bị dị thường (anomaly).",
+            "Lưu ý chi tiết hay gây nhầm giữa các ấn bản Hoffer: mục tiêu ở Slide 2 ghi 'List five properties of relations' và nhắc tới 'two properties of candidate keys', nhưng nội dung slide 4 thực tế tách thành 6 gạch đầu dòng (với thứ tự cột và thứ tự hàng tách riêng)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "COMPONENTS OF RELATIONAL MODEL",
+          "bullets": [
+            {
+              "text": "Data structure",
+              "subBullets": [
+                "Tables (relations), rows, columns"
+              ]
+            },
+            {
+              "text": "Data manipulation",
+              "subBullets": [
+                "Powerful SQL operations for retrieving and modifying data"
+              ]
+            },
+            {
+              "text": "Data integrity",
+              "subBullets": [
+                "Mechanisms for implementing business rules that maintain integrity of manipulated data"
+              ]
+            }
+          ],
+          "explanation": [
+            "Mô hình quan hệ không chỉ có mỗi 'bảng' mà đứng vững trên 3 trụ cột: (1) Cấu trúc dữ liệu (bảng/hàng/cột), (2) Thao tác dữ liệu (ngôn ngữ SQL để truy vấn SELECT và cập nhật INSERT/UPDATE/DELETE), và (3) Toàn vẹn dữ liệu (cơ chế ràng buộc đảm bảo dữ liệu luôn tuân thủ quy tắc nghiệp vụ).",
+            "Đề trắc nghiệm rất hay hỏi '3 thành phần của Relational Model là gì?' — nhớ đủ: Data structure, Data manipulation và Data integrity."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "RELATION",
+          "bullets": [
+            "A relation is a named, two-dimensional table of data.",
+            "A table consists of rows (records) and columns (attribute or field).",
+            {
+              "text": "Requirements for a table to qualify as a relation:",
+              "subBullets": [
+                "It must have a unique name.",
+                "Every attribute value must be atomic (not multivalued, not composite).",
+                "Every row must be unique (can’t have two rows with exactly the same values for all their fields).",
+                "Attributes (columns) in tables must have unique names.",
+                "The order of the columns must be irrelevant.",
+                "The order of the rows must be irrelevant."
+              ]
+            }
+          ],
+          "paragraphs": [
+            "NOTE: All relations are in 1st Normal form."
+          ],
+          "explanation": [
+            "Để một bảng 2 chiều thực sự được công nhận là một Relation trong CSDL quan hệ, nó phải thỏa mãn đủ 6 điều kiện: tên bảng duy nhất, mọi ô giá trị phải là đơn trị/nguyên tố (atomic — cấm mảng giá trị hoặc cấu trúc lồng nhau), không có hai hàng nào trùng hệt nhau trên mọi cột, tên các cột trong cùng bảng không trùng nhau, và thứ tự hàng/cột không mang ngữ nghĩa.",
+            "Quy tắc vàng in đỏ ở cuối slide: mọi bảng thỏa chuẩn Relation đều ĐƯƠNG NHIÊN đạt Dạng chuẩn 1 (1st Normal Form / 1NF). Nếu một bảng còn ô chứa nhiều giá trị (như Figure 4-25 ở Slide 47) thì bảng đó thậm chí chưa phải là relation."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "CORRESPONDENCE WITH E-R MODEL",
+          "bullets": [
+            "Relations (tables) correspond with entity types and with many-to-many relationship types.",
+            "Rows correspond with entity instances and with many-to-many relationship instances.",
+            "Columns correspond with attributes.",
+            "NOTE: The word relation (in relational database) is NOT the same as the word relationship (in E-R model)."
+          ],
+          "explanation": [
+            "Slide bắc cầu nối giữa mô hình E-R (Chương 2–3) và mô hình Quan hệ (Chương 4): thực thể (entity type) VÀ các mối quan hệ nhiều-nhiều (M:N relationship type) đều được hiện thực hóa thành bảng (relation); từng cá thể/cặp liên kết M:N trở thành hàng (row); còn các thuộc tính trở thành cột (column).",
+            "Cảnh báo kinh điển (NOTE cuối slide): 'Relation' là danh từ chỉ bảng dữ liệu trong CSDL quan hệ, hoàn toàn khác với 'Relationship' là đường nối biểu diễn mối quan hệ giữa các thực thể trong sơ đồ E-R."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 5"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Trường Khóa (Key Fields) & Ràng buộc Toàn vẹn (Integrity Constraints)",
+      "text": "Vai trò của Primary Key và Foreign Key, khái niệm Simple vs Composite Key, sơ đồ 4 bảng Pine Valley (Figure 4-3), 3 nhóm ràng buộc toàn vẹn (Domain, Entity Integrity, Referential Integrity), bảng Domain Definitions (Table 4-1), 3 luật xóa dữ liệu và câu lệnh DDL SQL cài đặt (Figure 4-6).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 6–12"
+      },
+      "digest": {
+        "keyPoints": [
+          "Primary Key (PK) là định danh duy nhất cho mỗi hàng trong relation; Foreign Key (FK) nằm ở bảng con (dependent / many side) để tham chiếu tới PK của bảng cha (parent / one side).",
+          "Khóa có thể là Simple (1 cột) hoặc Composite (từ 2 cột trở lên, thường vừa đóng vai trò composite PK vừa là từng FK riêng lẻ như OrderID và ProductID trong ORDER LINE).",
+          "3 ràng buộc toàn vẹn cốt lõi: Domain Constraints (giá trị hợp lệ theo kiểu & miền), Entity Integrity (không thành phần nào của PK được NULL), Referential Integrity (mọi giá trị FK phải khớp với một giá trị PK hiện có ở bảng cha hoặc là NULL).",
+          "3 luật xóa (Delete Rules) khi xóa dòng ở bảng cha: Restrict (cấm xóa nếu còn dòng con), Cascade (xóa dây chuyền dòng con), Set-to-Null (đưa FK ở bảng con về NULL — KHÔNG được phép dùng cho weak entity)."
+        ],
+        "terms": [
+          {
+            "term": "Entity Integrity",
+            "meaning": "Ràng buộc toàn vẹn thực thể: không bất kỳ thuộc tính nào thuộc Primary Key được phép nhận giá trị NULL."
+          },
+          {
+            "term": "Referential Integrity",
+            "meaning": "Ràng buộc toàn vẹn tham chiếu: giá trị Foreign Key ở bảng con bắt buộc phải khớp với một Primary Key tồn tại ở bảng cha, hoặc mang giá trị NULL (nếu quan hệ cho phép optional)."
+          },
+          {
+            "term": "Delete Rules (Restrict / Cascade / Set-to-Null)",
+            "meaning": "Chính sách xử lý của DBMS khi xóa bản ghi cha mà đang có bản ghi con tham chiếu tới."
+          }
+        ],
+        "pitfalls": [
+          "Trong sơ đồ lược đồ quan hệ (Figure 4-5), mũi tên toàn vẹn tham chiếu luôn đi TỪ bảng con/phụ thuộc (dependent table chứa FK) TỚI bảng cha (parent table chứa PK) — rất dễ vẽ ngược chiều!",
+          "Luật Set-to-Null KHÔNG ĐƯỢC PHÉP áp dụng cho Weak Entity vì khóa ngoại của weak entity là một phần trong composite Primary Key của chính nó (vi phạm Entity Integrity nếu thành NULL)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "KEY FIELDS",
+          "bullets": [
+            {
+              "text": "Keys are special fields that serve two main purposes:",
+              "subBullets": [
+                "Primary keys are unique identifiers of the relation. Examples include employee numbers, social security numbers, etc. This guarantees that all rows are unique.",
+                "Foreign keys are identifiers that enable a dependent relation (on the many side of a relationship) to refer to its parent relation (on the one side of the relationship)."
+              ]
+            },
+            "Keys can be simple (a single field) or composite (more than one field).",
+            "Keys usually are used as indexes to speed up the response to user queries (more on this in Chapter 5)."
+          ],
+          "explanation": [
+            "Slide giải thích 2 nhiệm vụ chính của trường khóa: Primary Key (PK) bảo đảm mọi hàng trong bảng đều phân biệt duy nhất với nhau, còn Foreign Key (FK) giúp bảng phụ thuộc (bên nhiều — many side) móc nối ngược về bảng cha (bên một — one side).",
+            "Cần phân biệt Simple key (khóa đơn gồm 1 cột như CustomerID) và Composite key (khóa ghép từ 2 cột trở lên như (OrderID, ProductID)). Ngoài tác dụng ràng buộc logic, các cột khóa thường được đánh chỉ mục (index) tự động để tăng tốc truy vấn ở Chương 5."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Figure 4-3 Schema for four relations (Pine Valley Furniture Company)",
+          "diagramText": [
+            "CUSTOMER: CustomerID [PK] | CustomerName | CustomerAddress | CustomerCity* | CustomerState* | CustomerPostalCode  → CustomerID khoanh tròn: Primary Key",
+            "ORDER: OrderID [PK] | OrderDate | CustomerID [FK]  → CustomerID khoanh tròn: Foreign Key (implements 1:N relationship between customer and order)",
+            "ORDER LINE: OrderID [PK] | ProductID [PK] | OrderedQuantity  → (OrderID, ProductID) khoanh tròn: Combined, these are a composite primary key (uniquely identifies the order line)...individually they are foreign keys (implement M:N relationship between order and product)",
+            "PRODUCT: ProductID [PK] | ProductDescription | ProductFinish | ProductStandardPrice | ProductLineID",
+            "* Not in Figure 2-22 for simplicity."
+          ],
+          "diagramNote": "Quy ước ký hiệu chuẩn trong lược đồ quan hệ Hoffer: nét gạch chân liền biểu thị Primary Key, nét gạch chân đứt đoạn biểu thị Foreign Key (nếu một cột vừa nằm trong PK vừa là FK như ở ORDER LINE thì được gạch liền vì thuộc Composite Primary Key).",
+          "explanation": [
+            "Figure 4-3 là ví dụ xương sống xuyên suốt cả môn DBS cho Pine Valley Furniture Company: CUSTOMER (1) – ORDER (N) được nối bằng FK `CustomerID` gạch đứt nằm trong bảng `ORDER`; còn quan hệ M:N giữa `ORDER` và `PRODUCT` được hiện thực hóa bằng bảng trung gian `ORDER LINE`.",
+            "Điểm cực quan trọng hay ra thi: trong `ORDER LINE`, cặp `(OrderID, ProductID)` kết hợp lại thành Composite Primary Key để định danh duy nhất từng dòng đơn hàng, đồng thời xét riêng từng cột thì `OrderID` là FK trỏ về `ORDER` và `ProductID` là FK trỏ về `PRODUCT`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "INTEGRITY CONSTRAINTS",
+          "bullets": [
+            {
+              "text": "Domain Constraints",
+              "subBullets": [
+                "Allowable values for an attribute (See Table 4-1)"
+              ]
+            },
+            {
+              "text": "Entity Integrity",
+              "subBullets": [
+                "No primary key attribute may be null. All primary key fields MUST contain data values."
+              ]
+            },
+            {
+              "text": "Referential Integrity",
+              "subBullets": [
+                "Rules that maintain consistency between the rows of two related tables."
+              ]
+            }
+          ],
+          "explanation": [
+            "Ba lớp hàng rào bảo vệ chất lượng dữ liệu trong CSDL quan hệ: Domain Constraints giới hạn miền giá trị hợp lệ của từng cột; Entity Integrity cấm hoàn toàn giá trị NULL ở mọi thành phần của Primary Key (kể cả từng phần trong Composite PK!); Referential Integrity giữ nhất quán giữa hai bảng liên quan qua khóa ngoại.",
+            "Bẫy trắc nghiệm thường gặp: với khóa chính ghép (ví dụ `(OrderID, ProductID)`), không được phép để `OrderID = 1001, ProductID = NULL` — bất kỳ thành phần nào của PK cũng bắt buộc `NOT NULL`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "TABLE 4-1 Domain Definitions for INVOICE Attributes",
+          "paragraphs": [
+            "Domain definitions enforce domain integrity constraints."
+          ],
+          "table": {
+            "caption": "TABLE 4-1 Domain Definitions for INVOICE Attributes",
+            "headers": [
+              "Attribute",
+              "Domain Name",
+              "Description",
+              "Domain"
+            ],
+            "rows": [
+              ["CustomerID", "Customer IDs", "Set of all possible customer IDs", "character: size 5"],
+              ["CustomerName", "Customer Names", "Set of all possible customer names", "character: size 25"],
+              ["CustomerAddress", "Customer Addresses", "Set of all possible customer addresses", "character: size 30"],
+              ["CustomerCity", "Cities", "Set of all possible cities", "character: size 20"],
+              ["CustomerState", "States", "Set of all possible states", "character: size 2"],
+              ["CustomerPostalCode", "Postal Codes", "Set of all possible postal zip codes", "character: size 10"],
+              ["OrderID", "Order IDs", "Set of all possible order IDs", "character: size 5"],
+              ["OrderDate", "Order Dates", "Set of all possible order dates", "date: format mm/dd/yy"],
+              ["ProductID", "Product IDs", "Set of all possible product IDs", "character: size 5"],
+              ["ProductDescription", "Product Descriptions", "Set of all possible product descriptions", "character: size 25"],
+              ["ProductFinish", "Product Finishes", "Set of all possible product finishes", "character: size 15"],
+              ["ProductStandardPrice", "Unit Prices", "Set of all possible unit prices", "monetary: 6 digits"],
+              ["ProductLineID", "Product Line IDs", "Set of all possible product line IDs", "integer: 3 digits"],
+              ["OrderedQuantity", "Quantities", "Set of all possible ordered quantities", "integer: 3 digits"]
+            ]
+          },
+          "explanation": [
+            "Table 4-1 minh họa cách đặc tả Domain Definition cho toàn bộ 14 thuộc tính trên chứng từ INVOICE: mỗi cột được gắn với một Domain Name, mô tả ngữ nghĩa và quy định kiểu/độ dài cụ thể (như `CustomerState` dài đúng 2 ký tự, `OrderDate` theo định dạng `date: format mm/dd/yy`, `ProductStandardPrice` kiểu tiền tệ 6 chữ số).",
+            "Các định nghĩa miền này chính là metadata giúp DBMS tự động từ chối dữ liệu nhập sai định dạng hoặc vượt quá độ dài, qua đó thực thi ràng buộc Domain Integrity."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "INTEGRITY CONSTRAINTS — Referential Integrity & Delete Rules",
+          "bullets": [
+            {
+              "text": "Referential Integrity–rule states that any foreign key value (on the relation of the many side) MUST match a primary key value in the relation of the one side. (Or the foreign key can be null)",
+              "subBullets": [
+                "For example: Delete Rules",
+                "Restrict–don’t allow delete of “parent” side if related rows exist in “dependent” side",
+                "Cascade–automatically delete “dependent” side rows that correspond with the “parent” side row to be deleted",
+                "Set-to-Null–set the foreign key in the dependent side to null if deleting from the parent side → not allowed for weak entities"
+              ]
+            }
+          ],
+          "explanation": [
+            "Định nghĩa chặt chẽ Referential Integrity: giá trị FK ở bảng con (bên nhiều) chỉ có 2 trường hợp hợp lệ — hoặc khớp đúng một PK đang tồn tại ở bảng cha (bên một), hoặc mang giá trị NULL (khi mối quan hệ cho phép optional).",
+            "Khi người dùng xóa 1 dòng ở bảng cha mà bảng con đang trỏ tới, DBMS áp dụng 1 trong 3 Delete Rules: **Restrict** (chặn không cho xóa cha nếu còn con — an toàn mặc định), **Cascade** (xóa cha thì tự động xóa hết mọi dòng con liên quan), và **Set-to-Null** (xóa cha thì gán FK ở dòng con thành NULL — tuyệt đối CẤM dùng cho weak entity vì FK của weak entity nằm trong PK của nó)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Figure 4-5 Referential integrity constraints (Pine Valley Furniture)",
+          "diagramText": [
+            "CUSTOMER (CustomerID [PK], CustomerName, CustomerAddress, CustomerCity, CustomerState, CustomerPostalCode)",
+            "ORDER (OrderID [PK], OrderDate, CustomerID [FK])  ──mũi tên từ ORDER.CustomerID → CUSTOMER.CustomerID",
+            "ORDER LINE (OrderID [PK], ProductID [PK], OrderedQuantity)  ──mũi tên từ ORDER LINE.OrderID → ORDER.OrderID; mũi tên từ ORDER LINE.ProductID → PRODUCT.ProductID",
+            "PRODUCT (ProductID [PK], ProductDescription, ProductFinish, ProductStandardPrice, ProductLineID)",
+            "Ghi chú nổi bật: Referential integrity constraints are drawn via arrows from dependent to parent table"
+          ],
+          "diagramNote": "Sơ đồ 4 bảng Pine Valley kèm 3 mũi tên xanh biểu diễn ràng buộc toàn vẹn tham chiếu xuất phát từ cột khóa ngoại của bảng phụ thuộc (dependent) trỏ thẳng vào khóa chính của bảng cha (parent).",
+          "explanation": [
+            "Figure 4-5 chuẩn hóa cách vẽ mũi tên toàn vẹn tham chiếu: luôn bắt đầu TỪ cột Foreign Key ở bảng phụ thuộc (ví dụ `ORDER.CustomerID`, `ORDER LINE.OrderID`, `ORDER LINE.ProductID`) và chĩa mũi tên VỀ bảng cha (`CUSTOMER`, `ORDER`, `PRODUCT`).",
+            "Mẹo nhớ khi vẽ bài thi trên giấy: đọc chiều mũi tên là 'bảng con tham chiếu/tìm cha của nó' — tránh nhầm với chiều 1:M (từ cha sang con) trong E-R."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Figure 4-6 SQL table definitions",
+          "paragraphs": [
+            "Referential integrity constraints are implemented with foreign key to primary key references."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Customer_T\n     (CustomerID          NUMBER(11,0)     NOT NULL,\n      CustomerName        VARCHAR2(25)     NOT NULL,\n      CustomerAddress     VARCHAR2(30),\n      CustomerCity        VARCHAR2(20),\n      CustomerState       CHAR(2),\n      CustomerPostalCode  VARCHAR2(9),\nCONSTRAINT Customer_PK PRIMARY KEY (CustomerID));\n\nCREATE TABLE Order_T\n     (OrderID             NUMBER(11,0)     NOT NULL,\n      OrderDate           DATE DEFAULT SYSDATE,\n      CustomerID          NUMBER(11,0),\nCONSTRAINT Order_PK PRIMARY KEY (OrderID),\nCONSTRAINT Order_FK FOREIGN KEY (CustomerID) REFERENCES Customer_T (CustomerID));\n\nCREATE TABLE Product_T\n     (ProductID           NUMBER(11,0)     NOT NULL,\n      ProductDescription  VARCHAR2(50),\n      ProductFinish       VARCHAR2(20),\n      ProductStandardPrice DECIMAL(6,2),\n      ProductLineID       NUMBER(11,0),\nCONSTRAINT Product_PK PRIMARY KEY (ProductID));\n\nCREATE TABLE OrderLine_T\n     (OrderID             NUMBER(11,0)     NOT NULL,\n      ProductID           NUMBER(11,0)     NOT NULL,\n      OrderedQuantity     NUMBER(11,0),\nCONSTRAINT OrderLine_PK PRIMARY KEY (OrderID, ProductID),\nCONSTRAINT OrderLine_FK1 FOREIGN KEY (OrderID) REFERENCES Order_T (OrderID),\nCONSTRAINT OrderLine_FK2 FOREIGN KEY (ProductID) REFERENCES Product_T (ProductID));"
+          },
+          "diagramNote": "Đoạn SQL DDL minh họa cài đặt 4 bảng theo Figure 4-5; khung đỏ và mũi tên đỏ chỉ vào ràng buộc `CONSTRAINT Order_FK FOREIGN KEY (CustomerID) REFERENCES Customer_T (CustomerID)` trỏ về cột `CustomerID` của `Customer_T`.",
+          "explanation": [
+            "Figure 4-6 chuyển trực tiếp lược đồ Figure 4-5 thành mã SQL `CREATE TABLE` (cú pháp Oracle như `NUMBER(11,0)`, `VARCHAR2`, `SYSDATE`), trong đó bảng cha (`Customer_T`, `Order_T`, `Product_T`) phải được tạo trước bảng con tham chiếu tới nó.",
+            "Chú ý cách khai báo khóa chính ghép trong `OrderLine_T`: `CONSTRAINT OrderLine_PK PRIMARY KEY (OrderID, ProductID)` đi kèm hai ràng buộc `FOREIGN KEY` tách biệt (`OrderLine_FK1` trỏ về `Order_T` và `OrderLine_FK2` trỏ về `Product_T`)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 12"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Chuyển đổi EER sang Quan hệ — Phần 1: Regular Entity, Weak Entity & Binary Relationship",
+      "text": "Quy tắc ánh xạ thực thể thường (thuộc tính đơn, phức hợp, đa trị), thực thể yếu (Weak Entity), và 3 dạng quan hệ hai ngôi (1:M, M:N, 1:1) kèm các hình minh họa Figure 4-8 đến 4-14.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 13–25"
+      },
+      "digest": {
+        "keyPoints": [
+          "Regular entity: thuộc tính đơn giữ nguyên; composite attribute chỉ lấy các thuộc tính thành phần đơn (bỏ tên nhóm cha); multivalued attribute tách thành bảng riêng chứa PK bảng gốc + thuộc tính đa trị ghép lại thành composite PK.",
+          "Weak entity: tạo bảng riêng với composite PK = PK của thực thể chủ (identifying/strong entity) + partial identifier của weak entity; FK tham chiếu thực thể chủ KHÔNG được phép NULL.",
+          "Binary 1:M: đưa PK của phía 1 sang làm FK ở phía M.",
+          "Binary M:N: tạo relation trung gian (intersection relation) chứa PK của cả hai thực thể (làm composite PK và đồng thời là FK riêng lẻ) cộng thuộc tính của mối quan hệ.",
+          "Binary 1:1: đặt PK của bên bắt buộc (mandatory side) làm FK ở bên tùy chọn (optional side) để giảm thiểu giá trị NULL."
+        ],
+        "terms": [
+          {
+            "term": "Composite Attribute Mapping",
+            "meaning": "Trải phẳng thuộc tính phức hợp thành các cột thành phần đơn (ví dụ bỏ Customer Address, chỉ giữ CustomerStreet, CustomerCity, CustomerState)."
+          },
+          {
+            "term": "Intersection Relation",
+            "meaning": "Bảng trung gian mới sinh ra khi ánh xạ quan hệ M:N (ví dụ CERTIFICATE giữa EMPLOYEE và COURSE)."
+          }
+        ],
+        "pitfalls": [
+          "Thuộc tính đa trị `{Skill}` của `EMPLOYEE` không lưu thành nhiều cột `Skill1, Skill2` mà tách hẳn sang bảng `EMPLOYEE SKILL(EmployeeID, Skill)` với cả 2 cột cùng được gạch chân làm Composite PK!",
+          "Trong quan hệ 1:1 có một đầu optional (Figure 4-14), luôn chọn bên OPTIONAL để đặt FK trỏ về bên MANDATORY — nếu đặt ngược về bên mandatory, các bản ghi không tham gia quan hệ sẽ sinh ra nhiều ô FK bị NULL."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS — Mapping Regular Entities to Relations",
+          "bullets": [
+            "Simple attributes: E-R attributes map directly onto the relation",
+            "Composite attributes: Use only their simple, component attributes",
+            "Multivalued Attribute: Becomes a separate relation with a foreign key taken from the superior entity"
+          ],
+          "explanation": [
+            "Đây là Bước 1 trong quy trình chuyển đổi sơ đồ E-R/EER sang bảng quan hệ: xử lý các thực thể mạnh/thường (Regular/Strong Entities).",
+            "Ghi nhớ xử lý 3 loại thuộc tính: đơn trị (map thẳng thành cột), phức hợp (chỉ lấy các thuộc tính con đơn lẻ, bỏ tên thuộc tính cha gộp), và đa trị (tách riêng thành một bảng mới có khóa ngoại trỏ về thực thể gốc)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Figure 4-8 Mapping a regular entity",
+          "diagramText": [
+            "(a) CUSTOMER entity type with simple attributes: CUSTOMER [Customer ID [PK], Customer Name, Customer Address, Customer Postal Code]",
+            "(b) CUSTOMER relation: CUSTOMER (CustomerID [PK], CustomerName, CustomerAddress, CustomerPostalCode)"
+          ],
+          "diagramNote": "Ánh xạ trực tiếp một entity có toàn thuộc tính đơn thành một relation tương ứng, giữ nguyên khóa chính CustomerID.",
+          "explanation": [
+            "Figure 4-8 minh họa trường hợp cơ bản nhất: thực thể `CUSTOMER` chỉ gồm các thuộc tính đơn (`Customer ID`, `Customer Name`, `Customer Address`, `Customer Postal Code`) biến đổi thẳng 1-1 thành bảng `CUSTOMER` với khóa chính `CustomerID`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Figure 4-9 Mapping a composite attribute",
+          "diagramText": [
+            "(a) CUSTOMER entity type with composite attribute: CUSTOMER [Customer ID [PK], Customer Name, Customer Address (CustomerStreet, CustomerCity, CustomerState), Customer Postal Code]",
+            "(b) CUSTOMER relation with address detail: CUSTOMER (CustomerID [PK], CustomerName, CustomerStreet, CustomerCity, CustomerState, CustomerPostalCode)"
+          ],
+          "diagramNote": "Thuộc tính phức hợp Customer Address bị loại bỏ ở cấp bảng, thay bằng 3 cột chi tiết đơn lẻ CustomerStreet, CustomerCity, CustomerState.",
+          "explanation": [
+            "Figure 4-9 minh họa cách xử lý thuộc tính phức hợp (composite attribute): trong sơ đồ E-R có `Customer Address` gộp 3 phần `(CustomerStreet, CustomerCity, CustomerState)`, khi chuyển sang relation thì KHÔNG tạo cột `CustomerAddress` nữa mà chỉ giữ lại 3 cột đơn lẻ.",
+            "Làm như vậy đảm bảo mọi ô trong bảng đều thỏa tính chất atomic của mô hình quan hệ và dễ tìm kiếm/lọc theo từng thành phố hoặc bang."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Figure 4-10 Mapping an entity with a multivalued attribute",
+          "diagramText": [
+            "(a) EMPLOYEE [Employee ID [PK], Employee Name, Employee Address, {Skill}]",
+            "Multivalued attribute becomes a separate relation with foreign key",
+            "(b) EMPLOYEE (EmployeeID [PK], EmployeeName, EmployeeAddress)",
+            "    EMPLOYEE SKILL (EmployeeID [PK], Skill [PK])  ──mũi tên từ EMPLOYEE SKILL.EmployeeID → EMPLOYEE.EmployeeID",
+            "One–to–many relationship between original entity and new relation"
+          ],
+          "diagramNote": "Thuộc tính đa trị {Skill} tách ra thành bảng EMPLOYEE SKILL riêng với khóa chính ghép (EmployeeID, Skill) và quan hệ 1:M với bảng EMPLOYEE.",
+          "explanation": [
+            "Figure 4-10 giải quyết thuộc tính đa trị `{Skill}` (một nhân viên có thể sở hữu nhiều kỹ năng): vì mỗi ô quan hệ chỉ chứa 1 giá trị đơn, ta tách `{Skill}` thành bảng riêng `EMPLOYEE SKILL`.",
+            "Khóa chính của bảng mới là tổ hợp `(EmployeeID, Skill)` — vừa bảo đảm một nhân viên có nhiều skill khác nhau không bị trùng hàng, vừa dùng `EmployeeID` làm FK móc ngược về `EMPLOYEE` theo quan hệ 1:M."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS (CONT.) — Mapping Weak Entities",
+          "bullets": [
+            "Becomes a separate relation with a foreign key taken from the superior entity",
+            {
+              "text": "Primary key composed of:",
+              "subBullets": [
+                "Partial identifier of weak entity",
+                "Primary key of identifying relation (strong entity)"
+              ]
+            }
+          ],
+          "explanation": [
+            "Bước 2 trong chuyển đổi EER: ánh xạ Weak Entity (thực thể yếu — thực thể không thể tồn tại độc lập nếu thiếu thực thể chủ và chỉ có partial identifier gạch chân nét đứt).",
+            "Weak Entity luôn biến thành một bảng riêng có khóa chính ghép từ 2 phần: khóa chính của thực thể chủ (strong/identifying entity) ghép cùng partial identifier của chính weak entity đó."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Figure 4-11 Example of mapping a weak entity — a) Weak entity DEPENDENT",
+          "diagramText": [
+            "EMPLOYEE [Employee ID [PK], Employee Name] ═══ (Claims, 1:M identifying relationship nét đôi) ═══< DEPENDENT (khung kép) [Dependent Name [gạch đứt/partial identifier] (First Name, Middle Initial, Last Name), Date of Birth, Gender]"
+          ],
+          "diagramNote": "Sơ đồ E-R biểu diễn DEPENDENT là thực thể yếu (viền chữ nhật kép) phụ thuộc vào EMPLOYEE qua mối quan hệ định danh Claims (đường nối kép); Dependent Name là cả partial identifier (gạch đứt kép/nhấn mạnh) lẫn thuộc tính phức hợp gồm 3 phần.",
+          "explanation": [
+            "Figure 4-11a trình bày tình huống kinh điển: `EMPLOYEE` bảo lãnh/khai báo (`Claims`) người phụ thuộc `DEPENDENT`. Một nhân viên có thể có nhiều `DEPENDENT`, nhưng bản thân `DEPENDENT` không có mã định danh độc lập trên toàn công ty mà chỉ có tên (`Dependent Name`).",
+            "Lưu ý điểm thú vị ở ví dụ này: `Dependent Name` vừa là partial identifier của weak entity, vừa là một thuộc tính phức hợp gồm `(First Name, Middle Initial, Last Name)` nên ở bước sang bảng ta phải rã cả 3 thành phần tên này ra."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Figure 4-11 Example of mapping a weak entity (cont.) — b) Relations resulting from weak entity",
+          "diagramText": [
+            "EMPLOYEE (EmployeeID [PK], EmployeeName)",
+            "DEPENDENT (FirstName [PK], MiddleInitial [PK], LastName [PK], EmployeeID [PK], DateOfBirth, Gender)",
+            "Mũi tên FK: DEPENDENT.EmployeeID → EMPLOYEE.EmployeeID",
+            "Chú thích: Composite primary key = {FirstName, MiddleInitial, LastName, EmployeeID}; Foreign key = EmployeeID",
+            "NOTE: the domain constraint for the foreign key should NOT allow null value if DEPENDENT is a weak entity"
+          ],
+          "diagramNote": "Kết quả chuyển đổi gồm 2 bảng; toàn bộ 4 cột FirstName, MiddleInitial, LastName và EmployeeID hợp thành composite primary key của DEPENDENT.",
+          "explanation": [
+            "Figure 4-11b thể hiện kết quả chuẩn xác sau khi áp dụng đồng thời quy tắc Weak Entity + Composite Attribute: `FirstName`, `MiddleInitial`, `LastName` (phần partial identifier đã trải phẳng) ghép với `EmployeeID` (PK từ `EMPLOYEE`) thành Composite Primary Key gồm 4 cột cho bảng `DEPENDENT`.",
+            "Cảnh báo đỏ cực hay hỏi trắc nghiệm: khóa ngoại `EmployeeID` trong bảng `DEPENDENT` tuyệt đối KHÔNG ĐƯỢC phép NULL vì nó là thành phần của khóa chính (Entity Integrity) và weak entity bắt buộc phải thuộc về một thực thể chủ."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS (CONT.) — Mapping Binary Relationships",
+          "bullets": [
+            "One-to-Many–Primary key on the one side becomes a foreign key on the many side",
+            "Many-to-Many–Create a new relation with the primary keys of the two entities as its primary key",
+            "One-to-One–Primary key on mandatory side becomes a foreign key on optional side"
+          ],
+          "explanation": [
+            "Bước 3 là xương sống khi chuyển đổi sơ đồ E-R: quy tắc xử lý 3 bản số của quan hệ hai ngôi (Binary Relationships).",
+            "Hãy thuộc lòng cả 3: (1) Quan hệ `1:M` → ném PK bên `1` sang làm FK ở bảng bên `M`; (2) Quan hệ `M:N` → tạo bảng mới lấy cả hai PK ghép lại làm khóa chính (cũng là 2 FK); (3) Quan hệ `1:1` → đẩy PK bên bắt buộc (mandatory) làm FK sang bên tùy chọn (optional)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Figure 4-12 Example of mapping a 1:M relationship",
+          "diagramText": [
+            "a) Relationship between customers and orders: CUSTOMER [Customer ID [PK], Customer Name, Customer Address, Customer Postal Code] ──|| (mandatory one) ── Submits ── ○< ORDER [ORDER ID [PK], Order Date]",
+            "   Note the mandatory one",
+            "b) Mapping the relationship:",
+            "   CUSTOMER (CustomerID [PK], CustomerName, CustomerAddress, CustomerPostalCode)",
+            "   ORDER (OrderID [PK], OrderDate, CustomerID [FK])  ──mũi tên FK từ ORDER.CustomerID → CUSTOMER.CustomerID",
+            "   Chú thích: Foreign key = CustomerID. Again, no null value in the foreign key…this is because of the mandatory minimum cardinality."
+          ],
+          "diagramNote": "Minh họa quan hệ 1:M (CUSTOMER — Submits — ORDER) biến đổi thành 2 bảng với CustomerID làm khóa ngoại trong ORDER; vì phía CUSTOMER có bản số tối thiểu là 1 (||) nên ORDER.CustomerID không được NULL.",
+          "explanation": [
+            "Figure 4-12 minh họa quy tắc `1:M`: bảng `CUSTOMER` (bên 1) giữ nguyên, còn bảng `ORDER` (bên M) nhận thêm cột khóa ngoại `CustomerID` gạch chân đứt trỏ về `CUSTOMER`.",
+            "Chú ý phần bản số tối thiểu (minimum cardinality): ký hiệu `||` (mandatory one) ở đầu `CUSTOMER` có nghĩa là mọi đơn hàng `ORDER` bắt buộc phải thuộc về đúng 1 khách hàng, do đó khi cài đặt vật lý `ORDER.CustomerID` phải đặt `NOT NULL`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "Figure 4-13 Example of mapping an M:N relationship — a) Completes relationship (M:N)",
+          "diagramText": [
+            "EMPLOYEE [Employee ID [PK], Employee Name, Employee Birth Date] >○── Completes ──○< COURSE [Course ID [PK], Course Title]",
+            "Thuộc tính trên mối quan hệ: Date Completed (nối nét đứt tới đường Completes)",
+            "The Completes relationship will need to become a separate relation."
+          ],
+          "diagramNote": "Sơ đồ E-R quan hệ M:N giữa EMPLOYEE và COURSE có thuộc tính riêng Date Completed gắn trên mối quan hệ Completes.",
+          "explanation": [
+            "Figure 4-13a giới thiệu quan hệ nhiều-nhiều (`M:N`): một nhân viên hoàn thành nhiều khóa học, một khóa học có thể được nhiều nhân viên hoàn thành, kèm ngày hoàn thành `Date Completed` gắn trực tiếp lên liên kết `Completes`.",
+            "Vì không thể nhét cột `CourseID` (hoặc `DateCompleted`) vào bảng `EMPLOYEE` hay nhét `EmployeeID` vào bảng `COURSE` mà không vi phạm 1NF, bắt buộc phải tách `Completes` thành một bảng thứ ba độc lập."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Figure 4-13 Example of mapping an M:N relationship (cont.) — b) Three resulting relations",
+          "diagramText": [
+            "EMPLOYEE (EmployeeID [PK], EmployeeName, EmployeeBirthDate)",
+            "CERTIFICATE (EmployeeID [PK], CourseID [PK], DateCompleted)  ← new intersection relation; Composite primary key = {EmployeeID, CourseID}",
+            "COURSE (CourseID [PK], CourseTitle)",
+            "Mũi tên FK: CERTIFICATE.EmployeeID → EMPLOYEE.EmployeeID; CERTIFICATE.CourseID → COURSE.CourseID"
+          ],
+          "diagramNote": "Mối quan hệ Completes trở thành bảng giao CERTIFICATE với khóa chính ghép (EmployeeID, CourseID), đồng thời từng cột đều là Foreign Key.",
+          "explanation": [
+            "Figure 4-13b trình bày kết quả ánh xạ chuẩn: từ 2 thực thể ban đầu thu được 3 bảng (`EMPLOYEE`, `CERTIFICATE`, `COURSE`). Bảng giao mới `CERTIFICATE` nhận khóa chính của cả hai đầu thành khóa chính ghép `(EmployeeID, CourseID)` và giữ luôn thuộc tính `DateCompleted` của mối quan hệ.",
+            "Chú ý: về mặt kỹ thuật, mỗi cột `EmployeeID` và `CourseID` trong `CERTIFICATE` vừa là một nửa của Composite Primary Key, vừa đóng vai trò Foreign Key trỏ về bảng gốc tương ứng."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Figure 4-14 Example of mapping a binary 1:1 relationship — a) In charge relationship (binary 1:1)",
+          "diagramText": [
+            "NURSE [Nurse ID [PK], Nurse Name, Nurse Birth Date] ──|| ── In Charge ── ○| CARE CENTER [Center ID [PK], Center Location]",
+            "Thuộc tính trên mối quan hệ: Date Assigned (nối nét đứt tới đường In Charge)",
+            "Mũi tên đỏ chỉ vào đầu CARE CENTER (○|): Often in 1:1 relationships, one direction is optional"
+          ],
+          "diagramNote": "Quan hệ 1:1 giữa NURSE (đầu bắt buộc || — không nhất thiết phải phụ trách 1 trung tâm? Khoan: đọc kỹ Crow's foot — dấu || nằm phía NURSE nghĩa là mỗi CARE CENTER bắt buộc có đúng 1 NURSE phụ trách; dấu ○| nằm phía CARE CENTER nghĩa là một NURSE có thể phụ trách 0 hoặc 1 CARE CENTER).",
+          "explanation": [
+            "Figure 4-14a là ví dụ cực dễ đọc nhầm chiều optional/mandatory: trên đường nối `In Charge`, phía gần `CARE CENTER` có vòng tròn gạch `○|` (một `NURSE` có thể phụ trách 0 hoặc 1 `CARE CENTER` ⇒ `CARE CENTER` là phía optional hay nói cách khác có thể tồn tại y tá chưa phụ trách trung tâm nào).",
+            "Ngược lại phía gần `NURSE` có dấu `||` (một `CARE CENTER` bắt buộc có đúng 1 `NURSE` phụ trách ⇒ đầu `NURSE` là mandatory đối với `CARE CENTER`). Vì mọi `CARE CENTER` đều PHẢI có 1 y tá phụ trách nên đặt khóa ngoại trong `CARE CENTER` sẽ không bao giờ bị NULL!"
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Figure 4-14 Example of mapping a binary 1:1 relationship (cont.) — b) Resulting relations",
+          "diagramText": [
+            "NURSE (NurseID [PK], NurseName, NurseBirthDate)",
+            "CARE CENTER (CenterID [PK], CenterLocation, NurseInCharge [FK], DateAssigned)  ──mũi tên FK từ CARE CENTER.NurseInCharge → NURSE.NurseID",
+            "Foreign key goes in the relation on the optional side, matching the primary key on the mandatory side"
+          ],
+          "diagramNote": "Khóa chính NurseID của NURSE được đưa sang CARE CENTER (đặt tên lại thành NurseInCharge — gạch đứt FK) cùng thuộc tính DateAssigned.",
+          "explanation": [
+            "Figure 4-14b khẳng định cách đặt FK tối ưu cho quan hệ `1:1`: đưa PK `NurseID` (đổi tên cho rõ nghĩa nghiệp vụ thành `NurseInCharge`) cùng thuộc tính quan hệ `DateAssigned` sang bảng `CARE CENTER`.",
+            "Lý do thực tế dễ hiểu: giả sử công ty có 100 y tá (`NURSE`) nhưng chỉ có 10 trung tâm (`CARE CENTER`); nếu đặt `CenterID` trong `NURSE` thì 90 dòng y tá sẽ bị NULL ở `CenterID` và `DateAssigned`, còn đặt `NurseInCharge` trong `CARE CENTER` thì cả 10 dòng trung tâm đều có giá trị đầy đủ (0% NULL)!"
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 25"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Chuyển đổi EER sang Quan hệ — Phần 2: Associative Entity, Unary, Ternary & Supertype/Subtype",
+      "text": "Quy tắc ánh xạ Thực thể kết hợp (có và không có identifier riêng), Quan hệ một ngôi (Unary 1:N & M:N), Quan hệ ba ngôi (Ternary PATIENT TREATMENT), và Quan hệ kế thừa Supertype/Subtype (Figure 4-15 đến 4-21).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 26–39"
+      },
+      "digest": {
+        "keyPoints": [
+          "Associative Entity không gán identifier riêng → xử lý y hệt M:N (composite PK từ PK hai đầu). Nếu ĐÃ gán identifier riêng (như Shipment ID) → dùng identifier đó làm PK, còn hai PK từ entity cha chỉ là FK thông thường (không nằm trong PK).",
+          "Unary 1:N: giữ 1 bảng duy nhất, thêm một cột Recursive Foreign Key ngay trong chính bảng đó (ví dụ ManagerID trỏ về EmployeeID).",
+          "Unary M:N (Bill-of-materials): tách thành 2 bảng — bảng thực thể chính (ITEM) và bảng kết hợp (COMPONENT) chứa 2 FK cùng tham chiếu về PK của bảng chính (ItemNo và ComponentNo).",
+          "Ternary (n-ary): mỗi thực thể thành 1 bảng, thêm 1 bảng associative ở giữa giữ FK tới tất cả n thực thể tham gia; thường nên cân nhắc surrogate key (ví dụ Treatment#) nếu composite PK quá cồng kềnh.",
+          "Supertype/Subtype: tạo 1 bảng cho supertype (chứa thuộc tính chung & subtype discriminator) và 1 bảng cho mỗi subtype (chứa thuộc tính riêng + PK mượn trực tiếp từ supertype, đồng thời làm FK tạo quan hệ 1:1)."
+        ],
+        "terms": [
+          {
+            "term": "Recursive Foreign Key",
+            "meaning": "Khóa ngoại trong một bảng tự tham chiếu lại chính khóa chính của cùng bảng đó (dùng cho Unary 1:N)."
+          },
+          {
+            "term": "Subtype Discriminator",
+            "meaning": "Thuộc tính nằm trong bảng supertype dùng để phân biệt bản ghi đang thuộc subtype nào (ví dụ Employee Type = 'H', 'S', 'C')."
+          },
+          {
+            "term": "Surrogate Key",
+            "meaning": "Khóa thay thế đơn gọn (ví dụ Treatment#) được tạo thay cho composite PK quá nhiều cột trong quan hệ ternary/n-ary."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi kinh điển với Associative Entity có sẵn định danh riêng (Figure 4-16 SHIPMENT): rất nhiều bạn quen tay gạch chân cả 3 cột `(ShipmentID, CustomerID, VendorID)` hoặc dùng `(CustomerID, VendorID)` làm PK — SAI! Đã có `ShipmentID` thì CHỈ `ShipmentID` là PK, còn `CustomerID` và `VendorID` chỉ là FK gạch chân nét đứt!",
+          "Trong Unary M:N (`ITEM`–`COMPONENT`), không được đặt 2 cột cùng tên `ItemNo, ItemNo` trong bảng `COMPONENT` — phải đổi tên cột thứ hai (thành `ComponentNo`) nhưng vẫn trỏ FK về cùng cột `ITEM.ItemNo`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS (CONT.) — Mapping Associative Entities",
+          "bullets": [
+            {
+              "text": "Identifier Not Assigned",
+              "subBullets": [
+                "Default primary key for the association relation is composed of the primary keys of the two entities (as in M:N relationship)"
+              ]
+            },
+            {
+              "text": "Identifier Assigned",
+              "subBullets": [
+                "It is natural and familiar to end-users",
+                "Default identifier may not be unique"
+              ]
+            }
+          ],
+          "explanation": [
+            "Bước 4 xử lý Associative Entity (Thực thể kết hợp — hình chữ nhật bo góc trong E-R) với 2 trường hợp hoàn toàn khác nhau về cách chọn Primary Key.",
+            "Nếu chưa có mã định danh riêng (`Identifier Not Assigned`), PK mặc định là tổ hợp PK của hai thực thể nối vào nó (giống hệt M:N). Nếu đã được gán mã riêng (`Identifier Assigned`, ví dụ mã phiếu giao hàng `Shipment ID` quen thuộc với người dùng hoặc khi một cặp Customer–Vendor giao hàng nhiều lần nên ghép 2 khóa vẫn trùng), thì mã riêng đó sẽ trở thành PK duy nhất."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "Figure 4-15 Example of mapping an associative entity — a) An associative entity",
+          "diagramText": [
+            "ORDER [Order ID [PK], Order Date] ──|| ──< ORDER LINE (khung bo góc: Ordered Quantity) >○── ──|| PRODUCT [Product ID [PK], Product Description, Product Finish, Product Standard Price, Product Line ID]",
+            "Note: Product Line ID is included here because it is a foreign key into the PRODUCT LINE entity, not because it would normally be included as an attribute of PRODUCT"
+          ],
+          "diagramNote": "ORDER LINE là thực thể kết hợp không có mã định danh riêng nằm giữa ORDER và PRODUCT.",
+          "explanation": [
+            "Figure 4-15a minh họa trường hợp Associative Entity KHÔNG có identifier riêng: `ORDER LINE` chỉ có mỗi thuộc tính `Ordered Quantity` nằm giữa `ORDER` và `PRODUCT`.",
+            "Chú ý phần Note bên dưới `PRODUCT`: `Product Line ID` xuất hiện trong khung thực thể là vì nó đóng vai trò khóa ngoại dẫn tới bảng `PRODUCT LINE` chứ không phải thuộc tính nội tại thuần túy của sản phẩm."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "Figure 4-15 Example of mapping an associative entity (cont.) — b) Three resulting relations",
+          "diagramText": [
+            "ORDER (OrderID [PK], OrderDate)",
+            "ORDER LINE (OrderID [PK], ProductID [PK], OrderedQuantity)",
+            "PRODUCT (ProductID [PK], ProductDescription, ProductFinish, ProductStandardPrice, ProductLineID)",
+            "Mũi tên FK: ORDER LINE.OrderID → ORDER.OrderID; ORDER LINE.ProductID → PRODUCT.ProductID",
+            "Khung đỏ quanh (OrderID, ProductID): Composite primary key formed from the two foreign keys"
+          ],
+          "diagramNote": "Khi chưa có định danh riêng, PK của ORDER LINE được ghép từ hai khóa ngoại OrderID và ProductID.",
+          "explanation": [
+            "Figure 4-15b cho thấy kết quả ánh xạ khi Associative Entity chưa có định danh riêng: bảng `ORDER LINE` lấy `OrderID` và `ProductID` làm Composite Primary Key, đồng thời từng cột làm Foreign Key trỏ về `ORDER` và `PRODUCT`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Figure 4-16 Example of mapping an associative entity with an identifier — a) SHIPMENT associative entity",
+          "diagramText": [
+            "CUSTOMER [Customer ID [PK], Customer Name] ──|| ──○< SHIPMENT (khung bo góc: Shipment ID [PK], Shipment Date, Shipment Amount) >○── ──|| VENDOR [Vendor ID [PK], Vendor Address]"
+          ],
+          "diagramNote": "SHIPMENT là thực thể kết hợp đã được gán sẵn khóa định danh riêng Shipment ID (in đậm gạch chân).",
+          "explanation": [
+            "Figure 4-16a minh họa trường hợp thứ hai (`Identifier Assigned`): `SHIPMENT` kết nối `CUSTOMER` và `VENDOR` nhưng có sẵn mã định danh riêng `Shipment ID` (vì cùng một nhà cung cấp có thể giao nhiều chuyến hàng cho cùng một khách hàng theo nhiều ngày khác nhau)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "Figure 4-16 Example of mapping an associative entity with an identifier (cont.) — b) Three resulting relations",
+          "diagramText": [
+            "CUSTOMER (CustomerID [PK], CustomerName)",
+            "SHIPMENT (ShipmentID [PK], CustomerID [FK], VendorID [FK], ShipmentDate, ShipmentAmount)",
+            "VENDOR (VendorID [PK], VendorAddress)",
+            "Mũi tên FK: SHIPMENT.CustomerID → CUSTOMER.CustomerID; SHIPMENT.VendorID → VENDOR.VendorID",
+            "Chú thích đỏ: Primary key differs from foreign keys"
+          ],
+          "diagramNote": "ShipmentID là Primary Key duy nhất của SHIPMENT; CustomerID và VendorID chỉ là 2 Foreign Key thông thường (gạch chân nét đứt).",
+          "explanation": [
+            "Figure 4-16b làm nổi bật điểm khác biệt cốt lõi (`Primary key differs from foreign keys`): lúc này bảng `SHIPMENT` chọn `ShipmentID` làm Primary Key đơn (gạch liền), còn `CustomerID` và `VendorID` chỉ đóng vai trò Foreign Key thông thường (gạch nét đứt), KHÔNG gộp vào Primary Key.",
+            "Đây là câu phân biệt kinh điển giữa Figure 4-15 và Figure 4-16 trong bài tập thiết kế lược đồ quan hệ từ EER."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS (CONT.) — Mapping Unary Relationships",
+          "bullets": [
+            "One-to-Many–Recursive foreign key in the same relation",
+            {
+              "text": "Many-to-Many–Two relations:",
+              "subBullets": [
+                "One for the entity type",
+                "One for an associative relation in which the primary key has two attributes, both taken from the primary key of the entity"
+              ]
+            }
+          ],
+          "explanation": [
+            "Bước 5 xử lý Unary (Recursive) Relationships — mối quan hệ giữa các thể hiện trong CÙNG một loại thực thể.",
+            "Với Unary `1:M`: chỉ cần đúng 1 bảng, thêm một cột khóa ngoại đệ quy (recursive FK) đặt tên khác đi ngay trong chính bảng đó. Với Unary `M:N`: phải tạo 2 bảng — 1 bảng cho thực thể, và 1 bảng kết hợp có composite PK gồm 2 cột đều bắt nguồn từ PK của bảng thực thể (đổi tên 1 cột để tránh trùng tên cột)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 31"
+          }
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "Figure 4-17 Mapping a unary 1:N relationship",
+          "diagramText": [
+            "(a) EMPLOYEE entity with unary relationship: EMPLOYEE [Employee ID [PK], Employee Name, Employee Date of Birth] — (Manages ○| ↔ Is Managed By ○<) tự quay về chính nó",
+            "(b) EMPLOYEE relation with recursive foreign key: EMPLOYEE (EmployeeID [PK], EmployeeName, EmployeeDateOfBirth, ManagerID [FK])",
+            "Mũi tên FK tự trỏ: EMPLOYEE.ManagerID → EMPLOYEE.EmployeeID"
+          ],
+          "diagramNote": "Vì một nhân viên chỉ bị quản lý bởi tối đa 1 người quản lý (cũng là một nhân viên), ta thêm cột ManagerID vào bảng EMPLOYEE để trỏ ngược về EmployeeID.",
+          "explanation": [
+            "Figure 4-17 minh họa Unary `1:N`: một người quản lý (`Manages`) được nhiều nhân viên, mỗi nhân viên chỉ được quản lý bởi (`Is Managed By`) 0 hoặc 1 sếp (ví dụ Giám đốc có `ManagerID = NULL`).",
+            "Bản chất vẫn là `1:M`, ta đưa PK bên 1 (`EmployeeID`) sang làm FK bên M (cũng chính là bảng `EMPLOYEE`), nhưng BẮT BUỘC đổi tên cột FK thành `ManagerID` vì một bảng không thể có 2 cột cùng tên `EmployeeID`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "Figure 4-18 Mapping a unary M:N relationship",
+          "diagramText": [
+            "(a) Bill-of-materials relationships (unary M:N): ITEM [Item No [PK], Item Description, Item Unit Cost] — (○< Contains >○) tự quay về chính nó, kèm thuộc tính Quantity (nét đứt)",
+            "(b) ITEM and COMPONENT relations:",
+            "    ITEM (ItemNo [PK], ItemDescription, ItemUnitCost)",
+            "    COMPONENT (ItemNo [PK], ComponentNo [PK], Quantity)",
+            "    Mũi tên FK: COMPONENT.ItemNo → ITEM.ItemNo; COMPONENT.ComponentNo → ITEM.ItemNo"
+          ],
+          "diagramNote": "Bài toán định mức vật tư (Bill of Materials): bảng mới COMPONENT mang cả ItemNo (sản phẩm cha) và ComponentNo (linh kiện con), cả hai đều là FK trỏ về ITEM.ItemNo.",
+          "explanation": [
+            "Figure 4-18 giải quyết bài toán kinh điển Bill-of-Materials (BOM / cấu thành sản phẩm): một mặt hàng chứa nhiều linh kiện con, và một linh kiện con lại có thể nằm trong nhiều mặt hàng cha khác nhau (`M:N`).",
+            "Ta tách ra bảng `COMPONENT` gồm cặp khóa chính ghép `(ItemNo, ComponentNo)` cộng cột `Quantity` (số lượng linh kiện con cần dùng), trong đó cả `ItemNo` lẫn `ComponentNo` đều có mũi tên FK trỏ về cùng cột `ITEM.ItemNo`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 33"
+          }
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS (CONT.) — Mapping Ternary (and n-ary) Relationships",
+          "bullets": [
+            "One relation for each entity and one for the associative entity",
+            "Associative entity has foreign keys to each entity in the relationship"
+          ],
+          "explanation": [
+            "Bước 6 xử lý quan hệ bậc 3 (Ternary) hoặc tổng quát bậc n (n-ary): mỗi thực thể tham gia tạo thành 1 bảng riêng, đồng thời thực thể kết hợp ở trung tâm trở thành 1 bảng mới mang FK tới TẤT CẢ các thực thể thành phần.",
+            "Cẩn thận khi chọn Primary Key cho bảng kết hợp này: nhiều khi tổ hợp các FK vẫn chưa đủ để phân biệt duy nhất nếu cùng bộ 3 đối tượng tương tác lặp lại theo ngày/giờ."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "Figure 4-19 Mapping a ternary relationship — a) PATIENT TREATMENT Ternary relationship with associative entity",
+          "diagramText": [
+            "PATIENT [Patient ID [PK], Patient Name] ──|| ──○< PATIENT TREATMENT (khung bo góc: PTreatment Date, PTreatment Time, PTreatment Results)",
+            "PHYSICIAN [Physician ID [PK], Physician Name] ──|| ──○< PATIENT TREATMENT",
+            "TREATMENT [Treatment Code [PK], Treatment Description] ──|| ──○< PATIENT TREATMENT"
+          ],
+          "diagramNote": "Thực thể kết hợp PATIENT TREATMENT gắn kết 3 thực thể PATIENT, PHYSICIAN và TREATMENT, lưu giữ ngày, giờ và kết quả điều trị.",
+          "explanation": [
+            "Figure 4-19a giới thiệu mô hình điều trị ba ngôi: mỗi lần điều trị (`PATIENT TREATMENT`) gắn 1 Bệnh nhân (`PATIENT`), 1 Bác sĩ (`PHYSICIAN`) và 1 Phương pháp (`TREATMENT`), kèm `PTreatment Date`, `PTreatment Time` và `PTreatment Results`.",
+            "Lưu ý bản số: mỗi lượt `PATIENT TREATMENT` bắt buộc nối tới 1 `PATIENT`, 1 `PHYSICIAN` và 1 `TREATMENT` (`||`), còn một bệnh nhân/bác sĩ/phương pháp có thể tham gia 0 hoặc nhiều lượt điều trị (`○<`)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 35"
+          }
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "Figure 4-19 Mapping a ternary relationship (cont.) — b) Mapping the ternary relationship PATIENT TREATMENT",
+          "diagramText": [
+            "PATIENT (PatientID [PK], PatientName)",
+            "PHYSICIAN (PhysicianID [PK], PhysicianName)",
+            "TREATMENT (TreatmentCode [PK], TreatmentDescription)",
+            "PATIENT TREATMENT (PatientID [PK], PhysicianID [PK], TreatmentCode [PK], PTreatmentDate [PK], PTreatmentTime [PK], PTreatmentResults)",
+            "Mũi tên FK: PATIENT TREATMENT.PatientID → PATIENT.PatientID; PhysicianID → PHYSICIAN.PhysicianID; TreatmentCode → TREATMENT.TreatmentCode",
+            "4 chú thích đỏ: (1) Remember that the primary key MUST be unique. (2) This is why treatment date and time are included in the composite primary key. (3) But this makes a very cumbersome key… (4) It would be better to create a surrogate key like Treatment#."
+          ],
+          "diagramNote": "Nếu không dùng khóa thay thế, Primary Key của PATIENT TREATMENT buộc phải gộp cả 5 cột (PatientID, PhysicianID, TreatmentCode, PTreatmentDate, PTreatmentTime) mới bảo đảm duy nhất; slide khuyên dùng surrogate key như Treatment#.",
+          "explanation": [
+            "Figure 4-19b minh họa một bẫy thiết kế rất hay gặp trong thực tế: nếu chỉ lấy `(PatientID, PhysicianID, TreatmentCode)` làm PK thì cùng một bệnh nhân được cùng một bác sĩ thực hiện cùng một liệu pháp 2 lần vào các ngày/giờ khác nhau sẽ bị trùng khóa!",
+            "Để khóa chính thực sự duy nhất, phải gộp thêm cả `PTreatmentDate` và `PTreatmentTime` thành composite key dài tới 5 cột — cực kỳ cồng kềnh khi tạo FK hoặc index. Giải pháp tốt hơn mà slide đề xuất là tạo **surrogate key** đơn gọn (ví dụ `Treatment#`)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 36"
+          }
+        },
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "TRANSFORMING EER DIAGRAMS INTO RELATIONS (CONT.) — Mapping Supertype/Subtype Relationships",
+          "bullets": [
+            "One relation for supertype and for each subtype",
+            "Supertype attributes (including identifier and subtype discriminator) go into supertype relation",
+            "Subtype attributes go into each subtype; primary key of supertype relation also becomes primary key of subtype relation",
+            "1:1 relationship established between supertype and each subtype, with supertype as primary table"
+          ],
+          "explanation": [
+            "Bước 7 ánh xạ hệ thống phân cấp kế thừa (Supertype/Subtype — tổng quát hóa/chuyên biệt hóa): quy tắc chuẩn của Hoffer tạo 1 bảng cho supertype và riêng 1 bảng cho MỖI subtype.",
+            "Bảng supertype giữ mọi thuộc tính dùng chung + PK gốc + cột subtype discriminator; mỗi bảng subtype chỉ chứa thuộc tính riêng của nó và dùng chính PK của supertype làm PK của riêng mình (đồng thời là FK tạo liên kết 1:1 về supertype)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 37"
+          }
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "Figure 4-20 Supertype/subtype relationships",
+          "diagramText": [
+            "EMPLOYEE (Supertype, nét đôi xuống vòng tròn disjoint 'd'): Employee Number [PK], Employee Name, Employee Address, Employee Date Hired, Employee Type",
+            "Discriminator: Employee Type =",
+            "  • \"H\" → HOURLY EMPLOYEE: Hourly Rate",
+            "  • \"S\" → SALARIED EMPLOYEE: Annual Salary, Stock Option",
+            "  • \"C\" → CONSULTANT: Contract Number, Billing Rate"
+          ],
+          "diagramNote": "Sơ đồ EER tổng quát hóa–chuyên biệt hóa của EMPLOYEE (total specialization nét đôi, disjoint 'd') với 3 subtype rời nhau HOURLY EMPLOYEE, SALARIED EMPLOYEE và CONSULTANT.",
+          "explanation": [
+            "Figure 4-20 biểu diễn hệ thống nhân viên gồm bảng cha `EMPLOYEE` và 3 lớp con chuyên biệt không giao nhau (chữ `d` = disjoint, đường đôi `═` = total specialization bắt buộc mỗi nhân viên thuộc đúng 1 trong 3 loại).",
+            "Thuộc tính phân loại (subtype discriminator) là `Employee Type` với 3 giá trị `'H'`, `'S'`, `'C'` giúp biết nhanh bản ghi `EMPLOYEE` nào cần tra cứu chi tiết ở bảng con tương ứng."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 38"
+          }
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "Figure 4-21 Mapping supertype/subtype relationships to relations",
+          "diagramText": [
+            "EMPLOYEE (EmployeeNumber [PK], EmployeeName, EmployeeAddress, EmployeeDateHired, EmployeeType)",
+            "HOURLY_EMPLOYEE (HEmployeeNumber [PK], HourlyRate)  ──FK → EMPLOYEE.EmployeeNumber",
+            "SALARIED_EMPLOYEE (SEmployeeNumber [PK], AnnualSalary, StockOption)  ──FK → EMPLOYEE.EmployeeNumber",
+            "CONSULTANT (CEmployeeNumber [PK], ContractNumber, BillingRate)  ──FK → EMPLOYEE.EmployeeNumber",
+            "Chú thích đỏ: These are implemented as one-to-one relationships."
+          ],
+          "diagramNote": "Mỗi subtype mượn EmployeeNumber từ bảng cha (đặt tiền tố H, S, C) làm khóa chính đồng thời làm khóa ngoại trỏ về EMPLOYEE.EmployeeNumber theo quan hệ 1:1.",
+          "explanation": [
+            "Figure 4-21 chuyển mô hình ở Slide 38 thành 4 bảng quan hệ tách bạch hoàn toàn — giúp không một thuộc tính riêng nào bị bỏ trống NULL hàng loạt (như trường hợp gộp chung tất cả vào một bảng duy nhất).",
+            "Lưu ý cách đặt tên PK ở 3 bảng con (`HEmployeeNumber`, `SEmployeeNumber`, `CEmployeeNumber`): tên cột khác nhau để gợi nhớ loại nhân viên, nhưng miền giá trị và liên kết khóa ngoại FK vẫn tham chiếu trực tiếp tới `EMPLOYEE.EmployeeNumber` theo quan hệ 1:1."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 39"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Chuẩn hóa Dữ liệu (Data Normalization: Anomalies, FD, 1NF, 2NF, 3NF)",
+      "text": "Định nghĩa Data Normalization, bảng chuẩn cấu trúc (Well-structured relations), 3 loại dị thường dữ liệu (Insertion, Deletion, Modification), ví dụ EMPLOYEE2 (Figure 4-2B), quy trình chuẩn hóa 1NF→5NF (Figure 4.22), Phụ thuộc hàm & Candidate Key, và từng bước chuẩn hóa bảng INVOICE từ chưa chuẩn hóa (Figure 4-25) → 1NF (Figure 4-26) → 2NF (Figure 4-28) → 3NF (Figure 4-29 & 4-30).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 40–54"
+      },
+      "digest": {
+        "keyPoints": [
+          "Normalization là công cụ kiểm chứng và phân rã các bảng chứa dư thừa dữ liệu và dị thường (anomalies) thành các bảng nhỏ, chuẩn cấu trúc (well-structured relations).",
+          "3 loại dị thường: Insertion anomaly (thêm mới bị trùng lặp hoặc không thêm được nếu thiếu dữ liệu đi kèm), Deletion anomaly (xóa 1 dòng làm mất luôn thông tin của thực thể khác), Modification/Update anomaly (sửa 1 thông tin phải sửa lặp lại ở nhiều dòng).",
+          "Quy tắc ngón tay cái (General rule of thumb): Một bảng không nên chứa nhiều hơn một entity type (chủ đề).",
+          "Thứ tự chuẩn hóa: 1NF (không còn thuộc tính đa trị, mọi ô atomic) → 2NF (1NF và không có Partial Functional Dependency vào một phần của PK ghép) → 3NF (2NF và không có Transitive Dependency giữa các thuộc tính non-key) → BCNF / 4NF / 5NF (thông thường 3NF là đủ dùng)."
+        ],
+        "terms": [
+          {
+            "term": "Functional Dependency (A → B)",
+            "meaning": "Giá trị của thuộc tính A (determinant) xác định duy nhất giá trị của thuộc tính B."
+          },
+          {
+            "term": "Partial Functional Dependency",
+            "meaning": "Thuộc tính non-key chỉ phụ thuộc vào một phần của Composite Primary Key thay vì toàn bộ PK — vi phạm 2NF."
+          },
+          {
+            "term": "Transitive Dependency",
+            "meaning": "Phụ thuộc hàm bắc cầu thông qua một thuộc tính không khóa (PK → X → Y, tức là tồn tại determinant X không phải PK xác định Y) — vi phạm 3NF."
+          }
+        ],
+        "pitfalls": [
+          "Một bảng chỉ có Primary Key ĐƠN (1 cột duy nhất) thì KHÔNG THỂ có partial dependency → tự động đạt ít nhất 2NF (miễn đã ở 1NF)!",
+          "Cẩn thận lỗi in ấn trong chính bộ slide gốc ở Slide 54: tiêu đề slide ghi nhầm 'Figure 4-29 Removing partial dependencies', thực tế nội dung ở slide đó đang loại bỏ TRANSITIVE dependencies để đưa `CUSTOMER ORDER (2NF)` lên `ORDER (3NF)` và `CUSTOMER (3NF)`!"
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "DATA NORMALIZATION",
+          "bullets": [
+            "Primarily a tool to validate and improve a logical design so that it satisfies certain constraints that avoid unnecessary duplication of data",
+            "The process of decomposing relations with anomalies to produce smaller, well-structured relations"
+          ],
+          "explanation": [
+            "Chuẩn hóa dữ liệu (Normalization) đóng vai trò lớp kiểm chứng theo hướng bottom-up (hoặc hậu kiểm thiết kế E-R): phát hiện và phân rã các bảng còn dư thừa dữ liệu để đưa về tập bảng nhỏ hơn, gọn sạch gọi là **well-structured relations**.",
+            "Cần phân biệt hai mục đích: tránh trùng lặp dữ liệu KHÔNG CẦN THIẾT (unnecessary duplication — khác với FK lặp lại có chủ đích để nối bảng) và triệt tiêu các dị thường khi thêm/xóa/sửa."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 40"
+          }
+        },
+        {
+          "slideNumber": "Slide 41",
+          "pageNumber": 41,
+          "title": "WELL-STRUCTURED RELATIONS",
+          "bullets": [
+            "A relation that contains minimal data redundancy and allows users to insert, delete, and update rows without causing data inconsistencies",
+            {
+              "text": "Goal is to avoid anomalies",
+              "subBullets": [
+                "Insertion Anomaly–adding new rows forces user to create duplicate data",
+                "Deletion Anomaly–deleting rows may cause a loss of data that would be needed for other future rows",
+                "Modification Anomaly–changing data in a row forces changes to other rows because of duplication"
+              ]
+            }
+          ],
+          "paragraphs": [
+            "General rule of thumb: A table should not pertain to more than one entity type."
+          ],
+          "explanation": [
+            "Định nghĩa chuẩn mực của **Well-structured relation**: chứa lượng dư thừa tối thiểu và cho phép Insert, Delete, Update dữ liệu tự do mà không gây mâu thuẫn dữ liệu.",
+            "Ghi nhớ câu tổng kết đỏ cực hay dùng để bắt bệnh thiết kế bảng nhanh: 'Theo nguyên tắc kinh nghiệm (rule of thumb), một bảng không bao giờ nên mô tả nhiều hơn một loại thực thể!' Nếu một bảng trộn cả thông tin Nhân viên lẫn Khóa học hoặc Đơn hàng lẫn Khách hàng thì chắc chắn xuất hiện 3 loại anomaly."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 41"
+          }
+        },
+        {
+          "slideNumber": "Slide 42",
+          "pageNumber": 42,
+          "title": "EXAMPLE–FIGURE 4-2B",
+          "table": {
+            "caption": "EMPLOYEE2",
+            "headers": [
+              "EmpID",
+              "Name",
+              "DeptName",
+              "Salary",
+              "CourseTitle",
+              "DateCompleted"
+            ],
+            "rows": [
+              ["100", "Margaret Simpson", "Marketing", "48,000", "SPSS", "6/19/2015"],
+              ["100", "Margaret Simpson", "Marketing", "48,000", "Surveys", "10/7/2015"],
+              ["140", "Alan Beeton", "Accounting", "52,000", "Tax Acc", "12/8/2015"],
+              ["110", "Chris Lucero", "Info Systems", "43,000", "Visual Basic", "1/12/2015"],
+              ["110", "Chris Lucero", "Info Systems", "43,000", "C++", "4/22/2015"],
+              ["190", "Lorenzo Davis", "Finance", "55,000", "", ""],
+              ["150", "Susan Martin", "Marketing", "42,000", "SPSS", "6/19/2015"],
+              ["150", "Susan Martin", "Marketing", "42,000", "Java", "8/12/2015"]
+            ]
+          },
+          "paragraphs": [
+            "Question–Is this a relation? | Answer–Yes: Unique rows and no multivalued attributes",
+            "Question–What’s the primary key? | Answer–Composite: EmpID, CourseTitle"
+          ],
+          "explanation": [
+            "Slide xét ví dụ bảng `EMPLOYEE2`: về mặt hình thức nó ĐÃ là một relation (mỗi ô chỉ chứa 1 giá trị đơn và không có 2 hàng giống hệt nhau) với khóa chính ghép được chọn là `(EmpID, CourseTitle)`.",
+            "Chi tiết hay ra bẫy thi: nhìn kỹ dòng nhân viên `190` (`Lorenzo Davis`), hai cột `CourseTitle` và `DateCompleted` bị để trống! Trên thực tế, nếu chọn `(EmpID, CourseTitle)` làm PK thì dòng 190 vi phạm Entity Integrity (NULL trong thành phần khóa chính) — đây là dấu hiệu cảnh báo bảng đang gộp sai 2 thực thể (Employee và Course Completion)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 42"
+          }
+        },
+        {
+          "slideNumber": "Slide 43",
+          "pageNumber": 43,
+          "title": "ANOMALIES IN THIS TABLE",
+          "bullets": [
+            "Insertion–can’t enter a new employee without having the employee take a class (or at least empty fields of class information)",
+            "Deletion–if we remove employee 140, we lose information about the existence of a Tax Acc class",
+            "Modification–giving a salary increase to employee 100 forces us to update multiple records"
+          ],
+          "paragraphs": [
+            "Why do these anomalies exist?\nBecause there are two themes (entity types) in this one relation. This results in data duplication and an unnecessary dependency between the entities."
+          ],
+          "explanation": [
+            "Slide phân tích cụ thể 3 anomaly trên ngay dữ liệu `EMPLOYEE2` ở Slide 42: (1) Insertion: tuyển nhân viên mới mà họ chưa học khóa nào thì không điền nổi PK `(EmpID, CourseTitle)` hoặc phải bỏ trống cột khóa học; (2) Deletion: xóa dòng nhân viên `140` (`Alan Beeton`) làm bay luôn thông tin từng có lớp `'Tax Acc'`; (3) Modification: tăng lương cho nhân viên `100` (`Margaret Simpson`) phải sửa ở nhiều hàng khác nhau, dễ lệch lương.",
+            "Nguyên nhân gốc rễ đúng như lời giải đỏ: bảng `EMPLOYEE2` ôm tới 2 chủ đề (`EMPLOYEE` và `COURSE COMPLETION`) vào làm một."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 43"
+          }
+        },
+        {
+          "slideNumber": "Slide 44",
+          "pageNumber": 44,
+          "title": "Figure 4.22 Steps in normalization",
+          "diagramText": [
+            "Table with multivalued attributes ──[Remove multivalued attributes]──→ First normal form (1NF)",
+            "First normal form ──[Remove partial dependencies]──→ Second normal form (2NF)",
+            "Second normal form ──[Remove transitive dependencies]──→ Third normal form (3NF)",
+            "Third normal form ──[Remove remaining anomalies resulting from multiple candidate keys]──→ Boyce-Codd normal form (BCNF)",
+            "Boyce-Codd normal form ──[Remove multivalued dependencies]──→ Fourth normal form (4NF)",
+            "Fourth normal form ──[Remove remaining anomalies]──→ Fifth normal form (5NF)",
+            "Chú thích đỏ: 3rd normal form is generally considered sufficient"
+          ],
+          "diagramNote": "Sơ đồ lộ trình 6 mức chuẩn hóa từ bảng có thuộc tính đa trị lần lượt qua 1NF, 2NF, 3NF, BCNF, 4NF đến 5NF cùng loại phụ thuộc bị loại bỏ ở từng bước.",
+          "explanation": [
+            "Figure 4.22 là bản đồ tóm tắt toàn bộ lý thuyết chuẩn hóa dữ liệu cần nhớ thuộc lòng cho mọi kỳ thi DBS: `1NF` (bỏ thuộc tính đa trị) → `2NF` (bỏ partial dependency) → `3NF` (bỏ transitive dependency) → `BCNF` (bỏ bất thường còn lại do có nhiều candidate key) → `4NF` (bỏ multivalued dependency) → `5NF` (bỏ join anomalies còn lại).",
+            "Ghi nhớ câu chốt quan trọng của giáo trình: trong thiết kế thực tế, đạt tới **3rd normal form (3NF)** nhìn chung đã được coi là đầy đủ (`3rd normal form is generally considered sufficient`)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 44"
+          }
+        },
+        {
+          "slideNumber": "Slide 45",
+          "pageNumber": 45,
+          "title": "FUNCTIONAL DEPENDENCIES AND KEYS",
+          "bullets": [
+            "Functional Dependency: The value of one attribute (the determinant) determines the value of another attribute",
+            {
+              "text": "Candidate Key:",
+              "subBullets": [
+                "A unique identifier. One of the candidate keys will become the primary key",
+                "E.g., perhaps there is both credit card number and SS# in a table…in this case both are candidate keys.",
+                "Each non-key field is functionally dependent on every candidate key."
+              ]
+            }
+          ],
+          "explanation": [
+            "Phụ thuộc hàm (Functional Dependency, viết `A → B`) là nền tảng toán học của chuẩn hóa: biết giá trị của `A` (gọi là **determinant** — yếu tố quyết định) thì xác định duy nhất một giá trị của `B` (ví dụ `EmpID → Name, Salary`).",
+            "Candidate Key là ứng cử viên cho khóa chính (một bảng có thể có nhiều candidate key như vừa có Số thẻ tín dụng vừa có Số an sinh xã hội `SS#`; mọi cột không khóa đều phụ thuộc hàm vào mọi candidate key)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 45"
+          }
+        },
+        {
+          "slideNumber": "Slide 46",
+          "pageNumber": 46,
+          "title": "FIRST NORMAL FORM",
+          "bullets": [
+            "No multivalued attributes",
+            "Every attribute value is atomic",
+            "Fig. 4-25 is not in 1st Normal Form (multivalued attributes) → it is not a relation.",
+            "Fig. 4-26 is in 1st Normal form.",
+            "All relations are in 1st Normal Form."
+          ],
+          "explanation": [
+            "Điều kiện chuẩn 1 (1NF): tuyệt đối không còn thuộc tính đa trị (một dòng hóa đơn chứa danh sách nhiều mã hàng) và mọi giá trị thuộc tính phải nguyên tố (atomic).",
+            "Slide đối chiếu hai hình tiếp theo: Figure 4-25 vi phạm 1NF nên thậm chí KHÔNG được gọi là relation, còn Figure 4-26 sau khi trải phẳng lặp lại thông tin đơn hàng trên từng dòng sản phẩm đã đạt 1NF và trở thành một relation."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 46"
+          }
+        },
+        {
+          "slideNumber": "Slide 47",
+          "pageNumber": 47,
+          "title": "Table with multivalued attributes, not in 1st normal form (FIGURE 4-25)",
+          "paragraphs": [
+            "Note: This is NOT a relation."
+          ],
+          "table": {
+            "caption": "FIGURE 4-25 INVOICE data (Pine Valley Furniture Company)",
+            "headers": [
+              "OrderID",
+              "OrderDate",
+              "CustomerID",
+              "CustomerName",
+              "CustomerAddress",
+              "ProductID",
+              "ProductDescription",
+              "ProductFinish",
+              "ProductStandardPrice",
+              "OrderedQuantity"
+            ],
+            "rows": [
+              ["1006", "10/24/2015", "2", "Value Furniture", "Plano, TX", "7", "Dining Table", "Natural Ash", "800.00", "2"],
+              ["(của 1006)", "", "", "", "", "5", "Writer's Desk", "Cherry", "325.00", "2"],
+              ["(của 1006)", "", "", "", "", "4", "Entertainment Center", "Natural Maple", "650.00", "1"],
+              ["1007", "10/25/2015", "6", "Furniture Gallery", "Boulder, CO", "11", "4-Dr Dresser", "Oak", "500.00", "4"],
+              ["(của 1007)", "", "", "", "", "4", "Entertainment Center", "Natural Maple", "650.00", "3"]
+            ]
+          },
+          "ocrNote": "Trên ảnh bảng gốc Figure 4-25, các ô OrderID..CustomerAddress ở 2 dòng phụ dưới đơn 1006 và 1 dòng phụ dưới đơn 1007 được bỏ trống (tạo nhóm lặp lồng bên trong một hóa đơn); ký hiệu '(của 1006)' / '(của 1007)' giúp giữ nguyên cấu trúc bảng HTML mà vẫn phản ánh chính xác việc các ô đó đang gộp nhóm đa trị.",
+          "explanation": [
+            "Figure 4-25 mô phỏng hóa đơn giấy quen thuộc trong thực tế: đơn 1006 chỉ ghi `OrderDate`, `CustomerID`, `CustomerName`, `CustomerAddress` một lần ở đầu, bên cạnh liệt kê 3 món hàng (mã 7, 5, 4); đơn 1007 liệt kê 2 món hàng (mã 11, 4).",
+            "Khi biểu diễn kiểu 'ô trống gộp nhóm lặp' như vậy vào CSDL, các thuộc tính sản phẩm tạo thành nhóm lặp (repeating group / multivalued attribute), nên bảng này KHÔNG đạt 1NF và chưa phải là relation."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 47"
+          }
+        },
+        {
+          "slideNumber": "Slide 48",
+          "pageNumber": 48,
+          "title": "Table with no multivalued attributes and unique rows, in 1st normal form (FIGURE 4-26)",
+          "paragraphs": [
+            "Note: This is a relation, but not a well-structured one."
+          ],
+          "table": {
+            "caption": "FIGURE 4-26 INVOICE relation (1NF) (Pine Valley Furniture Company)",
+            "headers": [
+              "OrderID",
+              "OrderDate",
+              "CustomerID",
+              "CustomerName",
+              "CustomerAddress",
+              "ProductID",
+              "ProductDescription",
+              "ProductFinish",
+              "ProductStandardPrice",
+              "OrderedQuantity"
+            ],
+            "rows": [
+              ["1006", "10/24/2015", "2", "Value Furniture", "Plano, TX", "7", "Dining Table", "Natural Ash", "800.00", "2"],
+              ["1006", "10/24/2015", "2", "Value Furniture", "Plano, TX", "5", "Writer's Desk", "Cherry", "325.00", "2"],
+              ["1006", "10/24/2015", "2", "Value Furniture", "Plano, TX", "4", "Entertainment Center", "Natural Maple", "650.00", "1"],
+              ["1007", "10/25/2015", "6", "Furniture Gallery", "Boulder, CO", "11", "4-Dr Dresser", "Oak", "500.00", "4"],
+              ["1007", "10/25/2015", "6", "Furniture Gallery", "Boulder, CO", "4", "Entertainment Center", "Natural Maple", "650.00", "3"]
+            ]
+          },
+          "explanation": [
+            "Figure 4-26 chuyển Figure 4-25 sang **1NF** bằng cách điền đầy đủ giá trị `OrderID`, `OrderDate`, `CustomerID`, `CustomerName`, `CustomerAddress` xuống mọi dòng chi tiết, và đặt Composite PK là `(OrderID, ProductID)` (hai cột gạch chân).",
+            "Bảng đã đạt 1NF và chính thức là một relation, nhưng lời chú thích đỏ cảnh báo ngay: 'not a well-structured one' — vì thông tin khách hàng `Value Furniture` lặp lại 3 lần và sản phẩm `Entertainment Center` giá `650.00` lặp lại ở nhiều đơn."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 48"
+          }
+        },
+        {
+          "slideNumber": "Slide 49",
+          "pageNumber": 49,
+          "title": "ANOMALIES IN THIS TABLE",
+          "bullets": [
+            "Insertion–if new product is ordered for order 1007 of existing customer, customer data must be re-entered, causing duplication",
+            "Deletion–if we delete the Dining Table from Order 1006, we lose information concerning this item’s finish and price",
+            "Update–changing the price of product ID 4 requires update in multiple records"
+          ],
+          "paragraphs": [
+            "Why do these anomalies exist?\nBecause there are multiple themes (entity types) in one relation. This results in duplication and an unnecessary dependency between the entities."
+          ],
+          "explanation": [
+            "Chỉ ra rõ 3 loại bất thường đang tồn tại ngay trong bảng `INVOICE (1NF)` ở Figure 4-26: thêm mặt hàng mới cho đơn `1007` phải gõ lại tên/địa chỉ khách hàng; xóa `Dining Table` khỏi đơn `1006` làm mất sạch thông tin chất liệu `Natural Ash` và giá `800.00`; sửa giá `ProductID = 4` phải sửa ở nhiều dòng (cả đơn 1006 và 1007).",
+            "Vì bảng `INVOICE (1NF)` gom tới 4 chủ đề (Order, Customer, Product, Order Line) vào 1 bảng, nên bước tiếp theo bắt buộc phải nâng cấp lên 2NF và 3NF."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 49"
+          }
+        },
+        {
+          "slideNumber": "Slide 50",
+          "pageNumber": 50,
+          "title": "SECOND NORMAL FORM",
+          "bullets": [
+            {
+              "text": "1NF PLUS every non-key attribute is fully functionally dependent on the ENTIRE primary key",
+              "subBullets": [
+                "Every non-key attribute must be defined by the entire key, not by only part of the key",
+                "No partial functional dependencies"
+              ]
+            }
+          ],
+          "explanation": [
+            "Định nghĩa chuẩn 2 (**2NF**): bảng đã ở `1NF` VÀ mọi thuộc tính không khóa (non-key attribute) phải phụ thuộc hàm ĐẦY ĐỦ vào TOÀN BỘ Primary Key — tức là KHÔNG tồn tại **Partial Functional Dependency** (phụ thuộc chỉ vào một phần của khóa chính ghép).",
+            "Hệ quả cực kỳ hữu ích khi làm đề thi trắc nghiệm: nếu một bảng đã ở 1NF và Primary Key chỉ gồm ĐÚNG 1 CỘT (simple key), thì không thể tách khóa ra làm từng phần được nên bảng đó TỰ ĐỘNG đạt 2NF."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 50"
+          }
+        },
+        {
+          "slideNumber": "Slide 51",
+          "pageNumber": 51,
+          "title": "Figure 4-27 Functional dependency diagram for INVOICE",
+          "diagramText": [
+            "Bảng INVOICE (OrderID [PK], OrderDate, CustomerID, CustomerName, CustomerAddress, ProductID [PK], ProductDescription, ProductFinish, ProductStandardPrice, OrderedQuantity)",
+            "  • Full Dependency: OrderID, ProductID → OrderedQuantity (trong công thức text ở dưới slide viết là 'OrderQuantity')",
+            "  • Partial Dependencies (từ OrderID): OrderID → OrderDate, CustomerID, CustomerName, CustomerAddress",
+            "  • Partial Dependencies (từ ProductID): ProductID → ProductDescription, ProductFinish, ProductStandardPrice",
+            "  • Transitive Dependencies: CustomerID → CustomerName, CustomerAddress",
+            "4 công thức in đỏ trên slide:",
+            "  OrderID → OrderDate, CustomerID, CustomerName, CustomerAddress",
+            "  CustomerID → CustomerName, CustomerAddress",
+            "  ProductID → ProductDescription, ProductFinish, ProductStandardPrice",
+            "  OrderID, ProductID → OrderQuantity",
+            "Kết luận: Therefore, NOT in 2nd Normal Form"
+          ],
+          "diagramNote": "Sơ đồ phụ thuộc hàm (FD diagram) cho bảng INVOICE cho thấy có 2 nhóm Partial Dependencies từ từng thành phần của khóa chính ghép (OrderID, ProductID) và 1 nhóm Transitive Dependencies xuất phát từ CustomerID.",
+          "ocrNote": "Trong hình bảng ghi tên cột là 'OrderedQuantity', còn dòng công thức chữ đỏ bên dưới in là 'OrderQuantity' — giữ nguyên cả hai cách viết theo đúng slide gốc.",
+          "explanation": [
+            "Figure 4-27 là hình mẫu chuẩn mực nhất để hiểu cách vẽ Functional Dependency Diagram trong đề thi tự luận: với Composite PK `(OrderID, ProductID)`, chỉ duy nhất `OrderedQuantity` cần cả 2 khóa mới xác định được (**Full Dependency**).",
+            "Các thuộc tính còn lại đều chỉ phụ thuộc vào riêng `OrderID` (`OrderDate`, `CustomerID`, `CustomerName`, `CustomerAddress`) hoặc chỉ phụ thuộc vào riêng `ProductID` (`ProductDescription`, `ProductFinish`, `ProductStandardPrice`) — đó là **Partial Dependencies**, chứng tỏ bảng CHƯA đạt 2NF. Ngoài ra còn có **Transitive Dependency** `CustomerID → CustomerName, CustomerAddress` sẽ xử lý khi lên 3NF."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 51"
+          }
+        },
+        {
+          "slideNumber": "Slide 52",
+          "pageNumber": 52,
+          "title": "Figure 4-28 Removing partial dependencies",
+          "diagramText": [
+            "ORDER LINE (3NF): (OrderID [PK], ProductID [PK], OrderedQuantity)",
+            "PRODUCT (3NF): (ProductID [PK], ProductDescription, ProductFinish, ProductStandardPrice)",
+            "CUSTOMER ORDER (2NF): (OrderID [PK], OrderDate, CustomerID, CustomerName, CustomerAddress)",
+            "   Mũi tên phụ thuộc trong CUSTOMER ORDER: OrderID → OrderDate, CustomerID; CustomerID → CustomerName, CustomerAddress (Transitive Dependencies)",
+            "Chú thích đỏ: Getting it into Second Normal Form | Partial dependencies are removed, but there are still transitive dependencies"
+          ],
+          "diagramNote": "Bằng cách tách các thuộc tính chỉ phụ thuộc vào từng phần khóa ra bảng riêng theo định thức của nó, ta thu được 3 bảng: ORDER LINE (đã 3NF), PRODUCT (đã 3NF) và CUSTOMER ORDER (mới đạt 2NF vì vẫn còn phụ thuộc bắc cầu qua CustomerID).",
+          "explanation": [
+            "Figure 4-28 chỉ dẫn quy tắc phân rã từ 1NF lên **2NF**: tách từng nhóm phụ thuộc bộ phận kèm đúng khóa bộ phận (determinant) thành một bảng riêng (`PRODUCT` mang `ProductID`, `CUSTOMER ORDER` mang `OrderID`), còn những gì phụ thuộc đầy đủ cả 2 khóa (`OrderedQuantity`) giữ lại ở bảng `ORDER LINE`.",
+            "Chú ý trạng thái chuẩn hóa của từng bảng kết quả: `ORDER LINE` và `PRODUCT` thực chất đã sạch hoàn toàn (đạt luôn 3NF), riêng `CUSTOMER ORDER` mới đạt `2NF` vì trong nó vẫn còn dây chuyền `OrderID → CustomerID → CustomerName, CustomerAddress`."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 52"
+          }
+        },
+        {
+          "slideNumber": "Slide 53",
+          "pageNumber": 53,
+          "title": "THIRD NORMAL FORM",
+          "bullets": [
+            "2NF PLUS no transitive dependencies (functional dependencies on non-primary-key attributes)",
+            "Note: This is called transitive, because the primary key is a determinant for another attribute, which in turn is a determinant for a third",
+            "Solution: Non-key determinant with transitive dependencies go into a new table; non-key determinant becomes primary key in the new table and stays as foreign key in the old table"
+          ],
+          "explanation": [
+            "Định nghĩa chuẩn 3 (**3NF**): bảng đã ở `2NF` VÀ KHÔNG còn **transitive dependency** — tức là không có thuộc tính không khóa (non-key attribute) nào lại làm determinant quyết định thuộc tính không khóa khác (`PK → X → Y`).",
+            "Công thức giải quyết kinh điển ở gạch đầu dòng 3: bốc `non-key determinant` (`CustomerID`) cùng các thuộc tính phụ thuộc vào nó (`CustomerName`, `CustomerAddress`) tách sang bảng mới trong đó `CustomerID` thành Primary Key, ĐỒNG THỜI giữ lại một bản sao `CustomerID` làm Foreign Key ở bảng cũ (`ORDER`) để không mất liên kết!"
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 53"
+          }
+        },
+        {
+          "slideNumber": "Slide 54",
+          "pageNumber": 54,
+          "title": "Figure 4-29 Removing partial dependencies (thực chất loại Transitive Dependencies lên 3NF) & Figure 4-30",
+          "diagramText": [
+            "ORDER (3NF): (OrderID [PK], OrderDate, CustomerID [FK])  ──FK từ ORDER.CustomerID → CUSTOMER.CustomerID",
+            "CUSTOMER (3NF): (CustomerID [PK], CustomerName, CustomerAddress)",
+            "Ghi chú: Getting it into Third Normal Form | Transitive dependencies are removed.",
+            "Figure 4-30 shows the result of normalization, yielding four separate relations where initially there was only one:",
+            "  • CUSTOMER [PK: Customer ID | Customer Name, Customer Address] ──||---○< (Places) ORDER [PK: Order ID, FK1: Customer ID | Order Date]",
+            "  • ORDER ──||---< (Includes) ORDER LINE [PK,FK1: Order ID, PK,FK2: Product ID | Ordered Quantity]",
+            "  • PRODUCT [PK: Product ID | Product Description, Product Finish, Product Standard Price] ──||---○< (Is Ordered) ORDER LINE"
+          ],
+          "diagramNote": "CUSTOMER ORDER (2NF) được tách thành ORDER (3NF) và CUSTOMER (3NF). Figure 4-30 bên dưới tổng hợp lại cả 4 bảng 3NF hoàn chỉnh thu được sau chuẩn hóa: CUSTOMER, ORDER, PRODUCT, ORDER LINE.",
+          "ocrNote": "Tiêu đề trên slide gốc in là 'Figure 4-29 Removing partial dependencies' nhưng đây là lỗi copy-paste của bộ slide Pearson vì nội dung thực tế và nhãn trên slide ghi rõ 'Getting it into Third Normal Form — Transitive dependencies are removed'.",
+          "explanation": [
+            "Slide 54 hoàn tất bước phân rã `CUSTOMER ORDER (2NF)` thành `ORDER (3NF)` và `CUSTOMER (3NF)` bằng cách rút `CustomerID → CustomerName, CustomerAddress` ra bảng `CUSTOMER` riêng và giữ lại `CustomerID` làm FK ở bảng `ORDER`.",
+            "Figure 4-30 ở góc dưới bên phải chứng minh sự hội tụ giữa hai phương pháp Thiết kế CSDL: dù bắt đầu Top-down từ sơ đồ E-R (Figure 4-3) hay Bottom-up từ chứng từ Invoice thô chuẩn hóa lên 3NF (Figures 4-25 → 4-30), kết quả cuối cùng đều ra đúng 4 bảng chuẩn `CUSTOMER`, `ORDER`, `ORDER LINE` và `PRODUCT`!"
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 54"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Gộp Quan hệ (Merging Relations / View Integration), Enterprise Keys & Bản quyền",
+      "text": "Các vấn đề cần phòng tránh khi gộp thực thể từ nhiều lược đồ E-R / user view (Synonyms, Homonyms, Transitive dependencies phát sinh, Supertype/subtype ẩn), kỹ thuật Enterprise Key / Object Identifier OID (Figure 4-31) và slide thông báo bản quyền cuối chương.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 55–57"
+      },
+      "digest": {
+        "keyPoints": [
+          "View Integration (Merging Relations) là quá trình hợp nhất các thực thể/bảng chuẩn hóa từ nhiều user view khác nhau thành một lược đồ dùng chung duy nhất.",
+          "4 vấn đề phát sinh khi merge relations: (1) Synonyms (từ đồng nghĩa — tên khác nhưng cùng nghĩa), (2) Homonyms (từ đồng âm — tên giống nhưng nghĩa khác), (3) Transitive dependencies mới phát sinh (hai bảng trước khi merge đều đạt 3NF nhưng sau khi gộp chưa chắc còn ở 3NF!), (4) Supertype/subtype relationships bị ẩn.",
+          "Enterprise Keys (như cột OID trong Figure 4-31) dùng một mã định danh duy nhất trên toàn doanh nghiệp (gắn bảng OBJECT cha chung cho EMPLOYEE, CUSTOMER...) giúp tránh trùng mã khi gộp nhiều bảng hoặc quản lý khóa toàn cục."
+        ],
+        "terms": [
+          {
+            "term": "Synonyms (trong View Integration)",
+            "meaning": "Hai hay nhiều thuộc tính/bảng đặt tên khác nhau nhưng biểu diễn cùng một khái niệm dữ liệu (ví dụ StudentID và MatricNo)."
+          },
+          {
+            "term": "Homonyms (trong View Integration)",
+            "meaning": "Hai thuộc tính dùng cùng một tên nhưng mang ý nghĩa khác nhau ở hai view (ví dụ Address là địa chỉ nhà riêng ở phòng Nhân sự nhưng là địa chỉ giao hàng ở phòng Bán hàng)."
+          },
+          {
+            "term": "Enterprise Key",
+            "meaning": "Khóa chính dùng chung mang tính duy nhất toàn doanh nghiệp (ví dụ OID trong bảng OBJECT), tham chiếu chung cho nhiều thực thể khác nhau."
+          }
+        ],
+        "pitfalls": [
+          "Câu hỏi trắc nghiệm rất hay bẫy: 'Nếu hợp nhất hai quan hệ đều đã đạt 3NF thì kết quả gộp chắc chắn đạt 3NF?' → SAI! Khi gộp cột từ hai bảng, phụ thuộc hàm chéo có thể xuất hiện làm phát sinh Transitive Dependency mới."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 55",
+          "pageNumber": 55,
+          "title": "MERGING RELATIONS",
+          "bullets": [
+            "View Integration–Combining entities from multiple ER models into common relations",
+            {
+              "text": "Issues to watch out for when merging entities from different ER models:",
+              "subBullets": [
+                "Synonyms–two or more attributes with different names but same meaning",
+                "Homonyms–attributes with same name but different meanings",
+                "Transitive dependencies–even if relations are in 3NF prior to merging, they may not be after merging",
+                "Supertype/subtype relationships–may be hidden prior to merging"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide giải thích pha tích hợp góc nhìn người dùng (View Integration / Merging Relations): trong dự án thực tế, nhiều nhóm phân tích tách rời tạo ra nhiều user view hoặc E-R nhỏ rồi mới gộp lại thành một CSDL thống nhất.",
+            "Cần nhớ đúng 4 rắc rối khi gộp bảng: **Synonyms** (khác tên nhưng cùng nghĩa → dễ tạo bảng/cột thừa), **Homonyms** (trùng tên nhưng khác nghĩa → dễ trộn nhầm dữ liệu sai), **Transitive dependencies** (hai bảng vốn đều đạt 3NF riêng lẻ, gộp vào lại rớt xuống 2NF!), và **Supertype/subtype ẩn** (ví dụ View 1 có `PATIENT`, View 2 có `OUTPATIENT`/`RESIDENT_PATIENT`, gộp lại mới nhận ra quan hệ cha–con)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 55"
+          }
+        },
+        {
+          "slideNumber": "Slide 56",
+          "pageNumber": 56,
+          "title": "Figure 4-31 Enterprise keys",
+          "diagramText": [
+            "a) Relations with enterprise key:",
+            "  OBJECT (OID [PK], ObjectType)",
+            "  EMPLOYEE (OID [PK], EmpID, EmpName, DeptName, Salary)",
+            "  CUSTOMER (OID [PK], CustID, CustName, Address)",
+            "b) Sample data with enterprise key:",
+            "  • OBJECT: (1, EMPLOYEE), (2, CUSTOMER), (3, CUSTOMER), (4, EMPLOYEE), (5, EMPLOYEE), (6, CUSTOMER), (7, CUSTOMER)",
+            "  • EMPLOYEE: (1, 100, 'Jennings, Fred', Marketing, 50000), (4, 101, 'Hopkins, Dan', Purchasing, 45000), (5, 102, 'Huber, Ike', Accounting, 45000)",
+            "  • CUSTOMER: (2, 100, \"Fred's Warehouse\", 'Greensboro, NC'), (3, 101, 'Bargain Bonanza', 'Moscow, ID'), (6, 102, \"Jasper's\", 'Tallahassee, FL'), (7, 103, \"Desks 'R Us\", 'Kettering, OH')"
+          ],
+          "diagramNote": "Figure 4-31 minh họa thiết kế Enterprise Key: OID (1..7) đóng vai trò khóa định danh duy nhất trên toàn hệ thống ở bảng cha OBJECT, trong khi EmpID và CustID ở hai bảng con đều bắt đầu từ 100, 101, 102 nhưng vẫn không bao giờ nhầm lẫn nhờ OID.",
+          "explanation": [
+            "Figure 4-31 giới thiệu khái niệm **Enterprise Key (OID)** — một dạng khóa định danh duy nhất trên toàn bộ tổ chức, tương tự mẫu thiết kế Supertype (`OBJECT`) và Subtypes (`EMPLOYEE`, `CUSTOMER`).",
+            "Nhìn bảng dữ liệu mẫu ở phần (b): cả nhân viên lẫn khách hàng đều có mã cục bộ trùng số nhau (`EmpID = 100, 101, 102` trùng với `CustID = 100, 101, 102`), nhưng nhờ có `OID` tuần tự từ 1 đến 7 trên toàn bảng `OBJECT`, mỗi đối tượng thực tế có một mã khóa duy nhất tuyệt đối trên toàn doanh nghiệp (rất hữu ích trong các hệ hướng đối tượng/CSDL hợp nhất)."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 56"
+          }
+        },
+        {
+          "slideNumber": "Slide 57",
+          "pageNumber": 57,
+          "title": "Thông báo bản quyền (Copyright Notice)",
+          "paragraphs": [
+            "This work is protected by United States copyright laws and is provided solely for the use of instructors in teaching their courses and assessing student learning. Dissemination or sale of any part of this work (including on the World Wide Web) will destroy the integrity of the work and is not permitted. The work and materials from it should never be made available to students except by instructors using the accompanying text in their classes. All recipients of this work are expected to abide by these restrictions and to honor the intended pedagogical purposes and the needs of other instructors who rely on these materials.",
+            "Chapter 4 | Copyright © 2016 Pearson Education, Inc. | 4-57"
+          ],
+          "explanation": [
+            "Trang 57 là slide thông báo bản quyền tiêu chuẩn của nhà xuất bản Pearson Education ở cuối bộ bài giảng Chương 4.",
+            "Toàn bộ nội dung kiến thức chuyên môn của Chương 4 trong `Chapter 04.pdf` trải dài từ Slide 1 đến Slide 56; slide cuối này được giữ lại đầy đủ nhằm bảo toàn khớp số trang 57/57 của tệp PDF gốc."
+          ],
+          "source": {
+            "file": "Chapter 04.pdf",
+            "loc": "Slide 57"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Bài tập Thực hành Bổ sung: Chuẩn hóa & Thiết kế ERD/3NF từ Ảnh Ghi chú Viết tay",
+      "text": "Chép nguyên văn và giải chi tiết 2 ảnh bài tập thực hành quản lý hội viên phòng tập (Member – Branch – Exercise – Workout Period): đọc hiểu ràng buộc nghiệp vụ viết tay, xác định Functional Dependencies (FD), vẽ ERD và chuẩn hóa về 3NF.",
+      "source": {
+        "file": "838362449_945188051537703_2571160256995451982_n.jpg",
+        "loc": "2 ảnh bài tập thực hành viết tay (Gym / Exercise)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Đề bài thực hành gồm thông tin hội viên (Member Number, Member Name / Full name, Locker Number), chi nhánh (Branch Number, Branch Name) và bảng chi tiết bài tập (Exercise Number, Exercise name, muscle group, Equipment, Difficulty level, Set per Perriod, Start Date, Finish Date).",
+          "Các ràng buộc nghiệp vụ ở Ảnh 1 quyết định bản số quan hệ: mỗi người có 1 locker riêng (1:1); một người tập nhiều bài (M:N giữa Member và Exercise kèm Set per Period, Start Date, Finish Date); một người có thể đổi branch nhiều lần tùy ý (cần cân nhắc 1:M nếu chỉ lưu branch hiện tại hoặc M:N kèm thời gian nếu lưu lịch sử chuyển branch).",
+          "Ảnh 2 cho ví dụ mẫu dữ liệu điền form và đặt hai yêu cầu thi điển hình: (a) Tìm Functional dependencies và (b) Vẽ ERD và chuẩn hóa 3NF."
+        ],
+        "terms": [
+          {
+            "term": "Lịch sử chuyển Branch vs Branch hiện tại",
+            "meaning": "Quy tắc 'một người có thể thay đổi branch bao nhiêu lần tùy ý' gợi ý nếu đề bài chỉ lưu chi nhánh hiện tại thì Member→Branch là N:1, còn nếu muốn lưu lịch sử qua nhiều lần đổi thì cần tách bảng Member_Branch (M:N)."
+          }
+        ],
+        "pitfalls": [
+          "Nhiều sinh viên gộp luôn các cột chi tiết bài tập (`Exercise name`, `muscle group`, `Equipment`, `Difficulty level`) chung với lịch tập của hội viên (`Set per Period`, `Start Date`, `Finish Date`) → vi phạm 2NF (Partial Dependency vào `Exercise Number`)!",
+          "Một hội viên có thể bắt đầu tập lại một bài qua nhiều `periods` khác nhau (hoặc tập nhiều bài bắt đầu cùng ngày), nên khóa chính của bảng lịch tập `WORKOUT / MEMBER_EXERCISE` thường phải gồm `(MemberNumber, ExerciseNumber, StartDate)` (hoặc có thêm mã `Period`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Bài tập Ảnh 1",
+          "title": "Ghi chú Đề bài & Ràng buộc nghiệp vụ (Member – Branch – Exercise)",
+          "diagramText": [
+            "Cụm thông tin bên trái:",
+            "  Member Number",
+            "  Member Name",
+            "  Locker Number",
+            "Cụm thông tin bên phải:",
+            "  Branch Number",
+            "  Branch Name",
+            "Dòng liệt kê thuộc tính bài tập (có ký hiệu * đầu dòng):",
+            "  * Excercise Number / Name / Set / Start Date / Finish Date",
+            "Các gạch đầu dòng ràng buộc nghiệp vụ viết tay:",
+            "  - Mỗi ng có 1 [?chữ bị gạch xóa — cần kiểm tra] locker riêng",
+            "  - Mỗi ng có thể bắt đầu vào bất kì periods nào, có thể thay đổi",
+            "  - [gạch bỏ: Bài] Một ng có thể tập n' bài",
+            "  - Một người có thể thay đổi branch bao nhiêu lần tuỳ ý, nh [?cần kiểm tra — từ viết tắt/cụm cuối dòng bị cắt nét]"
+          ],
+          "diagramNote": "Ảnh chụp trang vở viết tay ghi lại các nhóm thuộc tính của hệ thống phòng tập (Hội viên, Chi nhánh, Bài tập theo giai đoạn) cùng 4 quy tắc nghiệp vụ làm cơ sở xác định khóa, phụ thuộc hàm và bản số ERD.",
+          "ocrNote": "Ảnh viết tay: từ 'Excercise' có chữ 'c' thừa theo nét viết gốc; dòng 1 có 1 từ bị gạch bỏ trước 'locker'; dòng 3 có chữ 'Bài' gạch bỏ và viết tắt 'n'' (nhiều); chữ cuối dòng 4 là 'nh [?cần kiểm tra]' chưa rõ nét hoàn chỉnh.",
+          "explanation": [
+            "Ảnh 1 tóm tắt 4 quy tắc nghiệp vụ cốt lõi để thiết kế lược đồ E-R/3NF: (1) 'Mỗi người có 1 locker riêng' ⇒ quan hệ `1:1` giữa `MEMBER` và `LOCKER` (hoặc `LockerNumber` là thuộc tính duy nhất của `MEMBER`, suy ra `MemberNumber ↔ LockerNumber`).",
+            "(2) 'Mỗi người có thể bắt đầu vào bất kì periods nào, có thể thay đổi' kết hợp (3) 'Một người có thể tập n bài' ⇒ quan hệ `M:N` giữa `MEMBER` và `EXERCISE` lặp lại theo từng giai đoạn (`Start Date`, `Finish Date`, số hiệp `Set`). Khóa chính bảng trung gian phải chứa `(MemberNumber, ExerciseNumber, StartDate)` để không ghi đè khi tập lại vào giai đoạn mới.",
+            "(4) 'Một người có thể thay đổi branch bao nhiêu lần tùy ý' ⇒ cho phép cập nhật `BranchNumber` trong `MEMBER` (nếu chỉ lưu chi nhánh hiện tại theo quan hệ `1:M`), hoặc tách bảng lịch sử chuyển chi nhánh nếu đề bài yêu cầu theo dõi lịch sử qua từng giai đoạn."
+          ],
+          "source": {
+            "file": "838362449_945188051537703_2571160256995451982_n.jpg",
+            "loc": "Trang vở viết tay 1 (Yêu cầu nghiệp vụ)"
+          }
+        },
+        {
+          "slideNumber": "Bài tập Ảnh 2",
+          "title": "Phiếu mẫu thuộc tính Exercise & Đề bài Tìm FD, Vẽ ERD và 3NF",
+          "diagramText": [
+            "Phần đầu phiếu bên trái:",
+            "  Member Number: 0123 [?0123/0125 — cần kiểm tra]",
+            "  Full name:",
+            "  Locker Number: 123 [?123/723 — cần kiểm tra]",
+            "Phần đầu phiếu bên phải:",
+            "  Branch number: 03 [?03/05 — cần kiểm tra]",
+            "  Branch name:",
+            "Yêu cầu bài tập ở góc dưới trái:",
+            "  a, Tìm Funtional dependencies",
+            "  b, Vẽ ERD và 3NF"
+          ],
+          "table": {
+            "caption": "Bảng chi tiết các cột bài tập trên phiếu viết tay (Ảnh 2)",
+            "headers": [
+              "Exercise Number",
+              "Exercise name",
+              "muscle group",
+              "Equipment",
+              "Difficulty level",
+              "Set per Perriod",
+              "Start Date",
+              "Finish Date"
+            ],
+            "rows": [
+              ["(cột mã bài)", "(tên bài tập)", "(nhóm cơ)", "(thiết bị)", "(độ khó)", "(số set/giai đoạn)", "(ngày bắt đầu)", "(ngày kết thúc)"]
+            ]
+          },
+          "diagramNote": "Ảnh chụp trang vở kẻ cột mô tả đầy đủ 8 cột của phần danh sách bài tập kèm thông tin đầu phiếu (Member Number, Full name, Locker Number, Branch number, Branch name) và 2 câu hỏi (a) tìm Functional dependencies, (b) vẽ ERD và 3NF.",
+          "ocrNote": "Ảnh viết tay: 'Funtional' và 'Perriod' giữ nguyên chính tả gốc trên vở; một số chữ số viết tay ('0123', '123'/'723', '03') đã được đánh dấu [?cần kiểm tra] để bạn đối chiếu lại với vở gốc khi cần.",
+          "explanation": [
+            "Lời giải gợi ý câu (a) **Functional Dependencies (FD)**: từ cấu trúc phiếu + ràng buộc ở Ảnh 1 ta xác định được: (1) `Member Number → Full name, Locker Number, Branch number` (với giả sử mỗi thời điểm hội viên thuộc 1 branch hiện hành; nếu Locker là duy nhất cho từng người thì thêm `Locker Number → Member Number`); (2) `Branch number → Branch name` (đây là transitive dependency nếu để chung trong bảng Member!); (3) `Exercise Number → Exercise name, muscle group, Equipment, Difficulty level`; (4) `(Member Number, Exercise Number, Start Date) → Set per Period, Finish Date`.",
+            "Lời giải gợi ý câu (b) **Chuẩn hóa 3NF & ERD**: tách thành 4 quan hệ chuẩn 3NF tương ứng 4 thực thể trên ERD: `BRANCH(BranchNumber [PK], BranchName)`, `MEMBER(MemberNumber [PK], FullName, LockerNumber, BranchNumber [FK])`, `EXERCISE(ExerciseNumber [PK], ExerciseName, MuscleGroup, Equipment, DifficultyLevel)`, và bảng kết hợp/lịch tập `WORKOUT_PLAN(MemberNumber [PK], ExerciseNumber [PK], StartDate [PK], FinishDate, SetPerPeriod)`."
+          ],
+          "source": {
+            "file": "1791184980251_2287926346835723288_g7644320767961835470_cde4df6ccdbde03218d7d7622b75b7b3.jpg",
+            "loc": "Trang vở viết tay 2 (Bảng Exercise & câu a, b)"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch04-c01", "front": "Hai tính chất của candidate key?", "back": "Định danh duy nhất mọi row và không dư thừa (không thể bỏ attribute nào mà vẫn duy nhất).", "source": { "file": "Chapter 04.pdf", "loc": "Slides 9–12" } },
-    { "id": "dbs-ch04-c02", "front": "Entity integrity và referential integrity?", "back": "Entity integrity: không thành phần nào của PK được NULL. Referential integrity: giá trị FK phải khớp PK hiện có ở bảng cha hoặc là NULL.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 13–17" } },
-    { "id": "dbs-ch04-c03", "front": "Quan hệ 1:M ánh xạ thế nào?", "back": "PK của phía 1 trở thành FK ở phía M (kèm thuộc tính quan hệ nếu có).", "source": { "file": "Chapter 04.pdf", "loc": "Slides 24–28" } },
-    { "id": "dbs-ch04-c04", "front": "Quan hệ M:N ánh xạ thế nào?", "back": "Tạo relation trung gian; PK là tổ hợp PK của hai entity (cũng là FK) cộng thuộc tính quan hệ.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 24–28" } },
-    { "id": "dbs-ch04-c05", "front": "Điều kiện của 2NF và 3NF?", "back": "2NF: 1NF và không partial dependency. 3NF: 2NF và không transitive dependency.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 44–50" } },
-    { "id": "dbs-ch04-c06", "front": "Ba loại anomaly?", "back": "Insertion, deletion, modification (update) anomaly.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 39–40" } },
-    { "id": "dbs-ch04-c07", "front": "Subtype được ánh xạ thế nào sang relation?", "back": "Mỗi subtype một relation; PK của subtype đồng thời là FK tham chiếu PK supertype.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 36–37" } },
-    { "id": "dbs-ch04-c08", "front": "Bốn vấn đề khi merge relation?", "back": "Synonyms, homonyms, transitive dependencies, supertype/subtype ẩn.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 51–55" } }
+    {
+      "id": "dbs-ch04-c01",
+      "front": "Ba thành phần của Relational Model và sự khác nhau giữa Relation với Relationship?",
+      "back": "3 thành phần: Data structure (bảng/hàng/cột), Data manipulation (SQL), Data integrity (ràng buộc quy tắc nghiệp vụ). Relation là bảng 2 chiều trong CSDL quan hệ (tương ứng entity type hoặc M:N); Relationship là đường liên kết giữa các entity trong E-R model.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 3, 5"
+      }
+    },
+    {
+      "id": "dbs-ch04-c02",
+      "front": "6 yêu cầu để một bảng được công nhận là Relation (và vì sao mọi relation đều ở 1NF)?",
+      "back": "1) Tên relation duy nhất; 2) Giá trị mọi thuộc tính phải atomic (không đa trị, không phức hợp); 3) Mỗi hàng duy nhất; 4) Tên các cột duy nhất; 5) Thứ tự cột không quan trọng; 6) Thứ tự hàng không quan trọng. Vì đã cấm đa trị và bắt buộc atomic nên mọi relation mặc định đạt 1NF.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-ch04-c03",
+      "front": "Entity Integrity và Referential Integrity quy định gì? Chiều mũi tên toàn vẹn tham chiếu vẽ thế nào?",
+      "back": "Entity Integrity: không thành phần nào của Primary Key được NULL. Referential Integrity: mọi giá trị Foreign Key phải khớp với một Primary Key ở bảng cha (hoặc là NULL). Mũi tên tham chiếu luôn vẽ TỪ bảng con/phụ thuộc (FK) TỚI bảng cha (PK).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 8, 10–11"
+      }
+    },
+    {
+      "id": "dbs-ch04-c04",
+      "front": "Ba Delete Rules trong Referential Integrity? Luật nào cấm dùng cho Weak Entity?",
+      "back": "Restrict (cấm xóa bảng cha nếu còn dòng con); Cascade (tự động xóa các dòng con liên quan); Set-to-Null (gán FK bảng con thành NULL khi xóa cha). Luật Set-to-Null KHÔNG được phép dùng cho Weak Entity vì FK đó là một phần của PK bảng con.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 10, 19"
+      }
+    },
+    {
+      "id": "dbs-ch04-c05",
+      "front": "Ánh xạ thuộc tính Composite và Multivalued của Regular Entity sang Relation thế nào?",
+      "back": "Composite: bỏ tên thuộc tính gộp cha, chỉ giữ các thuộc tính con đơn lẻ (ví dụ chỉ giữ CustomerStreet, CustomerCity, CustomerState). Multivalued: tách thành bảng riêng chứa (PK bảng cha + thuộc tính đa trị) cùng làm composite PK và FK trỏ về bảng cha.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 13, 15–16"
+      }
+    },
+    {
+      "id": "dbs-ch04-c06",
+      "front": "Weak Entity được ánh xạ sang Relation như thế nào?",
+      "back": "Tạo một bảng riêng với khóa ngoại tham chiếu sang bảng cha (strong/identifying entity, FK KHÔNG được NULL); Primary Key của bảng mới là tổ hợp của (PK bảng cha + Partial Identifier của weak entity).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 17–19"
+      }
+    },
+    {
+      "id": "dbs-ch04-c07",
+      "front": "Quy tắc ánh xạ 3 loại Binary Relationship (1:M, M:N, 1:1) sang bảng?",
+      "back": "1:M: đưa PK bên 1 làm FK sang bên M. M:N: tạo bảng giao mới với composite PK là cả 2 PK hai đầu (đồng thời là 2 FK). 1:1: đưa PK bên bắt buộc (mandatory) sang làm FK ở bên tùy chọn (optional).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 20–25"
+      }
+    },
+    {
+      "id": "dbs-ch04-c08",
+      "front": "Associative Entity 'Identifier Assigned' khác 'Identifier Not Assigned' ở điểm nào khi sang bảng?",
+      "back": "Not Assigned (như ORDER LINE): dùng tổ hợp PK của hai thực thể cha làm composite PK. Assigned (như SHIPMENT có ShipmentID): chỉ dùng ShipmentID làm PK; PK của hai bảng cha trở thành FK thông thường (không nằm trong PK).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 26–30"
+      }
+    },
+    {
+      "id": "dbs-ch04-c09",
+      "front": "Ánh xạ Unary 1:N, Unary M:N và Ternary Relationship thế nào?",
+      "back": "Unary 1:N: thêm cột recursive FK ngay trong cùng bảng (ví dụ ManagerID trỏ về EmployeeID). Unary M:N: 2 bảng — bảng gốc (ITEM) và bảng kết hợp (COMPONENT) có 2 FK cùng trỏ về PK bảng gốc. Ternary: mỗi thực thể 1 bảng + 1 bảng kết hợp có FK tới mọi thực thể tham gia (nên dùng surrogate key nếu PK quá dài).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 31–36"
+      }
+    },
+    {
+      "id": "dbs-ch04-c10",
+      "front": "Supertype/Subtype được ánh xạ sang Relation ra sao theo chuẩn Hoffer?",
+      "back": "1 bảng cho supertype (chứa thuộc tính chung + PK + subtype discriminator) và 1 bảng cho mỗi subtype (chứa thuộc tính riêng + PK mượn từ supertype, đồng thời là FK tạo quan hệ 1:1 với supertype).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 37–39"
+      }
+    },
+    {
+      "id": "dbs-ch04-c11",
+      "front": "Ba loại Anomaly và nguyên nhân gốc rễ tạo ra chúng là gì?",
+      "back": "Insertion Anomaly (thêm hàng buộc tạo dữ liệu trùng hoặc không thêm được nếu thiếu dữ liệu đi kèm), Deletion Anomaly (xóa hàng làm mất thông tin thực thể khác), Modification/Update Anomaly (sửa 1 thông tin phải sửa lặp ở nhiều hàng). Nguyên nhân: một bảng chứa hơn 1 entity type (theme).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 41, 43, 49"
+      }
+    },
+    {
+      "id": "dbs-ch04-c12",
+      "front": "Liệt kê điều kiện của 1NF, 2NF, 3NF (và BCNF/4NF/5NF ở Figure 4.22)?",
+      "back": "1NF: mọi ô atomic, không đa trị. 2NF: 1NF + không còn partial functional dependency (mọi cột không khóa phụ thuộc toàn bộ PK). 3NF: 2NF + không còn transitive dependency (không có non-key determinant). BCNF xử lý candidate key chồng lấn; 4NF bỏ multivalued dependency; 5NF bỏ anomalies còn lại (thường 3NF đã đủ).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 44, 46, 50, 53"
+      }
+    },
+    {
+      "id": "dbs-ch04-c13",
+      "front": "Cách tách bảng khi gặp Transitive Dependency (PK → X → Y) ở bước 2NF → 3NF?",
+      "back": "Đưa non-key determinant X cùng các thuộc tính Y phụ thuộc vào X sang một bảng mới có Primary Key là X; ĐỒNG THỜI giữ lại X trong bảng cũ đóng vai trò Foreign Key trỏ về bảng mới.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 53–54"
+      }
+    },
+    {
+      "id": "dbs-ch04-c14",
+      "front": "4 vấn đề cần cảnh giác khi Merging Relations (View Integration) là gì?",
+      "back": "1) Synonyms (tên khác nhưng cùng nghĩa); 2) Homonyms (tên giống nhưng khác nghĩa); 3) Transitive dependencies mới phát sinh (2 bảng 3NF gộp lại có thể mất 3NF); 4) Supertype/subtype bị ẩn.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slide 55"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch04-q01", "stem": "Bước chuẩn hóa nào loại bỏ partial dependency?", "options": ["1NF → 2NF", "2NF → 3NF", "3NF → BCNF", "BCNF → 4NF"], "answer": 0, "explanation": "2NF yêu cầu không có phụ thuộc bộ phận vào một phần của PK ghép; 3NF loại transitive dependency.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 44–47" } },
-    { "id": "dbs-ch04-q02", "stem": "Trong quan hệ 1:1, FK nên đặt ở bên nào để tránh NULL?", "options": ["Bên optional, tham chiếu PK của bên mandatory", "Bên mandatory", "Cả hai bên", "Tạo bảng riêng luôn"], "answer": 0, "explanation": "PK của bên mandatory trở thành FK ở bên optional.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 24–28" } },
-    { "id": "dbs-ch04-q03", "stem": "Luật xóa nào tự động xóa các hàng con tham chiếu hàng cha bị xóa?", "options": ["Restrict", "Cascade", "Set-to-Null", "No action"], "answer": 1, "explanation": "Cascade xóa dây chuyền dependent rows.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 15–17" } },
-    { "id": "dbs-ch04-q04", "stem": "Với PK ghép (OrderID, ProductID), thuộc tính OrderDate chỉ phụ thuộc OrderID. Đây là dạng nào?", "options": ["Transitive dependency", "Partial dependency", "Multivalued dependency", "Join dependency"], "answer": 1, "explanation": "Phụ thuộc vào một phần của PK ghép là partial dependency, vi phạm 2NF.", "source": { "file": "Chapter 04.pdf", "loc": "Slides 44–47" } }
+    {
+      "id": "dbs-ch04-q01",
+      "stem": "Theo Slide 4 và Slide 46, phát biểu nào sau đây là ĐÚNG về mối liên hệ giữa Relation và 1st Normal Form (1NF)?",
+      "options": [
+        "Một bảng có thuộc tính đa trị vẫn được gọi là relation ở 1NF",
+        "Mọi relation đều tự động ở dạng 1NF; bảng còn thuộc tính đa trị thì KHÔNG phải là relation",
+        "Chỉ những bảng đạt 3NF mới được gọi là relation",
+        "Thứ tự các hàng trong relation bắt buộc phải sắp xếp theo khóa chính"
+      ],
+      "answer": 1,
+      "explanation": "Slide 4 & 46 khẳng định: 'All relations are in 1st Normal form' và Figure 4-25 còn multivalued attributes nên 'is not in 1st Normal Form → it is not a relation'.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 4, 46–47"
+      }
+    },
+    {
+      "id": "dbs-ch04-q02",
+      "stem": "Trong sơ đồ toàn vẹn tham chiếu (Figure 4-5), mũi tên biểu diễn Referential Integrity Constraint được vẽ theo chiều nào?",
+      "options": [
+        "Từ bảng cha (parent table) sang bảng phụ thuộc (dependent table)",
+        "Hai chiều qua lại giữa mọi bảng có cùng tên cột",
+        "Từ khóa ngoại của bảng phụ thuộc (dependent table) tới khóa chính của bảng cha (parent table)",
+        "Từ khóa chính sang các thuộc tính non-key trong cùng một bảng"
+      ],
+      "answer": 2,
+      "explanation": "Slide 11 ghi rõ: 'Referential integrity constraints are drawn via arrows from dependent to parent table'.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-ch04-q03",
+      "stem": "Luật xóa (Delete Rule) nào KHÔNG ĐƯỢC PHÉP áp dụng đối với một Weak Entity?",
+      "options": [
+        "Restrict",
+        "Cascade",
+        "Set-to-Null",
+        "Cả Restrict và Cascade"
+      ],
+      "answer": 2,
+      "explanation": "Slide 10 & 19 nhấn mạnh: 'Set-to-Null → not allowed for weak entities' vì khóa ngoại của weak entity là thành phần bắt buộc trong khóa chính ghép của nó (không thể chứa NULL).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 10, 19"
+      }
+    },
+    {
+      "id": "dbs-ch04-q04",
+      "stem": "Khi ánh xạ quan hệ binary 1:1 giữa NURSE (bắt buộc cho mỗi Care Center) và CARE CENTER (tùy chọn đối với mỗi Nurse) trong Figure 4-14, Foreign Key nên được đặt ở đâu?",
+      "options": [
+        "Đặt FK NurseInCharge trong bảng CARE CENTER (bên optional), tham chiếu PK của NURSE (bên mandatory)",
+        "Đặt FK CenterID trong bảng NURSE (bên mandatory)",
+        "Tạo thêm một bảng thứ ba chứa cả NurseID và CenterID",
+        "Đặt khóa ngoại ở cả hai bảng NURSE và CARE CENTER"
+      ],
+      "answer": 0,
+      "explanation": "Slide 20 & 25: với quan hệ 1:1, PK của bên mandatory trở thành FK ở bên optional để tránh sinh nhiều giá trị NULL.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 20, 24–25"
+      }
+    },
+    {
+      "id": "dbs-ch04-q05",
+      "stem": "Với Associative Entity đã được gán sẵn định danh riêng (Identifier Assigned, ví dụ SHIPMENT có ShipmentID nối CUSTOMER và VENDOR ở Figure 4-16), Primary Key của bảng SHIPMENT là gì?",
+      "options": [
+        "Composite PK gồm (CustomerID, VendorID)",
+        "Composite PK gồm (ShipmentID, CustomerID, VendorID)",
+        "Chỉ gồm ShipmentID; còn CustomerID và VendorID chỉ là Foreign Keys",
+        "Chỉ gồm CustomerID"
+      ],
+      "answer": 2,
+      "explanation": "Figure 4-16b (Slide 30) nêu rõ 'Primary key differs from foreign keys': ShipmentID là PK duy nhất, còn CustomerID và VendorID là FK (nét gạch đứt).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 26, 29–30"
+      }
+    },
+    {
+      "id": "dbs-ch04-q06",
+      "stem": "Quan hệ Unary M:N (ví dụ bài toán Bill-of-Materials: ITEM chứa nhiều ITEM khác với thuộc tính Quantity ở Figure 4-18) được chuyển đổi sang mô hình quan hệ như thế nào?",
+      "options": [
+        "Giữ 1 bảng ITEM và thêm 1 cột recursive FK ComponentNo",
+        "Tạo 2 bảng: ITEM và bảng kết hợp COMPONENT(ItemNo, ComponentNo, Quantity) với cả hai cột khóa đều là FK trỏ về ITEM.ItemNo",
+        "Tạo 3 bảng riêng biệt cho Item cha, Item con và Component",
+        "Dùng thuộc tính đa trị trong bảng ITEM"
+      ],
+      "answer": 1,
+      "explanation": "Slides 31 & 33: Unary M:N tách thành 2 relation (ITEM và COMPONENT), trong đó PK của COMPONENT gồm 2 thuộc tính đều lấy từ PK của ITEM và đều trỏ FK về ITEM.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 31, 33"
+      }
+    },
+    {
+      "id": "dbs-ch04-q07",
+      "stem": "Trong Figure 4-20 và 4-21 về ánh xạ Supertype EMPLOYEE (có subtype discriminator Employee Type) sang các Subtype (HOURLY_EMPLOYEE, SALARIED_EMPLOYEE, CONSULTANT), câu nào ĐÚNG?",
+      "options": [
+        "Mọi thuộc tính của 3 subtype đều phải gộp vào chung bảng EMPLOYEE",
+        "Mỗi subtype là một bảng riêng có PK lấy từ PK của EMPLOYEE và đồng thời là FK trỏ về EMPLOYEE theo quan hệ 1:1",
+        "Employee Type được đặt ở cả 3 bảng subtype thay vì bảng supertype",
+        "Chỉ cần tạo 3 bảng subtype, bỏ hẳn bảng supertype EMPLOYEE"
+      ],
+      "answer": 1,
+      "explanation": "Slide 37 & 39: 1 bảng cho supertype (chứa thuộc tính chung & subtype discriminator) và 1 bảng cho mỗi subtype dùng PK của supertype làm PK và FK (1:1).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 37–39"
+      }
+    },
+    {
+      "id": "dbs-ch04-q08",
+      "stem": "Xét bảng EMPLOYEE2 ở Slide 42–43: nếu xóa nhân viên 140 (Alan Beeton) thì ta mất luôn thông tin về sự tồn tại của lớp 'Tax Acc'. Đây là biểu hiện của loại anomaly nào?",
+      "options": [
+        "Insertion Anomaly",
+        "Deletion Anomaly",
+        "Modification Anomaly",
+        "Transitive Anomaly"
+      ],
+      "answer": 1,
+      "explanation": "Slide 43 chỉ rõ: 'Deletion–if we remove employee 140, we lose information about the existence of a Tax Acc class'.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 41–43"
+      }
+    },
+    {
+      "id": "dbs-ch04-q09",
+      "stem": "Trong bảng INVOICE (1NF) ở Slide 51 với PK ghép (OrderID, ProductID), phụ thuộc hàm 'OrderID → OrderDate, CustomerID, CustomerName, CustomerAddress' vi phạm dạng chuẩn nào đầu tiên, và phần 'CustomerID → CustomerName, CustomerAddress' vi phạm tiếp dạng chuẩn nào?",
+      "options": [
+        "Vi phạm 1NF; và vi phạm tiếp 2NF",
+        "Vi phạm 2NF (Partial Dependency); và vi phạm tiếp 3NF (Transitive Dependency)",
+        "Vi phạm 3NF; và vi phạm tiếp 4NF",
+        "Cả hai đều chỉ vi phạm BCNF"
+      ],
+      "answer": 1,
+      "explanation": "Slides 51–54: thuộc tính phụ thuộc riêng vào OrderID (một phần của PK ghép) là Partial Dependency → vi phạm 2NF. Khi đã tách sang CUSTOMER ORDER (2NF), việc CustomerID (non-key) quyết định CustomerName, CustomerAddress là Transitive Dependency → vi phạm 3NF.",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slides 50–54"
+      }
+    },
+    {
+      "id": "dbs-ch04-q10",
+      "stem": "Trong quá trình Merging Relations (View Integration) từ nhiều user view khác nhau, hai thuộc tính có TÊN GIỐNG NHAU nhưng Ý NGHĨA KHÁC NHAU được gọi là vấn đề gì?",
+      "options": [
+        "Synonyms",
+        "Homonyms",
+        "Supertype/subtype ẩn",
+        "Partial dependencies"
+      ],
+      "answer": 1,
+      "explanation": "Slide 55 định nghĩa: 'Homonyms–attributes with same name but different meanings' (trái ngược với Synonyms là khác tên nhưng cùng nghĩa).",
+      "source": {
+        "file": "Chapter 04.pdf",
+        "loc": "Slide 55"
+      }
+    }
   ]
 }

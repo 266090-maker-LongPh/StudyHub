@@ -1,28 +1,1708 @@
 {
-  "id": "dbs-ch02", "order": 2,
+  "id": "dbs-ch02",
+  "order": 2,
   "title": "Chương 2: Modeling Data in the Organization (E-R)",
-  "summary": [
-    { "h": "Thành phần mô hình E-R", "text": "Entity instance (thường tương ứng một row), entity type (một table). Relationship instance là liên kết giữa các entity (tương ứng PK–FK), relationship type là loại liên kết giữa các entity type. Attribute là thuộc tính (một field)." },
-    { "h": "Ký hiệu cơ bản", "text": "Strong entity: hình chữ nhật nét đơn. Weak entity: nét đôi. Associative entity: hình chữ nhật bo tròn nằm trong hình chữ nhật. Identifier: đậm, gạch dưới đơn. Partial identifier: đậm, gạch dưới đôi. [Derived] trong ngoặc vuông, {Multivalued} trong ngoặc nhọn, Composite( , , ) trong ngoặc tròn. Cardinality: mandatory one (||), optional one (o|), mandatory many (|<), optional many (o<)." },
-    { "h": "Business rules", "text": "Phát biểu định nghĩa hoặc ràng buộc một khía cạnh của nghiệp vụ. Business rule tốt có 7 đặc tính: Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented." },
-    { "h": "Entity nên và không nên là gì", "text": "Nên là đối tượng có nhiều instance, gồm nhiều attribute, là thứ ta đang cần mô hình hóa. Không nên là user của hệ thống (ví dụ TREASURER) hoặc output của hệ thống (ví dụ EXPENSE REPORT)." },
-    { "h": "Phân loại attribute", "text": "5 cách phân loại: required/optional; simple/composite; single-valued/multivalued; stored/derived; identifier. Tiêu chí chọn identifier: giá trị không đổi, không null, tránh intelligent identifier, thay key phức hợp dài bằng key đơn mới." },
-    { "h": "Degree và cardinality", "text": "Degree = số entity type tham gia: unary (1), binary (2), ternary (3). Cardinality cơ bản: 1:1, 1:M, M:N. Cardinality constraint gồm minimum (0 = optional, ≥1 = mandatory) và maximum (1 hoặc many)." },
-    { "h": "Associative entity và time stamp", "text": "Quan hệ có thuộc tính nên thành associative entity khi: mọi quan hệ đều many, có ý nghĩa độc lập, ưu tiên có identifier riêng và thuộc tính khác, có thể tham gia quan hệ khác; quan hệ ternary nên chuyển thành associative entity. Time stamp lưu thời điểm sự kiện (cần cho HIPAA, Sarbanes-Oxley)." }
+  "audit": {
+    "sourceFile": "hoffer_mdm12e_pp_ch02.pdf",
+    "totalPages": 49,
+    "extractedPages": 49,
+    "ocrNotes": []
+  },
+  "sources": [
+    {
+      "file": "hoffer_mdm12e_pp_ch02.pdf",
+      "loc": "Slides 1–49 (đầy đủ 49/49 slides)"
+    }
   ],
-  "sources": [{ "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slides 1–49" }],
+  "summary": [
+    {
+      "h": "Giới thiệu Chương 2 & Mục tiêu học tập (Objectives)",
+      "text": "Giới thiệu chủ đề mô hình hóa dữ liệu trong tổ chức (Modeling Data in the Organization) với mô hình Entity-Relationship (E-R) và 8 mục tiêu học tập cốt lõi.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 1–2"
+      },
+      "digest": {
+        "keyPoints": [
+          "Chương 2 chuyển từ tổng quan môi trường CSDL (Chương 1) sang kỹ thuật thiết kế mức khái niệm (Conceptual Data Modeling) bằng mô hình E-R.",
+          "8 mục tiêu trọng tâm: định nghĩa thuật ngữ E-R; hiểu tầm quan trọng của data modeling; đặt tên và định nghĩa chuẩn cho entity, relationship, attribute; phân biệt bậc unary, binary, ternary; mô hình hóa các loại attribute/entity/cardinality; vẽ ERD cho bài toán thực tế; chuyển M:N thành associative entity; và mô hình hóa dữ liệu biến đổi theo thời gian bằng time stamp."
+        ],
+        "terms": [
+          {
+            "term": "Entity-Relationship (E-R) Model",
+            "meaning": "Mô hình dữ liệu khái niệm biểu diễn thực thể (entities), thuộc tính (attributes) và mối quan hệ (relationships) trong nghiệp vụ tổ chức."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "title": "Chapter 2: Modeling Data in the Organization",
+          "paragraphs": [
+            "Chapter 2: Modeling Data in the Organization",
+            "Modern Database Management (12th Edition) — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 1"
+          },
+          "pageNumber": 1,
+          "explanation": [
+            "Slide mở đầu Chương 2 của giáo trình Modern Database Management (12th Edition), đi sâu vào bước Conceptual Data Modeling trong vòng đời phát triển CSDL.",
+            "Nếu Chương 1 trả lời câu hỏi 'Vì sao cần CSDL và quy trình phát triển ra sao?', thì Chương 2 dạy cách biến mô tả nghiệp vụ bằng ngôn ngữ tự nhiên thành sơ đồ E-R chuẩn xác."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "title": "Objectives",
+          "bullets": [
+            "Define terms",
+            "Understand importance of data modeling",
+            "Write good names and definitions for entities, relationships, and attributes",
+            "Distinguish unary, binary, and ternary relationships",
+            "Model different types of attributes, entities, relationships, and cardinalities",
+            "Draw E-R diagrams for common business situations",
+            "Convert many-to-many relationships to associative entities",
+            "Model time-dependent data using time stamps"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 2"
+          },
+          "pageNumber": 2,
+          "explanation": [
+            "Đây là checklist 8 kỹ năng cốt lõi cần đạt sau Chương 2, đặc biệt trọng tâm cho bài thi vẽ/đọc sơ đồ ERD (nhận diện weak entity, associative entity, xác định cardinality tối thiểu/tối đa, xử lý multivalued attribute và time stamp).",
+            "Khi ôn tập, cần luyện song song cả hai chiều: từ phát biểu nghiệp vụ (business rules) vẽ ra ERD, và nhìn vào ERD đọc ngược lại thành câu mô tả nghiệp vụ chính xác."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Các thành phần & Ký hiệu cơ bản của mô hình E-R",
+      "text": "Giới thiệu 3 thành phần nền tảng (Entity, Relationship, Attribute), sơ đồ mẫu Figure 2-1 và bảng tổng hợp ký hiệu Figure 2-2 (strong/weak/associative entity, thuộc tính, degree, cardinality).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 3–5"
+      },
+      "digest": {
+        "keyPoints": [
+          "Entity instance là một đối tượng/sự kiện cụ thể (thường ứng với một hàng trong bảng); Entity type là tập hợp các thực thể cùng tính chất (ứng với một bảng).",
+          "Relationship instance là liên kết giữa các entity cụ thể (ứng với cặp PK–FK); Relationship type là loại liên kết giữa các entity type.",
+          "Attribute là tính chất mô tả của entity hoặc relationship type (ứng với một cột/field trong bảng).",
+          "4 ký hiệu cardinality crow's foot chuẩn của giáo trình: Mandatory One (||), Optional One (o|), Mandatory Many (|<), Optional Many (o<)."
+        ],
+        "terms": [
+          {
+            "term": "Entity type vs. Entity instance",
+            "meaning": "Entity type là khung khái niệm (VD: STUDENT); Entity instance là từng bản thể cụ thể thuộc loại đó (VD: sinh viên Nguyễn Văn A)."
+          },
+          {
+            "term": "Associative entity",
+            "meaning": "Thực thể đặc biệt vừa mang vai trò của relationship vừa là một entity (vẽ hình chữ nhật bo góc, hoặc bo góc lồng trong hình chữ nhật)."
+          }
+        ],
+        "pitfalls": [
+          "Đọc ký hiệu cardinality crow's foot phải nhìn vào đầu đường dây chạm tới thực thể đích: vòng tròn 'o' hay vạch '|' gần phía giữa là minimum cardinality (0 hay >=1), còn vạch '|' hay chân chim '<' sát mép hộp là maximum cardinality (1 hay many)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 3",
+          "title": "E-R Model Constructs",
+          "bullets": [
+            {
+              "text": "Entities:",
+              "subBullets": [
+                "Entity instance–person, place, object, event, concept (often corresponds to a row in a table)",
+                "Entity Type–collection of entities (often corresponds to a table)"
+              ]
+            },
+            {
+              "text": "Relationships:",
+              "subBullets": [
+                "Relationship instance–link between entities (corresponds to primary key-foreign key equivalencies in related tables)",
+                "Relationship type–category of relationship...link between entity types"
+              ]
+            },
+            {
+              "text": "Attributes:",
+              "subBullets": [
+                "Properties or characteristics of an entity or relationship type (often corresponds to a field in a table)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 3"
+          },
+          "pageNumber": 3,
+          "explanation": [
+            "Slide đối chiếu trực tiếp giữa mức khái niệm (E-R Model) và mức quan hệ (Relational Tables ở Chương 4): Entity Type <-> Bảng (Table), Entity Instance <-> Dòng (Row), Attribute <-> Cột (Field/Column), và Relationship Instance <-> Liên kết khóa chính - khóa ngoại (PK-FK).",
+            "Lưu ý điểm hay bị hỏi: trong mô hình E-R mở rộng, cả Entity Type lẫn Relationship Type đều có thể sở hữu Attribute."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "title": "Sample E-R Diagram (Figure 2-1)",
+          "diagramText": [
+            "6 thực thể và các quan hệ hai chiều trên Figure 2-1:",
+            "• SUPPLIER (|| Sends) ——— (o< Sent By) SHIPMENT",
+            "• SUPPLIER (|< Supplies — nhãn 'is/must' chỉ vào vạch |) ——— (o< Supplied By — nhãn 'may' chỉ vào vòng tròn o) ITEM",
+            "• SHIPMENT (o< Includes) ——— (|< Included On — nhãn 'many' chỉ vào chân chim <) ITEM",
+            "• CUSTOMER (|| Submits) ——— (o< Submitted By) ORDER",
+            "• ORDER (o< Requests) ——— (|< Requested On) PRODUCT",
+            "• ITEM (|< Used In) ——— (|< Uses) PRODUCT",
+            "Key & Cardinalities legend: ENTITY TYPE (hình chữ nhật); Relationship (đoạn thẳng); Mandatory One (||); Optional One (o|); Mandatory Many (|<); Optional Many (o<)"
+          ],
+          "diagramNote": "Sơ đồ E-R mẫu gồm 6 thực thể (SUPPLIER, CUSTOMER, ORDER, SHIPMENT, ITEM, PRODUCT) minh họa cách đọc bản số hai chiều trên từng đường quan hệ theo ký hiệu crow's foot.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 4"
+          },
+          "pageNumber": 4,
+          "explanation": [
+            "Figure 2-1 minh họa quy tắc đọc ERD hai chiều cực kỳ quan trọng: vạch đứng sát giữa đường nối biểu thị bắt buộc (is/must = minimum 1), vòng tròn 'o' biểu thị tùy chọn (may = minimum 0), còn chân chim (<) biểu thị nhiều (many).",
+            "Ví dụ đọc quan hệ CUSTOMER – ORDER: 'Each CUSTOMER may submit many ORDERs' (nhờ o< ở phía ORDER), và ngược lại 'Each ORDER must be submitted by one and only one CUSTOMER' (nhờ || ở phía CUSTOMER).",
+            "Ví dụ đọc SHIPMENT – ITEM: 'Each SHIPMENT must include one or many ITEMs' (|< phía ITEM), còn 'Each ITEM may be included on zero or many SHIPMENTs' (o< phía SHIPMENT)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "title": "Basic E-R notation (Figure 2-2)",
+          "diagramText": [
+            "Entity symbols (Entity types): Strong (hình chữ nhật nét đơn); Weak (hình chữ nhật nét đôi); Associative (hình chữ nhật bo góc — một thực thể đặc biệt đồng thời là quan hệ)",
+            "Attribute symbols (ENTITY NAME box): Identifier (đậm, gạch dưới đơn); Partial identifier (đậm, gạch dưới đôi); Optional (chữ thường không gạch); [Derived] (trong ngoặc vuông); {Multivalued} (trong ngoặc nhọn); Composite( , , ) (trong ngoặc tròn)",
+            "Relationship symbols — Relationship degrees (chỉ số lượng entity type tham gia): Unary (1 hộp tự nối), Binary (2 hộp), Ternary (3 hộp nối vào một điểm chung)",
+            "Relationship cardinality (chỉ số lượng instance được phép ở mỗi đầu): Mandatory one (||), Mandatory many (|<), Optional one (o|), Optional many (o<)"
+          ],
+          "diagramNote": "Bảng tổng hợp đầy đủ các ký hiệu chuẩn của mô hình E-R theo giáo trình Hoffer (Entity types, Attributes, Relationship degrees và Cardinalities).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 5"
+          },
+          "pageNumber": 5,
+          "explanation": [
+            "Slide 5 là 'bảng tra cứu ký hiệu chuẩn' (cheat sheet) cho toàn bộ Chương 2. Mọi bài vẽ và đọc ERD đều dựa vào 4 nhóm ký hiệu trên Figure 2-2.",
+            "Điểm dễ nhầm trong thi: Identifier gạch dưới nét ĐƠN, còn Partial identifier của Weak entity mới gạch dưới nét ĐÔI; [Derived] dùng ngoặc VUÔNG [], còn {Multivalued} dùng ngoặc NHỌN {}."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Business Rules, Đặt tên & Định nghĩa dữ liệu chuẩn",
+      "text": "Cách xác định Business Rules, 7 tiêu chuẩn của một Business Rule tốt, 7 tiêu chuẩn đặt tên dữ liệu (Data Name) và hướng dẫn viết Data Definitions.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 6–9"
+      },
+      "digest": {
+        "keyPoints": [
+          "Business Rule là phát biểu định nghĩa hoặc ràng buộc một khía cạnh nghiệp vụ, bắt nguồn từ chính sách/quy trình và thường được tự động hóa qua DBMS.",
+          "7 tiêu chí của Business Rule tốt: Declarative (nói CÁI GÌ chứ không phải LÀM THẾ NÀO), Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented.",
+          "Tên dữ liệu tốt phải gắn với nghiệp vụ (không gắn kỹ thuật), có nghĩa và tự giải thích, duy nhất, dễ đọc, dùng từ chuẩn, lặp lại nhất quán theo cú pháp chuẩn.",
+          "Định nghĩa dữ liệu (Data Definitions) giải thích Term (khái niệm) hoặc Fact (liên kết giữa các term), cần súc tích, lấy cùng lúc thu thập yêu cầu hệ thống, kèm sơ đồ và đạt đồng thuận lặp lại."
+        ],
+        "terms": [
+          {
+            "term": "Business Rule",
+            "meaning": "Phát biểu khẳng định cấu trúc hoặc kiểm soát hành vi nghiệp vụ bằng thuật ngữ quen thuộc với người dùng cuối."
+          },
+          {
+            "term": "Term vs. Fact",
+            "meaning": "Term là từ/cụm từ mang nghĩa chuyên biệt (thường thành Entity/Attribute); Fact là mối liên kết giữa hai hay nhiều Term (thường thành Relationship)."
+          }
+        ],
+        "pitfalls": [
+          "Không trộn nhiều quy tắc vào cùng một câu (vi phạm tính Atomic), và không viết Business Rule theo kiểu hướng dẫn kỹ thuật/thuật toán cài đặt (vi phạm Declarative: what, not how)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 6",
+          "title": "Business Rules",
+          "bullets": [
+            "Statements defining or constraining a specific aspect of business operations",
+            "Originate from organizational policies, procedures, events, and functions",
+            "Establish and assert business structure",
+            "Control or influence business behavior",
+            "Formulated in vocabulary familiar to end users",
+            "Implemented and enforced automatically via DBMS software"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 6"
+          },
+          "pageNumber": 6,
+          "explanation": [
+            "Business Rules chính là cầu nối giữa bài toán thực tế của doanh nghiệp và sơ đồ ERD: từng entity, cardinality (ví dụ 'mỗi đơn hàng phải thuộc đúng một khách hàng') hay ràng buộc CHECK/FK đều xuất phát từ business rule.",
+            "Chú ý hai vế cuối: quy tắc phải diễn đạt bằng ngôn ngữ nghiệp vụ dễ hiểu với người dùng không rành IT, nhưng lại là cơ sở để DBMS kiểm soát tự động bằng ràng buộc toàn vẹn (constraints/triggers)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "title": "A Good Business Rule Is:",
+          "bullets": [
+            "Declarative – specifies what must hold, not how to implement it",
+            "Precise – unambiguous with shared organizational meaning",
+            "Atomic – captures a single indivisible statement",
+            "Consistent – free of internal and external contradictions",
+            "Expressible – written in structured natural language",
+            "Distinct – non-redundant across the rule catalog",
+            "Business-oriented – clear and meaningful to business stakeholders"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 7"
+          },
+          "pageNumber": 7,
+          "explanation": [
+            "Thuộc lòng 7 tính chất của một Business Rule chuẩn: Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented (rất hay ra câu hỏi liệt kê hoặc hỏi 'tính chất nào yêu cầu chỉ nêu WHAT, không nêu HOW?').",
+            "Ví dụ câu sai: 'Dùng trigger SQL để kiểm tra tuổi >= 18' -> vi phạm Declarative và Business-oriented; sửa chuẩn: 'An employee must be at least 18 years old when hired'."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "title": "A Good Data Name Is:",
+          "bullets": [
+            "Grounded in business terminology rather than technical/implementation details",
+            "Meaningful and self-documenting",
+            "Unique within the model",
+            "Readable",
+            "Constructed from an organization-approved vocabulary list",
+            "Repeatable across models and projects",
+            "Formatted according to standard naming syntax"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 8"
+          },
+          "pageNumber": 8,
+          "explanation": [
+            "Đặt tên tốt giúp sơ đồ ERD tự tài liệu hóa (self-documenting) và tránh nhầm lẫn khi nhiều nhóm cùng phát triển CSDL.",
+            "Ví dụ tránh đặt tên kiểu 'TBL_EMP_01' hay 'fld_a' (gắn kỹ thuật, tối nghĩa); nên đặt theo nghiệp vụ chuẩn như 'EMPLOYEE', 'Employee Number', 'Customer Postal Code'."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "title": "Data Definitions",
+          "bullets": [
+            {
+              "text": "Explanation of a term or fact",
+              "subBullets": [
+                "Term – word or phrase having a defined domain meaning",
+                "Fact – relationship or association connecting two or more terms"
+              ]
+            },
+            {
+              "text": "Guidelines for good data definition",
+              "subBullets": [
+                "Concise summary of core business meaning",
+                "Collected alongside systems requirements",
+                "Supported by visual diagrams",
+                "Agreed upon by consensus and refined iteratively"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 9"
+          },
+          "pageNumber": 9,
+          "explanation": [
+            "Phân biệt Term (khái niệm đơn lẻ như Student, Course) và Fact (sự kiện/mệnh đề nối các term như 'A student registers for a course').",
+            "Định nghĩa dữ liệu không phải viết một lần là xong mà cần rà soát đồng thuận giữa các phòng ban (ví dụ phòng Sales và Kế toán phải thống nhất định nghĩa thế nào là 'Active Customer')."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Thực thể (Entities), Thực thể không hợp lệ & Strong vs. Weak Entities",
+      "text": "Định nghĩa Entity/Entity Type/Instance, bảng ví dụ EMPLOYEE, tiêu chí nhận diện thực thể hợp lệ, ví dụ loại thực thể sai (Figure 2-4), phân biệt Strong vs Weak Entity (Figure 2-5) và quy tắc đặt tên/định nghĩa thực thể.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 10–16"
+      },
+      "digest": {
+        "keyPoints": [
+          "Entity có thể là người, nơi chốn, đồ vật, sự kiện hoặc khái niệm mà tổ chức muốn lưu trữ dữ liệu.",
+          "Entity HỢP LỆ phải có nhiều instance, nhiều attribute và là đối tượng cần mô hình hóa; KHÔNG nên là người dùng hệ thống (system user như TREASURER) hay đầu ra báo cáo (system output như EXPENSE REPORT).",
+          "Strong entity tồn tại độc lập và có unique identifier riêng (gạch dưới nét đơn); Weak entity phụ thuộc sự tồn tại vào identifying owner, chỉ có partial identifier (gạch dưới nét đôi) và nối bằng identifying relationship (nét đôi).",
+          "Tên Entity dùng danh từ số ít, ngắn gọn, thống nhất mọi sơ đồ; với thực thể sự kiện (event entity) nên đặt tên theo kết quả thay vì tên quy trình."
+        ],
+        "terms": [
+          {
+            "term": "Strong Entity",
+            "meaning": "Thực thể tồn tại độc lập với các loại thực thể khác và có khóa định danh (identifier) duy nhất của riêng nó."
+          },
+          {
+            "term": "Weak Entity",
+            "meaning": "Thực thể phụ thuộc vào một strong entity (identifying owner), không có unique identifier hoàn chỉnh mà chỉ có partial identifier."
+          },
+          {
+            "term": "Identifying Relationship",
+            "meaning": "Quan hệ nét đôi kết nối identifying owner (strong entity) với weak entity."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi kinh điển của sinh viên khi vẽ ERD: đưa User/Actor của Use Case (như Admin, Treasurer) hoặc màn hình/báo cáo (Expense Report, Invoice Report) vào làm Entity."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 10",
+          "title": "Entities",
+          "bullets": [
+            "Entity – person, place, object, event, or concept in the user environment about which data must be maintained",
+            "Entity type – collection of entities sharing common properties or characteristics",
+            "Entity instance – single occurrence belonging to an entity type"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 10"
+          },
+          "pageNumber": 10,
+          "explanation": [
+            "Cần nhớ 5 nhóm thực thể phổ biến: Person (EMPLOYEE, STUDENT), Place (STORE, WAREHOUSE), Object (PRODUCT, VEHICLE), Event (ORDER, SHIPMENT), Concept (ACCOUNT, COURSE).",
+            "Sự phân biệt Entity type vs Entity instance giống hệt Class vs Object trong lập trình hướng đối tượng (OOP)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "title": "Entity Type and Entity Instances",
+          "table": {
+            "caption": "FIGURE 2-3 Entity type EMPLOYEE with two instances",
+            "headers": [
+              "Attributes",
+              "Attribute Data Type",
+              "Example Instance",
+              "Example Instance"
+            ],
+            "rows": [
+              ["Employee Number", "CHAR (10)", "642-17-8360", "534-10-1971"],
+              ["Name", "CHAR (25)", "Michelle Brady", "David Johnson"],
+              ["Address", "CHAR (30)", "100 Pacific Avenue", "450 Redwood Drive"],
+              ["City", "CHAR (20)", "San Francisco", "Redwood City"],
+              ["State", "CHAR (2)", "CA", "CA"],
+              ["Zip Code", "CHAR (9)", "98173", "97142"],
+              ["Date Hired", "DATE", "03-21-1992", "08-16-1994"],
+              ["Birth Date", "DATE", "06-19-1968", "09-04-1975"]
+            ]
+          },
+          "diagramNote": "Bảng minh họa entity type EMPLOYEE có 8 thuộc tính cùng kiểu dữ liệu và 2 entity instance cụ thể (Michelle Brady và David Johnson).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 11"
+          },
+          "pageNumber": 11,
+          "explanation": [
+            "Figure 2-3 minh họa trực quan mối liên hệ giữa cấu trúc schema (tên Entity type + danh sách Attributes + Data Types) và dữ liệu thực tế (các cột Example Instance).",
+            "Khi chuyển sang bảng quan hệ, mỗi cột Example Instance trong hình trình bày dọc này sẽ trở thành một hàng (row/tuple) trong bảng EMPLOYEE."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "title": "An Entity...",
+          "bullets": [
+            {
+              "text": "SHOULD BE:",
+              "subBullets": [
+                "An object having multiple instances stored in the database",
+                "An object described by multiple attributes",
+                "An object relevant to the domain being modeled"
+              ]
+            },
+            {
+              "text": "SHOULD NOT BE:",
+              "subBullets": [
+                "A user of the database system",
+                "An output produced by the database system (such as a report)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 12"
+          },
+          "pageNumber": 12,
+          "explanation": [
+            "Đây là bộ lọc vàng để quyết định một danh từ trong đề bài có nên vẽ thành hình chữ nhật Entity hay không.",
+            "Nếu một đối tượng chỉ có đúng 1 bản ghi (singleton, không có nhiều instance) hoặc chỉ có 1 thuộc tính đơn lẻ, hoặc chỉ là người vận hành hệ thống / báo cáo in ra từ truy vấn dữ liệu sẵn có, thì KHÔNG tạo Entity cho nó."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "title": "Figure 2-4 Example of inappropriate entities",
+          "diagramText": [
+            "Mô hình sai (Inappropriate entities bị khoanh đỏ): TREASURER [System user] — Receives —< EXPENSE REPORT [System output]; TREASURER — Manages —< ACCOUNT; EXPENSE REPORT >— Summarizes —< EXPENSE; ACCOUNT — Is Charged —< EXPENSE",
+            "Chú thích trên hình: TREASURER = System user (Inappropriate); EXPENSE REPORT = System output (Inappropriate)",
+            "Mô hình đúng (Appropriate entities): ACCOUNT ———< Is Charged EXPENSE"
+          ],
+          "diagramNote": "So sánh mô hình chứa hai thực thể không hợp lệ (TREASURER là người dùng hệ thống và EXPENSE REPORT là báo cáo đầu ra) với mô hình đúng chỉ giữ lại ACCOUNT và EXPENSE.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 13"
+          },
+          "pageNumber": 13,
+          "explanation": [
+            "Figure 2-4 áp dụng trực tiếp quy tắc của Slide 12: TREASURER là nhân sự sử dụng hệ thống (system user) nên loại bỏ; EXPENSE REPORT chỉ là báo cáo tổng hợp chi phí xuất ra từ bảng EXPENSE (system output) nên cũng loại bỏ.",
+            "Kết quả mô hình sạch chỉ cần giữ lại ACCOUNT và EXPENSE nối với nhau qua quan hệ Is Charged; từ hai bảng này hệ thống hoàn toàn kết xuất được Expense Report bất cứ lúc nào."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "title": "Strong vs. Weak Entities, and Identifying Relationships",
+          "bullets": [
+            {
+              "text": "Strong entity",
+              "subBullets": [
+                "Exists independently of other entity types",
+                "Possesses its own unique identifier (single underline)"
+              ]
+            },
+            {
+              "text": "Weak entity",
+              "subBullets": [
+                "Existence depends on a strong entity (identifying owner) and cannot exist alone",
+                "Lacks a complete unique identifier (uses a partial identifier)",
+                "Both the entity box and partial identifier are drawn with double lines"
+              ]
+            },
+            {
+              "text": "Identifying relationship",
+              "subBullets": [
+                "Links the identifying strong entity to the weak entity (drawn with double lines)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 14"
+          },
+          "pageNumber": 14,
+          "explanation": [
+            "Điểm cốt lõi của Weak Entity là sự phụ thuộc tồn tại (existence dependence) và phụ thuộc định danh: nếu xóa Strong Entity cha thì Weak Entity con không còn ý nghĩa tồn tại và cũng không thể định danh duy nhất.",
+            "Về mặt hình vẽ: hộp Weak Entity nét ĐÔI, đường Identifying Relationship nét ĐÔI, và tên Partial Identifier gạch dưới nét ĐÔI."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "title": "Figure 2-5 Example of a weak identity and its identifying relationship",
+          "diagramText": [
+            "Strong entity (Identifying Owner): EMPLOYEE [hộp nét đơn] — Attributes: Employee ID (đậm, gạch dưới đơn), Employee Name",
+            "Identifying Relationship (đường nét đôi): Carries (nối 1:M từ EMPLOYEE tới DEPENDENT với chân chim ở phía DEPENDENT)",
+            "Weak entity: DEPENDENT [hộp nét đôi] — Partial Identifier: Dependent Name (đậm, gạch dưới đôi) gồm (First Name, Middle Initial, Last Name), kèm attribute Date of Birth"
+          ],
+          "diagramNote": "Ví dụ chuẩn về Strong entity EMPLOYEE (Identifying Owner) liên kết qua Identifying Relationship nét đôi 'Carries' với Weak entity DEPENDENT (có Partial Identifier Dependent Name).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 15"
+          },
+          "pageNumber": 15,
+          "explanation": [
+            "Figure 2-5 minh họa ví dụ kinh điển: bảng người thân phụ thuộc (DEPENDENT) của nhân viên bảo hiểm. Bản thân 'Dependent Name' có thể trùng giữa con của nhân viên A và nhân viên B, nên chỉ khi ghép với Employee ID của nhân viên chủ (Identifying Owner) mới xác định duy nhất một người phụ thuộc.",
+            "Lưu ý kỹ thuật nhỏ: ở đây Dependent Name vừa là Partial Identifier (gạch dưới đôi), vừa là một Composite attribute gồm (First Name, Middle Initial, Last Name)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "title": "Guidelines for Naming and Defining Entities",
+          "bullets": [
+            {
+              "text": "Names:",
+              "subBullets": [
+                "Use a singular noun",
+                "Tailor to the organization's terminology",
+                "Keep concise or use accepted abbreviations",
+                "For event entities, name the outcome/result rather than the process",
+                "Maintain consistent naming across all diagrams"
+              ]
+            },
+            {
+              "text": "Definitions:",
+              "subBullets": [
+                "Begin with 'An X is...'",
+                "Describe distinguishing characteristics of each instance",
+                "Clarify inclusion and exclusion boundaries",
+                "Specify when an instance is created or destroyed",
+                "Note transitions to other entity types",
+                "Indicate historical data retention requirements"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 16"
+          },
+          "pageNumber": 16,
+          "explanation": [
+            "Quy tắc đặt tên Entity rất dễ nhớ khi làm bài tập ERD: luôn viết HOA danh từ SỐ ÍT (ví dụ STUDENT, ORDER, SHIPMENT; không viết STUDENTS hay ORDERS).",
+            "Với thực thể sự kiện (event entity), đặt tên theo kết quả thay vì động từ quy trình: dùng ORDER hoặc SHIPMENT chứ không dùng ORDERING hay SHIPPING."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Phân loại Thuộc tính (Attributes) & Tiêu chí chọn Identifier",
+      "text": "5 cách phân loại attribute (Required/Optional, Simple/Composite, Single-valued/Multivalued, Stored/Derived, Identifier), tiêu chí chọn khóa định danh (Slide 22) và quy tắc đặt tên/định nghĩa attribute.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 17–25"
+      },
+      "digest": {
+        "keyPoints": [
+          "5 cặp phân loại attribute: Required vs Optional; Simple vs Composite; Single-valued vs Multivalued ({}); Stored vs Derived ([]); và Identifier (Simple hoặc Composite).",
+          "Required attribute bắt buộc có giá trị với mọi instance (NOT NULL); Optional attribute có thể để trống (NULL).",
+          "4 tiêu chí chọn Identifier: không thay đổi giá trị; không bao giờ null; tránh intelligent identifier (mã nhúng vị trí/người dễ đổi); thay khóa phức hợp quá dài bằng surrogate key đơn.",
+          "Cú pháp đặt tên attribute chuẩn: [Entity type name { [ Qualifier ] } ] Class."
+        ],
+        "terms": [
+          {
+            "term": "Composite attribute",
+            "meaning": "Thuộc tính có thể tách thành các thành phần nhỏ hơn có ý nghĩa riêng, ký hiệu bằng dấu ngoặc tròn, ví dụ Employee Address (Street Address, City, State, Postal Code)."
+          },
+          {
+            "term": "Multivalued vs. Derived attribute",
+            "meaning": "Multivalued {Skill} lưu nhiều giá trị cho một instance; Derived [Years Employed] không lưu vật lý mà tính toán động từ thuộc tính khác."
+          },
+          {
+            "term": "Candidate Identifier",
+            "meaning": "Thuộc tính (hoặc nhóm thuộc tính) thỏa mãn đủ điều kiện làm khóa định danh cho entity type."
+          }
+        ],
+        "pitfalls": [
+          "Tránh dùng mã thông minh (intelligent identifier như mã phòng ban gắn vào mã nhân viên hoặc biển số xe gắn tỉnh thành): khi nhân viên chuyển bộ phận hay đổi địa điểm, giá trị khóa bị thay đổi dẫn đến rủi ro toàn vẹn tham chiếu."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 17",
+          "title": "Attributes",
+          "bullets": [
+            "Attribute – property or characteristic belonging to an entity or relationship type",
+            {
+              "text": "Classifications of attributes:",
+              "subBullets": [
+                "Required versus Optional Attributes",
+                "Simple versus Composite Attribute",
+                "Single-Valued versus Multivalued Attribute",
+                "Stored versus Derived Attributes",
+                "Identifier Attributes"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 17"
+          },
+          "pageNumber": 17,
+          "explanation": [
+            "Slide 17 tổng hợp 5 trục phân loại thuộc tính trong mô hình E-R; một thuộc tính bất kỳ có thể mang nhiều tính chất cùng lúc (ví dụ Price History ở Slide 46 vừa là Multivalued vừa là Composite).",
+            "Các slides 18–23 ngay sau đó sẽ giải thích chi tiết từng nhóm phân loại kèm ví dụ minh họa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "title": "Required vs. Optional Attributes",
+          "table": {
+            "caption": "Entity type: STUDENT — Minh họa Required vs. Optional Attributes",
+            "headers": [
+              "Attributes",
+              "Attribute Data Type",
+              "Required or Optional",
+              "Example Instance",
+              "Example Instance"
+            ],
+            "rows": [
+              ["Student ID", "CHAR (10)", "Required", "876-24-8217", "822-24-4456"],
+              ["Student Name", "CHAR (40)", "Required", "Michael Grant", "Melissa Kraft"],
+              ["Home Address", "CHAR (30)", "Required", "314 Baker St.", "1422 Heft Ave"],
+              ["Home City", "CHAR (20)", "Required", "Centerville", "Miami"],
+              ["Home State", "CHAR (2)", "Required", "OH", "FL"],
+              ["Home Zip Code", "CHAR (9)", "Required", "45459", "33321"],
+              ["Major", "CHAR (3)", "Optional", "MIS", ""]
+            ]
+          },
+          "bullets": [
+            "Required – must have a value for every associated entity (or relationship) instance",
+            "Optional – may be left without a value for some entity (or relationship) instances"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 18"
+          },
+          "pageNumber": 18,
+          "explanation": [
+            "Ở ví dụ STUDENT, 6 thuộc tính đầu (Student ID đến Home Zip Code) là Required nên mọi sinh viên đều bắt buộc có dữ liệu (tương ứng ràng buộc NOT NULL khi cài đặt SQL).",
+            "Thuộc tính Major là Optional vì sinh viên năm nhất (như Melissa Kraft trong ví dụ) có thể chưa chọn chuyên ngành, giá trị được phép để trống (NULL)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "title": "Simple vs. Composite Attributes",
+          "bullets": [
+            "Composite attribute – an attribute composed of meaningful sub-parts (component attributes)"
+          ],
+          "diagramText": [
+            "Figure 2-7 A composite attribute:",
+            "Entity: EMPLOYEE — Composite Attribute: Employee Address (Street Address, City, State, Postal Code)",
+            "Chú thích: The address is broken into component attributes (Street Address, City, State, Postal Code)"
+          ],
+          "diagramNote": "Figure 2-7 minh họa Composite attribute Employee Address được tách thành 4 thành phần con đặt trong ngoặc tròn.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 19"
+          },
+          "pageNumber": 19,
+          "explanation": [
+            "Simple attribute là thuộc tính nguyên tử không tách nhỏ thêm có ý nghĩa (như Age, Salary). Ngược lại, Composite attribute gộp các thành phần liên quan lại trong sơ đồ khái niệm cho gọn, như Employee Address gồm Street Address, City, State, Postal Code.",
+            "Lợi ích thực tế: khi người dùng cần lọc sinh viên theo City hoặc State, việc phân rã Composite attribute cho phép truy vấn trực tiếp từng thành phần con khi sang thiết kế bảng quan hệ."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "title": "MULTI-VALUED AND DERIVED ATTRIBUTES",
+          "bullets": [
+            "Multivalued – may hold more than one value for a single entity (or relationship) instance",
+            "Derived – value is computed from other stored attributes rather than stored directly in the database"
+          ],
+          "diagramText": [
+            "Figure 2-8 Entity with multivalued attribute (Skill) and derived attribute (Years Employed):",
+            "Entity: EMPLOYEE — Employee ID (Identifier, đậm, gạch dưới đơn), Employee Name(. . .), Payroll Address(. . .), Date Employed, {Skill} [Multivalued Attribute], [Years Employed] [Derived Attribute]",
+            "Chú thích: Multivalued: an employee can have more than one skill; Derived: Calculated from date employed and current date"
+          ],
+          "diagramNote": "Figure 2-8 minh họa cách viết thuộc tính đa trị {Skill} bằng ngoặc nhọn và thuộc tính suy diễn [Years Employed] bằng ngoặc vuông.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 20"
+          },
+          "pageNumber": 20,
+          "explanation": [
+            "Multivalued attribute ({Skill}) cho biết một nhân viên có thể có nhiều kỹ năng cùng lúc. Lưu ý khi ánh xạ sang mô hình quan hệ (Chương 4), cột bảng không chứa mảng giá trị nên {Skill} sẽ phải tách thành bảng riêng hoặc quan hệ (như Slide 40).",
+            "Derived attribute ([Years Employed]) không nên lưu cứng vào CSDL vì giá trị thay đổi mỗi năm (dễ bị lỗi thời), mà tính từ Date Employed và ngày hiện tại khi truy vấn."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "title": "Identifiers (Keys)",
+          "bullets": [
+            "Identifier (Key) – attribute (or combination of attributes) that uniquely distinguishes each instance of an entity type",
+            "Simple versus Composite Identifier",
+            "Candidate Identifier – attribute meeting all requirements to serve as an entity identifier"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 21"
+          },
+          "pageNumber": 21,
+          "explanation": [
+            "Identifier ở mô hình khái niệm E-R chính là tiền thân của Primary Key (khóa chính) trong mô hình quan hệ.",
+            "Nếu một thực thể có nhiều Candidate Identifier cùng xác định duy nhất từng bản thể (ví dụ Student ID và Email/SSN), người thiết kế sẽ chọn một ứng viên tốt nhất làm Identifier chính."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "title": "Criteria for Identifiers",
+          "bullets": [
+            {
+              "text": "Select identifiers that:",
+              "subBullets": [
+                "Remain unchanged in value over time",
+                "Never contain null values"
+              ]
+            },
+            "Avoid intelligent identifiers (keys embedding volatile data like locations or people names)",
+            "Replace long composite keys with a new simple surrogate identifier"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 22"
+          },
+          "pageNumber": 22,
+          "explanation": [
+            "Đây là 4 nguyên tắc vàng khi chọn khóa chính rất hay gặp trong câu hỏi trắc nghiệm và tình huống thiết kế CSDL.",
+            "Tại sao tránh intelligent identifier? Vì khi mã phòng ban hay mã chi nhánh đổi (nhân viên thuyên chuyển hoặc công ty sáp nhập), khóa chính bị buộc phải sửa kéo theo hàng loạt khóa ngoại ở các bảng con."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "title": "Figure 2-9 Simple and composite identifier attributes",
+          "diagramText": [
+            "(a) Simple identifier attribute: STUDENT — Student ID (đậm, gạch dưới đơn; nhãn 'Identifier and Required'), Student Name(. . .), . . .",
+            "(b) Composite identifier attribute: FLIGHT — Flight ID (đậm, gạch dưới đơn; nhãn 'Composite Identifier') gồm (Flight Number, Date), Number Of Passengers, . . .",
+            "Chú thích: The identifier is boldfaced and underlined"
+          ],
+          "diagramNote": "Figure 2-9 so sánh simple identifier (Student ID trên STUDENT) và composite identifier (Flight ID ghép từ Flight Number và Date trên FLIGHT).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 23"
+          },
+          "pageNumber": 23,
+          "explanation": [
+            "Trong ví dụ (b) FLIGHT, bản thân Flight Number (như VN210) bay lặp lại hàng ngày nên chưa đủ định danh duy nhất một chuyến bay cụ thể; chỉ khi kết hợp cặp (Flight Number, Date) mới tạo thành Composite Identifier Flight ID.",
+            "Cả hai dạng khóa đơn và khóa phức hợp đều phải in đậm và gạch dưới nét đơn (identifier cũng đồng thời bắt buộc là Required)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "title": "Naming Attributes",
+          "bullets": [
+            "Attribute names should be singular nouns or noun phrases",
+            "Each attribute name should be unique",
+            {
+              "text": "Follow a standardized naming syntax:",
+              "subBullets": [
+                "Format: [Entity type name { [ Qualifier ] } ] Class"
+              ]
+            },
+            "Use consistent qualifiers and class words for parallel attributes across different entity types"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 24"
+          },
+          "pageNumber": 24,
+          "explanation": [
+            "Công thức đặt tên chuẩn '[Entity type name { [ Qualifier ] } ] Class' giúp nhận ra ngay thực thể sở hữu và ý nghĩa thuộc tính.",
+            "Ví dụ: Employee Home Address (Entity = Employee, Qualifier = Home, Class = Address); Student Billing Address -> cùng dùng qualifier/class nhất quán trên toàn hệ thống."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "title": "Defining Attributes",
+          "bullets": [
+            "Explain what the attribute represents and why it matters",
+            "Clarify boundaries of what is included and excluded in the value",
+            "Record aliases in the data dictionary documentation",
+            "Identify the authoritative source of values",
+            "Note whether values are mutable or fixed after creation",
+            "Specify whether the attribute is required or optional",
+            "Define minimum and maximum allowed occurrences",
+            "Document dependencies or relationships with other attributes"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 25"
+          },
+          "pageNumber": 25,
+          "explanation": [
+            "Slide 25 liệt kê 8 mục cần ghi rõ trong Data Dictionary / Metadata Repository cho mỗi thuộc tính (liên hệ trực tiếp với khái niệm Metadata ở Chương 1).",
+            "Ví dụ với thuộc tính Total Price: cần nêu rõ có bao gồm thuế VAT/phí ship hay không (giải quyết mục 2), nguồn tính toán từ đơn giá * số lượng (mục 4 & 8), và không được null (mục 6)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Quan hệ (Relationships), Bậc (Degree) & Bản số cơ bản (1:1, 1:M, M:N)",
+      "text": "Phân biệt Relationship Type vs Relationship Instance, 3 bậc quan hệ (Unary, Binary, Ternary) và 3 mức bản số cơ bản (One-to-One, One-to-Many, Many-to-Many) qua các ví dụ Figure 2-10 và Figure 2-12.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 26–33"
+      },
+      "digest": {
+        "keyPoints": [
+          "Relationship Type là khái niệm liên kết giữa các Entity Type; Relationship Instance là liên kết cụ thể giữa các Entity Instance.",
+          "Bậc (Degree) của relationship là số lượng Entity Type tham gia: Unary (1 entity tự liên kết), Binary (2 entity khác nhau), Ternary (3 entity khác nhau đồng thời).",
+          "Một relationship có thể mang thuộc tính riêng của nó (ví dụ Shipping Mode và Unit Cost trong quan hệ ternary VENDOR–PART–WAREHOUSE).",
+          "Hai entity có thể có nhiều hơn một relationship giữa chúng (multiple relationships)."
+        ],
+        "terms": [
+          {
+            "term": "Unary (Recursive) Relationship",
+            "meaning": "Quan hệ giữa các instance thuộc cùng một entity type (ví dụ EMPLOYEE Manages EMPLOYEE, PERSON Is Married To PERSON)."
+          },
+          {
+            "term": "Ternary Relationship",
+            "meaning": "Quan hệ bậc 3 kết nối đồng thời 3 entity type khác nhau (không tương đương với 3 quan hệ binary tách rời)."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm Degree (số entity type tham gia: 1, 2, 3) với Cardinality (số lượng instance liên kết: 1:1, 1:M, M:N). Một quan hệ Unary (bậc 1) vẫn có thể có cardinality 1:1 hoặc 1:M!"
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 26",
+          "title": "Modeling Relationships",
+          "bullets": [
+            {
+              "text": "Relationship Types vs. Relationship Instances",
+              "subBullets": [
+                "Relationship type is modeled as connection lines between entity types; instances connect specific entity occurrences"
+              ]
+            },
+            {
+              "text": "Relationships can carry their own attributes",
+              "subBullets": [
+                "Such attributes describe facts pertaining to the association itself rather than any single participating entity"
+              ]
+            },
+            "Multiple distinct relationships may exist between the same pair of entity types",
+            "Associative Entity – construct combining features of a relationship and an entity"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 26"
+          },
+          "pageNumber": 26,
+          "explanation": [
+            "Slide 26 mở ra nửa sau trọng tâm của Chương 2: mô hình hóa mối quan hệ giữa các thực thể.",
+            "Điểm quan trọng cần nhớ: khi một dữ liệu (như 'Ngày hoàn thành khóa học' hay 'Điểm số') không thuộc về riêng EMPLOYEE cũng không thuộc về riêng COURSE mà chỉ phát sinh KHI hai thực thể đó liên kết với nhau, thì nó là attribute của relationship."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "title": "Figure 2-10 Relationship types and instances",
+          "diagramText": [
+            "a) Relationship type (Completes): EMPLOYEE (Employee ID, Employee Name(...), Birth Date) —(many)——— Completes ———(many)— COURSE (Course ID, Course Title, {Topic})",
+            "b) Relationship instances (10 đường liên kết cụ thể giữa 5 nhân viên và 6 khóa học):",
+            "• Chen -> C++, Java (2 instances)",
+            "• Melton -> C++, COBOL, Perl (3 instances)",
+            "• Ritchie -> Perl (1 instance)",
+            "• Celko -> Java, SQL (2 instances)",
+            "• Gosling -> Java, SQL (2 instances)",
+            "• Visual Basic chưa có nhân viên nào hoàn thành",
+            "Chú thích: Each line represents an instance (10 in all) of the Completes relationship type"
+          ],
+          "diagramNote": "Figure 2-10 minh họa một Relationship Type (EMPLOYEE Completes COURSE) ở phần (a) và 10 Relationship Instances cụ thể nối giữa từng nhân viên và khóa học ở phần (b).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 27"
+          },
+          "pageNumber": 27,
+          "explanation": [
+            "Nhìn vào phần (b) giúp hiểu bản chất bảng trung gian (bảng nối M:N) sau này: 10 đường nối đó chính xác là 10 dòng dữ liệu trong bảng Completes!",
+            "Chú ý Visual Basic đứng lẻ không có đường nối nào và một số nhân viên hoàn thành 2–3 khóa: đó là lý do thực tế thường cần ký hiệu optional (o) hoặc mandatory (|) chi tiết hơn ở Slide 34."
+          ]
+        },
+        {
+          "slideNumber": "Slide 28",
+          "title": "Degree of Relationships",
+          "bullets": [
+            {
+              "text": "Degree of a relationship: total count of entity types participating in that relationship",
+              "subBullets": [
+                "Unary Relationship (degree 1)",
+                "Binary Relationship (degree 2)",
+                "Ternary Relationship (degree 3)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 28"
+          },
+          "pageNumber": 28,
+          "explanation": [
+            "Khái niệm Degree chỉ đếm số HỘP Entity Type tham gia vào đường quan hệ, không đếm số lượng bản thể (instances).",
+            "Trên thực tế Binary (bậc 2) chiếm đa số (~90% trong các ERD), nhưng Unary (đệ quy tự tham chiếu) và Ternary (bậc 3) rất hay được kiểm tra trong đề thi vì sinh viên dễ vẽ sai."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "title": "Degree of relationships – from Figure 2-2",
+          "diagramText": [
+            "Unary: 1 hình chữ nhật có đường vòng tự nối chính nó — One entity related to another of the same entity type",
+            "Binary: 2 hình chữ nhật nối nhau qua một đoạn thẳng — Entities of two different types related to each other",
+            "Ternary: 3 hình chữ nhật nối chụm vào một giao điểm chung — Entities of three different types related to each other"
+          ],
+          "diagramNote": "Minh họa trực quan 3 bậc quan hệ trích từ Figure 2-2 (Unary, Binary, Ternary).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 29"
+          },
+          "pageNumber": 29,
+          "explanation": [
+            "Slide 29 nhấn mạnh cách phân biệt bằng mắt khi nhìn sơ đồ: Unary chỉ có 1 hộp, Binary có 2 hộp, Ternary có 3 nhánh chụm vào cùng 1 tâm quan hệ (thường nên chuyển thành Associative Entity như Slide 41 & 45)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "title": "Cardinality of Relationships",
+          "bullets": [
+            {
+              "text": "One-to-One (1:1)",
+              "subBullets": [
+                "Each instance of an entity pairs with at most one related instance on the other side"
+              ]
+            },
+            {
+              "text": "One-to-Many (1:M)",
+              "subBullets": [
+                "An instance on the 'one' side may link to many instances, while each instance on the other side links to at most one"
+              ]
+            },
+            {
+              "text": "Many-to-Many (M:N)",
+              "subBullets": [
+                "Instances on both sides can associate with multiple instances on the opposite side"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 30"
+          },
+          "pageNumber": 30,
+          "explanation": [
+            "Đây là 3 mức Maximum Cardinality cơ bản của quan hệ. Khi chuyển sang CSDL quan hệ (Chương 4), cách thiết kế bảng hoàn toàn phụ thuộc vào 3 dạng này: 1:1 (gộp hoặc đặt FK có UNIQUE), 1:M (đưa PK bên 1 sang làm FK bên M), M:N (bắt buộc tạo bảng liên kết mới)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "title": "Figure 2-12 Examples of relationships of different degrees — a) Unary relationships",
+          "diagramText": [
+            "PERSON — [Is Married To] — PERSON (One-to-one, đường vòng đơn tự nối PERSON)",
+            "EMPLOYEE — [Manages] —|< EMPLOYEE (One-to-many, chân chim trên nhánh vào EMPLOYEE)",
+            "TEAM — [Stands After] — TEAM (One-to-one, xếp thứ tự bảng xếp hạng)"
+          ],
+          "diagramNote": "Figure 2-12a minh họa 3 quan hệ Unary phổ biến: kết hôn (1:1), quản lý nhân viên (1:M) và xếp hạng đội bóng (1:1).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 31"
+          },
+          "pageNumber": 31,
+          "explanation": [
+            "Chú ý quan hệ Unary Manages trên EMPLOYEE: một người quản lý (vốn cũng là Employee) quản lý nhiều nhân viên khác, và mỗi nhân viên chỉ có một sếp trực tiếp -> đây là cấu trúc cây phân cấp (hierarchy) kinh điển.",
+            "Quan hệ Stands After trên TEAM dùng để biểu diễn danh sách liên kết xếp hạng (đội B đứng ngay sau đội A)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "title": "Figure 2-12 Examples of relationships of different degrees (cont.) — b) Binary relationships",
+          "diagramText": [
+            "EMPLOYEE ——— Is Assigned ——— PARKING SPACE (One-to-one)",
+            "PRODUCT LINE ——— Contains ———|< PRODUCT (One-to-many, chân chim tại PRODUCT)",
+            "STUDENT >——— Registers For ———< COURSE (Many-to-many, chân chim tại cả hai đầu)"
+          ],
+          "diagramNote": "Figure 2-12b minh họa 3 quan hệ Binary chuẩn tương ứng 1:1, 1:M và M:N.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 32"
+          },
+          "pageNumber": 32,
+          "explanation": [
+            "Binary là dạng phổ biến nhất trong mọi bài toán CSDL: gán chỗ đỗ xe (1:1), dòng sản phẩm chứa nhiều sản phẩm (1:M), và sinh viên đăng ký nhiều môn học (M:N)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "title": "Figure 2-12 Examples of relationships of different degrees (cont.) — c) Ternary relationship",
+          "diagramText": [
+            "3 thực thể tham gia giao điểm quan hệ Supplies: VENDOR (chân chim), PART (chân chim), WAREHOUSE (chân chim)",
+            "Thuộc tính riêng gắn vào đường nét đứt của quan hệ Supplies: Shipping Mode, Unit Cost",
+            "Ví dụ instance: Vendor X Supplies Part C to Warehouse Y with a Shipping Mode of 'next-day air' and a Unit Cost of $5",
+            "Chú thích: Note: a relationship can have attributes of its own"
+          ],
+          "diagramNote": "Figure 2-12c minh họa quan hệ Ternary Supplies nối đồng thời VENDOR, PART, WAREHOUSE và mang hai thuộc tính riêng (Shipping Mode, Unit Cost).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 33"
+          },
+          "pageNumber": 33,
+          "explanation": [
+            "Tại sao không tách Supplies thành 3 quan hệ Binary VENDOR–PART, PART–WAREHOUSE, VENDOR–WAREHOUSE? Vì đơn giá Unit Cost $5 với chế độ 'next-day air' phụ thuộc vào CẢ BA yếu tố: nhà cung cấp nào giao linh kiện gì tới đúng kho hàng nào!",
+            "Slide này cũng chứng minh trực tiếp điểm ở Slide 26: quan hệ Supplies tự nó mang 2 thuộc tính Shipping Mode và Unit Cost."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Ràng buộc bản số (Cardinality Constraints) & Đa quan hệ (Multiple Relationships)",
+      "text": "Quy tắc Minimum/Maximum Cardinality, phân tích các ví dụ Mandatory vs Optional (Figure 2-17a/b/c), đa quan hệ giữa hai thực thể (Figure 2-21a) và ràng buộc cận dưới cố định (Figure 2-21b).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 34–39"
+      },
+      "digest": {
+        "keyPoints": [
+          "Cardinality Constraint gồm Minimum Cardinality (0 = optional, vẽ vòng tròn 'o'; >=1 = mandatory, vẽ vạch '|') và Maximum Cardinality (1 hoặc many '<').",
+          "Ký hiệu sát cạnh hộp là Maximum; ký hiệu nằm lui vào phía trong đường nối là Minimum.",
+          "Hai thực thể có thể liên kết bằng nhiều quan hệ mang ngữ nghĩa khác nhau (ví dụ EMPLOYEE vừa Works In DEPARTMENT, vừa Manages DEPARTMENT).",
+          "Nếu minimum cardinality lớn hơn 1 (ví dụ bắt buộc ít nhất 2 giảng viên đủ điều kiện dạy một môn học), ghi rõ con số cận dưới đó (2) cạnh vạch mandatory."
+        ],
+        "terms": [
+          {
+            "term": "Minimum Cardinality",
+            "meaning": "Số lượng instance tối thiểu ở thực thể đích phải liên kết với mỗi instance ở thực thể nguồn (0 = optional, >=1 = mandatory)."
+          },
+          {
+            "term": "Maximum Cardinality",
+            "meaning": "Số lượng instance tối đa được phép liên kết (1 hoặc many)."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi ngược chiều khi đặt ký hiệu o / | / <: luôn đứng tại hộp A đọc 'Mỗi A có thể/phải liên kết với bao nhiêu B?' rồi vẽ ký hiệu lên đầu dây chạm vào hộp B (KHÔNG vẽ sát hộp A)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 34",
+          "title": "Cardinality Constraints",
+          "bullets": [
+            "Cardinality Constraints – minimum and maximum number of instances of one entity that may or must link to an instance of another entity",
+            {
+              "text": "Minimum Cardinality",
+              "subBullets": [
+                "If zero -> optional (circle o)",
+                "If one or more -> mandatory (vertical bar |)"
+              ]
+            },
+            {
+              "text": "Maximum Cardinality",
+              "subBullets": [
+                "Specifies the upper bound (one | or many <)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 34"
+          },
+          "pageNumber": 34,
+          "explanation": [
+            "Từ Slide 34 trở đi, mọi đường quan hệ phải vẽ đầy đủ cặp ký hiệu ở MỖI ĐẦU dây: ký hiệu bên trong là Minimum (o hoặc |), ký hiệu ngoài sát hộp là Maximum (| hoặc <).",
+            "Mẹo nhớ thứ tự ký hiệu tính từ giữa dây đi ra sát hộp: 'Min ở trong – Max sát hộp'."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "title": "Figure 2-17 Examples of cardinality constraints — a) Mandatory cardinalities",
+          "diagramText": [
+            "PATIENT (||) ——— Has Recorded ——— (|<) PATIENT HISTORY",
+            "Diễn giải hai chiều:",
+            "• Phía PATIENT (|| Mandatory One): A patient history is recorded for one and only one patient",
+            "• Phía PATIENT HISTORY (|< Mandatory Many): A patient must have recorded at least one history, and can have many",
+            "Ví dụ instances: Mark — Visit 1; Sarah — Visit 1, Visit 2; Elsie — Visit 1"
+          ],
+          "diagramNote": "Figure 2-17a minh họa hai đầu đều bắt buộc (Mandatory One || và Mandatory Many |<) giữa PATIENT và PATIENT HISTORY.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 35"
+          },
+          "pageNumber": 35,
+          "explanation": [
+            "Trong ví dụ này cả hai phía đều không cho phép 0 instance: mỗi bệnh nhân nhập hồ sơ ít nhất đã có 1 lần khám (PATIENT HISTORY >= 1), và mọi bản ghi lịch sử khám bệnh bắt buộc thuộc đúng 1 bệnh nhân (== 1).",
+            "Bảng ví dụ bên phải chứng minh điều đó: cả Mark, Sarah và Elsie đều có ít nhất 1 Visit, và không có Visit nào vô chủ."
+          ]
+        },
+        {
+          "slideNumber": "Slide 36",
+          "title": "Figure 2-17 Examples of cardinality constraints (cont.) — b) One optional, one mandatory",
+          "diagramText": [
+            "EMPLOYEE (|<) ——— Is Assigned To ——— (o<) PROJECT",
+            "Diễn giải hai chiều:",
+            "• Phía EMPLOYEE (|< Mandatory Many): A project must be assigned to at least one employee, and may be assigned to many",
+            "• Phía PROJECT (o< Optional Many): An employee can be assigned to any number of projects, or may not be assigned to any at all",
+            "Ví dụ instances: Rose -> BPR, OO; Pete -> TQM; Debbie -> BPR; Tom -> TQM, OO, CR; Heidi -> (chưa tham gia dự án nào)"
+          ],
+          "diagramNote": "Figure 2-17b minh họa quan hệ M:N kết hợp một đầu bắt buộc (|< phía EMPLOYEE) và một đầu tùy chọn (o< phía PROJECT).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 36"
+          },
+          "pageNumber": 36,
+          "explanation": [
+            "Nhìn vào danh sách mẫu: Heidi chưa nhận dự án nào chứng tỏ phía PROJECT là Optional Many (o<); trong khi cả 4 dự án (BPR, TQM, OO, CR) đều có tối thiểu 1 nhân viên phụ trách chứng tỏ phía EMPLOYEE là Mandatory Many (|<).",
+            "Đây là câu hỏi đọc ngược từ dữ liệu mẫu ra cardinality rất phổ biến trong bài thi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 37",
+          "title": "Figure 2-17 Examples of cardinality constraints (cont.) — c) Optional cardinalities",
+          "diagramText": [
+            "PERSON (o|) ——— Is Married To ——— (o|) PERSON (unary)",
+            "Diễn giải: A person is married to at most one other person, or may not be married at all",
+            "Ví dụ instances: Shirley <-> Ellis; Mack <-> Kathy; Dawn (độc thân); Fred (độc thân)"
+          ],
+          "diagramNote": "Figure 2-17c minh họa quan hệ Unary hai đầu đều Optional One (o|) trên thực thể PERSON.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 37"
+          },
+          "pageNumber": 37,
+          "explanation": [
+            "Vì có những người chưa kết hôn (Dawn, Fred) nên minimum cardinality ở cả hai đầu phải bằng 0 (vẽ o| thay vì ||).",
+            "Nếu vẽ || trên quan hệ Is Married To thì sẽ sai nghiệp vụ vì ép buộc mọi PERSON sinh ra đã phải kết hôn!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 38",
+          "title": "Figure 2-21 Examples of multiple relationships — a) Employees and departments",
+          "diagramText": [
+            "3 quan hệ cùng tồn tại trên EMPLOYEE và DEPARTMENT:",
+            "1) EMPLOYEE (|< Works In) ——— (|| Has Workers) DEPARTMENT: Mỗi phòng ban phải có ít nhất 1 nhân viên; mỗi nhân viên làm việc tại đúng 1 phòng ban",
+            "2) EMPLOYEE (|| Manages) ——— (o| Is Managed By) DEPARTMENT: Mỗi phòng ban do đúng 1 nhân viên quản lý; mỗi nhân viên có thể không quản lý phòng nào hoặc quản lý tối đa 1 phòng",
+            "3) Unary trên EMPLOYEE: EMPLOYEE (o| Supervises) ——— (o< Supervised By) EMPLOYEE: Một nhân viên giám sát 0 hoặc nhiều nhân viên khác, và được giám sát bởi 0 hoặc 1 quản lý",
+            "Chú thích: Entities can be related to one another in more than one way"
+          ],
+          "diagramNote": "Figure 2-21a minh họa mô hình đa quan hệ (multiple relationships) với 2 quan hệ khác nhau giữa EMPLOYEE–DEPARTMENT và 1 quan hệ unary trên EMPLOYEE.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 38"
+          },
+          "pageNumber": 38,
+          "explanation": [
+            "Khi một nhân viên bình thường thuộc phòng IT (Works In) nhưng trưởng phòng (Manages) lại là một quan hệ riêng biệt (không phải nhân viên nào cũng làm trưởng phòng), ta phải vẽ HAI đường quan hệ tách biệt giữa EMPLOYEE và DEPARTMENT.",
+            "Khi ánh xạ sang bảng quan hệ, Works In tạo FK Department_ID trong bảng EMPLOYEE, còn Manages tạo FK Manager_ID trong bảng DEPARTMENT."
+          ]
+        },
+        {
+          "slideNumber": "Slide 39",
+          "title": "Figure 2-21 Examples of multiple relationships (cont.) — b) Professors and courses (fixed lower limit constraint)",
+          "diagramText": [
+            "Quan hệ 1 (lịch dạy qua thực thể liên kết SCHEDULE): PROFESSOR (||) ——— (o<) SCHEDULE [Semester (đậm, gạch dưới đôi)] (>o) ——— (||) COURSE",
+            "Quan hệ 2 (đủ điều kiện giảng dạy): PROFESSOR (|< với số 2 ghi dưới vạch |) ——— Is Qualified ——— (|<) COURSE",
+            "Chú thích: Here, min cardinality constraint is 2. At least two professors must be qualified to teach each course. Each professor must be qualified to teach at least one course."
+          ],
+          "diagramNote": "Figure 2-21b minh họa hai quan hệ giữa PROFESSOR và COURSE (lịch giảng dạy SCHEDULE theo học kỳ và năng lực giảng dạy Is Qualified với cận dưới cố định = 2).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 39"
+          },
+          "pageNumber": 39,
+          "explanation": [
+            "Điểm đặc biệt trên hình là con số '2' viết ngay dưới vạch đứng phía PROFESSOR trên đường Is Qualified: khi nghiệp vụ yêu cầu tối thiểu N > 1 (ở đây mỗi môn phải có ít nhất 2 giảng viên đủ chuẩn dạy dự phòng), ta ghi rõ con số cận dưới cạnh ký hiệu mandatory.",
+            "Đồng thời học kỳ (Semester) được phân biệt trong SCHEDULE vì một giảng viên có thể dạy cùng một môn nhiều lần ở các học kỳ khác nhau (lưu lịch sử giảng dạy)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Biểu diễn Multivalued Attribute & Thực thể liên kết (Associative Entities)",
+      "text": "Cách chuyển đổi thuộc tính đa trị thành thực thể/quan hệ (Figure 2-15a/b), 5 tiêu chí chuyển relationship thành Associative Entity (Slide 41), chuyển M:N thành CERTIFICATE (Figure 2-11a/b), BOM STRUCTURE (Figure 2-13c) và ràng buộc trên quan hệ Ternary (Figure 2-18).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 40–45"
+      },
+      "digest": {
+        "keyPoints": [
+          "Multivalued attribute đơn giản ({Prerequisite}) hoặc đa trị phức hợp ({Skill(Skill Code, Skill Title, Skill Type)}) có thể chuyển thành entity + relationship.",
+          "5 điều kiện chuyển relationship có thuộc tính thành Associative Entity: (1) mọi quan hệ nối với nó đều many; (2) có ý nghĩa độc lập; (3) ưu tiên có unique identifier riêng và các thuộc tính khác; (4) có thể tham gia quan hệ với thực thể thứ ba; (5) quan hệ Ternary nên chuyển thành Associative Entity.",
+          "Khi chuyển binary M:N thành Associative Entity (như CERTIFICATE), hai quan hệ hai bên đổi thành hai quan hệ 1:M với vạch mandatory (||) đặt ở hai thực thể gốc và chân chim (<) chĩa vào Associative Entity.",
+          "Với quan hệ Ternary (Figure 2-18 SUPPLY SCHEDULE), cẩn thận đọc từng Business Rule gắn với từng nhánh (1, 2, 3) để đặt đúng optional/mandatory."
+        ],
+        "terms": [
+          {
+            "term": "Associative Entity",
+            "meaning": "Cấu trúc kết hợp giữa thực thể và quan hệ, vừa có thể có identifier và thuộc tính riêng, vừa có thể tham gia tiếp các quan hệ khác."
+          },
+          {
+            "term": "Bill of Materials (BOM) Structure",
+            "meaning": "Cấu trúc đệ quy M:N (một sản phẩm lắp từ nhiều linh kiện và một linh kiện dùng trong nhiều lắp ráp), thường mô hình hóa qua associative entity BOM STRUCTURE."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi đặt ngược đầu chân chim khi chuyển M:N thành Associative Entity: luôn đặt (||) ở phía hai entity gốc (EMPLOYEE, COURSE) và đặt chân chim (<) ở phía associative entity (CERTIFICATE)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 40",
+          "title": "Figure 2-15a and 2-15b Multivalued attributes can be represented as relationships",
+          "diagramText": [
+            "Nhóm 1 (simple multivalued attribute): COURSE (Course ID, Course Title, {Prerequisite})  ==>  COURSE [PK Course ID, Course Title] nối 2 đường nét đứt (|| Has Prerequisites o<) và (|| Is Prerequisite For o<) tới Prerequisite [PK Course ID, PK Pre-Req Course ID]",
+            "Nhóm 2 (composite multivalued attribute): EMPLOYEE (Employee ID, Employee Name, {Skill (Skill Code, Skill Title, Skill Type)})  ==>  EMPLOYEE [PK Employee ID, Employee Name] (||)———(o<) Possesses [PK,FK1 Employee ID; PK,FK2 Skill Code] (>o)———(||) SKILL [PK Skill Code, Skill Title, Skill Type]"
+          ],
+          "diagramNote": "Figure 2-15a/b trình bày hai mẫu chuyển hóa chuẩn khi đưa thuộc tính đa trị ({Prerequisite} và {Skill(...)}) thành bảng/thực thể liên kết trong thiết kế chi tiết.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 40"
+          },
+          "pageNumber": 40,
+          "explanation": [
+            "Khi chuẩn bị sang mức thiết kế logic/quan hệ, mọi thuộc tính đa trị đều phải được loại bỏ vì mỗi ô của bảng chỉ chứa 1 giá trị đơn.",
+            "Nếu thuộc tính đa trị là đơn giản giữa các thực thể cùng loại ({Prerequisite} của COURSE) thì tạo quan hệ M:N đệ quy (Prerequisite); còn nếu đa trị là phức hợp nhiều cột ({Skill(Code, Title, Type)}) thì tách ra thực thể SKILL và bảng liên kết Possesses để tránh lặp lại Skill Title và Skill Type."
+          ]
+        },
+        {
+          "slideNumber": "Slide 41",
+          "title": "Associative Entities",
+          "bullets": [
+            "An entity – holds attributes of its own",
+            "A relationship – links entity types together",
+            {
+              "text": "Conditions indicating a relationship with attributes should become an associative entity:",
+              "subBullets": [
+                "All connected relationships must carry a 'many' cardinality on the associative side",
+                "The associative entity carries meaningful identity independent of participating entities",
+                "It preferably possesses its own unique identifier along with additional attributes",
+                "It may participate in other relationships beyond the original connected entities",
+                "Ternary relationships should be converted into associative entities"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 41"
+          },
+          "pageNumber": 41,
+          "explanation": [
+            "5 tiêu chí trên Slide 41 là câu hỏi lý thuyết rất hay gặp trong bài kiểm tra DBS. Chú ý đặc biệt điều kiện 4 và 5: nếu một quan hệ cần nối thêm với thực thể khác (ví dụ CERTIFICATE được cấp bởi INSTRUCTOR) hoặc là quan hệ bậc 3 (ternary), bắt buộc phải nâng cấp nó thành Associative Entity vì một đường quan hệ thông thường không thể nối với đường quan hệ khác."
+          ]
+        },
+        {
+          "slideNumber": "Slide 42",
+          "title": "Figure 2-11a A binary relationship with an attribute",
+          "diagramText": [
+            "EMPLOYEE (Employee ID, Employee Name(. . .), Birth Date) [B >] ——— Completes ——— [< A] COURSE (Course ID, Course Title, {Topic})",
+            "Thuộc tính của relationship (nối bằng đường nét đứt lên đường Completes): Date Completed",
+            "Chú thích: Here, the date completed attribute pertains specifically to the employee's completion of a course... it is an attribute of the relationship."
+          ],
+          "diagramNote": "Figure 2-11a mô hình hóa Date Completed như thuộc tính gắn trên quan hệ M:N Completes giữa EMPLOYEE và COURSE.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 42"
+          },
+          "pageNumber": 42,
+          "explanation": [
+            "Date Completed phụ thuộc vào đúng cặp (Employee ID, Course ID) — nhân viên X hoàn thành khóa học Y vào ngày nào.",
+            "Ở dạng 2-11a, Completes vẫn là relationship thuần túy mang 1 thuộc tính. Slide 43 ngay sau đó sẽ minh họa cách chuyển sang Associative Entity khi nó cần mã chứng chỉ riêng (Certificate Number)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 43",
+          "title": "Figure 2-11b An associative entity (CERTIFICATE)",
+          "diagramText": [
+            "EMPLOYEE (Employee ID, Employee Name(. . .), Birth Date) (||) ——— (< A) CERTIFICATE [hộp chữ nhật bo góc: Certificate Number (đậm, gạch dưới đơn), Date Completed] (B >) ——— (||) COURSE (Course ID, Course Title, {Topic})",
+            "Chú thích: Associative entity is like a relationship with an attribute, but it is also considered to be an entity in its own right. Note that the many-to-many cardinality between entities in Figure 2-11a has been replaced by two one-to-many relationships with the associative entity."
+          ],
+          "diagramNote": "Figure 2-11b chuyển đổi quan hệ M:N Completes thành Associative Entity CERTIFICATE có Certificate Number và Date Completed, biến thành hai quan hệ 1:M.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 43"
+          },
+          "pageNumber": 43,
+          "explanation": [
+            "Khi có thêm mã chứng chỉ (Certificate Number), CERTIFICATE trở thành thực thể có ý nghĩa kinh doanh độc lập. Quan hệ M:N ban đầu được phân rã thành hai quan hệ 1:M: mỗi CERTIFICATE thuộc đúng 1 EMPLOYEE (||) và đúng 1 COURSE (||).",
+            "Hãy đối chiếu ký hiệu A và B giữa Slide 42 và Slide 43: phần chân chim B từng ở phía EMPLOYEE nay nằm ở đầu nối từ EMPLOYEE vào CERTIFICATE, còn chân chim A từng ở phía COURSE nay nằm ở đầu nối từ COURSE vào CERTIFICATE."
+          ]
+        },
+        {
+          "slideNumber": "Slide 44",
+          "title": "Figure 2-13c An associative entity – bill of materials structure",
+          "diagramText": [
+            "ITEM ——— Has Components ——— (<) BOM STRUCTURE (Effective Date [đậm, gạch dưới đôi], Quantity) (> ) ——— Used In Assemblies ——— ITEM",
+            "Chú thích: This could just be a relationship with attributes... it's a judgment call."
+          ],
+          "diagramNote": "Figure 2-13c minh họa cấu trúc định mức nguyên vật liệu (Bill of Materials) bằng quan hệ đệ quy M:N giữa ITEM qua Associative Entity BOM STRUCTURE.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 44"
+          },
+          "pageNumber": 44,
+          "explanation": [
+            "Trong sản xuất, một ITEM thành phẩm (như bàn học) gồm nhiều ITEM linh kiện (chân bàn, mặt bàn, ốc vít), và ngược lại một loại ốc vít có thể dùng lắp vào nhiều mẫu bàn ghế khác nhau -> tạo thành quan hệ unary M:N.",
+            "Việc tách thành Associative Entity BOM STRUCTURE (với Partial Identifier Effective Date gạch dưới đôi và Quantity) là một lựa chọn thiết kế linh hoạt (judgment call) giúp quản lý số lượng linh kiện theo ngày hiệu lực."
+          ]
+        },
+        {
+          "slideNumber": "Slide 45",
+          "title": "Figure 2-18 Cardinality constraints in a ternary relationship",
+          "diagramText": [
+            "VENDOR (||) —[1]— (o<) SUPPLY SCHEDULE [Shipping Mode, Unit Cost] (>|) —[3]— (||) WAREHOUSE; và PART (||) —[2]— (|<) SUPPLY SCHEDULE",
+            "Business Rules tương ứng từng nhãn (1), (2), (3):",
+            "• (1) Each vendor can supply many parts to any number of warehouses but need not supply any parts (o< phía SUPPLY SCHEDULE)",
+            "• (2) Each part can be supplied by any number of vendors to more than one warehouse, but each part must be supplied by at least one vendor to a warehouse (|< phía SUPPLY SCHEDULE)",
+            "• (3) Each warehouse can be supplied with any number of parts from more than one vendor, but each warehouse must be supplied with at least one part (|< phía SUPPLY SCHEDULE)"
+          ],
+          "diagramNote": "Figure 2-18 chuyển quan hệ bậc 3 Supplies (Slide 33) thành Associative Entity SUPPLY SCHEDULE kèm đầy đủ 3 ràng buộc bản số theo Business Rules.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 45"
+          },
+          "pageNumber": 45,
+          "explanation": [
+            "Nhớ quy tắc cốt lõi ở đầu mỗi nhánh nối vào Associative Entity: cả 3 phía VENDOR, PART và WAREHOUSE đều mang Mandatory One (||) vì mỗi dòng trong SUPPLY SCHEDULE bắt buộc phải xác định rõ đúng 1 nhà cung cấp, đúng 1 linh kiện và đúng 1 kho nhận.",
+            "Trong khi đó, optional/mandatory ở đầu chân chim chĩa vào SUPPLY SCHEDULE được quyết định bởi business rule: Vendor được phép chưa cung cấp đơn nào (o<), còn mỗi Part và Warehouse trong hệ thống đều bắt buộc có ít nhất 1 nguồn cung (|<)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Dữ liệu theo thời gian (Time-Stamping), Mô hình Pine Valley Furniture (Visio) & Tổng kết",
+      "text": "Kỹ thuật mô hình hóa lịch sử biến đổi theo thời gian bằng Time Stamp (Figure 2-19, 2-20c), lý do tuân thủ luật HIPAA/Sarbanes-Oxley, mô hình hoàn chỉnh Pine Valley Furniture trên Microsoft Visio (Figure 2-22) và trang kết chương.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 46–49"
+      },
+      "digest": {
+        "keyPoints": [
+          "Time stamp là giá trị thời gian gắn kèm một dữ liệu để ghi nhận thời điểm xảy ra sự kiện làm thay đổi dữ liệu đó.",
+          "Hai cách mô hình hóa time stamp: dùng thuộc tính vừa Multivalued vừa Composite như {Price History (Effective Date, Price)}, hoặc dùng Associative Entity có From Date / To Date như ASSIGNMENT (Figure 2-20c).",
+          "Lưu vết dữ liệu theo thời gian ngày càng quan trọng do yêu cầu kiểm toán/quy định như HIPAA và Sarbanes-Oxley.",
+          "Các công cụ mô hình hóa khác nhau (như Microsoft Visio ở Figure 2-22) có thể dùng ký hiệu hơi khác cho cùng một khái niệm E-R (ví dụ đặt PK/FK trong bảng, vẽ nét đứt cho quan hệ non-identifying)."
+        ],
+        "terms": [
+          {
+            "term": "Time Stamp",
+            "meaning": "Giá trị thời gian gắn với một dữ liệu nhằm theo dõi lịch sử thay đổi hoặc khoảng thời gian hiệu lực của mối liên kết."
+          }
+        ],
+        "pitfalls": [
+          "Khi đề bài yêu cầu lưu lịch sử thay đổi (giá sản phẩm qua từng thời kỳ, lịch sử phân công nhân viên vào dự án theo ngày), không được ghi đè mất giá trị cũ hoặc dùng binary relationship thường không có khóa thời gian — phải dùng thuộc tính time stamp hoặc associative entity mang Effective Date / From Date."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 46",
+          "title": "Figure 2-19 Simple example of time-stamping",
+          "diagramText": [
+            "PRODUCT: Product ID (đậm, gạch dưới đơn), {Price History (Effective Date [Time Stamp], Price)}",
+            "Định nghĩa: Time stamp – a time value associated with a data value, often indicating when an event occurred affecting that data value",
+            "Chú thích: The Price History attribute is both multivalued and composite."
+          ],
+          "diagramNote": "Figure 2-19 minh họa time stamp Effective Date nằm bên trong thuộc tính vừa đa trị vừa phức hợp {Price History (Effective Date, Price)} của PRODUCT.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 46"
+          },
+          "pageNumber": 46,
+          "explanation": [
+            "Nếu bảng PRODUCT chỉ lưu mỗi cột Price, mỗi khi tăng giá sản phẩm thì đơn hàng cũ sẽ bị tính sai lịch sử giá. Giải pháp nhanh trong ERD là dùng {Price History (Effective Date, Price)}.",
+            "Chú ý tính chất kép của Price History: dấu {} cho biết một sản phẩm có nhiều mốc giá theo thời gian (Multivalued), và dấu () cho biết mỗi mốc giá gồm 2 thành phần Effective Date và Price (Composite)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 47",
+          "title": "Figure 2-20c E-R diagram with associative entity for product assignment to product line over time",
+          "diagramText": [
+            "PRODUCT (||) ——— (|<) ASSIGNMENT [From Date (đậm, gạch dưới đôi), To Date] (>|) ——— (||) PRODUCT LINE",
+            "PRODUCT (|<) ——— Sales For Product ——— (o<) ORDER",
+            "PRODUCT LINE (|<) ——— Sales For Product Line ——— (o<) ORDER",
+            "Chú thích 1: Modeling time-dependent data has become more important due to regulations such as HIPAA and Sarbanes-Oxley.",
+            "Chú thích 2: The Assignment associative entity shows the date range of a product's assignment to a particular product line."
+          ],
+          "diagramNote": "Figure 2-20c theo dõi lịch sử một sản phẩm được gán vào từng dòng sản phẩm theo khoảng thời gian (From Date, To Date) thông qua Associative Entity ASSIGNMENT.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 47"
+          },
+          "pageNumber": 47,
+          "explanation": [
+            "Tại sao không nối trực tiếp PRODUCT với PRODUCT LINE? Vì một sản phẩm có thể chuyển từ dòng sản phẩm A sang dòng sản phẩm B theo thời gian (hoặc tạm ngưng). ASSIGNMENT giữ lại cặp From Date (Partial Identifier, gạch dưới đôi) và To Date để truy vết chính xác tại thời điểm lập hóa đơn ORDER thì PRODUCT đó thuộc PRODUCT LINE nào.",
+            "Giáo trình nhắc tới hai đạo luật HIPAA (y tế) và Sarbanes-Oxley (tài chính kế toán) để nhấn mạnh yêu cầu lưu vết kiểm toán (audit trail) không được xóa dữ liệu lịch sử."
+          ]
+        },
+        {
+          "slideNumber": "Slide 48",
+          "title": "Figure 2-22 Data model for Pine Valley Furniture Company in Microsoft Visio notation",
+          "diagramText": [
+            "Toàn bộ ERD của Pine Valley Furniture Company vẽ bằng ký hiệu Microsoft Visio (chia ngăn PK và thuộc tính):",
+            "• SALESPERSON (PK Salesperson ID) — Serves — TERRITORY (PK Territory ID) — DOES BUSINESS IN — CUSTOMER (PK Customer ID)",
+            "• PRODUCT LINE (PK Product Line ID) — Includes — PRODUCT (PK Product ID) — ORDER LINE (Ordered Quantity) — ORDER (PK Order ID, Order Date) — Submits — CUSTOMER",
+            "• VENDOR (PK Vendor ID) — SUPPLIES (Supply Unit Price) — RAW MATERIAL (PK Material ID) — USES (Goes Into Quantity) — PRODUCT",
+            "• PRODUCT — PRODUCED IN — WORK CENTER (PK Work Center ID) — WORKS IN — EMPLOYEE (PK Employee ID, Employee Name, Employee Address)",
+            "• EMPLOYEE có unary Supervises/Is Supervised By và nối SKILL (PK Skill) qua HAS SKILL",
+            "Chú thích: Different modeling software tools may have different notation for the same constructs."
+          ],
+          "diagramNote": "Figure 2-22 là sơ đồ ERD tổng thể của doanh nghiệp mẫu Pine Valley Furniture Company trình bày theo ký hiệu Microsoft Visio.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 48"
+          },
+          "pageNumber": 48,
+          "explanation": [
+            "So với ký hiệu hộp đơn ở các slide trước, Microsoft Visio vẽ hộp chia ô PK rõ ràng, đường nét liền biểu thị identifying relationship (PK tham gia khóa chính bảng con như ORDER LINE, SUPPLIES, USES, HAS SKILL), còn đường nét đứt biểu thị non-identifying relationship.",
+            "Sơ đồ Pine Valley Furniture này sẽ được giữ xuyên suốt từ Chương 2 sang Chương 3 (Entity Clusters) và Chương 4 (Relational Schema)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 49",
+          "title": "Copyright Notice (Pearson Education)",
+          "paragraphs": [
+            "Instructor copyright and distribution notice slide (Pearson Education, Inc., 2016)."
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch02.pdf",
+            "loc": "Slide 49"
+          },
+          "pageNumber": 49,
+          "explanation": [
+            "Trang 49 (2-49) là trang thông báo bản quyền tiêu chuẩn của nhà xuất bản Pearson Education ở cuối bộ slide giảng dạy, không chứa thêm nội dung học thuật mới."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch02-c01", "front": "Weak entity khác strong entity thế nào?", "back": "Weak entity phụ thuộc strong entity (identifying owner), không có identifier riêng mà chỉ có partial identifier; vẽ hộp nét đôi, nối bằng identifying relationship (nét đôi).", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 14" } },
-    { "id": "dbs-ch02-c02", "front": "Ký hiệu derived và multivalued attribute?", "back": "Derived: [ngoặc vuông]. Multivalued: {ngoặc nhọn}.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slides 5, 20" } },
-    { "id": "dbs-ch02-c03", "front": "Degree của relationship là gì? Kể tên.", "back": "Số entity type tham gia: unary (1), binary (2), ternary (3).", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 28" } },
-    { "id": "dbs-ch02-c04", "front": "Minimum cardinality bằng 0 nghĩa là gì?", "back": "Optional (vẽ vòng tròn o); từ 1 trở lên là mandatory (vạch |).", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 34" } },
-    { "id": "dbs-ch02-c05", "front": "4 tiêu chí chọn identifier?", "back": "Không đổi giá trị; không null; tránh intelligent identifier; thay key phức hợp dài bằng key đơn mới.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 22" } },
-    { "id": "dbs-ch02-c06", "front": "7 đặc tính của business rule tốt?", "back": "Declarative, Precise, Atomic, Consistent, Expressible, Distinct, Business-oriented.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 7" } },
-    { "id": "dbs-ch02-c07", "front": "Khi nào nên chuyển relationship có thuộc tính thành associative entity?", "back": "Mọi quan hệ đều many; có ý nghĩa độc lập; ưu tiên có identifier riêng và thuộc tính khác; có thể tham gia quan hệ khác; ternary nên chuyển thành associative entity.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 41" } }
+    {
+      "id": "dbs-ch02-c01",
+      "front": "Weak entity khác strong entity thế nào?",
+      "back": "Weak entity phụ thuộc vào strong entity (identifying owner), không tự tồn tại độc lập và không có identifier riêng hoàn chỉnh mà chỉ có partial identifier; vẽ hộp nét đôi, partial identifier gạch dưới nét đôi, nối bằng identifying relationship (nét đôi).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 14–15"
+      }
+    },
+    {
+      "id": "dbs-ch02-c02",
+      "front": "Ký hiệu của derived, multivalued và composite attribute?",
+      "back": "Derived: [ngoặc vuông]; Multivalued: {ngoặc nhọn}; Composite: tên thuộc tính kèm các thành phần con trong (ngoặc tròn, phân cách dấu phẩy).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 5, 19–20"
+      }
+    },
+    {
+      "id": "dbs-ch02-c03",
+      "front": "Degree của relationship là gì? Kể tên 3 bậc phổ biến.",
+      "back": "Degree là số lượng entity type tham gia vào relationship: Unary (bậc 1 – 1 entity tự liên kết), Binary (bậc 2 – 2 entity khác nhau), Ternary (bậc 3 – 3 entity khác nhau đồng thời).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 28–29"
+      }
+    },
+    {
+      "id": "dbs-ch02-c04",
+      "front": "Minimum cardinality bằng 0 hay >= 1 có ý nghĩa và ký hiệu gì?",
+      "back": "Minimum = 0 là Optional (ký hiệu vòng tròn o nằm phía trong); Minimum >= 1 là Mandatory (ký hiệu vạch đứng | nằm phía trong).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 34"
+      }
+    },
+    {
+      "id": "dbs-ch02-c05",
+      "front": "4 tiêu chí chọn identifier (khóa định danh) tốt?",
+      "back": "1) Giá trị không đổi theo thời gian; 2) Không bao giờ nhận giá trị null; 3) Tránh intelligent identifier (chứa địa điểm/tên người dễ đổi); 4) Thay khóa phức hợp quá dài bằng một khóa đơn mới.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "dbs-ch02-c06",
+      "front": "7 đặc tính của một business rule tốt?",
+      "back": "Declarative (nêu cái gì, không nêu cách làm), Precise, Atomic (một mệnh đề duy nhất), Consistent, Expressible, Distinct (không trùng lặp), Business-oriented.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "dbs-ch02-c07",
+      "front": "5 điều kiện nên chuyển relationship có thuộc tính thành associative entity?",
+      "back": "1) Mọi quan hệ nối với nó đều có cardinality 'many'; 2) Có ý nghĩa độc lập ngoài các entity liên quan; 3) Ưu tiên có unique identifier riêng và các thuộc tính khác; 4) Có thể tham gia quan hệ khác; 5) Quan hệ ternary nên chuyển thành associative entity.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 41"
+      }
+    },
+    {
+      "id": "dbs-ch02-c08",
+      "front": "E-R constructs tương ứng với những thành phần nào trong bảng quan hệ?",
+      "back": "Entity type ≈ Table (bảng); Entity instance ≈ Row (dòng); Attribute ≈ Field/Column (cột); Relationship instance ≈ cặp giá trị Primary Key – Foreign Key giữa các bảng.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-ch02-c09",
+      "front": "Đối tượng nào NÊN và KHÔNG NÊN mô hình hóa thành Entity?",
+      "back": "NÊN: đối tượng cần mô hình hóa, có nhiều instance và nhiều attribute. KHÔNG NÊN: người dùng hệ thống (ví dụ TREASURER) hoặc báo cáo đầu ra của hệ thống (ví dụ EXPENSE REPORT).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 12–13"
+      }
+    },
+    {
+      "id": "dbs-ch02-c10",
+      "front": "Quy tắc đặt tên Entity và cú pháp đặt tên Attribute chuẩn?",
+      "back": "Entity: danh từ số ít, ngắn gọn, với sự kiện đặt theo kết quả (ORDER thay vì ORDERING). Attribute: danh từ/cụm danh từ số ít, duy nhất, theo chuẩn [Entity type name { [ Qualifier ] } ] Class.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 16, 24"
+      }
+    },
+    {
+      "id": "dbs-ch02-c11",
+      "front": "Required attribute khác Optional attribute ở điểm nào?",
+      "back": "Required attribute bắt buộc phải có giá trị cho mọi instance (NOT NULL, ví dụ Student ID); Optional attribute có thể không có giá trị ở một số instance (ví dụ Major của sinh viên chưa chọn ngành).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 18"
+      }
+    },
+    {
+      "id": "dbs-ch02-c12",
+      "front": "Vì sao không nên tách quan hệ Ternary thành 3 quan hệ Binary rời rạc?",
+      "back": "Vì thuộc tính và ý nghĩa của quan hệ Ternary phụ thuộc đồng thời vào cả 3 thực thể (ví dụ Shipping Mode và Unit Cost trong VENDOR–PART–WAREHOUSE chỉ xác định khi biết đủ cả 3 bên); thay vào đó hãy chuyển thành Associative Entity (SUPPLY SCHEDULE).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 33, 45"
+      }
+    },
+    {
+      "id": "dbs-ch02-c13",
+      "front": "Time stamp là gì và có những cách biểu diễn nào trong ERD?",
+      "back": "Time stamp là giá trị thời gian gắn với dữ liệu để ghi lại thời điểm sự kiện thay đổi dữ liệu. Có thể dùng thuộc tính multivalued composite như {Price History(Effective Date, Price)} hoặc associative entity có From Date / To Date (ASSIGNMENT).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 46–47"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch02-q01", "stem": "Thực thể nào KHÔNG nên mô hình hóa thành entity?", "options": ["ORDER", "PRODUCT", "EXPENSE REPORT (output của hệ thống)", "CUSTOMER"], "answer": 2, "explanation": "Entity không nên là user hoặc output của hệ thống; ví dụ Figure 2-4 loại TREASURER và EXPENSE REPORT.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slides 12–13" } },
-    { "id": "dbs-ch02-q02", "stem": "Ký hiệu 'o<' trên đầu quan hệ có nghĩa là gì?", "options": ["Mandatory one", "Optional one", "Mandatory many", "Optional many"], "answer": 3, "explanation": "Vòng tròn = optional (min 0), chân chim = many.", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 5" } },
-    { "id": "dbs-ch02-q03", "stem": "Attribute [Years Employed] tính từ Date Employed và ngày hiện tại thuộc loại nào?", "options": ["Multivalued", "Composite", "Derived", "Identifier"], "answer": 2, "explanation": "Giá trị tính được từ attribute khác, không lưu: derived, ký hiệu [ ].", "source": { "file": "hoffer_mdm12e_pp_ch02.pdf", "loc": "Slide 20" } }
+    {
+      "id": "dbs-ch02-q01",
+      "stem": "Thực thể nào KHÔNG nên mô hình hóa thành entity?",
+      "options": [
+        "ORDER",
+        "PRODUCT",
+        "EXPENSE REPORT (output của hệ thống)",
+        "CUSTOMER"
+      ],
+      "answer": 2,
+      "explanation": "Slide 12–13 (Figure 2-4): Entity không nên là user (TREASURER) hoặc output của hệ thống (EXPENSE REPORT).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 12–13"
+      }
+    },
+    {
+      "id": "dbs-ch02-q02",
+      "stem": "Ký hiệu 'o<' trên đầu quan hệ có nghĩa là gì?",
+      "options": [
+        "Mandatory one",
+        "Optional one",
+        "Mandatory many",
+        "Optional many"
+      ],
+      "answer": 3,
+      "explanation": "Vòng tròn 'o' ở phía trong = optional (minimum = 0), chân chim '<' sát hộp = many (Slide 4–5).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 4–5"
+      }
+    },
+    {
+      "id": "dbs-ch02-q03",
+      "stem": "Attribute [Years Employed] tính từ Date Employed và ngày hiện tại thuộc loại nào?",
+      "options": [
+        "Multivalued",
+        "Composite",
+        "Derived",
+        "Identifier"
+      ],
+      "answer": 2,
+      "explanation": "Slide 20 (Figure 2-8): Derived attribute có giá trị tính toán từ các thuộc tính khác và không lưu trực tiếp trong CSDL, ký hiệu bằng ngoặc vuông [ ].",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 20"
+      }
+    },
+    {
+      "id": "dbs-ch02-q04",
+      "stem": "Khi vẽ Weak Entity trong mô hình E-R (Figure 2-5), ký hiệu nào sau đây ĐÚNG?",
+      "options": [
+        "Hộp nét đứt, partial identifier gạch dưới nét đơn",
+        "Hộp nét đôi, identifying relationship nét đôi, partial identifier gạch dưới nét đôi",
+        "Hộp bo góc lồng trong hình chữ nhật",
+        "Hộp nét đơn, partial identifier đặt trong ngoặc nhọn {}"
+      ],
+      "answer": 1,
+      "explanation": "Slide 14–15: Cả hộp weak entity, identifying relationship và partial identifier đều dùng nét ĐÔI.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slides 14–15"
+      }
+    },
+    {
+      "id": "dbs-ch02-q05",
+      "stem": "Thuộc tính 'Good Business Rule' yêu cầu phát biểu cái gì phải xảy ra chứ KHÔNG mô tả cách cài đặt kỹ thuật thuộc tính chất nào?",
+      "options": [
+        "Atomic",
+        "Declarative",
+        "Distinct",
+        "Expressible"
+      ],
+      "answer": 1,
+      "explanation": "Slide 7: Declarative – what, not how.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "dbs-ch02-q06",
+      "stem": "Tiêu chí nào KHÔNG phù hợp khi chọn Identifier cho một Entity Type?",
+      "options": [
+        "Giá trị không thay đổi theo thời gian",
+        "Không bao giờ chứa giá trị null",
+        "Ghép mã chi nhánh và tên người quản lý vào khóa chính (intelligent identifier)",
+        "Thay thế composite key quá dài bằng một khóa đơn mới"
+      ],
+      "answer": 2,
+      "explanation": "Slide 22: Cần TRÁNH intelligent identifier (như mã chứa địa điểm hoặc con người có thể thay đổi).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "dbs-ch02-q07",
+      "stem": "Trong Figure 2-21b, giữa PROFESSOR và COURSE trên quan hệ 'Is Qualified' có số '2' đặt dưới vạch mandatory phía PROFESSOR. Điều này có nghĩa là gì?",
+      "options": [
+        "Mỗi giảng viên chỉ được dạy tối đa 2 môn",
+        "Mỗi môn học chỉ có tối đa 2 giảng viên đăng ký",
+        "Mỗi môn học phải có ít nhất 2 giảng viên đủ điều kiện giảng dạy",
+        "Mỗi giảng viên phải học lại 2 môn"
+      ],
+      "answer": 2,
+      "explanation": "Slide 39: Minimum cardinality constraint = 2 ở phía PROFESSOR nghĩa là ít nhất 2 giáo sư phải đủ điều kiện dạy mỗi khóa học.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 39"
+      }
+    },
+    {
+      "id": "dbs-ch02-q08",
+      "stem": "Trong Figure 2-11b, khi chuyển quan hệ M:N 'Completes' giữa EMPLOYEE và COURSE thành Associative Entity CERTIFICATE, hai quan hệ mới hai bên có bản số như thế nào?",
+      "options": [
+        "Hai quan hệ M:N",
+        "Hai quan hệ 1:1",
+        "Hai quan hệ 1:M với vạch mandatory one (||) ở phía EMPLOYEE và COURSE",
+        "Một quan hệ 1:1 và một quan hệ M:N"
+      ],
+      "answer": 2,
+      "explanation": "Slide 43: Quan hệ M:N ban đầu được thay bằng hai quan hệ 1:M nối vào CERTIFICATE, với mandatory one (||) đặt tại EMPLOYEE và COURSE.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 43"
+      }
+    },
+    {
+      "id": "dbs-ch02-q09",
+      "stem": "Trong Figure 2-18 (quan hệ ternary qua SUPPLY SCHEDULE), vì sao phía SUPPLY SCHEDULE của nhánh VENDOR vẽ 'o<' còn nhánh PART và WAREHOUSE vẽ '|<'?",
+      "options": [
+        "Vì VENDOR có thể chưa cung cấp mặt hàng nào, còn mỗi PART và WAREHOUSE bắt buộc có ít nhất một nguồn cung",
+        "Vì VENDOR chỉ cung cấp cho đúng 1 kho",
+        "Vì WAREHOUSE không cần lưu lịch trình cung ứng",
+        "Vì PART là weak entity phụ thuộc VENDOR"
+      ],
+      "answer": 0,
+      "explanation": "Slide 45 (Business Rules 1–3): VENDOR 'need not supply any parts' (optional many o<), trong khi mỗi PART và WAREHOUSE 'must be supplied' ít nhất một lần (mandatory many |<).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 45"
+      }
+    },
+    {
+      "id": "dbs-ch02-q10",
+      "stem": "Thuộc tính {Price History (Effective Date, Price)} trong Figure 2-19 đồng thời thuộc hai phân loại nào?",
+      "options": [
+        "Derived và Optional",
+        "Multivalued và Composite",
+        "Simple và Identifier",
+        "Single-valued và Derived"
+      ],
+      "answer": 1,
+      "explanation": "Slide 46: Dấu {} biểu thị Multivalued (một sản phẩm có nhiều mức giá theo thời gian) và dấu () biểu thị Composite (gồm Effective Date và Price).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch02.pdf",
+        "loc": "Slide 46"
+      }
+    }
   ]
 }

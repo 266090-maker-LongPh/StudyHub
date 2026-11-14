@@ -10,10 +10,57 @@ export interface CodeSnippet {
   text: string;
 }
 
+export interface SummaryTable {
+  caption?: string;
+  headers: string[];
+  rows: string[][];
+}
+
+export interface BulletGroup {
+  text: string;
+  subBullets?: string[];
+}
+
+export interface VerbatimSlide {
+  slideNumber: string;
+  pageNumber?: number;
+  title: string;
+  paragraphs?: string[];
+  bullets?: (string | BulletGroup)[];
+  table?: SummaryTable;
+  code?: CodeSnippet;
+  diagramText?: string[];
+  diagramNote?: string;
+  ocrNote?: string;
+  explanation?: string[];
+  source: SourceRef;
+}
+
+export interface TermDefinition {
+  term: string;
+  meaning: string;
+}
+
+export interface SectionDigest {
+  keyPoints: string[];
+  terms?: TermDefinition[];
+  pitfalls?: string[];
+}
+
 export interface SummarySection {
   h: string;
   text: string;
   code?: CodeSnippet;
+  source?: SourceRef;
+  slides?: VerbatimSlide[];
+  digest?: SectionDigest;
+}
+
+export interface ExtractionAudit {
+  sourceFile: string;
+  totalPages: number;
+  extractedPages: number;
+  ocrNotes: string[];
 }
 
 export interface Flashcard {
@@ -40,6 +87,7 @@ export interface Chapter {
   sources: SourceRef[];
   cards: Flashcard[];
   questions: QuizQuestion[];
+  audit?: ExtractionAudit;
 }
 
 export interface SubjectDataset {

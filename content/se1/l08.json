@@ -1,26 +1,1477 @@
 {
-  "id": "se1-l08", "order": 7,
+  "id": "se1-l08",
+  "order": 7,
   "title": "Lecture 8: Architectural Design",
-  "summary": [
-    { "h": "Vì sao cần kiến trúc", "text": "Kiến trúc xác định các thành phần cấu trúc chính và quan hệ giữa chúng. Quan trọng vì: quyết định đặc tính phi chức năng; là biểu diễn để các stakeholder giao tiếp; cho phép lý giải và quản lý thay đổi." },
-    { "h": "Ba loại cấu trúc", "text": "Module structures: chia hệ thành các đơn vị cài đặt (class, layer, chức năng), là cơ sở phân công làm việc. Component-and-Connector (C&C): các thành phần chạy lúc runtime (client, server, filter) và connector (call-return, pipe...). Allocation structures: ánh xạ cấu trúc phần mềm sang môi trường phi phần mềm (tổ chức, phát triển, cài đặt, thực thi)." },
-    { "h": "Quy tắc kiến trúc tốt", "text": "Thiết kế information hiding và separation of concerns; dùng pattern và tactic đã biết; không phụ thuộc phiên bản sản phẩm thương mại; module tạo dữ liệu tách khỏi module tiêu thụ dữ liệu; không kỳ vọng module và component tương ứng 1-1; dễ đổi processor cho mỗi process; ít cách để component tương tác; tập tranh chấp tài nguyên nhỏ và xác định rõ." },
-    { "h": "Layered pattern", "text": "Chia phần mềm thành các layer với quan hệ allowed-to-use một chiều. Mỗi phần mềm thuộc đúng một layer; ít nhất 2 layer (thường 3+); quan hệ allowed-to-use không được vòng tròn (không dùng ngược lên). Nhược điểm: tốn chi phí và độ phức tạp ban đầu, giảm hiệu năng. Layer bridging (dùng layer thấp không kề) quá nhiều làm hại portability và modifiability." },
-    { "h": "Client-Server, Broker, MVC", "text": "Client-Server: client khởi tạo yêu cầu, server phục vụ (request/reply connector); nhược điểm: server là bottleneck và single point of failure. Broker: broker trung gian định vị server cho client (kèm client-side/server-side proxy, bridge tùy chọn); nhược điểm: thêm độ trễ, broker là single point of failure, dễ là mục tiêu tấn công, khó test. MVC: Model (dữ liệu và logic), View (hiển thị/nhập), Controller (điều phối), quan hệ notifies; phải có ít nhất một instance mỗi loại." },
-    { "h": "Modifiability, coupling, cohesion", "text": "Modifiability là chi phí và rủi ro khi thay đổi. Coupling: xác suất sửa module này lan sang module khác. Cohesion: mức liên quan chặt giữa các trách nhiệm của module. Tactics: split module, increase cohesion, reduce coupling (encapsulate, use an intermediary, restrict dependencies, refactor, abstract common services)." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 8.pdf",
+    "totalPages": 38,
+    "extractedPages": 38,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 8.pdf là PDF dạng cuộn ảnh 1 trang dài (kích thước 960x27360) chứa đúng 38 slides; do file gốc chỉ có 1 trang PDF vật lý nên toàn bộ 38 slides đặt pageNumber: 1 kèm slideNumber \"Slide 1\"–\"Slide 38\".",
+      "Slide 4: Chỉ gồm tiêu đề 'Architectural Design vs Detailed Design' và 2 hình ảnh so sánh mặt bằng kiến trúc tổng thể tầng với góc làm việc đứng chi tiết, không có chữ thân bài.",
+      "Slides 7, 13, 16, 20: Văn bản trên slide gốc ngắt khoảng trắng giữa từ: 'special ization' (Slide 7), 'in stances' (Slides 13, 20) và 'appro priately' (Slide 16), giữ nguyên văn.",
+      "Slide 26: Slide gốc viết tách 'for wards' và lặp cụm từ 'The service result the result (and any exceptions) back to the requesting client.' (giữ nguyên văn).",
+      "Slides 30–33: Slide 30 ngắt từ 'under lying' và 'func tionality'; tiêu đề các Slides 31–33 viết dấu gạch dưới 'Model-View_Controller Pattern' (giữ nguyên văn)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 8.pdf",
+      "loc": "Slides 1–38 (PDF cuộn ảnh 1 trang dài chứa 38 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 8.pdf", "loc": "Slides 1–38 (PDF ảnh 1 trang)" }],
+  "summary": [
+    {
+      "h": "Giới thiệu bài giảng & Vai trò của Architectural Design",
+      "text": "Giới thiệu Lecture 8 về Thiết kế kiến trúc (Architectural Design), dàn ý 5 phần, tài liệu tham khảo Len Bass, hình ảnh ẩn dụ phân biệt Architectural Design với Detailed Design và 3 lý do kiến trúc phần mềm đóng vai trò quyết định.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 1–5"
+      },
+      "digest": {
+        "keyPoints": [
+          "Architectural design xác định các thành phần cấu trúc chính và mối quan hệ giữa chúng dưới dạng một tập các software structures.",
+          "Khác với Detailed design (chi tiết bên trong từng thành phần/module), Architectural design nhìn tổng thể cách phân chia hệ thống (như bản vẽ mặt bằng tòa nhà so với bố trí một bàn làm việc).",
+          "Kiến trúc quan trọng vì 3 lý do: (1) chi phối mạnh đặc tính phi chức năng (theo nghiên cứu của Chen et al về architecturally significant requirements), (2) là ngôn ngữ chung để mọi stakeholder giao tiếp, (3) cho phép lý giải và quản lý thay đổi khi hệ thống tiến hóa.",
+          "Cấu trúc phần mềm chia thành 3 nhóm lớn: Module, Component and Connector (C&C), và Allocation."
+        ],
+        "terms": [
+          {
+            "term": "Architectural Design",
+            "meaning": "Quá trình xác định các thành phần cấu trúc chính của hệ thống phần mềm và mối quan hệ giữa chúng."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 8: Architectural Design",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 8",
+            "Architectural Design"
+          ],
+          "explanation": [
+            "Slide mở đầu bài giảng Lecture 8 thuộc môn 61FIT3SE1 - Software Engineering 1 với chủ đề Thiết kế kiến trúc (Architectural Design).",
+            "Nếu Lecture 7 tập trung vào hiểu 'hệ thống phải làm gì' (Requirements) thì Lecture 8 bắt đầu chuyển sang thiết kế bộ khung cấu trúc cấp cao để đáp ứng các yêu cầu đó."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 1,
+          "title": "Outline",
+          "bullets": [
+            "Why Architectural Design?",
+            "Architectural structure",
+            "What makes a good architecture?",
+            "Architectural pattern",
+            "Modifiability"
+          ],
+          "explanation": [
+            "Bài giảng gồm 5 phần rõ ràng: lý do cần thiết kế kiến trúc, 3 loại cấu trúc kiến trúc, bộ quy tắc của kiến trúc tốt, các mẫu kiến trúc tiêu biểu (Layered, Client-Server, Broker, MVC) và thuộc tính khả năng sửa đổi (Modifiability).",
+            "Mạch nội dung bám sát khung lý thuyết chuẩn của Len Bass trong sách Software Architecture in Practice."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 1,
+          "title": "References",
+          "bullets": [
+            "Len Bass, Software Architecture in Practice, Chapter 1, 2, 7 and 13"
+          ],
+          "explanation": [
+            "Toàn bộ định nghĩa 3 cấu trúc, quy tắc kiến trúc tốt, mẫu kiến trúc và chiến thuật modifiability trong bài giảng đều trích từ giáo trình Software Architecture in Practice (Len Bass et al., các chương 1, 2, 7 và 13).",
+            "Đặc biệt các bảng Overview / Elements / Relations / Constraints / Weaknesses của từng pattern bám sát chuẩn tài liệu hóa kiến trúc của tác giả."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 1,
+          "title": "Architectural Design vs Detailed Design",
+          "diagramText": [
+            "[Hình bên trái]: Bản vẽ mặt bằng kiến trúc tổng thể cả một tầng văn phòng (Architectural Design: bố cục các khu vực, hành lang, thang máy, phòng làm việc).",
+            "[Hình bên phải]: Ảnh chụp chi tiết một góc làm việc đứng tích hợp máy chạy bộ (Detailed Design: cách sắp xếp thiết bị bên trong một vị trí cụ thể)."
+          ],
+          "diagramNote": "Hình ảnh ẩn dụ phân biệt tầm nhìn kiến trúc tổng thể (Architectural Design) với thiết kế chi tiết từng bộ phận (Detailed Design).",
+          "ocrNote": "Slide gốc chỉ chứa tiêu đề và 2 ảnh minh họa, không có đoạn chữ thân slide.",
+          "explanation": [
+            "Bản vẽ mặt bằng tầng văn phòng đại diện cho Architectural Design: quan tâm hệ thống có những khối lớn nào, ranh giới ở đâu và thông thương với nhau như thế nào.",
+            "Góc làm việc cá nhân đại diện cho Detailed Design: quan tâm chi tiết cài đặt bên trong một khối đã chọn (sẽ học kỹ hơn ở Lecture 9 về Class Diagrams)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 1,
+          "title": "Why Architectural Design?",
+          "bullets": [
+            {
+              "text": "Architectural design:",
+              "subBullets": [
+                "identify the main structural components and the relationships between them",
+                "is a set of software structures"
+              ]
+            },
+            {
+              "text": "Why Architectural design:",
+              "subBullets": [
+                "It dominantly affects the non-functional system characteristics ( in a study of “architecturally significant requirements” by Chen et al)",
+                "Provides a representation that facilitates communication among all stakeholders.",
+                "The decisions made in an architecture allow you to reason about and manage change as the system evolves"
+              ]
+            },
+            {
+              "text": "Three categories of software structures:",
+              "subBullets": [
+                "Module",
+                "Component and Connector",
+                "Allocation"
+              ]
+            }
+          ],
+          "explanation": [
+            "Ba lý do cốt lõi phải làm kiến trúc nghiêm túc: thứ nhất, các thuộc tính phi chức năng (hiệu năng, khả năng bảo trì, bảo mật, sẵn sàng...) chủ yếu được định đoạt ở cấp độ kiến trúc chứ không thể vá víu bằng tối ưu từng dòng code lẻ.",
+            "Thứ hai, sơ đồ kiến trúc tạo ngôn ngữ chung cho khách hàng, quản lý và dev trao đổi; thứ ba, các quyết định kiến trúc giúp dự đoán tác động và kiểm soát thay đổi khi hệ thống mở rộng theo thời gian."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 5"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Ba loại Cấu trúc Kiến trúc (Module, Component-and-Connector, Allocation)",
+      "text": "Phân tích chi tiết 3 góc nhìn cấu trúc phần mềm: Module structures (tĩnh — đơn vị cài đặt và phân công team), Component-and-connector structures (động — tương tác lúc runtime) và Allocation structures (ánh xạ sang phần cứng, thư mục và tổ chức đội ngũ).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 6–11"
+      },
+      "digest": {
+        "keyPoints": [
+          "Module Structures chia hệ thống thành các đơn vị cài đặt tĩnh (classes, layers, functionality...), làm cơ sở giao việc cho các nhóm lập trình và trả lời các câu hỏi về trách nhiệm chức năng, allowed-to-use, depends-on và kế thừa.",
+          "Component-and-connector (C&C) Structures mô tả thực thể chạy lúc runtime (services, peers, clients, servers, filters...) và connectors truyền thông (call-return, synchronization, pipes...) nhằm trả lời tương tác runtime, shared data stores, nhân bản, song song và thay đổi cấu trúc động.",
+          "Allocation Structures ánh xạ phần mềm sang 4 môi trường phi phần mềm: organizational, developmental, installation và execution — trả lời bài toán gán CPU/processor, cấu trúc thư mục/file và phân công cho nhóm phát triển."
+        ],
+        "terms": [
+          {
+            "term": "Module Structure",
+            "meaning": "Cấu trúc phân chia mã nguồn thành các đơn vị cài đặt tĩnh (class, layer, module) để giao việc và quản lý phụ thuộc."
+          },
+          {
+            "term": "Component-and-Connector (C&C) Structure",
+            "meaning": "Cấu trúc mô tả các thực thể thực thi lúc chạy (runtime components) và kênh giao tiếp/đồng bộ giữa chúng (connectors)."
+          },
+          {
+            "term": "Allocation Structure",
+            "meaning": "Cấu trúc ánh xạ các phần tử phần mềm sang môi trường phi phần mềm (phần cứng, hệ thống thư mục/file, đội ngũ phát triển)."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm Module với Component: 1 Module (mã tĩnh) có thể sinh ra nhiều Component instances chạy song song lúc runtime (sẽ nhấn mạnh lại ở Slide 13).",
+          "Allocation không chỉ là deploy lên server/CPU mà còn bao gồm cả cấu trúc thư mục/file (developmental) và phân công nhóm phát triển (organizational)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 1,
+          "title": "Architectural structure — Module Structures (1/2)",
+          "paragraphs": [
+            "Module Structures:"
+          ],
+          "bullets": [
+            "Some structures partition systems into implementation units, which we call modules.",
+            "Modules are assigned specific computational responsibilities, and are the basis of work assignments for programming teams.",
+            "In large projects, these elements (modules) are subdivided for assignment to sub-teams.",
+            "Modules are elements such as classes, layer, functionality, ..."
+          ],
+          "explanation": [
+            "Module Structures nhìn hệ thống ở trạng thái tĩnh (khi chưa chạy): chia phần mềm thành các đơn vị cài đặt như class, layer hay nhóm chức năng.",
+            "Mỗi module được giao một trách nhiệm tính toán cụ thể và chính là đơn vị chia nhỏ công việc cho các nhóm lập trình (sub-teams) trong dự án lớn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 1,
+          "title": "Architectural structure — Module Structures (2/2)",
+          "paragraphs": [
+            "Module structures allow us to answer questions:"
+          ],
+          "bullets": [
+            "What is the primary functional responsibility assigned to each module?",
+            "What other software elements is a module allowed to use?",
+            "What other software does it actually use and depend on?",
+            "What modules are related to other modules by generalization or special ization (i.e., inheritance) relationships?"
+          ],
+          "ocrNote": "Slide gốc tách khoảng trắng từ 'special ization' (giữ nguyên văn).",
+          "explanation": [
+            "Góc nhìn Module trả lời 4 câu hỏi thiết kế tĩnh: (1) trách nhiệm chức năng chính của từng module là gì; (2) module được phép gọi (allowed to use) module nào — dùng để kiểm soát ranh giới layer.",
+            "(3) Thực tế nó phụ thuộc vào module nào (depends on) để ước lượng tác động khi sửa code; (4) các quan hệ kế thừa (generalization/specialization) giữa các module ra sao."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 1,
+          "title": "Architectural structure — Component-and-connector Structures (1/2)",
+          "paragraphs": [
+            "Component-and-connector Structures:"
+          ],
+          "bullets": [
+            "Structures focus on the way the elements interact with each other at runtime to carry out the system’s functions.",
+            "We call runtime structures component-and-connector (C&C) structures.",
+            "In our use, a component is a runtime entity.",
+            "Runtime components are services, peers, clients, servers, filters, or others.",
+            "Connectors are the communication vehicles among components, such as call return, process synchronization operators, pipes, or others."
+          ],
+          "explanation": [
+            "Component-and-connector (C&C) chuyển góc nhìn sang lúc chương trình đang chạy (runtime): các component lúc này không còn là file code mà là tiến trình/dịch vụ/client/server/filter sống trên bộ nhớ.",
+            "Connector là phương tiện truyền thông và điều phối giữa các thực thể đang chạy đó, chẳng hạn cơ chế gọi-trả (call return), đồng bộ tiến trình hay đường ống dữ liệu (pipes)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 1,
+          "title": "Architectural structure — Component-and-connector Structures (2/2)",
+          "paragraphs": [
+            "Component-and-connector views help us answer questions:"
+          ],
+          "bullets": [
+            "What are the major executing components and how do they interact at runtime?",
+            "What are the major shared data stores?",
+            "Which parts of the system are replicated?",
+            "How does data progress through the system?",
+            "What parts of the system can run in parallel?",
+            "Can the system’s structure change as it executes and, if so, how?"
+          ],
+          "explanation": [
+            "Các câu hỏi thuộc về vận hành động đều cần góc nhìn C&C để trả lời: luồng dữ liệu chảy qua hệ thống ra sao, kho dữ liệu dùng chung nào là nút thắt, thành phần nào được nhân bản (replicated) để chịu tải hay chạy song song (parallel).",
+            "Nó cũng giúp kiểm tra xem cấu trúc kết nối có thay đổi động lúc đang chạy (dynamic reconfiguration) hay không."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 1,
+          "title": "Architectural structure — Allocation Structures (1/2)",
+          "paragraphs": [
+            "Allocation Structures:"
+          ],
+          "bullets": [
+            {
+              "text": "Allocation structures describe the mapping from software structures to nonsoftware structures:",
+              "subBullets": [
+                "The system’s organizational",
+                "The system’s developmental",
+                "The system’s installation",
+                "The system’s execution"
+              ]
+            },
+            {
+              "text": "For example:",
+              "subBullets": [
+                "Modules are assigned to places in a file structure for implementation, integration, and testing.",
+                "Components are deployed onto hardware in order to execute."
+              ]
+            }
+          ],
+          "explanation": [
+            "Allocation Structures làm cầu nối giữa cấu trúc phần mềm với thế giới 'phi phần mềm' bên ngoài: cơ cấu tổ chức nhân sự (organizational), môi trường phát triển/mã nguồn (developmental), môi trường cài đặt (installation) và hạ tầng chạy (execution).",
+            "Hai ví dụ minh họa rất rõ: xếp các module vào cây thư mục file để build/test là developmental allocation, còn triển khai component lên máy chủ phần cứng là execution allocation."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 1,
+          "title": "Architectural structure — Allocation Structures (2/2)",
+          "paragraphs": [
+            "Allocation views help us answer questions such as these:"
+          ],
+          "bullets": [
+            "What processor does each software element execute on?",
+            "In what directories or files is each element stored during development, testing, and system building?",
+            "What is the assignment of each software element to development teams?"
+          ],
+          "explanation": [
+            "Ba câu hỏi đặc trưng của Allocation views gắn trực tiếp với 3 khía cạnh quản trị thực thi, mã nguồn và nhân lực: chạy trên vi xử lý/máy chủ nào, lưu ở thư mục/file nào khi build-test và giao cho team nào phụ trách.",
+            "Khi đi thi gặp câu hỏi có từ khóa 'processor', 'directories/files' hoặc 'development teams', đáp án chắc chắn là Allocation structure."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 11"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Quy tắc Kiến trúc tốt (Good Architecture — Structural Rules)",
+      "text": "Trình bày 8 quy tắc cấu trúc giúp kiến trúc phần mềm đạt chất lượng tốt, dễ bảo trì, dễ phân tán tiến trình và hạn chế tranh chấp tài nguyên.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 12–14"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thiết kế theo information hiding và separation of concerns; ưu tiên sử dụng các architectural patterns và tactics đã được kiểm chứng theo từng quality attribute.",
+          "Tránh phụ thuộc cứng vào một phiên bản sản phẩm/công cụ thương mại cụ thể; tách biệt module sinh dữ liệu (producers) với module tiêu thụ dữ liệu (consumers).",
+          "Không kỳ vọng tương ứng 1-1 giữa module và component (một module trong hệ thống đồng thời có thể tạo nhiều instance component chạy song song).",
+          "Viết process sao cho dễ đổi processor (thậm chí lúc runtime); giữ ít kiểu tương tác giữa các component; thu hẹp và kiểm soát rõ tập điểm tranh chấp tài nguyên (resource contention areas)."
+        ],
+        "pitfalls": [
+          "Lỗi phổ biến khi thiết kế hệ đa luồng/phân tán là mặc định mỗi module chỉ ứng với đúng 1 component runtime, hoặc gộp chung logic tạo dữ liệu và xử lý/hiển thị dữ liệu vào một module."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 1,
+          "title": "Good Architecture",
+          "paragraphs": [
+            "Good Architecture"
+          ],
+          "explanation": [
+            "Slide chuyển mục mở đầu Phần 3: Các tiêu chuẩn và quy tắc giúp nhận biết một bản thiết kế kiến trúc tốt.",
+            "Hai slide tiếp theo (Slides 13–14) liệt kê 8 quy tắc cấu trúc (structural rules) đúc kết từ kinh nghiệm thực chiến trong sách của Len Bass."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 1,
+          "title": "Structural rules (1/2)",
+          "paragraphs": [
+            "Architectures should follow rules:"
+          ],
+          "bullets": [
+            "Should design information hiding and separation of concerns.",
+            "Should use well-known architectural patterns and tactics specific to each attribute.",
+            "Shouldn’t depend on a particular version of a commercial product or tool.",
+            "Modules that produce data should be separate from modules that consume data.",
+            "Don’t expect a one-to-one correspondence between modules and components. For example, in systems with concurrency, there may be multiple in stances of a component running in parallel, where each component is built from the same module."
+          ],
+          "ocrNote": "Slide gốc viết tách chữ 'in stances' (giữ nguyên văn).",
+          "explanation": [
+            "Năm quy tắc đầu nhấn mạnh tính mô-đun hóa và độc lập công nghệ: ẩn giấu thông tin (information hiding) và tách biệt mối quan tâm (separation of concerns) để thay đổi cục bộ không lan rộng; tận dụng patterns & tactics chuẩn thay vì tự phát minh lại.",
+            "Tránh bị trói buộc (vendor lock-in) vào một phiên bản tool thương mại cụ thể, tách riêng producer với consumer để tăng khả năng tái sử dụng, và nhớ rằng một module tĩnh có thể nhân bản thành nhiều instance component chạy song song."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 1,
+          "title": "Structural rules (2/2)",
+          "bullets": [
+            "Every process should be written so that its assignment to a specific processor can be easily changed, perhaps even at runtime.",
+            "The architecture should feature a small number of ways for components to interact.",
+            "The architecture should contain a specific (and small) set of resource contention areas, the resolution of which is clearly specified and maintained."
+          ],
+          "explanation": [
+            "Ba quy tắc tiếp theo tập trung vào vận hành hiệu quả và kiểm soát độ phức tạp: tiến trình không nên gắn chết vào một CPU/máy chủ cố định mà phải dễ di chuyển để cân bằng tải hoặc chịu lỗi.",
+            "Giữ số kiểu giao tiếp (connectors) ít và thống nhất giúp hệ thống dễ hiểu, dễ test; đồng thời thu gọn các vùng tranh chấp tài nguyên dùng chung (như lock CSDL hay hàng đợi) cùng quy tắc giải quyết rõ ràng để tránh deadlock/nghẽn cổ chai."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 14"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Architectural Patterns & Module Pattern — Layered Pattern",
+      "text": "Định nghĩa 3 thành phần của Architectural Pattern (Context, Problem, Solution), bảng phân loại các pattern theo 3 nhóm cấu trúc (Module, C&C, Allocation), và đặc tả đầy đủ Layered Pattern (nguyên tắc phân lớp, ràng buộc, nhược điểm, hiện tượng layer bridging).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 15–21"
+      },
+      "digest": {
+        "keyPoints": [
+          "Architectural pattern xác lập quan hệ giữa Context (tình huống lặp lại), Problem (vấn đề tổng quát hóa) và Solution (tập element types, connectors, topological layout và semantic constraints).",
+          "Phân loại pattern trên Slide 17: Module (Layered), C&C (Broker, MVC, Pipe-and-Filter, Client-Server, Peer-to-Peer, Service-Oriented Architecture), Allocation (Map-Reduce, Multi-tier).",
+          "Layered Pattern chia phần mềm thành các layer cung cấp tập dịch vụ gắn kết với quan hệ allowed-to-use một chiều (từ trên xuống).",
+          "Ràng buộc của Layered Pattern: mỗi phần mềm thuộc đúng 1 layer; có ít nhất 2 layer (thường 3+); không được dùng vòng tròn (lower layer không được dùng layer phía trên). Nhược điểm: thêm chi phí và độ phức tạp ban đầu, giảm hiệu năng.",
+          "Layer bridging là khi lớp trên gọi lớp dưới không liền kề — nếu xảy ra nhiều sẽ phá hỏng mục tiêu portability và modifiability của phân lớp nghiêm ngặt."
+        ],
+        "terms": [
+          {
+            "term": "Layered Pattern",
+            "meaning": "Module pattern chia phần mềm thành các tầng (layers) theo quan hệ allowed-to-use một chiều từ trên xuống để tách biệt mối quan tâm."
+          },
+          {
+            "term": "Layer bridging",
+            "meaning": "Trường hợp phần mềm ở tầng cao hơn sử dụng trực tiếp module ở một tầng thấp hơn không liền kề (lạm dụng nhiều sẽ làm hại portability và modifiability)."
+          }
+        ],
+        "pitfalls": [
+          "Trong phân loại của Len Bass (Slide 17), Layered là Module pattern, còn Multi-tier là Allocation pattern — đừng đánh đồng 2 khái niệm này (tier là ánh xạ vật lý/triển khai, layer là phân nhóm module logic).",
+          "Trong Layered Pattern, layer bridging xuống tầng thấp hơn không kề là ngoại lệ có thể gặp nhưng dùng nhiều sẽ hại modifiability/portability; còn gọi ngược lên tầng trên (upward usage) là bị CẤM hoàn toàn."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 1,
+          "title": "Architectural patterns",
+          "paragraphs": [
+            "Architectural patterns"
+          ],
+          "explanation": [
+            "Slide chuyển mục mở đầu Phần 4: Các mẫu kiến trúc phần mềm (Architectural Patterns).",
+            "Các slide sau trình bày định nghĩa chung, phân loại và đặc tả chi tiết 4 pattern trọng tâm: Layered, Client-Server, Broker và Model-View-Controller."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 1,
+          "title": "Architecture Patterns — Elements of a Pattern",
+          "paragraphs": [
+            "An architectural pattern establishes a relationship between:"
+          ],
+          "bullets": [
+            "A context. A recurring, common situation in the world that gives rise to a problem.",
+            "A problem. The problem, appropriately generalized, that arises in the given context.",
+            {
+              "text": "A solution. A successful architectural resolution to the problem, appro priately abstracted. The solution for a pattern is determined and described by:",
+              "subBullets": [
+                "A set of element types (for example, data repositories, processes, and objects)",
+                "A set of interaction mechanisms or connectors (for example, method calls, events, or message bus)",
+                "A topological layout of the components",
+                "A set of semantic constraints covering topology, element behavior, and interaction mechanisms"
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết tách chữ 'appro priately' (giữ nguyên văn).",
+          "explanation": [
+            "Một mẫu kiến trúc không chỉ là cái hình vẽ hộp và mũi tên mà là bộ ba Context – Problem – Solution tái sử dụng được cho nhiều dự án cùng dạng bài toán.",
+            "Phần Solution chuẩn luôn gồm 4 yếu tố: các loại phần tử tham gia, cơ chế kết nối/tương tác, bố cục hình học (topology) và các ràng buộc ngữ nghĩa (ví dụ: tầng dưới không được gọi tầng trên)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 1,
+          "title": "Architecture Patterns — Categorization",
+          "paragraphs": [
+            "Patterns can be categorized by the dominant type of elements that they show:"
+          ],
+          "bullets": [
+            {
+              "text": "Module patterns :",
+              "subBullets": [
+                "Layered Pattern"
+              ]
+            },
+            {
+              "text": "Component-and-connector (C&C) patterns:",
+              "subBullets": [
+                "Broker Pattern",
+                "Model-View-Controller Pattern",
+                "Pipe-and-Filter Pattern",
+                "Client-Server Pattern",
+                "Peer-to-Peer Pattern",
+                "Service-Oriented Architecture Pattern"
+              ]
+            },
+            {
+              "text": "Allocation patterns:",
+              "subBullets": [
+                "Map-Reduce Pattern",
+                "Multi-tier Pattern"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide phân loại các mẫu kiến trúc phổ biến theo nhóm cấu trúc chi phối: Layered thuộc Module patterns; Broker, MVC, Pipe-and-Filter, Client-Server, Peer-to-Peer và SOA thuộc C&C patterns; Map-Reduce và Multi-tier thuộc Allocation patterns.",
+            "Bảng phân loại này là câu hỏi trắc nghiệm rất hay gặp khi kiểm tra hiểu bản chất từng pattern (tĩnh vs runtime vs triển khai)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 1,
+          "title": "Module Patterns - Layered Pattern (Context & Problem)",
+          "bullets": [
+            {
+              "text": "Context:",
+              "subBullets": [
+                "All complex systems experience the need to develop and evolve portions of the system independently. For this reason the developers of the system need a clear and well-documented separation of concerns, so that modules of the system may be independently developed and maintained."
+              ]
+            },
+            {
+              "text": "Problem:",
+              "subBullets": [
+                "The software needs to be segmented in such a way that the modules can be developed and evolved separately with little interaction among the parts, supporting portability, modifiability, and reuse."
+              ]
+            }
+          ],
+          "explanation": [
+            "Layered Pattern xuất phát từ nhu cầu tách biệt rõ các phần trong hệ thống phức tạp để nhiều người/nhóm phát triển và bảo trì độc lập.",
+            "Ba mục tiêu chất lượng chính mà bài toán phân lớp nhắm tới là tính khả chuyển (portability — dễ thay đổi tầng nền tảng/CSDL), tính dễ sửa đổi (modifiability) và khả năng tái sử dụng (reuse)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 1,
+          "title": "Module Patterns - Layered Pattern (Solution)",
+          "paragraphs": [
+            "Solution: To achieve this separation of concerns, the layered pattern divides the software into units called layers. Each layer is a grouping of modules that offers a cohesive set of services."
+          ],
+          "table": {
+            "caption": "Đặc tả Layered Pattern (slide gốc trình bày 2 cột không có dòng tiêu đề).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Overview",
+                "The layered pattern defines layers (groupings of modules that offer a cohesive set of services) and a unidirectional allowed-to-use relation among the layers."
+              ],
+              [
+                "Elements",
+                "Layer, a kind of module. The description of a layer should define what modules the layer contains and a characterization of the cohesive set of services that the layer provides."
+              ],
+              [
+                "Relations",
+                "Allowed to use, which is a specialization of a more generic depends-on relation. The design should define what the layer usage rules are"
+              ]
+            ]
+          },
+          "explanation": [
+            "Giải pháp của Layered Pattern gom các module có dịch vụ gắn kết vào từng tầng (layer) và áp đặt quan hệ một chiều 'được phép sử dụng' (allowed-to-use) giữa các tầng.",
+            "Allowed-to-use là dạng chuyên biệt của quan hệ phụ thuộc (depends-on): bản thiết kế kiến trúc bắt buộc phải ghi rõ quy tắc tầng nào được phép gọi tầng nào."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 1,
+          "title": "Module Patterns - Layered Pattern (Constraints & Weaknesses)",
+          "paragraphs": [
+            "Note: The case of software in a higher layer using modules in a nonadjacent lower layer is called layer bridging. If many in stances of layer bridging occur, the system may not meet its portability and modifiability goals that strict layering helps to achieve. Upward usages are not allowed in this pattern."
+          ],
+          "table": {
+            "caption": "Ràng buộc và nhược điểm Layered Pattern (slide gốc đặt đoạn Note phía dưới bảng và không có dòng tiêu đề cột).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Constraints",
+                "Every piece of software is allocated to exactly one layer.\nThere are at least two layers (but usually there are three or more).\nThe allowed-to-use relations should not be circular (i.e., a lower layer cannot use a layer above)."
+              ],
+              [
+                "Weaknesses",
+                "The addition of layers adds up-front cost and complexity to a system.\nLayers contribute a performance penalty."
+              ]
+            ]
+          },
+          "ocrNote": "Slide gốc viết tách chữ 'in stances' trong đoạn Note phía dưới bảng (giữ nguyên văn).",
+          "explanation": [
+            "Ba ràng buộc bắt buộc của Layered Pattern: mỗi phần tử mã chỉ nằm ở đúng một layer; phải có tối thiểu 2 layer (thực tế thường 3+ như Presentation–Business–Data); và không bao giờ có vòng phụ thuộc ngược từ layer dưới lên layer trên.",
+            "Đoạn Note làm rõ hai khái niệm hay thi: 'layer bridging' (nhảy cóc xuống layer thấp không liền kề — quá nhiều sẽ phá vỡ portability và modifiability) và nguyên tắc 'upward usages are not allowed'."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 1,
+          "title": "Module Patterns - Layered Pattern (Stack-of-boxes Notation)",
+          "diagramText": [
+            "Biểu đồ xếp chồng 3 tầng: [ A ] (trên) / [ B ] (giữa) / [ C ] (dưới)",
+            "Key: [ Hộp chữ nhật ] = Layer — A layer is allowed to use the next lower layer.",
+            "Chú thích dưới hình: Stack-of-boxes notation for layered designs"
+          ],
+          "diagramNote": "Ký pháp hộp xếp chồng (stack-of-boxes) biểu diễn thiết kế phân lớp nghiêm ngặt: tầng A chỉ dùng tầng B ngay dưới và B chỉ dùng C.",
+          "explanation": [
+            "Trong ký pháp stack-of-boxes kinh điển, các layer đặt xếp khít lên nhau thể hiện tầng trên chỉ được gọi tầng kề ngay bên dưới (A → B → C).",
+            "Cách vẽ này giúp kiểm tra trực quan tính phi tuần hoàn (không vòng lặp) của quan hệ allowed-to-use."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 21"
+          }
+        }
+      ]
+    },
+    {
+      "h": "C&C Patterns: Client-Server, Broker & Model-View-Controller (MVC)",
+      "text": "Phân tích đầy đủ 3 mẫu Component-and-Connector cốt lõi: Client-Server (kèm sơ đồ hệ thống ngân hàng ATM), Broker (kèm sơ đồ lớp Client/Proxy/Broker/Bridge/Server) và Model-View-Controller (kèm sơ đồ State Query / Change Notification / View Selection / User Gestures / State Change).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 22–33"
+      },
+      "digest": {
+        "keyPoints": [
+          "Client-Server tách các client gọi dịch vụ và server cung cấp dịch vụ qua request/reply connector; nhược điểm là server dễ thành performance bottleneck và single point of failure, đồng thời quyết định đặt logic ở client hay server rất khó sửa về sau.",
+          "Broker chèn thành phần trung gian lúc runtime để định vị server, chuyển tiếp request và trả kết quả/exception mà client không cần biết vị trí hay bản chất server (có Client-Side Proxy, Server-Side Proxy và tùy chọn Bridge 0..1); nhược điểm là tăng độ trễ, broker thành điểm nghẽn/SPOF, mục tiêu tấn công và khó test.",
+          "MVC tách giao diện hay thay đổi (View) khỏi dữ liệu & logic (Model) thông qua điều phối của Controller qua quan hệ notifies; phải có ít nhất 1 instance mỗi loại và Model KHÔNG tương tác trực tiếp với Controller.",
+          "Các luồng tương tác chính trên sơ đồ MVC: View → State Query → Model; Model → Change Notification (nét đứt) → View; View → User Gestures (nét đứt) → Controller; Controller → State Change → Model; Controller → View Selection → View."
+        ],
+        "terms": [
+          {
+            "term": "Client-Server Pattern",
+            "meaning": "C&C pattern trong đó Client chủ động khởi tạo yêu cầu tới Server qua request/reply connector để truy cập tài nguyên/dịch vụ dùng chung."
+          },
+          {
+            "term": "Broker Pattern",
+            "meaning": "C&C pattern chèn Broker trung gian (cùng proxy và bridge) nhằm che giấu vị trí và cách triển khai server khỏi client, cho phép đổi binding động."
+          },
+          {
+            "term": "Model-View-Controller (MVC)",
+            "meaning": "C&C pattern tách ứng dụng tương tác thành Model (dữ liệu/logic), View (hiển thị/nhập liệu) và Controller (dịch thao tác thành cập nhật Model/View)."
+          }
+        ],
+        "pitfalls": [
+          "Ràng buộc của MVC trên Slide 32 ghi rõ: 'The model component should not interact directly with the controller' (luồng từ Controller tới Model là một chiều State Change, Model thông báo cho View chứ không điều khiển Controller).",
+          "Trong Client-Server (Slide 23–24), một thành phần Server hoàn toàn có thể đóng vai Client để gọi tới một Server khác."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Client-Server Pattern (Context, Problem & Solution)",
+          "bullets": [
+            {
+              "text": "Context: There are shared resources and services that large numbers of distributed clients wish to access, and for which we wish to control access or quality of service."
+            },
+            {
+              "text": "Problem: By managing a set of shared resources and services, we can promote modifiability and reuse, by factoring out common services and having to modify these in a single location, or a small number of locations. We want to improve scalability and availability by centralizing the control of these resources and services, while distributing the resources themselves across multiple physical servers."
+            },
+            {
+              "text": "Solution: Clients interact by requesting services of servers, which provide a set of services. Some components may act as both clients and servers. There may be one central server or multiple distributed ones."
+            }
+          ],
+          "explanation": [
+            "Client-Server giải quyết bài toán nhiều client phân tán cần dùng chung dịch vụ/tài nguyên và cần kiểm soát quyền truy cập hoặc chất lượng dịch vụ tại một số điểm tập trung.",
+            "Một điểm tinh tế là vai trò client và server mang tính tương đối theo từng cuộc gọi: một thành phần có thể làm server phục vụ người dùng cuối nhưng đồng thời lại làm client gọi tới server cơ sở dữ liệu phía sau."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Client-Server Pattern (Specification)",
+          "table": {
+            "caption": "Bảng đặc tả Client-Server Pattern (slide gốc không có dòng tiêu đề cột).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Overview",
+                "Clients initiate interactions with servers, invoking services as needed from those servers and waiting for the results of those requests."
+              ],
+              [
+                "Elements",
+                "Client, a component that invokes services of a server component. Clients have ports that describe the services they require.\nServer, a component that provides services to clients. Servers have ports that describe the services they provide.\nRequest/reply connector, a data connector employing a request/reply protocol, used by a client to invoke services on a server."
+              ],
+              [
+                "Relations",
+                "The attachment relation associates clients with servers."
+              ]
+            ]
+          },
+          "explanation": [
+            "Giao thức mặc định của Client-Server là bất đối xứng theo cơ chế khởi tạo: Client chủ động khởi phát yêu cầu (require port) rồi chờ kết quả từ Server (provide port) qua connector kiểu request/reply.",
+            "Quan hệ kết nối giữa port của client và port của server trong đặc tả kiến trúc gọi là attachment relation."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Client-Server Pattern (Constraints & Weaknesses)",
+          "paragraphs": [
+            "Note: In early forms of client-server, service invocation is synchronous. However, variants of the client-server pattern may employ more sophisticated connector protocols."
+          ],
+          "table": {
+            "caption": "Ràng buộc và nhược điểm Client-Server Pattern (đoạn Note gốc nằm dưới bảng).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Constraints",
+                "Clients are connected to servers through request/reply connectors.\nServer components can be clients to other servers.\nSpecializations may impose restrictions:\n• Numbers of attachments to a given port\n• Allowed relations among servers\nComponents may be arranged in tiers, which are logical groupings of related functionality or functionality that will share a host computing environment"
+              ],
+              [
+                "Weaknesses",
+                "Server can be a performance bottleneck.\nServer can be a single point of failure.\nDecisions about where to locate functionality (in the client or in the server) are often complex and costly to change after a system has been built."
+              ]
+            ]
+          },
+          "explanation": [
+            "Ba nhược điểm trọng yếu của Client-Server: Server dễ trở thành cổ chai hiệu năng (performance bottleneck) khi lượng client tăng cao; server sập là toàn hệ thống tê liệt (single point of failure — SPOF); và việc phân chia chức năng đặt ở client (fat client) hay server (thin client) rất tốn kém để thay đổi sau này.",
+            "Ngoài ra cần phân biệt từ 'tiers' trong bảng: sắp xếp các component thành tiers theo nhóm chức năng hoặc máy chủ vật lý dùng chung môi trường chạy."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Client-Server Pattern (ATM Banking System)",
+          "diagramText": [
+            "Hàng Server phía trên (biểu tượng FTX server daemon):",
+            "• [Bank transaction authorizer] (port: server)",
+            "• [ATM monitoring server] (2 ports: server, server)",
+            "• [ATM reconfiguration server] (2 ports: server, server)",
+            "Hàng Client phía dưới & các đường nối TCP socket connector:",
+            "• [ATM main process] (ATM OS/2 client process): port client (trái) ──→ server của Bank transaction authorizer; port client (phải) ──→ server (trái) của ATM monitoring server",
+            "• [Reconfigure and update process] (ATM OS/2 client process): port client ──→ server (trái) của ATM reconfiguration server",
+            "• [Monitoring station program] (Windows application): port client (trái) ──→ server (phải) của ATM monitoring server; port client (phải) ──→ server (phải) của ATM reconfiguration server",
+            "Key: Client [■] ──── [■] Server : TCP socket connector with client and server ports",
+            "Shapes: Rounded stacked rect = FTX server daemon | Stacked rect = ATM OS/2 client process | Stacked oval = Windows application",
+            "Caption: The client-server architecture of an ATM banking system"
+          ],
+          "diagramNote": "Ví dụ thực tế C&C view của hệ thống ngân hàng ATM gồm 3 nhóm server daemon kết nối qua TCP socket tới các tiến trình ATM OS/2 và ứng dụng Windows giám sát.",
+          "explanation": [
+            "Sơ đồ minh họa cách một kiến trúc Client-Server thực tế hoạt động: mỗi máy ATM chạy tiến trình giao dịch chính kết nối đồng thời tới server cấp phép giao dịch và server giám sát.",
+            "Trong khi đó trạm giám sát Windows của nhân viên ngân hàng vừa theo dõi trạng thái qua ATM monitoring server vừa gửi cấu hình qua ATM reconfiguration server — nhiều client và server cùng nối qua TCP socket connector chuẩn hóa."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns - Broker Pattern (Context, Problem & Solution)",
+          "paragraphs": [
+            "Context: Many systems are constructed from a collection of services distributed across multiple servers. Implementing these systems is complex because you need to worry about how the systems will interoperate—how they will connect to each other and how they will exchange information—as well as the availability of the component services.",
+            "Problem: How do we structure distributed software so that service users do not need to know the nature and location of service providers, making it easy to dynamically change the bindings between users and providers?",
+            "Solution: The broker pattern separates users of services (clients) from providers of services (servers) by inserting an intermediary, called a broker. When a client needs a service, it queries a broker via a service interface. The broker then for wards the client’s service request to a server, which processes the request. The service result the result (and any exceptions) back to the requesting client."
+          ],
+          "ocrNote": "Slide gốc viết tách 'for wards' và lặp chữ 'The service result the result (and any exceptions) back to the requesting client.' (giữ nguyên văn).",
+          "explanation": [
+            "So với Client-Server thông thường (client phải biết địa chỉ server), Broker giải quyết bài toán liên kết động giữa nhiều dịch vụ phân tán: client không cần biết server nằm ở đâu hay viết bằng nền tảng gì.",
+            "Broker đóng vai người môi giới định tuyến: nhận yêu cầu từ client qua service interface, chuyển tới server phù hợp rồi chuyển ngược kết quả hoặc ngoại lệ (exceptions) về cho client."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns - Broker Pattern (Specification)",
+          "table": {
+            "caption": "Bảng đặc tả Broker Pattern (slide gốc không có dòng tiêu đề cột).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Overview",
+                "The broker pattern defines a runtime component, called a broker, that mediates the communication between a number of clients and servers."
+              ],
+              [
+                "Elements",
+                "Client, a requester of services\nServer, a provider of services\nBroker, an intermediary that locates an appropriate server to fulfill a client’s request, forwards the request to the server, and returns the results to the client\nClient-side proxy, an intermediary that manages the actual communication with the broker\nServer-side proxy, an intermediary that manages the actual communication with the broker\nBridges, a channel to communicate multiple broker"
+              ],
+              [
+                "Relations",
+                "The attachment relation associates clients (and, optionally, client-side proxies) and servers (and, optionally, server-side proxies) with brokers."
+              ]
+            ]
+          },
+          "explanation": [
+            "Ngoài Client, Server và Broker, kiến trúc đầy đủ còn có Client-side proxy và Server-side proxy làm nhiệm vụ đóng gói/giải gói dữ liệu (marshaling) giúp code client/server gọi dịch vụ từ xa tự nhiên như gọi hàm nội bộ.",
+            "Nếu hệ thống lớn trải dài qua nhiều mạng hoặc tên miền khác nhau, Bridges sẽ đóng vai trò kênh cầu nối liên lạc giữa nhiều Broker với nhau."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns - Broker Pattern (Constraints & Weaknesses)",
+          "paragraphs": [
+            "Note: Essentially any modern platform for distributed service providers and consumers implements some form of a broker"
+          ],
+          "table": {
+            "caption": "Ràng buộc và nhược điểm Broker Pattern (đoạn Note gốc đặt phía dưới bảng).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Constraints",
+                "The client can only attach to a broker (potentially via a client-side proxy). The server can only attach to a broker (potentially via a server side proxy)."
+              ],
+              [
+                "Weaknesses",
+                "Brokers add a layer of indirection, and hence latency, between clients and servers, and that layer may be a communication bottleneck.\nThe broker can be a single point of failure.\nA broker adds up-front complexity.\nA broker may be a target for security attacks.\nA broker may be difficult to test"
+              ]
+            ]
+          },
+          "explanation": [
+            "Ràng buộc cốt lõi của Broker là client và server KHÔNG nói chuyện trực tiếp với nhau mà chỉ được gắn (attach) vào broker (trực tiếp hoặc qua proxy).",
+            "Năm nhược điểm cần nhớ khi so sánh với Client-Server: thêm tầng gián tiếp nên tăng độ trễ (latency) và có thể tạo nút thắt truyền thông; broker là SPOF; tăng độ phức tạp ban đầu; dễ thành đích tấn công bảo mật tập trung; và khó viết test tích hợp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns - Broker Pattern (Structure Diagram)",
+          "diagramText": [
+            "Các lớp thành phần & phương thức:",
+            "• Broker: +locateServer(), +locateClient(), +registerServer(), +unregisterServer()",
+            "• Client-Side Proxy: +pack_data(), +unpack_data(), +send_request(), +return()",
+            "• Server-Side Proxy: +pack_data(), +unpack_data(), +call_service(), +send_response()",
+            "• Client: +call_server(), +start_task(), +use_Broker_API()",
+            "• Bridge: +pack_data(), +unpack_data(), +forward_message(), +transmit_message()",
+            "• Server: +initialize(), +enter_main_loop(), +run_service(), +use_Broker_API()",
+            "Quan hệ & bội số (Associations):",
+            "• Client-Side Proxy (*) ── -transfers ── (1) Broker",
+            "• Broker (1) ── -transfers ── (*) Server-Side Proxy",
+            "• Client (1) ── -call ── (*) Client-Side Proxy",
+            "• Server (1) ── -call ── (*) Server-Side Proxy",
+            "• Client (*) ── -uses ── (1) Broker",
+            "• Server (*) ── -uses ── (1) Broker",
+            "• Broker (1, -call) ── (0..1) Bridge"
+          ],
+          "diagramNote": "Sơ đồ cấu trúc tĩnh của Broker Pattern (tương tác giữa Client, Client-Side Proxy, Broker, Bridge, Server-Side Proxy và Server).",
+          "explanation": [
+            "Nhìn vào các phương thức trên sơ đồ ta hiểu ngay luồng chạy của Broker: Server khởi chạy sẽ gọi registerServer() với Broker; Client qua Client-Side Proxy gọi pack_data() → send_request() tới Broker.",
+            "Broker dùng locateServer() để tìm đúng máy chủ đích (hoặc chuyển qua Bridge nếu sang broker khác — bội số 0..1 tức tùy chọn), rồi Server-Side Proxy gọi unpack_data() → call_service() và send_response() ngược trở về."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Model-View-Controller Pattern (Context, Problem & Solution)",
+          "paragraphs": [
+            "Context: User interface software is typically the most frequently modified portion of an interactive application. For this reason it is important to keep modifications to the user interface software separate from the rest of the system. Users often wish to look at data from different perspectives, such as a bar graph or a pie chart. These representations should both reflect the current state of the data.",
+            "Problem: How can user interface functionality be kept separate from application functionality and yet still be responsive to user input, or to changes in the under lying application’s data? And how can multiple views of the user interface be created, maintained, and coordinated when the underlying application data changes?",
+            "Solution: The model-view-controller (MVC) pattern separates application func tionality into three kinds of components:"
+          ],
+          "bullets": [
+            "A model, which contains the application’s data",
+            "A view, which displays some portion of the underlying data and interacts with the user",
+            "A controller, which mediates between the model and the view and manages the notifications of state changes"
+          ],
+          "ocrNote": "Slide gốc viết tách chữ 'under lying' và 'func tionality' (giữ nguyên văn).",
+          "explanation": [
+            "Lý do kinh điển đẻ ra MVC là giao diện người dùng (UI) thay đổi liên tục và cùng một bộ dữ liệu có thể cần hiển thị đồng thời dưới nhiều góc nhìn khác nhau (như vừa biểu đồ cột vừa biểu đồ tròn).",
+            "MVC chia tách trách nhiệm thành 3 vai trò: Model giữ dữ liệu/trạng thái gốc; View hiển thị và nhận thao tác người dùng; Controller làm cầu nối chuyển thao tác thành thay đổi trạng thái và điều phối hiển thị."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Model-View_Controller Pattern (Specification)",
+          "table": {
+            "caption": "Bảng đặc tả MVC Pattern (slide gốc viết dấu gạch dưới ở tiêu đề 'Model-View_Controller Pattern' và không có dòng tiêu đề cột).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Overview",
+                "The MVC pattern breaks system functionality into three components: a model, a view, and a controller that mediates between the model and the view."
+              ],
+              [
+                "Elements",
+                "The model is a representation of the application data or state, and it contains (or provides an interface to) application logic.\nThe view is a user interface component that either produces a representation of the model for the user or allows for some form of user input, or both.\nThe controller manages the interaction between the model and the view, translating user actions into changes to the model or changes to the view."
+              ],
+              [
+                "Relations",
+                "The notifies relation connects instances of model, view, and controller, notifying elements of relevant state changes."
+              ]
+            ]
+          },
+          "ocrNote": "Tiêu đề trên slide gốc viết 'Model-View_Controller Pattern' dùng dấu gạch dưới (giữ nguyên văn).",
+          "explanation": [
+            "Bảng làm rõ một chi tiết quan trọng hay hiểu nhầm: Model không chỉ chứa dữ liệu thô mà còn chứa (hoặc cung cấp giao diện tới) application logic.",
+            "Cơ chế giao tiếp chính giúp nhiều View luôn đồng bộ với Model mà không ghép chặt (loose coupling) là quan hệ notifies: thông báo sự kiện thay đổi trạng thái."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 31"
+          }
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Model-View_Controller Pattern (Constraints & Weaknesses)",
+          "paragraphs": [
+            "Note: these MVC components are loosely coupled, it is easy to develop and test them in parallel, and changes to one have minimal impact on the others."
+          ],
+          "table": {
+            "caption": "Ràng buộc và nhược điểm MVC Pattern (tiêu đề gốc dùng 'Model-View_Controller Pattern' và đoạn Note đặt dưới bảng).",
+            "headers": [
+              "Aspect",
+              "Specification"
+            ],
+            "rows": [
+              [
+                "Constraints",
+                "There must be at least one instance each of model, view, and controller.\nThe model component should not interact directly with the controller."
+              ],
+              [
+                "Weaknesses",
+                "The complexity may not be worth it for simple user interfaces.\nThe model, view, and controller abstractions may not be good fits for some user interface toolkits."
+              ]
+            ]
+          },
+          "ocrNote": "Tiêu đề slide gốc viết 'Model-View_Controller Pattern' (giữ nguyên văn).",
+          "explanation": [
+            "Hai ràng buộc bắt buộc của MVC cần thuộc lòng: phải có ít nhất 1 instance cho mỗi loại (Model, View, Controller), và Model không được tương tác trực tiếp với Controller.",
+            "Ưu điểm lớn nêu ở phần Note là 3 thành phần liên kết lỏng (loosely coupled) nên phát triển và kiểm thử song song rất thuận lợi; nhược điểm là hơi cồng kềnh cho UI quá đơn giản hoặc không khớp với một số bộ công cụ giao diện có sẵn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 1,
+          "title": "Component-and-connector (C&C) Patterns – Model-View_Controller Pattern (MVC Diagram)",
+          "diagramText": [
+            "3 thành phần (3 khối):",
+            "• Model (trên giữa):",
+            "  - Encapsulates application state",
+            "  - Responds to state queries",
+            "  - Exposes application functionality",
+            "  - Notifies views of changes",
+            "• View (dưới trái):",
+            "  - Renders the models",
+            "  - Requests updates from models",
+            "  - Sends user gestures to controller",
+            "  - Allows controller to select view",
+            "• Controller (dưới phải):",
+            "  - Defines application behavior",
+            "  - Maps user actions to model updates",
+            "  - Selects view for response",
+            "  - One for each functionality",
+            "5 mũi tên tương tác:",
+            "• View ──(nét liền) State Query ──→ Model",
+            "• Model ──(nét đứt) Change Notification ──→ View",
+            "• Controller ──(nét liền) State Change ──→ Model",
+            "• View ──(nét đứt) User Gestures ──→ Controller",
+            "• Controller ──(nét liền) View Selection ──→ View"
+          ],
+          "diagramNote": "Sơ đồ luồng tương tác chuẩn của MVC: nét liền biểu diễn lời gọi chủ động (State Query, State Change, View Selection), nét đứt biểu diễn thông báo/sự kiện (Change Notification, User Gestures).",
+          "ocrNote": "Tiêu đề slide gốc viết 'Model-View_Controller Pattern' (giữ nguyên văn).",
+          "explanation": [
+            "Sơ đồ tóm gọn toàn bộ vòng đời một thao tác người dùng trong MVC: Người dùng bấm/nhập trên View → View gửi User Gestures sang Controller → Controller xử lý rồi gọi State Change cập nhật Model và/hoặc gọi View Selection đổi giao diện.",
+            "Khi dữ liệu đổi, Model phát Change Notification (nét đứt) sang View → View tự gọi State Query lên Model để lấy dữ liệu mới nhất và vẽ lại giao diện. Chú ý KHÔNG có mũi tên nào đi từ Model sang Controller!"
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 33"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Khả năng sửa đổi (Modifiability), Coupling, Cohesion & Tổng kết",
+      "text": "Định nghĩa Modifiability (chi phí và rủi ro của thay đổi), Coupling vs Cohesion, và 3 nhóm chiến thuật (tactics) tăng Modifiability: Split module, Increase cohesion và 5 tactics giảm coupling.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 34–38"
+      },
+      "digest": {
+        "keyPoints": [
+          "Modifiability là mức độ quan tâm đến chi phí (cost) và rủi ro (risk) khi thực hiện các thay đổi (thêm tính năng, sửa lỗi/bảo mật/hiệu năng, cải thiện UX, tích hợp công nghệ/nền tảng/hệ thống mới).",
+          "Coupling của module: xác suất việc sửa một module sẽ lan truyền (propagate) sang module khác. Cohesion của module: mức độ gắn kết chặt chẽ giữa các trách nhiệm bên trong cùng một module ('unity of purpose').",
+          "Ba chiến thuật tăng Modifiability: (1) Split module (chia nhỏ module giảm chi phí sửa trung bình), (2) Increase cohesion (tăng tính mạch lạc ngữ nghĩa, tách trách nhiệm không cùng mục đích ra module riêng), (3) Reduce coupling (Encapsulate, Use an intermediary, Restrict dependencies, Refactor, Abstract common services)."
+        ],
+        "terms": [
+          {
+            "term": "Modifiability",
+            "meaning": "Thuộc tính chất lượng xoay quanh chi phí (cost) và rủi ro (risk) khi phải thay đổi phần mềm."
+          },
+          {
+            "term": "Coupling",
+            "meaning": "Xác suất việc chỉnh sửa một module này sẽ kéo theo phải sửa (lan truyền sang) module khác."
+          },
+          {
+            "term": "Cohesion",
+            "meaning": "Mức độ các trách nhiệm trong một module liên quan chặt chẽ với nhau ('unity of purpose')."
+          }
+        ],
+        "pitfalls": [
+          "Slide 37 xếp 'Split module' và 'Increase cohesion' thành 2 chiến thuật ngang hàng với 'Reduce coupling', chứ KHÔNG phải tiểu mục nằm dưới Reduce coupling; 5 tiểu mục nằm dưới Reduce coupling là Encapsulate, Use an intermediary, Restrict dependencies, Refactor, Abstract common services."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 1,
+          "title": "Modifiability",
+          "paragraphs": [
+            "Modifiability"
+          ],
+          "explanation": [
+            "Slide chuyển mục mở đầu Phần 5 (cuối bài): Thuộc tính chất lượng Modifiability (Khả năng sửa đổi).",
+            "Các slide sau giải thích vì sao hệ thống luôn đổi và cách đo lường/cải thiện kiến trúc thông qua Coupling, Cohesion và các chiến thuật (tactics)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 1,
+          "title": "Modifiability — Why Change Happens",
+          "paragraphs": [
+            "Change happens:",
+            "Modifiability is about change. We concern for the cost and risk of making changes."
+          ],
+          "bullets": [
+            "Add new features",
+            "Fix defects, tighten security, improve performance",
+            "Enhance user’s experience",
+            "Embrace new technology, new platforms, new protocol",
+            "Make systems work together, even if they were never designed to do so"
+          ],
+          "explanation": [
+            "Thay đổi trong phần mềm là điều chắc chắn xảy ra vì 5 lý do thực tế: thêm tính năng, vá lỗi/tăng bảo mật/hiệu năng, nâng trải nghiệm người dùng, đón công nghệ-nền tảng mới và tích hợp chéo các hệ thống vốn không thiết kế để chạy cùng nhau.",
+            "Cốt lõi của Modifiability không phải cấm thay đổi mà là tối thiểu hóa chi phí (cost) và rủi ro (risk) mỗi khi thay đổi diễn ra."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 35"
+          }
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 1,
+          "title": "Modifiability - Coupling and Cohesion",
+          "bullets": [
+            "Coupling of a module: The probability that a modification to one module will propagate to the other",
+            "Cohesion of a module: Measures how strongly the responsibilities of a module are related. Informally, it measures the module’s “unity of purpose.”"
+          ],
+          "explanation": [
+            "Coupling (độ ghép nối giữa các module) đo xác suất sửa chỗ này khiến chỗ khác hỏng hoặc phải sửa theo — thiết kế tốt luôn hướng tới Low Coupling.",
+            "Cohesion (độ cố kết bên trong một module) đo 'sự thống nhất mục đích' của các hàm/trách nhiệm nằm chung một module — thiết kế tốt luôn hướng tới High Cohesion."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 36"
+          }
+        },
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 1,
+          "title": "Modifiability — Tactics",
+          "paragraphs": [
+            "To enhance modifiability:"
+          ],
+          "bullets": [
+            "Split module: Refining the module into several smaller modules should reduce the average cost of future changes",
+            "Increase cohesion: Increase semantic coherence. If the responsibilities A and B in a module do not serve the same purpose, they should be placed in different modules.",
+            {
+              "text": "Reduce coupling:",
+              "subBullets": [
+                "Encapsulate",
+                "Use an intermediary",
+                "Restrict dependencies",
+                "Refactor",
+                "Abstract common services"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide hệ thống hóa bộ chiến thuật tăng Modifiability thành 3 nhánh: Split module để cô lập phạm vi thay đổi; Increase cohesion bằng cách tách các trách nhiệm không cùng mục đích (semantic coherence) sang module khác.",
+            "Nhánh Reduce coupling gồm 5 chiến thuật cụ thể: Encapsulate (đóng gói ẩn chi tiết sau interface), Use an intermediary (dùng trung gian như Broker/Facade để phá phụ thuộc trực tiếp), Restrict dependencies (như luật allowed-to-use trong Layered), Refactor (tái cấu trúc bỏ phụ thuộc chéo/trùng lặp) và Abstract common services (trừu tượng hóa dịch vụ dùng chung)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 37"
+          }
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 1,
+          "title": "Summary",
+          "bullets": [
+            "Why Architectural Design?",
+            "Architectural structure",
+            "What makes a good architecture?",
+            "Architectural patterns",
+            "Modifiability"
+          ],
+          "explanation": [
+            "Slide tổng kết khép lại toàn bộ 5 chủ điểm chính của Lecture 8 từ slide Outline (Slide 2).",
+            "Khi ôn thi, hãy chú ý phân biệt chính xác 3 nhóm cấu trúc (Module, C&C, Allocation), nắm chắc các bảng Constraints/Weaknesses của Layered, Client-Server, Broker, MVC, và thuộc 5 tactics của Reduce coupling."
+          ],
+          "source": {
+            "file": "Resources/Lecture 8.pdf",
+            "loc": "Slide 38"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l08-c01", "front": "Ba loại software structure?", "back": "Module, Component-and-Connector (C&C), Allocation.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 5–11" } },
-    { "id": "se1-l08-c02", "front": "Ràng buộc của layered pattern?", "back": "Mỗi phần mềm thuộc đúng một layer; ít nhất 2 layer; allowed-to-use không vòng tròn.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 18–21" } },
-    { "id": "se1-l08-c03", "front": "Nhược điểm của Client-Server?", "back": "Server có thể là performance bottleneck và single point of failure; quyết định đặt chức năng ở client hay server khó và tốn kém để đổi.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 22–25" } },
-    { "id": "se1-l08-c04", "front": "Vai trò broker trong Broker pattern?", "back": "Trung gian lúc runtime: định vị server phù hợp, chuyển yêu cầu và trả kết quả/exception cho client, che giấu bản chất và vị trí của server.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 26–29" } },
-    { "id": "se1-l08-c05", "front": "Ba thành phần của MVC?", "back": "Model (dữ liệu/trạng thái và logic), View (hiển thị và nhập liệu), Controller (dịch thao tác người dùng thành thay đổi model/view).", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 30–33" } },
-    { "id": "se1-l08-c06", "front": "Coupling và cohesion định nghĩa thế nào?", "back": "Coupling: xác suất sửa module này lan sang module khác. Cohesion: mức độ liên quan chặt giữa các trách nhiệm trong một module.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slide 36" } }
+    {
+      "id": "se1-l08-c01",
+      "front": "Ba lý do khiến Architectural Design đặc biệt quan trọng?",
+      "back": "1) Chi phối mạnh mẽ các đặc tính phi chức năng (architecturally significant requirements); 2) Tạo biểu diễn chung giúp mọi stakeholder giao tiếp; 3) Các quyết định kiến trúc cho phép lý giải và quản lý thay đổi khi hệ thống tiến hóa.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 5"
+      }
+    },
+    {
+      "id": "se1-l08-c02",
+      "front": "Ba nhóm cấu trúc phần mềm (software structures) và câu hỏi mỗi nhóm trả lời?",
+      "back": "Module structures (tĩnh: trách nhiệm module, allowed-to-use, depends-on, kế thừa); Component-and-Connector / C&C (runtime: thành phần chạy, data stores, nhân bản, song song, luồng dữ liệu); Allocation (ánh xạ phi phần mềm: chạy trên processor nào, lưu ở thư mục/file nào, giao cho team nào).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 5–11"
+      }
+    },
+    {
+      "id": "se1-l08-c03",
+      "front": "Tám quy tắc cấu trúc (structural rules) cho một kiến trúc tốt?",
+      "back": "Information hiding & separation of concerns; dùng pattern & tactic đã biết; không phụ thuộc phiên bản sản phẩm/tool thương mại cụ thể; tách module tạo dữ liệu và tiêu thụ dữ liệu; không kỳ vọng module và component 1-1; process dễ đổi processor; ít kiểu tương tác giữa component; tập vùng tranh chấp tài nguyên nhỏ và được kiểm soát rõ.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 13–14"
+      }
+    },
+    {
+      "id": "se1-l08-c04",
+      "front": "Ba thành phần tạo nên một Architectural Pattern và 4 yếu tố mô tả Solution?",
+      "back": "Context – Problem – Solution. Solution được mô tả bởi: 1) Element types; 2) Interaction mechanisms/connectors; 3) Topological layout; 4) Semantic constraints.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "se1-l08-c05",
+      "front": "Phân loại các Pattern tiêu biểu theo Module, C&C và Allocation (Slide 17)?",
+      "back": "Module: Layered. C&C: Broker, Model-View-Controller (MVC), Pipe-and-Filter, Client-Server, Peer-to-Peer, Service-Oriented Architecture (SOA). Allocation: Map-Reduce, Multi-tier.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l08-c06",
+      "front": "Ràng buộc (Constraints) và Nhược điểm của Layered Pattern?",
+      "back": "Constraints: mỗi phần mềm thuộc đúng 1 layer; ít nhất 2 layer (thường 3+); quan hệ allowed-to-use không vòng tròn (tầng dưới không dùng tầng trên). Weaknesses: tăng chi phí và độ phức tạp ban đầu; gây suy giảm hiệu năng (performance penalty).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 19–20"
+      }
+    },
+    {
+      "id": "se1-l08-c07",
+      "front": "Layer bridging là gì và khi nào nó gây hại?",
+      "back": "Layer bridging là trường hợp phần mềm ở tầng cao hơn gọi trực tiếp module ở tầng thấp hơn không liền kề. Nếu xảy ra quá nhiều (many instances), hệ thống khó đạt mục tiêu portability và modifiability (còn gọi ngược lên tầng trên thì bị cấm hoàn toàn).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 20"
+      }
+    },
+    {
+      "id": "se1-l08-c08",
+      "front": "Các phần tử (Elements), Ràng buộc và Nhược điểm của Client-Server Pattern?",
+      "back": "Elements: Client (require ports), Server (provide ports), Request/reply connector. Weaknesses: Server dễ thành performance bottleneck và single point of failure; quyết định đặt logic ở client hay server rất phức tạp và đắt đỏ để sửa sau khi đã xây hệ thống.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 23–24"
+      }
+    },
+    {
+      "id": "se1-l08-c09",
+      "front": "Các thành phần trong Broker Pattern và vai trò của chúng?",
+      "back": "Client (yêu cầu), Server (cung cấp), Broker (trung gian định vị server, chuyển request, trả kết quả/exception), Client-side proxy & Server-side proxy (quản lý giao tiếp/đóng gói với broker), Bridges (kênh giao tiếp giữa nhiều broker).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 26–29"
+      }
+    },
+    {
+      "id": "se1-l08-c10",
+      "front": "Năm nhược điểm (Weaknesses) của Broker Pattern?",
+      "back": "1) Thêm tầng gián tiếp gây tăng độ trễ (latency) và có thể thành nút thắt truyền thông; 2) Broker có thể là single point of failure; 3) Tăng độ phức tạp ban đầu; 4) Dễ thành mục tiêu tấn công bảo mật; 5) Khó kiểm thử (difficult to test).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 28"
+      }
+    },
+    {
+      "id": "se1-l08-c11",
+      "front": "Ba thành phần của MVC và các ràng buộc bắt buộc trên Slide 32?",
+      "back": "Model (dữ liệu/trạng thái & logic), View (hiển thị & nhận input), Controller (điều phối, dịch thao tác user thành thay đổi Model/View) nối qua quan hệ notifies. Ràng buộc: phải có ít nhất 1 instance mỗi loại; Model KHÔNG được tương tác trực tiếp với Controller.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 30–33"
+      }
+    },
+    {
+      "id": "se1-l08-c12",
+      "front": "Năm mũi tên tương tác trong sơ đồ MVC (Slide 33)?",
+      "back": "View → (State Query) → Model; Model ⇢ (Change Notification) → View; View ⇢ (User Gestures) → Controller; Controller → (State Change) → Model; Controller → (View Selection) → View.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 33"
+      }
+    },
+    {
+      "id": "se1-l08-c13",
+      "front": "Định nghĩa Modifiability, Coupling và Cohesion?",
+      "back": "Modifiability: quan tâm đến chi phí (cost) và rủi ro (risk) khi thay đổi hệ thống. Coupling: xác suất sửa một module sẽ lan truyền sang module khác. Cohesion: mức độ gắn kết giữa các trách nhiệm trong một module ('unity of purpose').",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 35–36"
+      }
+    },
+    {
+      "id": "se1-l08-c14",
+      "front": "Các chiến thuật (tactics) tăng Modifiability trên Slide 37?",
+      "back": "Split module; Increase cohesion (tăng semantic coherence); Reduce coupling gồm 5 tactics: Encapsulate, Use an intermediary, Restrict dependencies, Refactor, Abstract common services.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 37"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l08-q01", "stem": "Pattern nào là module pattern?", "options": ["Broker", "MVC", "Layered", "Client-Server"], "answer": 2, "explanation": "Slide 17: Layered là module pattern; Broker, MVC, Client-Server là C&C pattern.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slide 17" } },
-    { "id": "se1-l08-q02", "stem": "Tactic nào KHÔNG thuộc nhóm giảm coupling?", "options": ["Encapsulate", "Use an intermediary", "Split module", "Restrict dependencies"], "answer": 2, "explanation": "Split module là tactic riêng; giảm coupling gồm encapsulate, intermediary, restrict dependencies, refactor, abstract common services.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slide 37" } },
-    { "id": "se1-l08-q03", "stem": "Allocation structure trả lời câu hỏi nào?", "options": ["Component nào chạy song song?", "Mỗi phần tử phần mềm chạy trên processor nào và giao cho team nào?", "Module nào kế thừa module nào?", "Dữ liệu chảy thế nào?"], "answer": 1, "explanation": "Allocation structures ánh xạ phần mềm sang processor, thư mục/file và nhóm phát triển.", "source": { "file": "Resources/Lecture 8.pdf", "loc": "Slides 10–11" } }
+    {
+      "id": "se1-l08-q01",
+      "stem": "Theo phân loại trên Slide 17, mẫu kiến trúc nào thuộc nhóm Module patterns?",
+      "options": [
+        "Broker Pattern",
+        "Model-View-Controller Pattern",
+        "Layered Pattern",
+        "Multi-tier Pattern"
+      ],
+      "answer": 2,
+      "explanation": "Slide 17 xếp Layered Pattern thuộc Module patterns; Broker và MVC thuộc C&C patterns; còn Multi-tier Pattern thuộc Allocation patterns.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l08-q02",
+      "stem": "Chiến thuật (tactic) nào KHÔNG nằm trong nhóm 'Reduce coupling' ở Slide 37?",
+      "options": [
+        "Encapsulate",
+        "Use an intermediary",
+        "Split module",
+        "Restrict dependencies"
+      ],
+      "answer": 2,
+      "explanation": "Slide 37 đặt 'Split module' và 'Increase cohesion' là hai tactic ngang hàng với 'Reduce coupling'; 5 tactic con của Reduce coupling là Encapsulate, Use an intermediary, Restrict dependencies, Refactor và Abstract common services.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 37"
+      }
+    },
+    {
+      "id": "se1-l08-q03",
+      "stem": "Góc nhìn kiến trúc nào giúp trả lời các câu hỏi: 'Phần tử phần mềm chạy trên processor nào, lưu ở thư mục/file nào và giao cho team phát triển nào?'",
+      "options": [
+        "Module structures",
+        "Component-and-connector structures",
+        "Allocation structures",
+        "Layered bridging structures"
+      ],
+      "answer": 2,
+      "explanation": "Slides 10–11: Allocation structures ánh xạ cấu trúc phần mềm sang cấu trúc phi phần mềm (organizational, developmental, installation, execution) và trả lời trực tiếp 3 câu hỏi trên.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 10–11"
+      }
+    },
+    {
+      "id": "se1-l08-q04",
+      "stem": "Vì sao kiến trúc thiết kế tốt KHÔNG nên kỳ vọng tương ứng 1-1 giữa module và component (Slide 13)?",
+      "options": [
+        "Vì mỗi component luôn nằm trên một máy chủ vật lý khác nhau",
+        "Vì trong hệ thống có xử lý đồng thời (concurrency), một module tĩnh có thể tạo ra nhiều instance component chạy song song",
+        "Vì module không có trách nhiệm tính toán",
+        "Vì component không giao tiếp qua connector"
+      ],
+      "answer": 1,
+      "explanation": "Slide 13 lấy ví dụ hệ thống có concurrency: có thể có nhiều instance của một component chạy song song nhưng đều được xây dựng từ cùng một module.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "se1-l08-q05",
+      "stem": "Hiện tượng 'layer bridging' trong Layered Pattern (Slide 20) mô tả tình huống nào và hệ quả là gì?",
+      "options": [
+        "Tầng dưới gọi ngược lên tầng trên; hoàn toàn được khuyến khích để tăng tốc",
+        "Phần mềm ở tầng cao sử dụng module ở tầng thấp không liền kề; nếu xảy ra nhiều có thể khiến hệ thống không đạt mục tiêu portability và modifiability",
+        "Chỉ có đúng 2 layer trong hệ thống; giúp giảm độ phức tạp",
+        "Dùng Broker làm cầu nối giữa hai layer"
+      ],
+      "answer": 1,
+      "explanation": "Slide 20 định nghĩa layer bridging là tầng cao dùng module ở tầng thấp không kề; nhiều trường hợp bridging làm mất khả năng portability và modifiability của strict layering (còn upward usages thì bị cấm hoàn toàn).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 20"
+      }
+    },
+    {
+      "id": "se1-l08-q06",
+      "stem": "Trong sơ đồ Client-Server hệ thống ngân hàng ATM (Slide 25), thành phần client 'ATM main process' kết nối trực tiếp tới những server nào?",
+      "options": [
+        "Chỉ kết nối tới ATM reconfiguration server",
+        "Bank transaction authorizer và ATM monitoring server",
+        "Chỉ kết nối tới Monitoring station program",
+        "Kết nối tới cả 3 server cùng lúc"
+      ],
+      "answer": 1,
+      "explanation": "Slide 25 vẽ ATM main process có 2 port client: port trái nối tới Bank transaction authorizer (port server), port phải nối tới ATM monitoring server (port server bên trái).",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 25"
+      }
+    },
+    {
+      "id": "se1-l08-q07",
+      "stem": "Trong sơ đồ lớp Broker Pattern (Slide 29), bội số (multiplicity) của liên kết từ Broker sang Bridge là gì và ý nghĩa là gì?",
+      "options": [
+        "1..* — mỗi Broker bắt buộc phải có ít nhất 1 Bridge",
+        "0..1 — mỗi Broker có thể có tối đa 1 Bridge (tùy chọn khi cần liên thông nhiều broker)",
+        "* — nhiều Bridge dùng chung bởi một Client",
+        "1 — mọi Client gọi trực tiếp Bridge mà không qua Broker"
+      ],
+      "answer": 1,
+      "explanation": "Slide 29 ghi rõ bội số phía Broker là 1 và phía Bridge là 0..1 trên liên kết -call, thể hiện Bridge là thành phần tùy chọn để kết nối giữa nhiều broker.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "se1-l08-q08",
+      "stem": "Phát biểu nào ĐÚNG với ràng buộc của Model-View-Controller (MVC) Pattern theo Slides 32–33?",
+      "options": [
+        "Model gọi trực tiếp các hàm của Controller mỗi khi dữ liệu thay đổi",
+        "Có thể bỏ hoàn toàn Controller nếu ứng dụng chỉ có 1 View",
+        "Phải có ít nhất một instance mỗi loại (model, view, controller) và Model không nên tương tác trực tiếp với Controller",
+        "View chỉ hiển thị chứ không được phép nhận input từ người dùng"
+      ],
+      "answer": 2,
+      "explanation": "Slide 32 quy định hai ràng buộc: phải có ít nhất một instance mỗi loại (model, view, controller) và 'The model component should not interact directly with the controller'.",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slides 32–33"
+      }
+    },
+    {
+      "id": "se1-l08-q09",
+      "stem": "Khái niệm 'Cohesion of a module' được định nghĩa trên Slide 36 là gì?",
+      "options": [
+        "Xác suất việc sửa một module sẽ lan truyền sang module khác",
+        "Mức độ liên quan chặt chẽ giữa các trách nhiệm trong một module ('unity of purpose')",
+        "Số lượng server tối đa kết nối vào một broker",
+        "Tốc độ truyền gói tin qua TCP socket connector"
+      ],
+      "answer": 1,
+      "explanation": "Slide 36 phân biệt rõ: Coupling là xác suất sửa đổi lan sang module khác; Cohesion đo mức độ gắn kết giữa các trách nhiệm bên trong module ('unity of purpose').",
+      "source": {
+        "file": "Resources/Lecture 8.pdf",
+        "loc": "Slide 36"
+      }
+    }
   ]
 }

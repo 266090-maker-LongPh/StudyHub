@@ -16,9 +16,50 @@ interface SearchDoc {
   kind: 'lesson' | 'card' | 'quiz';
   chapterId: string;
   chapterTitle: string;
+  sectionIndex?: number;
   title: string;
   body: string;
   sourceText: string;
+}
+
+function flattenSectionText(sec: SubjectDataset['chapters'][number]['summary'][number]): string {
+  const parts: string[] = [sec.text];
+  if (sec.code?.text) parts.push(sec.code.text);
+  if (sec.digest) {
+    parts.push(...sec.digest.keyPoints);
+    if (sec.digest.terms) {
+      parts.push(...sec.digest.terms.map((t) => `${t.term}: ${t.meaning}`));
+    }
+    if (sec.digest.pitfalls) {
+      parts.push(...sec.digest.pitfalls);
+    }
+  }
+  if (sec.slides) {
+    for (const sl of sec.slides) {
+      parts.push(`${sl.slideNumber} ${sl.title}`);
+      if (sl.paragraphs) parts.push(...sl.paragraphs);
+      if (sl.bullets) {
+        for (const b of sl.bullets) {
+          if (typeof b === 'string') {
+            parts.push(b);
+          } else {
+            parts.push(b.text);
+            if (b.subBullets) parts.push(...b.subBullets);
+          }
+        }
+      }
+      if (sl.table) {
+        if (sl.table.caption) parts.push(sl.table.caption);
+        parts.push(sl.table.headers.join(' '));
+        parts.push(...sl.table.rows.map((r) => r.join(' ')));
+      }
+      if (sl.diagramText) parts.push(...sl.diagramText);
+      if (sl.diagramNote) parts.push(sl.diagramNote);
+      if (sl.explanation) parts.push(...sl.explanation);
+      if (sl.code?.text) parts.push(sl.code.text);
+    }
+  }
+  return parts.filter(Boolean).join(' ');
 }
 
 export function SearchPage({
@@ -47,9 +88,17 @@ export function SearchPage({
             kind: 'lesson',
             chapterId: ch.id,
             chapterTitle: ch.title,
+            sectionIndex: idx,
             title: `${ch.title} — ${sec.h}`,
-            body: `${sec.text} ${sec.code?.text ?? ''}`,
-            sourceText: ch.sources.map((s) => `${s.file} (${s.loc})`).join(', '),
+            body: flattenSectionText(sec),
+            sourceText: (
+              sec.source
+                ? [sec.source]
+                : sec.slides?.map((sl) => sl.source) ?? ch.sources
+            )
+              .map((s) => `${s.file} (${s.loc})`)
+              .slice(0, 3)
+              .join(', '),
           };
           docs.push(doc);
           map.set(id, doc);
@@ -124,7 +173,9 @@ export function SearchPage({
       onSelectSubject(doc.subject);
     }
     if (doc.kind === 'lesson') {
-      navigate(`/lesson/${doc.chapterId}`);
+      const hash =
+        typeof doc.sectionIndex === 'number' ? `#sec-${doc.sectionIndex}` : '';
+      navigate(`/lesson/${doc.chapterId}${hash}`);
     } else if (doc.kind === 'card') {
       navigate(`/flashcards?chapter=${encodeURIComponent(doc.chapterId)}`);
     } else {

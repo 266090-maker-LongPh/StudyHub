@@ -1,25 +1,1816 @@
 {
-  "id": "dbs-ch06", "order": 6,
+  "id": "dbs-ch06",
+  "order": 6,
   "title": "Chương 6: Introduction to SQL",
-  "summary": [
-    { "h": "SQL và môi trường", "text": "SQL xuất phát từ mô hình quan hệ của Codd (1970) và System R của IBM; chuẩn ANSI đầu tiên năm 1986. DDL định nghĩa database (CREATE, ALTER, DROP, ràng buộc); DML thao tác và truy vấn (INSERT, UPDATE, DELETE, SELECT); DCL kiểm soát (GRANT, REVOKE, COMMIT). Catalog là tập các schema; schema chứa mô tả đối tượng do user tạo." },
-    { "h": "Tạo bảng và referential integrity", "text": "7 bước: chọn data type, cột NOT NULL, cột UNIQUE, cặp PK–FK, giá trị DEFAULT, domain constraint (CHECK), tạo bảng và index. Hành động ON UPDATE/DELETE cho FK: RESTRICT, CASCADE, SET NULL, SET DEFAULT." },
-    { "h": "Thứ tự xử lý SELECT", "text": "Thứ tự viết: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY. Thứ tự xử lý logic: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. WHERE lọc hàng trước khi gom nhóm (không chứa hàm tổng hợp); HAVING lọc nhóm sau GROUP BY. Với hàm tổng hợp, cột không tổng hợp trong SELECT phải có trong GROUP BY." },
-    { "h": "Độ ưu tiên toán tử Boolean", "text": "NOT trước, rồi AND, rồi OR. Dùng ngoặc để thay đổi thứ tự." },
-    { "h": "View", "text": "Dynamic view là bảng ảo, chỉ lưu định nghĩa SELECT. Materialized view lưu vật lý kết quả và cần refresh. WITH CHECK OPTION ngăn INSERT/UPDATE qua view tạo hàng không thỏa WHERE của view. Ưu điểm: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất, dữ liệu mới nhất, tốn ít chỗ, view tùy biến, physical data independence. Nhược điểm: tốn thời gian xử lý mỗi lần dùng; có thể không update được trực tiếp." }
+  "audit": {
+    "sourceFile": "Chapter 06.pdf",
+    "totalPages": 48,
+    "extractedPages": 48,
+    "ocrNotes": [
+      "PDF Chapter 06.pdf thực tế gồm 48 trang (Slides 1–48), đã trích xuất đầy đủ 48/48 slides kèm pageNumber 1–48.",
+      "Slide 43 chứa ảnh chụp bảng Product_T trong MS Access có một số tiêu đề cột và ô bị cắt bớt bề rộng hiển thị trên giao diện (ProductI[, ProductDescriptio[, ProductFinis[, ProductStandardPric, Entertainment Cente), đã ghi chú trong ocrNote.",
+      "Slide 48 là khung chữ nhật trống/đã che phần nội dung thông báo bản quyền (chỉ còn dòng chữ rất nhỏ không đọc rõ ở góc trên bên trái khung và chân trang Copyright © 2016 Pearson Education, Inc. 6-48), đã đánh dấu [?cần kiểm tra]."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Chapter 06.pdf",
+      "loc": "Slides 1–48 (đầy đủ 48/48 slides)"
+    }
   ],
-  "sources": [{ "file": "Chapter 06.pdf", "loc": "Slides 1–48" }],
+  "summary": [
+    {
+      "h": "Giới thiệu chương, Mục tiêu, Tổng quan & Lịch sử SQL",
+      "text": "Giới thiệu Chương 6 (Introduction to SQL), 6 mục tiêu học tập, định nghĩa SQL và RDBMS, lịch sử phát triển từ mô hình quan hệ của E. F. Codd (1970) đến chuẩn ANSI SQL và 6 lợi ích của ngôn ngữ chuẩn hóa.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 1–6"
+      },
+      "digest": {
+        "keyPoints": [
+          "SQL (Structured Query Language, thường đọc là \"Sequel\") là ngôn ngữ chuẩn cho các Hệ quản trị CSDL quan hệ (RDBMS).",
+          "RDBMS quản lý dữ liệu như một tập hợp các bảng (tables), trong đó mọi mối quan hệ được biểu diễn qua các giá trị chung (common values: PK–FK) giữa các bảng liên quan.",
+          "Lịch sử cốt lõi: 1970 (E. F. Codd đề xuất mô hình quan hệ) → 1974–1979 (System R & Sequel tại IBM) → 1979 (Oracle thương mại hóa RDBMS SQL đầu tiên) → 1986 (chuẩn ANSI SQL đầu tiên) → nhiều đợt cập nhật lớn (1989, 1992, 1999, 2003, 2006, 2008, 2011).",
+          "Chuẩn SQL giúp giảm chi phí đào tạo, tăng năng suất, đảm bảo tính di động (portability), tuổi thọ ứng dụng, giảm phụ thuộc một hãng và giao tiếp liên hệ thống."
+        ],
+        "terms": [
+          {
+            "term": "SQL (Structured Query Language)",
+            "meaning": "Ngôn ngữ truy vấn có cấu trúc tiêu chuẩn dùng để định nghĩa, thao tác và kiểm soát dữ liệu trong RDBMS."
+          },
+          {
+            "term": "RDBMS",
+            "meaning": "Relational Database Management System — DBMS quản lý dữ liệu dưới dạng tập các bảng mà quan hệ biểu diễn bằng giá trị chung ở các bảng liên quan."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm năm Oracle thương mại hóa CSDL SQL đầu tiên (1979) với năm phát hành chuẩn ANSI SQL đầu tiên (1986) hoặc năm IBM ra System R (1974–1979).",
+          "SQL có hai mức chuẩn theo Slide 5: Minimal (Level 1) và Complete (Level 2)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "CHAPTER 6: INTRODUCTION TO SQL",
+          "paragraphs": [
+            "CHAPTER 6: INTRODUCTION TO SQL",
+            "Modern Database Management (12th Edition) — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi",
+            "Copyright © 2016 Pearson Education, Inc."
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide mở đầu Chương 6: \"Introduction to SQL\" trích từ giáo trình Modern Database Management (12th Edition).",
+            "Sau khi đã học mô hình dữ liệu khái niệm (E-R/EER ở Ch.2–3), thiết kế logic/chuẩn hóa (Ch.4) và thiết kế vật lý (Ch.5), Chương 6 chính thức chuyển sang hiện thực hóa CSDL quan hệ bằng ngôn ngữ SQL: tạo bảng, áp đặt ràng buộc toàn vẹn, thêm/sửa/xóa dữ liệu, viết truy vấn SELECT đơn bảng và tạo View."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "Interpret history and role of SQL",
+            "Define a database using SQL data definition language",
+            "Write single table queries using SQL",
+            "Establish referential integrity using SQL",
+            "Discuss SQL:1999 and SQL:2011 standards"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Slide liệt kê 6 mục tiêu trọng tâm của Chương 6: nắm thuật ngữ môi trường SQL, hiểu lịch sử & vai trò của SQL, dùng DDL để định nghĩa bảng/ràng buộc, viết truy vấn trên một bảng (single table queries), thiết lập toàn vẹn tham chiếu (referential integrity) và biết các mở rộng trong chuẩn SQL:1999 / SQL:2008 / SQL:2011.",
+            "Lưu ý sự phân ranh với Chương 7: Chương 6 tập trung vào DDL + DML cơ bản và truy vấn trên một bảng (`SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY`) cùng với `CREATE VIEW`; sang Chương 7 mới học Join nhiều bảng và Subquery."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "SQL OVERVIEW",
+          "bullets": [
+            "Structured Query Language – often pronounced “Sequel”",
+            "The standard for relational database management systems (RDBMS)",
+            "RDBMS: A database management system that manages data as a collection of tables in which all relationships are represented by common values in related tables"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Cung cấp định nghĩa chuẩn mực của SQL và RDBMS. Tên gọi \"Sequel\" bắt nguồn từ tiền thân SEQUEL (Structured English Query Language) tại IBM vào thập niên 1970.",
+            "Điểm mấu chốt trong định nghĩa RDBMS hay ra đề trắc nghiệm: mọi mối quan hệ giữa các bảng đều được biểu diễn bằng **giá trị chung (common values)** trong các bảng liên quan (tức cặp Primary Key – Foreign Key), chứ không dùng con trỏ vật lý như mô hình Hierarchical/Network."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "HISTORY OF SQL",
+          "bullets": [
+            "1970–E. F. Codd develops relational database concept",
+            "1974-1979–System R with Sequel (later SQL) created at IBM Research Lab",
+            "1979–Oracle markets first relational DB with SQL",
+            "1981 – SQL/DS first available RDBMS system on DOS/VSE",
+            "Others followed: INGRES (1981), IDM (1982), DG/SGL (1984), Sybase (1986)",
+            "1986–ANSI SQL standard released",
+            "1989, 1992, 1999, 2003, 2006, 2008, 2011–Major ANSI standard updates",
+            "Current–SQL is supported by most major database vendors"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "Tóm tắt các mốc lịch sử quan trọng nhất của SQL: 1970 (E. F. Codd đặt nền móng mô hình quan hệ), 1974–1979 (IBM xây dựng nguyên mẫu System R cùng Sequel), 1979 (Oracle thương mại hóa hệ CSDL SQL đầu tiên — thậm chí trước khi IBM ra SQL/DS năm 1981).",
+            "Mốc chuẩn hóa: ANSI ban hành chuẩn SQL đầu tiên năm 1986, sau đó cập nhật lớn qua các năm 1989, 1992 (SQL-92), 1999 (SQL:1999), 2003, 2006, 2008 (thêm cột identity, trigger cải tiến) và 2011."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "PURPOSE OF SQL STANDARD",
+          "bullets": [
+            "Specify syntax/semantics for data definition and manipulation",
+            "Define data structures and basic operations",
+            "Enable portability of database definition and application modules",
+            "Specify minimal (level 1) and complete (level 2) standards",
+            "Allow for later growth/enhancement to standard (referential integrity, transaction management, user-defined functions, extended join operations, national character sets)"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Giải thích lý do cần có chuẩn ANSI/ISO SQL: thống nhất cú pháp & ngữ nghĩa cho định nghĩa/thao tác dữ liệu, giúp định nghĩa CSDL và mô-đun ứng dụng có tính di động (portability) giữa các hệ quản trị khác nhau.",
+            "Chuẩn phân thành 2 mức: minimal (level 1) và complete (level 2), đồng thời thiết kế mở để bổ sung dần các tính năng như referential integrity, transaction management, UDF, extended joins và bộ ký tự quốc gia."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "BENEFITS OF A STANDARDIZED RELATIONAL LANGUAGE",
+          "bullets": [
+            "Reduced training costs",
+            "Productivity",
+            "Application portability",
+            "Application longevity",
+            "Reduced dependence on a single vendor",
+            "Cross-system communication"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Liệt kê 6 lợi ích thực tiễn khi doanh nghiệp dùng ngôn ngữ SQL chuẩn hóa thay vì ngôn ngữ độc quyền của từng hãng.",
+            "Nắm chắc ý \"Application longevity\" (tuổi thọ ứng dụng cao vì chuẩn tồn tại lâu dài qua nhiều thế hệ phần cứng) và \"Reduced dependence on a single vendor\" (tránh bị khóa chặt vào một nhà cung cấp — vendor lock-in), tuy nhiên trong thực tế các hãng vẫn có phần mở rộng riêng (dialect như PL/SQL, T-SQL)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Môi trường SQL, Phân loại DDL/DML/DCL & Kiểu dữ liệu SQL",
+      "text": "Cấu trúc môi trường SQL:2011 gồm Catalog, Schema, DDL, DML, DCL (Slides 7–9), các lệnh CREATE cốt lõi (Slide 10) và bảng kiểu dữ liệu mẫu Table 6-2 (Slide 11).",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 7–11"
+      },
+      "digest": {
+        "keyPoints": [
+          "Catalog là tập hợp các schema cấu thành phần mô tả của một database (ví dụ môi trường DEV_C và PROD_C).",
+          "Schema chứa mô tả các đối tượng do người dùng tạo như base tables, views, constraints.",
+          "Ba nhóm lệnh SQL chính: DDL (CREATE, ALTER, DROP, TRUNCATE — định nghĩa cấu trúc, dùng ở Physical Design & Maintenance); DML (INSERT, UPDATE, DELETE, SELECT — nạp và truy vấn dữ liệu, dùng ở Implementation & Maintenance); DCL (GRANT, ADD, REVOKE, COMMIT — phân quyền và kiểm soát, dùng ở Implementation & Maintenance).",
+          "Các kiểu dữ liệu SQL cơ bản (Table 6-2): String (CHAR, VARCHAR/VARCHAR2, BLOB), Number (NUMERIC, INTEGER/INT), Temporal (TIMESTAMP, TIMESTAMP WITH LOCAL TIME ZONE), Boolean (TRUE/FALSE/UNKNOWN)."
+        ],
+        "terms": [
+          {
+            "term": "Catalog",
+            "meaning": "A set of schemas that constitute the description of a database."
+          },
+          {
+            "term": "Schema",
+            "meaning": "The structure that contains descriptions of objects created by a user (base tables, views, constraints)."
+          },
+          {
+            "term": "DDL / DML / DCL",
+            "meaning": "Data Definition Language (định nghĩa cấu trúc), Data Manipulation Language (thao tác/truy vấn dữ liệu), Data Control Language (quản trị quyền và commit)."
+          }
+        ],
+        "pitfalls": [
+          "TRUNCATE TABLE nằm trong nhóm DDL (theo Figure 6-4: Drop or truncate tables), không phải DML; SELECT nằm trong nhóm DML (Manipulate the database: SELECT).",
+          "Trong BOOLEAN của SQL chuẩn có 3 giá trị logic (3-valued logic): TRUE, FALSE và UNKNOWN (do NULL gây ra)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "SQL ENVIRONMENT",
+          "bullets": [
+            {
+              "text": "Catalog",
+              "subBullets": [
+                "A set of schemas that constitute the description of a database"
+              ]
+            },
+            {
+              "text": "Schema",
+              "subBullets": [
+                "The structure that contains descriptions of objects created by a user (base tables, views, constraints)"
+              ]
+            },
+            {
+              "text": "Data Definition Language (DDL)",
+              "subBullets": [
+                "Commands that define a database, including creating, altering, and dropping tables and establishing constraints"
+              ]
+            },
+            {
+              "text": "Data Manipulation Language (DML)",
+              "subBullets": [
+                "Commands that maintain and query a database"
+              ]
+            },
+            {
+              "text": "Data Control Language (DCL)",
+              "subBullets": [
+                "Commands that control a database, including administering privileges and committing data"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "Phân biệt 5 khái niệm nền tảng của SQL Environment. Về mặt phân cấp: một **Catalog** bao gồm nhiều **Schema**, mỗi **Schema** chứa mô tả các đối tượng do người dùng tạo (bảng gốc, view, ràng buộc).",
+            "Ghi nhớ ranh giới 3 nhóm ngôn ngữ con của SQL hay hỏi trắc nghiệm: DDL (tạo/sửa/xóa cấu trúc & ràng buộc), DML (duy trì/thao tác và truy vấn dữ liệu), DCL (quản trị quyền `GRANT`/`REVOKE` và xác nhận giao dịch `COMMIT`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Figure 6-1 A simplified schematic of a typical SQL environment, as described by the SQL: 2011 standard",
+          "diagramText": [
+            "USERS ↔ PROGRAMS ↔ (SQL queries) ↔ DBMS",
+            "DBMS ↔ Catalog: DEV_C [DATA | Required information schema | User schemas]",
+            "DBMS ↔ Catalog: PROD_C [DATA | Required information schema | User schemas]"
+          ],
+          "diagramNote": "Sơ đồ môi trường SQL theo chuẩn SQL:2011 cho thấy các ứng dụng gửi câu lệnh SQL qua DBMS để tương tác với nhiều Catalog (ví dụ DEV_C cho phát triển và PROD_C cho vận hành); mỗi Catalog gồm dữ liệu (DATA), information schema bắt buộc và các user schemas.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "Figure 6-1 minh họa kiến trúc môi trường SQL:2011 với hai Catalog tách biệt (phát triển `DEV_C` và sản xuất `PROD_C`) cùng được quản lý bởi DBMS.",
+            "Bên trong mỗi Catalog luôn có **Required information schema** (lược đồ hệ thống lưu metadata chuẩn hóa về bảng/cột/ràng buộc) và các **User schemas** do lập trình viên hoặc DBA định nghĩa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Figure 6-4 DDL, DML, DCL, and the database development process",
+          "diagramText": [
+            "DDL (Define the database: CREATE tables, indexes, views; Establish foreign keys; Drop or truncate tables) → Physical Design; Maintenance",
+            "DML (Load the database: INSERT data; UPDATE the database; Manipulate the database: SELECT) → Implementation; Maintenance",
+            "DCL (Control the database: GRANT, ADD, REVOKE) → Implementation; Maintenance"
+          ],
+          "diagramNote": "Sơ đồ đối chiếu 3 nhóm lệnh SQL (DDL, DML, DCL) với 3 pha sau của SDLC (Physical Design, Implementation, Maintenance).",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Figure 6-4 liên kết trực tiếp kiến thức Chương 1 (SDLC) với Chương 6 (SQL): DDL được dùng đầu tiên ở pha **Physical Design** (tạo bảng, index, view, khóa ngoại) và tiếp tục dùng ở **Maintenance** (sửa/xóa bảng).",
+            "Trong khi đó, DML và DCL chủ yếu được dùng từ pha **Implementation** (nạp dữ liệu, viết câu truy vấn, phân quyền người dùng) và kéo dài sang pha **Maintenance**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "SQL DATABASE DEFINITION",
+          "bullets": [
+            "Data Definition Language (DDL)",
+            {
+              "text": "Major CREATE statements:",
+              "subBullets": [
+                "CREATE SCHEMA–defines a portion of the database owned by a particular user",
+                "CREATE TABLE–defines a new table and its columns",
+                "CREATE VIEW–defines a logical table from one or more tables or views"
+              ]
+            },
+            "Other CREATE statements: CHARACTER SET, COLLATION, TRANSLATION, ASSERTION, DOMAIN"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "Tổng hợp 3 lệnh `CREATE` quan trọng nhất của DDL: `CREATE SCHEMA`, `CREATE TABLE` (tạo bảng vật lý) và `CREATE VIEW` (tạo bảng logic/ảo từ các bảng hoặc view khác).",
+            "Ngoài ra chuẩn SQL còn định nghĩa `CREATE DOMAIN` (tạo kiểu miền giá trị dùng chung), `CREATE ASSERTION` (ràng buộc mức nhiều bảng), `CHARACTER SET`, `COLLATION` và `TRANSLATION` — tuy nhiên không phải DBMS thương mại nào cũng cài đặt đầy đủ `ASSERTION` hay `DOMAIN`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "SQL DATA TYPES",
+          "table": {
+            "caption": "TABLE 6-2 Sample SQL Data Types",
+            "headers": [
+              "Category",
+              "SQL Data Type",
+              "Description"
+            ],
+            "rows": [
+              [
+                "String",
+                "CHARACTER (CHAR)",
+                "Stores string values containing any characters in a character set. CHAR is defined to be a fixed length."
+              ],
+              [
+                "String",
+                "CHARACTER VARYING (VARCHAR or VARCHAR2)",
+                "Stores string values containing any characters in a character set but of definable variable length."
+              ],
+              [
+                "String",
+                "BINARY LARGE OBJECT (BLOB)",
+                "Stores binary string values in hexadecimal format. BLOB is defined to be a variable length. (Oracle also has CLOB and NCLOB, as well as BFILE for storing unstructured data outside the database.)"
+              ],
+              [
+                "Number",
+                "NUMERIC",
+                "Stores exact numbers with a defined precision and scale."
+              ],
+              [
+                "Number",
+                "INTEGER (INT)",
+                "Stores exact numbers with a predefined precision and scale of zero."
+              ],
+              [
+                "Temporal",
+                "TIMESTAMP / TIMESTAMP WITH LOCAL TIME ZONE",
+                "Stores a moment an event occurs, using a definable fraction-of-a-second precision. Value adjusted to the user’s session time zone (available in Oracle and MySQL)."
+              ],
+              [
+                "Boolean",
+                "BOOLEAN",
+                "Stores truth values: TRUE, FALSE, or UNKNOWN."
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Table 6-2 tóm tắt 4 nhóm kiểu dữ liệu chính trong SQL: Chuỗi (`CHAR` độ dài cố định, `VARCHAR`/`VARCHAR2` độ dài thay đổi, `BLOB` lưu nhị phân lớn), Số (`NUMERIC` có precision & scale, `INT` có scale = 0), Thời gian (`TIMESTAMP`), và Logic (`BOOLEAN`).",
+            "Lưu ý khi thi và cài đặt thực tế: `CHAR(n)` luôn chiếm đủ `n` ký tự (đệm khoảng trắng nếu ngắn hơn — hợp cho mã cố định như State `CHAR(2)`), còn `VARCHAR(n)` / `VARCHAR2(n)` chỉ tốn dung lượng theo độ dài thực tế; Oracle dùng `VARCHAR2` và `NUMBER`, còn MySQL dùng `VARCHAR` và `INT`/`DECIMAL`."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Quy trình tạo bảng (CREATE TABLE), Khóa chính/Khóa ngoại, Ràng buộc & MySQL",
+      "text": "7 bước tạo bảng chuẩn mực, cú pháp tổng quát CREATE TABLE (Figure 6-5), ví dụ đầy đủ cho công ty PVF bằng Oracle 12c (Figure 6-6), minh họa trong MySQL và phân tích chi tiết từng bước định nghĩa cột, khóa chính đơn/ghép, giá trị DEFAULT, ràng buộc CHECK và khóa ngoại.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 12–21"
+      },
+      "digest": {
+        "keyPoints": [
+          "7 bước tạo bảng: (1) chọn data type, (2) cột NOT NULL, (3) cột UNIQUE (candidate keys), (4) cặp Primary Key – Foreign Key, (5) giá trị DEFAULT, (6) ràng buộc miền giá trị (domain specifications / CHECK), (7) tạo bảng và các index liên quan.",
+          "Khóa chính (PK) không bao giờ được nhận giá trị NULL và có thể là khóa ghép (composite primary key) gồm nhiều cột như `PRIMARY KEY (OrderID, ProductID)` trong `OrderLine_T`.",
+          "Ràng buộc giá trị cột gồm `DEFAULT` (ví dụ `OrderDate DATE DEFAULT SYSDATE`) và `CHECK` (ví dụ `CHECK (ProductFinish IN ('Cherry', 'Natural Ash', ...))`).",
+          "Khóa ngoại (FK) của bảng phụ thuộc tham chiếu khóa chính của bảng cha qua `CONSTRAINT ... FOREIGN KEY (col) REFERENCES ParentTable(pk_col)`."
+        ],
+        "terms": [
+          {
+            "term": "Composite Primary Key",
+            "meaning": "Khóa chính được tạo thành từ nhiều thuộc tính (ví dụ OrderID và ProductID trong bảng OrderLine_T)."
+          },
+          {
+            "term": "Domain Constraint (CHECK)",
+            "meaning": "Ràng buộc giới hạn miền giá trị hợp lệ được phép nhập vào một cột."
+          }
+        ],
+        "pitfalls": [
+          "Khi tạo bảng có khóa ngoại (`Order_T` tham chiếu `Customer_T`, `OrderLine_T` tham chiếu `Order_T` và `Product_T`), BẮT BUỘC phải chạy lệnh tạo bảng cha (`Customer_T`, `Product_T`) trước bảng con, nếu không sẽ lỗi thiếu bảng tham chiếu.",
+          "Trong MySQL (Slide 16), nếu đặt tên bảng trùng từ khóa dành riêng của SQL như `order`, phải bọc tên bảng bằng dấu backtick (`` `dbs`.`order` ``), và dùng `AUTO_INCREMENT` cho khóa chính tự tăng."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "STEPS IN TABLE CREATION",
+          "bullets": [
+            "1. Identify data types for attributes",
+            "2. Identify columns that can and cannot be null",
+            "3. Identify columns that must be unique (candidate keys)",
+            "4. Identify primary key–foreign key mates",
+            "5. Determine default values",
+            "6. Identify constraints on columns (domain specifications)",
+            "7. Create the table and associated indexes"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "Đưa ra quy trình 7 bước có hệ thống để chuyển từ lược đồ quan hệ (Chương 4) và đặc tả vật lý (Chương 5) thành câu lệnh `CREATE TABLE` hoàn chỉnh.",
+            "Hãy nhớ đúng thứ tự logic trước khi gõ DDL: kiểu dữ liệu → `NOT NULL` → `UNIQUE` → cặp `PK–FK` → `DEFAULT` → `CHECK` → chạy `CREATE TABLE` và tạo `INDEX`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Figure 6-5 General syntax for CREATE TABLE statement used in data definition language",
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE tablename\n( {column definition    [table constraint] } . , .\n[ON COMMIT {DELETE | PRESERVE} ROWS] );\n\nwhere column definition ::=\ncolumn_name\n    {domain name | datatype [(size)] }\n    [column_constraint_clause. . .]\n    [default value]\n    [collate clause]\n\nand table constraint ::=\n    [CONSTRAINT constraint_name]\n    Constraint_type [constraint_attributes]"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Figure 6-5 trình bày cú pháp chuẩn (BNF) của `CREATE TABLE`: mỗi bảng gồm một hoặc nhiều cặp `column definition` và `table constraint` cách nhau bởi dấu phẩy.",
+            "Phân biệt hai vị trí đặt ràng buộc: **Column-level constraint** viết ngay trên dòng khai báo cột (như `NOT NULL` hoặc `CHECK`), còn **Table-level constraint** viết ở cuối danh sách cột với `CONSTRAINT tên_ràng_buộc` (bắt buộc khi khai báo khóa chính ghép nhiều cột hoặc muốn đặt tên rõ ràng cho PK/FK để dễ bảo trì/xóa ràng buộc sau này)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "THE FOLLOWING SLIDES CREATE TABLES FOR THIS ENTERPRISE DATA MODEL",
+          "paragraphs": [
+            "(from Chapter 1, Figure 1-3)"
+          ],
+          "diagramText": [
+            "CUSTOMER (Customer ID [PK], Customer Name) — Places / Is Placed By (1:M) —< ORDER (Order ID [PK], Customer ID, Order Date)",
+            "ORDER — Contains / Is Contained In (1:M) —< ORDER LINE (Quantity) >— Is For / Has (1:M) — PRODUCT (Product ID [PK], Standard Price)"
+          ],
+          "diagramNote": "Sơ đồ mô hình dữ liệu mẫu của Pine Valley Furniture Company (từ Chương 1, Figure 1-3) gồm 4 thực thể CUSTOMER, ORDER, ORDER LINE và PRODUCT làm cơ sở cho các lệnh CREATE TABLE ở các slide tiếp theo.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "Nhắc lại sơ đồ dữ liệu 4 bảng quen thuộc của công ty mẫu Pine Valley Furniture (PVF): `CUSTOMER`, `ORDER`, `ORDER LINE` và `PRODUCT`.",
+            "Dựa vào sơ đồ này có thể suy ngay thứ tự tạo bảng: `Customer_T` và `Product_T` không chứa khóa ngoại trỏ sang bảng khác trong nhóm này nên tạo trước; `Order_T` trỏ tới `Customer_T` nên tạo sau `Customer_T`; `OrderLine_T` trỏ tới cả `Order_T` và `Product_T` nên phải tạo cuối cùng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Figure 6-6 SQL database definition commands for PVF Company",
+          "paragraphs": [
+            "(Oracle 12c)",
+            "Overall table definitions"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Customer_T\n            (CustomerID         NUMBER(11,0)    NOT NULL,\n             CustomerName       VARCHAR2(25)    NOT NULL,\n             CustomerAddress    VARCHAR2(30),\n             CustomerCity       VARCHAR2(20),\n             CustomerState      CHAR(2),\n             CustomerPostalCode VARCHAR2(9),\nCONSTRAINT Customer_PK PRIMARY KEY (CustomerID));\n\nCREATE TABLE Order_T\n            (OrderID            NUMBER(11,0)    NOT NULL,\n             OrderDate          DATE DEFAULT SYSDATE,\n             CustomerID         NUMBER(11,0),\nCONSTRAINT Order_PK PRIMARY KEY (OrderID),\nCONSTRAINT Order_FK FOREIGN KEY (CustomerID) REFERENCES Customer_T(CustomerID));\n\nCREATE TABLE Product_T\n            (ProductID          NUMBER(11,0)    NOT NULL,\n             ProductDescription VARCHAR2(50),\n             ProductFinish      VARCHAR2(20)\n                  CHECK (ProductFinish IN ('Cherry', 'Natural Ash', 'White Ash',\n                                           'Red Oak', 'Natural Oak', 'Walnut')),\n             ProductStandardPrice DECIMAL(6,2),\n             ProductLineID      INTEGER,\nCONSTRAINT Product_PK PRIMARY KEY (ProductID));\n\nCREATE TABLE OrderLine_T\n            (OrderID            NUMBER(11,0)    NOT NULL,\n             ProductID          INTEGER         NOT NULL,\n             OrderedQuantity    NUMBER(11,0),\nCONSTRAINT OrderLine_PK PRIMARY KEY (OrderID, ProductID),\nCONSTRAINT OrderLine_FK1 FOREIGN KEY (OrderID) REFERENCES Order_T(OrderID),\nCONSTRAINT OrderLine_FK2 FOREIGN KEY (ProductID) REFERENCES Product_T(ProductID));"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "Figure 6-6 cung cấp trọn bộ 4 câu lệnh DDL (theo cú pháp Oracle 12c) tạo toàn bộ CSDL PVF Company: `Customer_T`, `Order_T`, `Product_T` và `OrderLine_T`.",
+            "Chú ý các điểm khác biệt giữa Oracle 12c trên slide và MySQL khi chạy thực hành: Oracle dùng `NUMBER(11,0)`, `VARCHAR2`, `SYSDATE`; trong MySQL cần đổi thành `INT` (hoặc `DECIMAL(11,0)`), `VARCHAR`, và `DEFAULT (CURRENT_DATE)` (hoặc `DATETIME DEFAULT CURRENT_TIMESTAMP`).",
+            "Cũng chú ý kiểu dữ liệu giữa cột khóa ngoại và khóa chính tham chiếu phải tương thích: ví dụ trong `OrderLine_T`, `OrderID` là `NUMBER(11,0)` khớp `Order_T(OrderID)` và `ProductID` là `INTEGER` khớp kiểu số nguyên."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "IN MYSQL",
+          "code": {
+            "lang": "sql",
+            "text": "-- SQL File 6*\ncreate table dbs.users (\n    id int auto_increment,\n    name varchar(25),\n\n    primary key(id)\n)\n\n-- SQL File 7*\nCREATE table `dbs`.`order` (\n    id int auto_increment,\n    order_date date,\n    user_id int,\n\n    PRIMARY KEY(id),\n    FOREIGN KEY(user_id) REFERENCES users(id)\n)"
+          },
+          "diagramNote": "Hai ảnh chụp cửa sổ soạn SQL trong MySQL Workbench minh họa cách tạo bảng users và bảng order trong schema dbs bằng cú pháp MySQL (dùng AUTO_INCREMENT và dấu backtick bao quanh tên bảng `order`).",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "Slide bổ sung thực tế của giảng viên minh họa viết DDL ngay trên **MySQL Workbench**: dùng `int auto_increment` để tự tăng khóa chính và `varchar(25)` thay vì `VARCHAR2` của Oracle.",
+            "Điểm bẫy thực hành cực kỳ quan trọng ở ảnh bên phải (`SQL File 7*`): bảng đặt tên là `order` — trùng với từ khóa `ORDER` (trong `ORDER BY`) của SQL! Vì vậy bắt buộc phải bọc trong cặp dấu backtick `` `dbs`.`order` ``, nếu viết `CREATE TABLE dbs.order` sẽ báo lỗi cú pháp ngay lập tức."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Defining attributes and their data types",
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Product_T\n            (ProductID          NUMBER(11,0)    NOT NULL,\n             ProductDescription VARCHAR2(50),\n             ProductFinish      VARCHAR2(20)\n                  CHECK (ProductFinish IN ('Cherry', 'Natural Ash', 'White Ash',\n                                           'Red Oak', 'Natural Oak', 'Walnut')),\n             ProductStandardPrice DECIMAL(6,2),\n             ProductLineID      INTEGER,\nCONSTRAINT Product_PK PRIMARY KEY (ProductID));"
+          },
+          "diagramNote": "Slide khoanh khung đỏ vùng khai báo tên cột và kiểu dữ liệu trong lệnh CREATE TABLE Product_T: NUMBER(11,0), VARCHAR2(50), VARCHAR2(20), DECIMAL(6,2), INTEGER.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "Tách riêng bước 1 trong quy trình tạo bảng trên ví dụ `Product_T`: chọn tên thuộc tính và kiểu dữ liệu phù hợp với bản chất dữ liệu.",
+            "Hiểu rõ ý nghĩa tham số `DECIMAL(6,2)`: tổng cộng tối đa **6 chữ số** trong đó có **2 chữ số sau dấu thập phân** (tức giá tối đa lưu được là `9999.99`, không phải 6 chữ số phần nguyên + 2 chữ số phần thập phân!). Đây là câu hỏi rất hay bẫy khi kiểm tra về kiểu số."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Non-nullable specification / Identifying primary key",
+          "paragraphs": [
+            "Non-nullable specification",
+            "Identifying primary key",
+            "Primary keys can never have NULL values"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Product_T\n            (ProductID          NUMBER(11,0)    NOT NULL,\n             ProductDescription VARCHAR2(50),\n             ProductFinish      VARCHAR2(20)\n                  CHECK (ProductFinish IN ('Cherry', 'Natural Ash', 'White Ash',\n                                           'Red Oak', 'Natural Oak', 'Walnut')),\n             ProductStandardPrice DECIMAL(6,2),\n             ProductLineID      INTEGER,\nCONSTRAINT Product_PK PRIMARY KEY (ProductID));"
+          },
+          "diagramNote": "Slide khoanh khung đỏ hai vị trí trong CREATE TABLE Product_T: `NOT NULL` trên cột ProductID và mệnh đề `CONSTRAINT Product_PK PRIMARY KEY (ProductID));`.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "Minh họa bước 2 (xác định cột `NOT NULL`) và bước 4 (xác định Primary Key) trên `Product_T`.",
+            "Theo quy tắc **Entity Integrity** (toàn vẹn thực thể từ Chương 4), khóa chính không bao giờ được phép mang giá trị `NULL`. Dù nhiều DBMS tự ngầm hiểu cột trong `PRIMARY KEY` là `NOT NULL`, việc khai báo tường minh `NOT NULL` giúp chuẩn hóa và rõ ràng ở mức thiết kế."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Non-nullable specifications / Primary key (Composite PK)",
+          "paragraphs": [
+            "Non-nullable specifications",
+            "Primary key",
+            "Some primary keys are composite–composed of multiple attributes"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE OrderLine_T\n            (OrderID            NUMBER(11,0)    NOT NULL,\n             ProductID          INTEGER         NOT NULL,\n             OrderedQuantity    NUMBER(11,0),\nCONSTRAINT OrderLine_PK PRIMARY KEY (OrderID, ProductID),\nCONSTRAINT OrderLine_FK1 FOREIGN KEY (OrderID) REFERENCES Order_T(OrderID),\nCONSTRAINT OrderLine_FK2 FOREIGN KEY (ProductID) REFERENCES Product_T(ProductID));"
+          },
+          "diagramNote": "Slide khoanh đỏ hai dòng NOT NULL (OrderID, ProductID) và dòng `CONSTRAINT OrderLine_PK PRIMARY KEY (OrderID, ProductID),`.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Minh họa **Composite Primary Key** (khóa chính ghép) trên bảng trung gian `OrderLine_T` (hiện thực hóa quan hệ M:N giữa `Order_T` và `Product_T`).",
+            "Cả hai cột thành phần (`OrderID` và `ProductID`) đều phải đánh dấu `NOT NULL`, và khi khai báo khóa chính ghép ta BẮT BUỘC phải viết dưới dạng table-level constraint `PRIMARY KEY (OrderID, ProductID)` chứ không thể gắn từ khóa `PRIMARY KEY` riêng lẻ trên từng dòng cột."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Controlling the values in attributes",
+          "paragraphs": [
+            "Default value",
+            "Domain constraint"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Order_T\n            (OrderID            NUMBER(11,0)    NOT NULL,\n             OrderDate          DATE DEFAULT SYSDATE,\n             CustomerID         NUMBER(11,0),\nCONSTRAINT Order_PK PRIMARY KEY (OrderID),\nCONSTRAINT Order_FK FOREIGN KEY (CustomerID) REFERENCES Customer_T(CustomerID));\n\nCREATE TABLE Product_T\n            (ProductID          NUMBER(11,0)    NOT NULL,\n             ProductDescription VARCHAR2(50),\n             ProductFinish      VARCHAR2(20)\n                  CHECK (ProductFinish IN ('Cherry', 'Natural Ash', 'White Ash',\n                                           'Red Oak', 'Natural Oak', 'Walnut')),\n             ProductStandardPrice DECIMAL(6,2),\n             ProductLineID      INTEGER,\nCONSTRAINT Product_PK PRIMARY KEY (ProductID));"
+          },
+          "diagramNote": "Slide khoanh khung đỏ `DATE DEFAULT SYSDATE,` (Default value) trong Order_T và `CHECK (ProductFinish IN (...))` (Domain constraint) trong Product_T.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 20"
+          },
+          "explanation": [
+            "Minh họa bước 5 (`DEFAULT`) và bước 6 (`CHECK`) nhằm kiểm soát giá trị hợp lệ ở cấp độ thuộc tính.",
+            "`DATE DEFAULT SYSDATE` tự động điền ngày hệ thống hiện tại nếu lệnh `INSERT` bỏ qua cột `OrderDate`; còn `CHECK (ProductFinish IN (...))` đảm bảo người dùng chỉ nhập được một trong 6 loại màu gỗ quy định (lưu ý: các bản MySQL cũ trước 8.0.16 phân tích cú pháp `CHECK` nhưng bỏ qua không thực thi, từ MySQL 8.0.16 trở đi mới bắt buộc kiểm tra `CHECK`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Identifying foreign keys and establishing relationships",
+          "paragraphs": [
+            "Primary key of parent table",
+            "Foreign key of dependent table"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Customer_T\n            (CustomerID         NUMBER(11,0)    NOT NULL,\n             CustomerName       VARCHAR2(25)    NOT NULL,\n             CustomerAddress    VARCHAR2(30),\n             CustomerCity       VARCHAR2(20),\n             CustomerState      CHAR(2),\n             CustomerPostalCode VARCHAR2(9),\nCONSTRAINT Customer_PK PRIMARY KEY (CustomerID));\n\nCREATE TABLE Order_T\n            (OrderID            NUMBER(11,0)    NOT NULL,\n             OrderDate          DATE DEFAULT SYSDATE,\n             CustomerID         NUMBER(11,0),\nCONSTRAINT Order_PK PRIMARY KEY (OrderID),\nCONSTRAINT Order_FK FOREIGN KEY (CustomerID) REFERENCES Customer_T(CustomerID));"
+          },
+          "diagramNote": "Slide khoanh khung đỏ phần định nghĩa CustomerID làm PK trong bảng cha `Customer_T` và mệnh đề `CONSTRAINT Order_FK FOREIGN KEY (CustomerID) REFERENCES Customer_T(CustomerID));` trong bảng phụ thuộc `Order_T`.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 21"
+          },
+          "explanation": [
+            "Minh họa bước 4: thiết lập liên kết 1:M bằng cặp **Primary key của bảng cha** (`Customer_T.CustomerID`) và **Foreign key của bảng phụ thuộc** (`Order_T.CustomerID`).",
+            "Lưu ý: cột `CustomerID` trong `Order_T` phải có cùng kiểu dữ liệu với cột `CustomerID` trong `Customer_T` (`NUMBER(11,0)`), nhưng không bắt buộc cùng tên cột và không nhất thiết phải `NOT NULL` (nếu quan hệ là optional từ phía đơn hàng, FK có thể nhận `NULL`)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Toàn vẹn tham chiếu (Referential Integrity), ALTER/DROP TABLE & Lệnh DML cập nhật dữ liệu",
+      "text": "Khái niệm toàn vẹn tham chiếu và 4 hành động xử lý cập nhật/xóa (RESTRICT, CASCADE, SET NULL, SET DEFAULT), thay đổi/xóa cấu trúc bảng (ALTER TABLE, DROP TABLE), cột IDENTITY (SQL:2008), các lệnh DML (INSERT, DELETE, UPDATE) và tạo INDEX tối ưu truy cập.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 22–30"
+      },
+      "digest": {
+        "keyPoints": [
+          "Referential integrity đảm bảo giá trị FK ở bảng con phải khớp với một giá trị PK hiện có ở bảng cha (trong quan hệ 1:M), bằng cách kiểm soát: xóa bản ghi cha, cập nhật PK bản ghi cha và chèn bản ghi con.",
+          "4 quy tắc hành xử khi cập nhật/xóa ở bảng cha (Figure 6-7): `RESTRICT` (cấm nếu đang có bản ghi con), `CASCADE` (lan truyền thay đổi/xóa sang bảng con), `SET NULL` (đổi FK bảng con thành NULL), `SET DEFAULT` (đổi FK bảng con về giá trị mặc định đã định nghĩa).",
+          "`ALTER TABLE` dùng để thêm/sửa/xóa cột hoặc thêm constraint; `DROP TABLE` xóa hẳn bảng khỏi schema.",
+          "DML cập nhật dữ liệu gồm `INSERT INTO` (nhập đủ cột, nhập danh sách cột chỉ định, hoặc `INSERT ... SELECT`), `DELETE FROM ... [WHERE]` và `UPDATE ... SET ... [WHERE]`.",
+          "`CREATE INDEX` tăng tốc truy cập ngẫu nhiên và tuần tự trên bảng gốc."
+        ],
+        "terms": [
+          {
+            "term": "Referential Integrity",
+            "meaning": "Ràng buộc đảm bảo giá trị khóa ngoại (FK) của bảng con phải khớp với giá trị khóa chính (PK) của bảng liên quan trong quan hệ 1:M (hoặc NULL nếu cho phép)."
+          },
+          {
+            "term": "GENERATED ALWAYS AS IDENTITY",
+            "meaning": "Cú pháp chuẩn SQL:2008 tạo cột tự sinh số định danh duy nhất (START WITH, INCREMENT BY, MINVALUE, MAXVALUE, NO CYCLE)."
+          }
+        ],
+        "pitfalls": [
+          "Quên mệnh đề `WHERE` trong `DELETE FROM Customer_T;` hoặc `UPDATE Product_T SET ...;` sẽ xóa hoặc sửa TOÀN BỘ các dòng trong bảng!",
+          "Trong `Figure 6-7` (Slide 23), sách đặt `ON UPDATE RESTRICT/CASCADE/...` minh họa ngay dưới khối `CustomerT` dù theo SQL chuẩn các mệnh đề `ON DELETE`/`ON UPDATE` phải gắn vào định nghĩa `FOREIGN KEY` ở bảng con (`Order_T`). Cần nắm đúng bản chất SQL chuẩn khi viết code thật.",
+          "Cẩn thận giữa `DROP TABLE` (DDL — xóa luôn định nghĩa bảng và dữ liệu) và `DELETE FROM` (DML — chỉ xóa các hàng dữ liệu, cấu trúc bảng vẫn còn)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "DATA INTEGRITY CONTROLS",
+          "bullets": [
+            "Referential integrity–constraint that ensures that foreign key values of a table must match primary key values of a related table in 1:M relationships",
+            {
+              "text": "Restricting:",
+              "subBullets": [
+                "Deletes of primary records",
+                "Updates of primary records",
+                "Inserts of dependent records"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 22"
+          },
+          "explanation": [
+            "Nêu rõ 3 tình huống có thể làm hỏng toàn vẹn tham chiếu mà DBMS phải kiểm soát chặt: (1) Xóa bản ghi cha đang được bản ghi con tham chiếu, (2) Sửa giá trị PK của bản ghi cha, và (3) Thêm mới (hoặc sửa FK) bản ghi con với giá trị FK không tồn tại ở bảng cha.",
+            "Với tình huống thứ 3 (chèn bản ghi con có FK mồ côi), DBMS luôn từ chối (trừ khi FK là `NULL` và cột đó cho phép `NULL`). Còn với tình huống 1 & 2, ta có 4 lựa chọn xử lý ở Slide 23."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Figure 6-7 Ensuring data integrity through updates",
+          "paragraphs": [
+            "Restricted Update: A customer ID can only be deleted if it is not found in ORDER table.",
+            "Cascaded Update: Changing a customer ID in the CUSTOMER table will result in that value changing in the ORDER table to match.",
+            "Set Null Update: When a customer ID is changed, any customer ID in the ORDER table that matches the old customer ID is set to NULL.",
+            "Set Default Update: When a customer ID is changed, any customer ID in the ORDER tables that matches the old customer ID is set to a predefined default value.",
+            "Relational integrity is enforced via the primary-key to foreign-key match"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE CustomerT\n            (CustomerID         INTEGER DEFAULT '999'   NOT NULL,\n             CustomerName       VARCHAR(40)             NOT NULL,\n             ...\nCONSTRAINT Customer_PK PRIMARY KEY (CustomerID),\nON UPDATE RESTRICT);\n\n... ON UPDATE CASCADE);\n... ON UPDATE SET NULL);\n... ON UPDATE SET DEFAULT);"
+          },
+          "diagramText": [
+            "CUSTOMER (PK=CustomerID) ——< ORDER (FK=CustomerID)"
+          ],
+          "diagramNote": "Sơ đồ Figure 6-7 minh họa quan hệ 1:M giữa CUSTOMER và ORDER cùng 4 chế độ ràng buộc ON UPDATE: RESTRICT, CASCADE, SET NULL và SET DEFAULT.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 23"
+          },
+          "explanation": [
+            "Nắm chắc 4 hành động tham chiếu: `RESTRICT` (chặn thao tác nếu có bản ghi con), `CASCADE` (tự động cập nhật/xóa dây chuyền sang bảng con), `SET NULL` (gán FK bảng con thành `NULL` — chỉ dùng được nếu cột FK không đặt `NOT NULL`), và `SET DEFAULT` (gán FK bảng con về giá trị `DEFAULT` định sẵn).",
+            "Lưu ý phản biện kỹ thuật về slide: hình vẽ trong sách viết minh họa hơi thiếu chính xác khi đặt `ON UPDATE RESTRICT` ở bảng `CustomerT` (và viết `CustomerT` thiếu dấu `_`, `DEFAULT '999'` là chuỗi cho cột `INTEGER`). Trong SQL chuẩn thực tế, mệnh đề `ON UPDATE` / `ON DELETE` luôn gắn ngay sau `FOREIGN KEY (...) REFERENCES ...` ở bảng con (`Order_T`), và Oracle không hỗ trợ `ON UPDATE CASCADE` trực tiếp như MySQL/SQL Server."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "CHANGING TABLES",
+          "bullets": [
+            "ALTER TABLE statement allows you to change column specifications:",
+            {
+              "text": "Table Actions:",
+              "subBullets": [
+                "ADD [COLUMN] column_definition",
+                "ALTER [COLUMN] column_name SET DEFAULT default-value",
+                "ALTER [COLUMN] column_name DROP DEFAULT",
+                "DROP [COLUMN] column_name [RESTRICT] [CASCADE]",
+                "ADD table_constraint"
+              ]
+            },
+            "Example (adding a new column with a default value):"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "ALTER TABLE table_name alter_table_action;\n\n-- Example:\nALTER TABLE CUSTOMER_T\nADD COLUMN CustomerType VARCHAR2 (10) DEFAULT \"Commercial\";"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 24"
+          },
+          "explanation": [
+            "`ALTER TABLE` là lệnh DDL cho phép chỉnh sửa cấu trúc bảng đã tồn tại mà không cần xóa tạo lại: thêm cột (`ADD [COLUMN]`), đặt/gỡ giá trị mặc định (`SET DEFAULT` / `DROP DEFAULT`), xóa cột (`DROP [COLUMN]`), hoặc bổ sung ràng buộc (`ADD table_constraint`).",
+            "Chú ý tiểu tiết cú pháp trong ví dụ trên slide: slide dùng dấu ngoặc kép `\"Commercial\"` và `VARCHAR2 (10)`. Trong ANSI SQL và Oracle chuẩn, hằng chuỗi ký tự phải dùng dấu nháy đơn `'Commercial'` (trong MySQL mặc định cũng nên dùng `'Commercial'`; còn Oracle dùng `ADD CustomerType ...` không có từ khóa `COLUMN`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "REMOVING TABLES",
+          "bullets": [
+            "DROP TABLE statement allows you to remove tables from your schema:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "DROP TABLE CUSTOMER_T"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 25"
+          },
+          "explanation": [
+            "`DROP TABLE` là lệnh DDL xóa hoàn toàn định nghĩa bảng cùng toàn bộ dữ liệu, index và ràng buộc gắn với bảng đó khỏi schema.",
+            "Cảnh báo hay thi: nếu bảng khác (ví dụ `Order_T`) đang có khóa ngoại trỏ tới `Customer_T`, lệnh `DROP TABLE Customer_T` sẽ bị DBMS chặn lỗi toàn vẹn tham chiếu trừ khi xóa bảng con trước hoặc dùng tùy chọn `CASCADE CONSTRAINTS` (Oracle)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "INSERT STATEMENT",
+          "bullets": [
+            "Adds one or more rows to a table",
+            "Inserting into a table",
+            "Inserting a record that has some null attributes requires identifying the fields that actually get data",
+            "Inserting from another table"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Inserting into a table\nINSERT INTO Customer_T VALUES\n(001, 'Contemporary Casuals', '1355 S. Himes Blvd.', 'Gainesville', 'FL', 32601);\n\n-- Inserting a record that has some null attributes\nINSERT INTO Product_T (ProductID,\nProductDescription, ProductFinish, ProductStandardPrice)\n    VALUES (1, 'End Table', 'Cherry', 175, 8);\n\n-- Inserting from another table\nINSERT INTO CaCustomer_T\nSELECT * FROM Customer_T\n    WHERE CustomerState = 'CA';"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 26"
+          },
+          "explanation": [
+            "Trình bày 3 dạng `INSERT` kinh điển: (1) Không liệt kê cột (phải truyền đủ mọi cột theo đúng thứ tự định nghĩa bảng), (2) Liệt kê tường minh danh sách cột cần điền (các cột bị bỏ qua sẽ nhận `DEFAULT` hoặc `NULL`), và (3) Chèn hàng loạt từ kết quả `SELECT` của bảng khác (`INSERT INTO ... SELECT ...`).",
+            "Bẫy quan sát cực tinh ở ví dụ thứ 2 trên slide: danh sách cột liệt kê **4 cột** `(ProductID, ProductDescription, ProductFinish, ProductStandardPrice)`, nhưng phần `VALUES (1, 'End Table', 'Cherry', 175, 8)` lại truyền tới **5 giá trị** (dư số `8` — vốn là `ProductLineID`)! Khi chạy thật trong DBMS, lệch số lượng cột và giá trị sẽ gây lỗi `ORA-00913: too many values` / `Column count doesn't match value count`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "CREATING TABLES WITH IDENTITY COLUMNS",
+          "paragraphs": [
+            "Introduced with SQL:2008",
+            "Inserting into a table does not require explicit customer ID entry or field list"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE TABLE Customer_T\n(CustomerID INTEGER GENERATED ALWAYS AS IDENTITY\n    (START WITH 1\n     INCREMENT BY 1\n     MINVALUE 1\n     MAXVALUE 10000\n     NO CYCLE),\nCustomerName        VARCHAR2(25) NOT NULL,\nCustomerAddress     VARCHAR2(30),\nCustomerCity        VARCHAR2(20),\nCustomerState       CHAR(2),\nCustomerPostalCode  VARCHAR2(9),\nCONSTRAINT Customer_PK PRIMARY KEY (CustomerID));\n\nINSERT INTO CUSTOMER_T VALUES ( 'Contemporary Casuals',\n'1355 S. Himes Blvd.', 'Gainesville', 'FL', 32601);"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 27"
+          },
+          "explanation": [
+            "Giới thiệu tính năng **Identity Column** được bổ sung từ chuẩn **SQL:2008** (`GENERATED ALWAYS AS IDENTITY`), cho phép DBMS tự động cấp phát số nguyên tăng dần (`START WITH 1`, `INCREMENT BY 1`, giới hạn `MINVALUE`/`MAXVALUE`, không quay vòng `NO CYCLE`).",
+            "Lưu ý cú pháp thực tế: khi dùng `GENERATED ALWAYS AS IDENTITY` và muốn bỏ qua cột `CustomerID` lúc `INSERT`, trên nhiều DBMS (như Oracle/PostgreSQL/SQL Server) nếu viết `INSERT INTO table VALUES (...)` không liệt kê danh sách cột thì vẫn phải truyền đủ số cột (hoặc dùng từ khóa `DEFAULT`), nên cách an toàn nhất là luôn ghi rõ danh sách cột `INSERT INTO CUSTOMER_T (CustomerName, ...) VALUES (...)`. Trong MySQL, tính năng tương đương là `AUTO_INCREMENT`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "DELETE STATEMENT",
+          "bullets": [
+            "Removes rows from a table",
+            {
+              "text": "Delete certain rows",
+              "subBullets": [
+                "DELETE FROM CUSTOMER_T WHERE CUSTOMERSTATE = 'HI';"
+              ]
+            },
+            {
+              "text": "Delete all rows",
+              "subBullets": [
+                "DELETE FROM CUSTOMER_T;"
+              ]
+            }
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Delete certain rows\nDELETE FROM CUSTOMER_T WHERE CUSTOMERSTATE = 'HI';\n\n-- Delete all rows\nDELETE FROM CUSTOMER_T;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 28"
+          },
+          "explanation": [
+            "Lệnh `DELETE FROM` thuộc nhóm DML dùng để xóa các hàng thỏa điều kiện `WHERE`. Nếu bỏ mệnh đề `WHERE`, toàn bộ các dòng trong bảng sẽ bị xóa sạch (nhưng cấu trúc bảng và index vẫn tồn tại).",
+            "So sánh câu hay thi: `DELETE FROM table;` (DML — xóa từng hàng, ghi log, có thể `ROLLBACK` trong transaction, kích hoạt trigger `ON DELETE`) khác với `DROP TABLE table;` (DDL — xóa bay luôn bảng) và `TRUNCATE TABLE table;` (DDL — làm rỗng bảng nhanh)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "UPDATE STATEMENT",
+          "bullets": [
+            "Modifies data in existing rows"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "UPDATE Product_T\nSET ProductStandardPrice = 775\n    WHERE ProductID = 7;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 29"
+          },
+          "explanation": [
+            "Lệnh `UPDATE` sửa giá trị của một hoặc nhiều cột trên các bản ghi đã tồn tại thỏa mãn điều kiện `WHERE`.",
+            "Cẩn thận khi thi: nếu quên `WHERE ProductID = 7`, toàn bộ sản phẩm trong `Product_T` sẽ bị đổi giá thành `775`! Ngoài ra giá trị mới vẫn phải vượt qua mọi ràng buộc trên cột (`NOT NULL`, `CHECK`, `FOREIGN KEY`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "SCHEMA DEFINITION",
+          "bullets": [
+            {
+              "text": "Control processing/storage efficiency:",
+              "subBullets": [
+                "Choice of indexes",
+                "File organizations for base tables",
+                "File organizations for indexes",
+                "Data clustering",
+                "Statistics maintenance"
+              ]
+            },
+            {
+              "text": "Creating indexes",
+              "subBullets": [
+                "Speed up random/sequential access to base table data",
+                "Example: CREATE INDEX NAME_IDX ON CUSTOMER_T(CUSTOMERNAME) — This makes an index for the CUSTOMERNAME field of the CUSTOMER_T table"
+              ]
+            }
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE INDEX NAME_IDX ON CUSTOMER_T(CUSTOMERNAME)"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 30"
+          },
+          "explanation": [
+            "Kết nối lại với Chương 5 (Thiết kế vật lý): ở cấp độ định nghĩa schema, người quản trị kiểm soát hiệu năng xử lý/lưu trữ qua 5 yếu tố: lựa chọn index, tổ chức file cho bảng gốc, tổ chức file cho index, data clustering và duy trì thống kê (statistics) cho query optimizer.",
+            "Lệnh `CREATE INDEX NAME_IDX ON CUSTOMER_T(CUSTOMERNAME)` tạo chỉ mục phụ trên cột `CUSTOMERNAME` để tăng tốc truy vấn tìm kiếm hoặc sắp xếp theo tên khách hàng, nhưng đổi lại làm tốn thêm dung lượng và hơi chậm đi khi `INSERT`/`UPDATE`/`DELETE`."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Truy vấn SELECT đơn bảng, Thứ tự xử lý logic, Alias & Hàm tổng hợp",
+      "text": "Cấu trúc 6 mệnh đề của câu lệnh SELECT (Figure 6-2), thứ tự xử lý logic (Figure 6-10), toán tử so sánh (Table 6-3), đặt tên bí danh (Alias) và dùng hàm tổng hợp (Aggregate Function COUNT).",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 31–35"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thứ tự viết (cú pháp) 6 mệnh đề SELECT: `SELECT` → `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `ORDER BY`.",
+          "Thứ tự thực thi logic (Figure 6-10): `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY`.",
+          "Các toán tử so sánh SQL (Table 6-3): `=`, `>`, `>=`, `<`, `<=`, `<>`, `!=`.",
+          "Khi `SELECT` có hàm tổng hợp (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), mọi cột đơn trị (single-valued) xuất hiện trong `SELECT` đều phải có mặt trong `GROUP BY`."
+        ],
+        "terms": [
+          {
+            "term": "Alias",
+            "meaning": "Tên thay thế (bí danh) cho cột hoặc bảng trong câu truy vấn (ví dụ CUSTOMER_V CUST hoặc CUSTOMERNAME AS NAME)."
+          },
+          {
+            "term": "Aggregate Function",
+            "meaning": "Hàm tính toán tổng hợp trên một tập nhiều hàng (như COUNT, SUM, AVG, MIN, MAX)."
+          }
+        ],
+        "pitfalls": [
+          "ĐÂY LÀ BẪY KINH ĐIỂN TRÊN SLIDE 34: vì `WHERE` chạy TRƯỚC `SELECT` theo Figure 6-10, nên trong SQL chuẩn/Oracle/MySQL **không được phép** dùng column alias đặt ở `SELECT` (như `AS NAME`) ngay trong mệnh đề `WHERE NAME = ...` (chỉ được dùng trong `ORDER BY` vốn chạy sau `SELECT`).",
+          "Trong `SELECT COUNT(*), ProductID FROM OrderLine_T`, thiếu `GROUP BY ProductID` sẽ báo lỗi vì trộn cột đơn trị với hàm tổng hợp."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "SELECT STATEMENT",
+          "bullets": [
+            "Used for queries on single or multiple tables",
+            {
+              "text": "Clauses of the SELECT statement:",
+              "subBullets": [
+                "SELECT: List the columns (and expressions) to be returned from the query",
+                "FROM: Indicate the table(s) or view(s) from which data will be obtained",
+                "WHERE: Indicate the conditions under which a row will be included in the result",
+                "GROUP BY: Indicate categorization of results",
+                "HAVING: Indicate the conditions under which a category (group) will be included",
+                "ORDER BY: Sorts the result according to specified criteria"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 31"
+          },
+          "explanation": [
+            "Giới thiệu vai trò chính xác của từng mệnh đề trong 6 mệnh đề chuẩn của `SELECT`.",
+            "Cần ghi nhớ rành mạch: `WHERE` lọc trên **từng hàng (row)** trước khi gom nhóm, còn `HAVING` lọc trên **từng nhóm/danh mục (category/group)** sau khi `GROUP BY` đã chạy."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "Figure 6-2 General syntax & Figure 6-10 SQL statement processing order",
+          "paragraphs": [
+            "Figure 6-2 General syntax of the SELECT statement used in DML",
+            "Figure 6-10 SQL statement processing order (based on van der Lans, 2006 p.100)"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT [ALL/DISTINCT] column_list\nFROM table_list\n[WHERE conditional expression]\n[GROUP BY group_by_column_list]\n[HAVING conditional expression]\n[ORDER BY order_by_column_list]"
+          },
+          "diagramText": [
+            "FROM (Identifies involved tables)",
+            "  ↓ (hoặc đi tắt tới GROUP BY nếu không có WHERE)",
+            "WHERE (Finds all rows meeting stated condition(s))",
+            "  ↓ (hoặc đi tắt tới SELECT nếu không có GROUP BY)",
+            "GROUP BY (Organizes rows according to values in stated column(s))",
+            "  ↓ (hoặc đi tắt tới SELECT nếu không có HAVING)",
+            "HAVING (Finds all groups meeting stated condition(s))",
+            "  ↓",
+            "SELECT (Identifies columns)",
+            "  ↓ (hoặc đi tắt tới results nếu không có ORDER BY)",
+            "ORDER BY (Sorts rows)",
+            "  ↓",
+            "results"
+          ],
+          "diagramNote": "Sơ đồ Figure 6-10 mô tả thứ tự xử lý logic của câu lệnh SELECT: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → results (với các nhánh bỏ qua đối với những mệnh đề tùy chọn không có mặt).",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 32"
+          },
+          "explanation": [
+            "Đây là slide QUAN TRỌNG BẬC NHẤT của Chương 6 khi thi lý thuyết lẫn viết SQL thực tế: phân biệt thứ tự viết cú pháp (`SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY`) với thứ tự xử lý logic của DBMS (`FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY`).",
+            "Từ sơ đồ Figure 6-10 suy ra ngay 3 hệ quả vàng: (1) Table alias định nghĩa ở `FROM` dùng được ở mọi bước sau (`WHERE`, `SELECT`, ...); (2) Column alias định nghĩa ở `SELECT` KHÔNG dùng được ở `WHERE`, `GROUP BY`, `HAVING` theo chuẩn ANSI SQL, mà chỉ dùng được ở `ORDER BY`; (3) Lọc hàng ở `WHERE` trước giúp giảm số dòng cần gom nhóm ở `GROUP BY`, tăng tốc truy vấn đáng kể."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "SELECT EXAMPLE",
+          "bullets": [
+            "Find products with standard price less than $275"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductDescription, ProductStandardPrice\n  FROM Product_T\n    WHERE ProductStandardPrice < 275;"
+          },
+          "table": {
+            "caption": "TABLE 6-3 Comparison Operators in SQL",
+            "headers": [
+              "Operator",
+              "Meaning"
+            ],
+            "rows": [
+              [
+                "=",
+                "Equal to"
+              ],
+              [
+                ">",
+                "Greater than"
+              ],
+              [
+                ">=",
+                "Greater than or equal to"
+              ],
+              [
+                "<",
+                "Less than"
+              ],
+              [
+                "<=",
+                "Less than or equal to"
+              ],
+              [
+                "<>",
+                "Not equal to"
+              ],
+              [
+                "!=",
+                "Not equal to"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 33"
+          },
+          "explanation": [
+            "Ví dụ truy vấn đơn bảng cơ bản kết hợp `SELECT`, `FROM`, `WHERE` cùng Table 6-3 liệt kê 7 toán tử so sánh trong SQL.",
+            "Lưu ý ôn thi: toán tử \"khác\" chuẩn ANSI SQL là `<>` (được hỗ trợ ở mọi DBMS), còn `!=` là biến thể phổ biến nhưng không phải chuẩn ANSI ban đầu; phép so sánh bằng là dấu `=` đơn (KHÔNG phải `==`), và để kiểm tra giá trị rỗng phải dùng `IS NULL` / `IS NOT NULL` chứ không dùng `= NULL` hay `<> NULL`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "SELECT EXAMPLE USING ALIAS",
+          "bullets": [
+            "Alias is an alternative column or table name"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CUST.CUSTOMERNAME AS\n  NAME, CUST.CUSTOMERADDRESS\nFROM CUSTOMER_V CUST\n  WHERE NAME = 'Home Furnishings';"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 34"
+          },
+          "explanation": [
+            "Giới thiệu 2 loại bí danh (Alias): **Table alias** (`CUSTOMER_V CUST` — chú ý trong Oracle không viết chữ `AS` cho table alias, chỉ viết khoảng trắng) và **Column alias** (`CUST.CUSTOMERNAME AS NAME`).",
+            "CẢNH BÁO LỖI KINH ĐIỂN TRÊN SLIDE NÀY: câu lệnh trên slide viết `WHERE NAME = 'Home Furnishings';` — dùng alias cột `NAME` ngay trong `WHERE`. Vì `WHERE` chạy trước `SELECT` (Slide 32), cả Oracle, SQL Server và MySQL đều báo lỗi `invalid identifier` / `Unknown column 'NAME' in 'where clause'`! Để chạy đúng, phải viết `WHERE CUST.CUSTOMERNAME = 'Home Furnishings';`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "SELECT EXAMPLE USING A FUNCTION",
+          "bullets": [
+            "Using the COUNT aggregate function to find totals"
+          ],
+          "paragraphs": [
+            "Note: With aggregate functions you can’t have single-valued columns included in the SELECT clause, unless they are included in the GROUP BY clause."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT COUNT(*) FROM ORDERLINE_T\n  WHERE ORDERID = 1004;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 35"
+          },
+          "explanation": [
+            "Minh họa hàm tổng hợp `COUNT(*)` để đếm số dòng đơn hàng thuộc đơn `1004` (trả về một con số duy nhất — gọi là scalar aggregate ở Slide 41).",
+            "Ghi nhớ quy tắc ở phần `Note`: trong SQL chuẩn, không thể trộn cột đơn trị (ví dụ `ProductID`) cùng với hàm tổng hợp (ví dụ `COUNT(*)`) trong `SELECT`, trừ khi cột đơn trị đó được đưa vào `GROUP BY` (vì khi gom nhiều dòng thành 1 kết quả tổng hợp, DBMS không biết lấy giá trị riêng lẻ nào nếu không có nhóm)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Toán tử Boolean (NOT/AND/OR), Dấu ngoặc, ORDER BY, GROUP BY & HAVING",
+      "text": "Kết hợp điều kiện logic NOT, AND, OR và phép so sánh chuỗi LIKE với ký tự đại diện %, minh họa thứ tự ưu tiên mặc định (Figure 6-8) và khi có ngoặc (Figure 6-9), sắp xếp ORDER BY, toán tử IN, phân nhóm GROUP BY (Scalar vs Vector aggregate), lọc nhóm HAVING và ví dụ đầy đủ kết hợp WHERE + HAVING.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 36–43"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thứ tự ưu tiên mặc định của toán tử Boolean: `NOT` trước → rồi `AND` → cuối cùng mới đến `OR`. Dùng dấu ngoặc đơn `( ... )` để thay đổi thứ tự.",
+          "`LIKE` dùng wildcard `%` (đại diện chuỗi 0 hoặc nhiều ký tự bất kỳ) và `_` (đại diện đúng 1 ký tự); `IN (...)` kiểm tra thuộc danh sách, hiệu quả và gọn hơn nhiều phép `OR` nối tiếp.",
+          "`ORDER BY col1, col2` sắp xếp theo `col1` trước, nếu trùng giá trị mới sắp theo `col2` (mặc định `ASC`, dùng `DESC` để giảm dần).",
+          "Scalar aggregate trả về 1 giá trị duy nhất cho cả bảng; Vector aggregate dùng `GROUP BY` để trả về nhiều giá trị theo từng nhóm.",
+          "Khác biệt cốt lõi: `WHERE` lọc từng **hàng** trước `GROUP BY` (không chứa hàm tổng hợp); `HAVING` lọc từng **nhóm** sau `GROUP BY` (chứa điều kiện trên hàm tổng hợp)."
+        ],
+        "terms": [
+          {
+            "term": "Scalar vs Vector Aggregate",
+            "meaning": "Scalar aggregate: hàm tổng hợp trả về một giá trị duy nhất; Vector aggregate: hàm tổng hợp đi kèm GROUP BY trả về nhiều giá trị theo từng nhóm."
+          },
+          {
+            "term": "HAVING",
+            "meaning": "Mệnh đề lọc các nhóm (categories) sau khi đã thực hiện GROUP BY."
+          }
+        ],
+        "pitfalls": [
+          "Biểu thức `A LIKE '%Desk' OR B LIKE '%Table' AND Price > 300` (không ngoặc) được hiểu là `A LIKE '%Desk' OR (B LIKE '%Table' AND Price > 300)` → trả về TẤT CẢ các bàn Desk bất kể giá, hợp với các Table có giá > 300!",
+          "Trong ví dụ Slide 43, `White Ash` có trung bình đúng bằng `750.00` bị loại vì điều kiện là `HAVING AVG(ProductStandardPrice) < 750` (nhỏ hơn hẳn, không phải `<=`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "SELECT EXAMPLE–BOOLEAN OPERATORS",
+          "bullets": [
+            "AND, OR, and NOT Operators for customizing conditions in WHERE clause"
+          ],
+          "paragraphs": [
+            "Note: The LIKE operator allows you to compare strings using wildcards. For example, the % wildcard in ‘%Desk’ indicates that all strings that have any number of characters preceding the word “Desk” will be allowed."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductDescription, ProductFinish, ProductStandardPrice\n  FROM Product_T\n    WHERE ProductDescription LIKE '%Desk'\n      OR ProductDescription LIKE '%Table'\n      AND ProductStandardPrice > 300;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 36"
+          },
+          "explanation": [
+            "Minh họa phép so sánh mẫu chuỗi `LIKE '%Desk'` (tất cả chuỗi kết thúc bằng `Desk`) kết hợp các toán tử logic `OR` và `AND` trong `WHERE`.",
+            "Lưu ý kỹ câu truy vấn này KHÔNG có dấu ngoặc đơn quanh phần `OR` — hãy đoán xem nó trả về sản phẩm nào trước khi sang Slide 37! Ngoài `%` (0..n ký tự), SQL chuẩn còn có wildcard `_` (đại diện đúng 1 ký tự)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "Figure 6-8 Boolean query A without use of parentheses",
+          "paragraphs": [
+            "By default, processing order of Boolean operators is NOT, then AND, then OR"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductDescription, ProductFinish, ProductStandardPrice\n  FROM Product_T\n    WHERE ProductDescription LIKE '%Desk'\n      OR ProductDescription LIKE '%Table'\n      AND ProductStandardPrice > 300;"
+          },
+          "diagramText": [
+            "Step 1 (Process AND): WHERE ProductDescription LIKE '%Table' AND StandardPrice > $300  [giao của vòng tròn All Tables và Products with Standard Price > $300]",
+            "Step 2 (Process OR): WHERE ProductDescription LIKE '%Desk'  [toàn bộ vòng tròn All Desks]",
+            "Step 3: Final result is the union (OR) of these two areas  [tất cả Desk mọi giá + các Table giá > $300]"
+          ],
+          "diagramNote": "Biểu đồ Venn Figure 6-8 giải thích trực quan kết quả khi không dùng ngoặc: phép AND giữa Table và Price > $300 được thực hiện trước ở Bước 1, rồi mới hợp (OR) với toàn bộ tập All Desks ở Bước 2.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 37"
+          },
+          "explanation": [
+            "Đây là câu hỏi thi kinh điển về độ ưu tiên toán tử Boolean: **NOT → AND → OR**.",
+            "Do `AND` có độ ưu tiên cao hơn `OR`, hệ thống tính `(ProductDescription LIKE '%Table' AND ProductStandardPrice > 300)` trước, rồi mới `OR` với `ProductDescription LIKE '%Desk'`. Kết quả bị lọt vào cả những chiếc bàn Desk có giá ≤ $300 dù người viết thường muốn tìm Desk hoặc Table đều phải có giá > $300!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "SELECT EXAMPLE–BOOLEAN OPERATORS (With parentheses)",
+          "bullets": [
+            "With parentheses…these override the normal precedence of Boolean operators"
+          ],
+          "paragraphs": [
+            "With parentheses, you can override normal precedence rules. In this case parentheses make the OR take place before the AND."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductDescription, ProductFinish, ProductStandardPrice\n  FROM Product_T;\n  WHERE (ProductDescription LIKE '%Desk'\n    OR ProductDescription LIKE '%Table')\n  AND ProductStandardPrice > 300;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 38"
+          },
+          "explanation": [
+            "Thêm cặp dấu ngoặc đơn `(...)` bao quanh điều kiện `OR` để ép DBMS thực hiện phép `OR` trước, sau đó mới lấy giao `AND` với điều kiện giá `> 300`.",
+            "Lưu ý lỗi đánh máy thừa dấu chấm phẩy trên slide ngay sau `FROM Product_T;` — nếu copy nguyên xi chạy trong DBMS thì câu lệnh sẽ kết thúc ngay sau `FROM Product_T;` và báo lỗi cú pháp ở dòng `WHERE`; khi code thực tế phải bỏ dấu `;` sau `Product_T`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "Figure 6-9 Boolean query B with use of parentheses",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductDescription, ProductFinish, ProductStandardPrice\n  FROM Product_T;\n  WHERE (ProductDescription LIKE '%Desk'\n    OR ProductDescription LIKE '%Table')\n  AND ProductStandardPrice > 300;"
+          },
+          "diagramText": [
+            "Step 1 (Process OR): WHERE ProductDescription LIKE '%Desk' OR ProductDescription LIKE '%Table'  [toàn bộ vòng tròn All Desks hợp với vòng tròn All Tables]",
+            "Step 2 (Process AND): WHERE Result of first process AND StandardPrice > $300  [chỉ giữ phần giao của cả Desk lẫn Table với vùng StandardPrice > $300]"
+          ],
+          "diagramNote": "Biểu đồ Venn Figure 6-9 minh họa sự thay đổi tập kết quả nhờ dấu ngoặc: cả Desk và Table đều phải thỏa mãn điều kiện giá > $300.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 39"
+          },
+          "explanation": [
+            "So sánh Figure 6-8 (Slide 37) và Figure 6-9 (Slide 39) thấy rõ sự khác biệt ở phần giao của vòng tròn `All Desks` với vòng tròn `StandardPrice > $300`: chỉ những Desk có giá > $300 mới được giữ lại.",
+            "Nguyên tắc thực hành tốt: bất cứ khi nào kết hợp vừa `AND` vừa `OR` trong `WHERE`, hãy luôn đặt dấu ngoặc đơn tường minh để tránh sai logic nghiệp vụ."
+          ]
+        },
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "SORTING RESULTS WITH ORDER BY CLAUSE",
+          "bullets": [
+            "Sort the results first by STATE, and within a state by the CUSTOMER NAME"
+          ],
+          "paragraphs": [
+            "Note: The IN operator in this example allows you to include rows whose CustomerState value is either FL, TX, CA, or HI. It is more efficient than separate OR conditions."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CustomerName, CustomerCity, CustomerState\n  FROM Customer_T\n    WHERE CustomerState IN ('FL', 'TX', 'CA', 'HI')\n      ORDER BY CustomerState, CustomerName;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 40"
+          },
+          "explanation": [
+            "Minh họa 2 điểm quan trọng: (1) Toán tử `IN ('FL', 'TX', 'CA', 'HI')` thay thế cho chuỗi nhiều phép `OR`, ngắn gọn và giúp optimizer xử lý hiệu quả hơn; (2) `ORDER BY CustomerState, CustomerName` sắp xếp đa cấp — ưu tiên cột đứng trước (`CustomerState`), nếu cùng bang mới sắp theo `CustomerName`.",
+            "Mặc định `ORDER BY` sắp tăng dần (`ASC`). Nếu muốn một cột giảm dần, viết rõ `DESC` ngay sau cột đó (ví dụ `ORDER BY CustomerState ASC, CustomerName DESC`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 41",
+          "pageNumber": 41,
+          "title": "CATEGORIZING RESULTS USING GROUP BY CLAUSE",
+          "bullets": [
+            {
+              "text": "For use with aggregate functions",
+              "subBullets": [
+                "Scalar aggregate: single value returned from SQL query with aggregate function",
+                "Vector aggregate: multiple values returned from SQL query with aggregate function (via GROUP BY)"
+              ]
+            }
+          ],
+          "paragraphs": [
+            "You can use single-value fields with aggregate functions if they are included in the GROUP BY clause"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CustomerState, COUNT (CustomerState)\n  FROM Customer_T\n    GROUP BY CustomerState;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 41"
+          },
+          "explanation": [
+            "Phân biệt thuật ngữ hay gặp trong đề trắc nghiệm: **Scalar aggregate** (chỉ có hàm tổng hợp, không có `GROUP BY`, trả về đúng 1 giá trị như Slide 35) và **Vector aggregate** (dùng `GROUP BY` để chia hàng thành từng nhóm theo `CustomerState`, trả về nhiều hàng tổng hợp — mỗi bang một giá trị đếm).",
+            "Lưu ý sự khác nhau giữa `COUNT(*)` và `COUNT(CustomerState)`: `COUNT(*)` đếm tất cả hàng trong nhóm (kể cả hàng có giá trị `NULL`), còn `COUNT(CustomerState)` chỉ đếm các hàng mà cột `CustomerState` khác `NULL`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 42",
+          "pageNumber": 42,
+          "title": "QUALIFYING RESULTS BY CATEGORIES USING THE HAVING CLAUSE",
+          "bullets": [
+            "For use with GROUP BY"
+          ],
+          "paragraphs": [
+            "Like a WHERE clause, but it operates on groups (categories), not on individual rows. Here, only those groups with total numbers greater than 1 will be included in final result."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CustomerState, COUNT (CustomerState)\n  FROM Customer_T\n    GROUP BY CustomerState\n      HAVING COUNT (CustomerState) > 1;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 42"
+          },
+          "explanation": [
+            "Giải thích bản chất `HAVING`: nếu `WHERE` là bộ lọc cho từng dòng dữ liệu thô, thì `HAVING` là bộ lọc cho từng **nhóm** sau khi `GROUP BY` đã gom nhóm và tính hàm tổng hợp.",
+            "Trong ví dụ này, các bang chỉ có đúng 1 khách hàng sẽ bị `HAVING COUNT(CustomerState) > 1` loại bỏ khỏi kết quả cuối cùng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 43",
+          "pageNumber": 43,
+          "title": "A QUERY WITH BOTH WHERE AND HAVING",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductFinish, AVG (ProductStandardPrice)\n  FROM Product_T\n    WHERE ProductFinish IN ('Cherry', 'Natural Ash', 'Natural Maple',\n    'White Ash')\n      GROUP BY ProductFinish\n        HAVING AVG (ProductStandardPrice) < 750\n          ORDER BY ProductFinish;"
+          },
+          "table": {
+            "caption": "Dữ liệu nguồn bảng Product_T (MS Access) và bảng kết quả (Result)",
+            "headers": [
+              "ProductID",
+              "ProductDescription",
+              "ProductFinish",
+              "ProductStandardPrice",
+              "ProductLineID"
+            ],
+            "rows": [
+              [
+                "1",
+                "End Table",
+                "Cherry",
+                "$175.00",
+                "1"
+              ],
+              [
+                "2",
+                "Coffee Table",
+                "Natural Ash",
+                "$200.00",
+                "2"
+              ],
+              [
+                "3",
+                "Computer Desk",
+                "Natural Ash",
+                "$375.00",
+                "2"
+              ],
+              [
+                "4",
+                "Entertainment Cente[?cần kiểm tra]",
+                "Natural Maple",
+                "$650.00",
+                "3"
+              ],
+              [
+                "5",
+                "Writers Desk",
+                "Cherry",
+                "$325.00",
+                "1"
+              ],
+              [
+                "6",
+                "8-Drawer Desk",
+                "White Ash",
+                "$750.00",
+                "2"
+              ],
+              [
+                "7",
+                "Dining Table",
+                "Natural Ash",
+                "$800.00",
+                "2"
+              ],
+              [
+                "8",
+                "Computer Desk",
+                "Walnut",
+                "$250.00",
+                "3"
+              ]
+            ]
+          },
+          "diagramText": [
+            "Result:",
+            "PRODUCTFINISH | AVG(PRODUCTSTANDARDPRICE)",
+            "Cherry        | 250",
+            "Natural Ash   | 458.333333",
+            "Natural Maple | 650"
+          ],
+          "ocrNote": "Ảnh chụp bảng Product_T trong MS Access có một số tiêu đề cột bị cắt bớt bề rộng hiển thị (ProductI[, ProductDescriptio[, ProductFinis[, ProductStandardPric) và dòng 4 hiển thị 'Entertainment Cente' (chữ cuối bị khuất cột, thực tế là 'Entertainment Center' như thấy ở Chương 7 Slide 25).",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 43"
+          },
+          "explanation": [
+            "Theo dõi từng bước xử lý câu lệnh này theo thứ tự logic Slide 32: (1) `FROM Product_T` lấy đủ 8 dòng; (2) `WHERE ProductFinish IN (...)` loại dòng 8 (`Walnut`, $250.00) còn 7 dòng; (3) `GROUP BY ProductFinish` gom thành 4 nhóm: `Cherry` (175, 325 → AVG = 250), `Natural Ash` (200, 375, 800 → AVG = 458.333333), `Natural Maple` (650 → AVG = 650), `White Ash` (750 → AVG = 750).",
+            "(4) `HAVING AVG(ProductStandardPrice) < 750` loại nhóm `White Ash` vì 750 không nhỏ hơn hẳn 750; (5) `SELECT` xuất 2 cột và `ORDER BY ProductFinish` sắp theo thứ tự chữ cái: `Cherry`, `Natural Ash`, `Natural Maple`."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Khung nhìn (Views): Dynamic vs Materialized, WITH CHECK OPTION & Bản quyền",
+      "text": "Phân biệt Base Table, Dynamic View và Materialized View, cú pháp CREATE VIEW với WITH CHECK OPTION, 7 ưu điểm và 2 nhược điểm của View, cùng Slide 48 cuối tệp.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 44–48"
+      },
+      "digest": {
+        "keyPoints": [
+          "Base Table là bảng thật chứa dữ liệu thô; Dynamic View là \"bảng ảo\" (virtual table) chỉ lưu định nghĩa SELECT (không lưu dữ liệu vật lý); Materialized View lưu bản sao dữ liệu vật lý và cần refresh định kỳ.",
+          "`WITH CHECK OPTION` ngăn các thao tác `INSERT`/`UPDATE` qua một updateable view làm phát sinh hàng không còn thỏa điều kiện `WHERE` của chính view đó.",
+          "7 ưu điểm của View: đơn giản hóa lệnh truy vấn, hỗ trợ bảo mật (không nên phụ thuộc hoàn toàn vào view để bảo mật), tăng năng suất lập trình, luôn chứa dữ liệu mới nhất từ base table, tốn ít chỗ lưu trữ, cung cấp góc nhìn tùy biến cho người dùng, thiết lập physical data independence.",
+          "2 nhược điểm của View: tốn thời gian xử lý mỗi lần view được tham chiếu (với dynamic view) và không phải view nào cũng cập nhật trực tiếp được (ví dụ view có `JOIN`, `GROUP BY`, `DISTINCT`, hàm tổng hợp)."
+        ],
+        "terms": [
+          {
+            "term": "Dynamic View",
+            "meaning": "Bảng ảo được tạo động khi truy vấn, không lưu dữ liệu thật mà chạy lại câu SELECT trên base tables/views."
+          },
+          {
+            "term": "Materialized View",
+            "meaning": "Bản sao lưu trữ vật lý kết quả của truy vấn, cần làm mới (refresh) định kỳ để khớp với bảng gốc."
+          },
+          {
+            "term": "WITH CHECK OPTION",
+            "meaning": "Tùy chọn trên updateable view nhằm chặn INSERT/UPDATE tạo ra dòng vi phạm điều kiện WHERE của view."
+          }
+        ],
+        "pitfalls": [
+          "View hỗ trợ bảo mật (assist with data security) nhưng slide cảnh báo rõ: \"don't rely on views for security, there are more important security measures\".",
+          "Dynamic view tốn ít dung lượng lưu trữ nhất nhưng lại tốn thời gian CPU biên dịch/thực thi lại truy vấn gốc mỗi khi được gọi; Materialized view ngược lại."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 44",
+          "pageNumber": 44,
+          "title": "USING AND DEFINING VIEWS",
+          "bullets": [
+            "Views provide users controlled access to tables",
+            "Base Table–table containing the raw data",
+            {
+              "text": "Dynamic View",
+              "subBullets": [
+                "A “virtual table” created dynamically upon request by a user",
+                "No data actually stored; instead data from base table made available to user",
+                "Based on SQL SELECT statement on base tables or other views"
+              ]
+            },
+            {
+              "text": "Materialized View",
+              "subBullets": [
+                "Copy or replication of data",
+                "Data actually stored",
+                "Must be refreshed periodically to match corresponding base tables"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 44"
+          },
+          "explanation": [
+            "Phân biệt rạch ròi 3 khái niệm: **Base Table** (bảng gốc lưu dữ liệu thô), **Dynamic View** (bảng ảo không lưu dữ liệu, mỗi lần truy vấn là chạy lại câu `SELECT` định nghĩa view) và **Materialized View** (lưu vật lý kết quả để đọc cực nhanh cho báo cáo/Data Warehouse nhưng dữ liệu có thể bị trễ cho tới khi được refresh).",
+            "Gắn với kiến trúc 3 lược đồ Chương 1: View trong SQL chính là công cụ hiện thực hóa các **External Schema (User Views)**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 45",
+          "pageNumber": 45,
+          "title": "SAMPLE CREATE VIEW",
+          "bullets": [
+            "View has a name.",
+            "View is based on a SELECT statement.",
+            "CHECK_OPTION works only for updateable views and prevents updates that would create rows not included in the view."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE VIEW ExpensiveStuff_V\n  AS\n    SELECT ProductID, ProductDescription, ProductStandardPrice\n      FROM Product_T\n        WHERE ProductStandardPrice > 300\n          WITH CHECK OPTION;"
+          },
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 45"
+          },
+          "explanation": [
+            "Ví dụ tạo `ExpensiveStuff_V` chỉ hiển thị sản phẩm có giá trên 300.",
+            "Tác dụng thực tế của `WITH CHECK OPTION`: nếu người dùng chạy `UPDATE ExpensiveStuff_V SET ProductStandardPrice = 150 WHERE ProductID = 5;` (hoặc `INSERT` sản phẩm giá `150` vào `ExpensiveStuff_V`), dữ liệu sau khi sửa sẽ bị biến mất khỏi chính view này vì `150 <= 300`. Khi có `WITH CHECK OPTION`, DBMS sẽ chặn và báo lỗi để tránh hiện tượng \"dữ liệu vừa thêm/sửa lại tự biến mất\"."
+          ]
+        },
+        {
+          "slideNumber": "Slide 46",
+          "pageNumber": 46,
+          "title": "ADVANTAGES OF VIEWS",
+          "bullets": [
+            "Simplify query commands",
+            "Assist with data security (but don't rely on views for security, there are more important security measures)",
+            "Enhance programming productivity",
+            "Contain most current base table data",
+            "Use little storage space",
+            "Provide customized view for user",
+            "Establish physical data independence"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 46"
+          },
+          "explanation": [
+            "Nắm đủ 7 ưu điểm của Dynamic View: (1) Đơn giản hóa câu lệnh truy vấn phức tạp thay vì phải lặp lại join/lọc nhiều lần; (2) Hỗ trợ bảo mật dữ liệu bằng cách chỉ phơi bày các cột/dòng được phép; (3) Tăng năng suất lập trình viên; (4) Luôn chứa dữ liệu mới nhất từ bảng gốc vì truy vấn trực tiếp lúc chạy; (5) Tốn rất ít dung lượng lưu trữ vì chỉ lưu định nghĩa SQL trong data dictionary; (6) Cung cấp góc nhìn tùy biến theo từng nhóm người dùng; (7) Thiết lập tính độc lập dữ liệu vật lý (khi tách/đổi tên bảng gốc chỉ cần sửa định nghĩa View).",
+            "Bẫy thi hay gặp ở ý số 2: dù View hỗ trợ phân quyền theo cột/dòng, slide nhấn mạnh \"don't rely on views for security, there are more important security measures\" — không được xem View là lớp bảo mật duy nhất mà vẫn phải kết hợp phân quyền `GRANT`/`REVOKE`, mã hóa và kiểm soát truy cập ở mức DBMS/ứng dụng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 47",
+          "pageNumber": 47,
+          "title": "DISADVANTAGES OF VIEWS",
+          "bullets": [
+            "Use processing time each time view is referenced",
+            "May or may not be directly updateable"
+          ],
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 47"
+          },
+          "explanation": [
+            "2 nhược điểm cần nhớ để đối chiếu với Slide 46: (1) Mỗi lần gọi Dynamic View, DBMS đều phải gộp và thực thi câu `SELECT` bên dưới nên tốn CPU/thời gian xử lý; (2) Không phải view nào cũng cập nhật trực tiếp (`INSERT`/`UPDATE`/`DELETE`) được.",
+            "Khi nào view KHÔNG update trực tiếp được? Khi view chứa `GROUP BY`, `HAVING`, hàm tổng hợp (`SUM`, `AVG`, `COUNT`...), `DISTINCT`, cột tính toán biểu thức, hoặc `JOIN` nhiều bảng không xác định rõ khóa chính bảng gốc."
+          ]
+        },
+        {
+          "slideNumber": "Slide 48",
+          "pageNumber": 48,
+          "title": "Copyright Placeholder Slide (Trang 48/48)",
+          "paragraphs": [
+            "[?cần kiểm tra] Khung chữ nhật trống trên slide (vùng thông báo bản quyền bị che/trống, chỉ thấy dòng chữ siêu nhỏ không đọc rõ ở góc trên bên trái khung).",
+            "Chapter 6 — Copyright © 2016 Pearson Education, Inc. — 6-48"
+          ],
+          "ocrNote": "Trang 48/48 của file Chapter 06.pdf chỉ hiển thị khung chữ nhật trống màu xám nhạt ở giữa (vùng thông báo bản quyền giáo trình Pearson) và chân trang chuẩn; không chứa kiến thức SQL bổ sung.",
+          "source": {
+            "file": "Chapter 06.pdf",
+            "loc": "Slide 48"
+          },
+          "explanation": [
+            "Trang cuối (48/48) của tập slide `Chapter 06.pdf` là trang bản quyền bị làm trống phần khung nội dung (tương tự trang cảnh báo bản quyền Pearson ở cuối Chương 7 và Chương 8).",
+            "Không có nội dung lý thuyết hay cú pháp SQL nào trên trang này; toàn bộ kiến thức Chương 6 đã kết thúc ở Slide 47."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch06-c01", "front": "Thứ tự xử lý logic của SELECT?", "back": "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY.", "source": { "file": "Chapter 06.pdf", "loc": "Slide 32" } },
-    { "id": "dbs-ch06-c02", "front": "WHERE khác HAVING?", "back": "WHERE lọc hàng trước khi nhóm và không chứa hàm tổng hợp; HAVING lọc nhóm sau GROUP BY.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 42–43" } },
-    { "id": "dbs-ch06-c03", "front": "Độ ưu tiên NOT, AND, OR?", "back": "NOT trước, sau đó AND, cuối cùng OR; dùng ngoặc để đổi.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 36–39" } },
-    { "id": "dbs-ch06-c04", "front": "DDL, DML, DCL là gì?", "back": "DDL định nghĩa cấu trúc (CREATE/ALTER/DROP); DML thao tác dữ liệu (INSERT/UPDATE/DELETE/SELECT); DCL kiểm soát quyền và commit (GRANT/REVOKE/COMMIT).", "source": { "file": "Chapter 06.pdf", "loc": "Slides 7–9" } },
-    { "id": "dbs-ch06-c05", "front": "Dynamic view khác materialized view?", "back": "Dynamic view là bảng ảo, không lưu dữ liệu; materialized view lưu kết quả vật lý và cần làm mới định kỳ.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 44–45" } },
-    { "id": "dbs-ch06-c06", "front": "Bốn hành động ON DELETE/UPDATE cho FK?", "back": "RESTRICT, CASCADE, SET NULL, SET DEFAULT.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 22–23" } }
+    {
+      "id": "dbs-ch06-c01",
+      "front": "Thứ tự xử lý logic của câu lệnh SELECT (Figure 6-10)?",
+      "back": "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY (khác với thứ tự viết: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY).",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 32"
+      }
+    },
+    {
+      "id": "dbs-ch06-c02",
+      "front": "WHERE và HAVING khác nhau thế nào?",
+      "back": "WHERE lọc từng hàng riêng lẻ trước khi gom nhóm (không chứa hàm tổng hợp); HAVING lọc các nhóm (categories) sau khi đã thực hiện GROUP BY.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 31, 42–43"
+      }
+    },
+    {
+      "id": "dbs-ch06-c03",
+      "front": "Độ ưu tiên mặc định của toán tử Boolean NOT, AND, OR?",
+      "back": "NOT trước, sau đó đến AND, cuối cùng là OR. Dùng dấu ngoặc đơn () để ghi đè thứ tự ưu tiên.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 36–39"
+      }
+    },
+    {
+      "id": "dbs-ch06-c04",
+      "front": "Phân biệt Catalog, Schema, DDL, DML, DCL?",
+      "back": "Catalog: tập các schema mô tả DB. Schema: cấu trúc chứa mô tả đối tượng user tạo. DDL: định nghĩa cấu trúc (CREATE/ALTER/DROP/TRUNCATE). DML: thao tác & truy vấn dữ liệu (INSERT/UPDATE/DELETE/SELECT). DCL: phân quyền & commit (GRANT/REVOKE/COMMIT).",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 7–9"
+      }
+    },
+    {
+      "id": "dbs-ch06-c05",
+      "front": "Dynamic view khác Materialized view thế nào?",
+      "back": "Dynamic view là bảng ảo (virtual table), không lưu dữ liệu thật mà chạy lại SELECT khi truy cập. Materialized view lưu bản sao dữ liệu vật lý và phải refresh định kỳ để khớp bảng gốc.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 44"
+      }
+    },
+    {
+      "id": "dbs-ch06-c06",
+      "front": "Bốn hành động xử lý Referential Integrity khi UPDATE/DELETE bản ghi cha?",
+      "back": "RESTRICT (cấm nếu có bản ghi con), CASCADE (cập nhật/xóa dây chuyền sang bảng con), SET NULL (gán FK con thành NULL), SET DEFAULT (gán FK con về giá trị mặc định).",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 22–23"
+      }
+    },
+    {
+      "id": "dbs-ch06-c07",
+      "front": "Các mốc lịch sử chính của SQL (1970, 1974–1979, 1979, 1986)?",
+      "back": "1970: E. F. Codd phát triển mô hình quan hệ; 1974–1979: IBM Research Lab tạo System R với Sequel; 1979: Oracle thương mại hóa CSDL SQL đầu tiên; 1986: chuẩn ANSI SQL đầu tiên ra đời.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-ch06-c08",
+      "front": "7 bước tạo bảng trong SQL (Slide 12)?",
+      "back": "1) Data types; 2) Cột NOT NULL / NULL; 3) Cột UNIQUE (candidate keys); 4) Cặp PK–FK; 5) Default values; 6) Domain constraints (CHECK); 7) Tạo bảng và indexes.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "dbs-ch06-c09",
+      "front": "Kiểu DECIMAL(6,2) và CHAR vs VARCHAR2 khác nhau gì?",
+      "back": "DECIMAL(6,2) lưu số chính xác tối đa 6 chữ số với 2 chữ số thập phân (tối đa 9999.99). CHAR có độ dài cố định, còn VARCHAR/VARCHAR2 có độ dài thay đổi.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 11, 17"
+      }
+    },
+    {
+      "id": "dbs-ch06-c10",
+      "front": "Vì sao câu lệnh trên Slide 34 (`WHERE NAME = 'Home Furnishings'` với `AS NAME` ở SELECT) dễ gây lỗi?",
+      "back": "Vì về mặt logic, WHERE thực thi TRƯỚC SELECT (Figure 6-10) nên column alias khai báo ở SELECT chưa tồn tại khi DBMS kiểm tra điều kiện WHERE.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 32, 34"
+      }
+    },
+    {
+      "id": "dbs-ch06-c11",
+      "front": "Scalar aggregate khác Vector aggregate thế nào?",
+      "back": "Scalar aggregate là truy vấn dùng hàm tổng hợp trả về 1 giá trị duy nhất (không GROUP BY); Vector aggregate dùng GROUP BY để trả về nhiều giá trị theo từng nhóm.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 35, 41"
+      }
+    },
+    {
+      "id": "dbs-ch06-c12",
+      "front": "Tác dụng của WITH CHECK OPTION trong CREATE VIEW?",
+      "back": "Áp dụng cho updateable view nhằm ngăn INSERT hoặc UPDATE qua view tạo ra các dòng không thỏa mãn điều kiện WHERE của chính view đó.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 45"
+      }
+    },
+    {
+      "id": "dbs-ch06-c13",
+      "front": "Quy tắc dùng cột đơn trị cùng hàm tổng hợp trong SELECT?",
+      "back": "Không thể đặt cột đơn trị (single-valued column) chung với hàm tổng hợp trong mệnh đề SELECT trừ khi cột đơn trị đó nằm trong mệnh đề GROUP BY.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 35, 41"
+      }
+    },
+    {
+      "id": "dbs-ch06-c14",
+      "front": "7 ưu điểm và 2 nhược điểm của View?",
+      "back": "Ưu: đơn giản hóa truy vấn, hỗ trợ bảo mật, tăng năng suất, dữ liệu mới nhất, tốn ít chỗ, tùy biến theo user, physical data independence. Nhược: tốn thời gian xử lý mỗi lần tham chiếu; có thể không update trực tiếp được.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 46–47"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch06-q01", "stem": "Mệnh đề nào được thực thi đầu tiên về mặt logic trong SELECT?", "options": ["SELECT", "WHERE", "FROM", "GROUP BY"], "answer": 2, "explanation": "Thứ tự logic bắt đầu từ FROM.", "source": { "file": "Chapter 06.pdf", "loc": "Slide 32" } },
-    { "id": "dbs-ch06-q02", "stem": "Biểu thức ProductDescription LIKE '%Desk' OR ProductDescription LIKE '%Table' AND ProductStandardPrice > 300 (không ngoặc) trả về gì?", "options": ["Chỉ Desk và Table giá trên 300", "Mọi Desk (mọi giá) cộng Table giá trên 300", "Chỉ Table", "Lỗi cú pháp"], "answer": 1, "explanation": "AND chạy trước OR nên kết quả là mọi Desk hợp với Table có giá trên 300.", "source": { "file": "Chapter 06.pdf", "loc": "Slides 36–39" } },
-    { "id": "dbs-ch06-q03", "stem": "Dynamic view lưu gì trong database?", "options": ["Toàn bộ dữ liệu kết quả", "Chỉ định nghĩa truy vấn SELECT", "Một bản sao bảng gốc", "Chỉ index"], "answer": 1, "explanation": "Dynamic view là virtual table, không lưu dữ liệu.", "source": { "file": "Chapter 06.pdf", "loc": "Slide 44" } }
+    {
+      "id": "dbs-ch06-q01",
+      "stem": "Theo Figure 6-10, mệnh đề nào được thực thi đầu tiên về mặt logic trong câu lệnh SELECT?",
+      "options": [
+        "SELECT",
+        "WHERE",
+        "FROM",
+        "GROUP BY"
+      ],
+      "answer": 2,
+      "explanation": "Slide 32 (Figure 6-10): thứ tự xử lý logic là FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 32"
+      }
+    },
+    {
+      "id": "dbs-ch06-q02",
+      "stem": "Biểu thức `WHERE ProductDescription LIKE '%Desk' OR ProductDescription LIKE '%Table' AND ProductStandardPrice > 300` (không có dấu ngoặc) trả về kết quả gì?",
+      "options": [
+        "Chỉ các Desk và Table có giá trên 300",
+        "Mọi sản phẩm Desk (mọi giá) hợp với các sản phẩm Table có giá trên 300",
+        "Chỉ các sản phẩm Table có giá trên 300",
+        "Lỗi cú pháp SQL"
+      ],
+      "answer": 1,
+      "explanation": "Slide 37 (Figure 6-8): AND chạy trước OR nên phép `LIKE '%Table' AND ProductStandardPrice > 300` chạy trước, rồi mới OR với `LIKE '%Desk'`.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slides 36–39"
+      }
+    },
+    {
+      "id": "dbs-ch06-q03",
+      "stem": "Dynamic view lưu trữ gì trong database?",
+      "options": [
+        "Toàn bộ bản sao dữ liệu kết quả",
+        "Chỉ định nghĩa câu lệnh SELECT (không lưu dữ liệu vật lý)",
+        "Một bản sao bảng gốc kèm index riêng",
+        "Chỉ lưu khóa chính của bảng gốc"
+      ],
+      "answer": 1,
+      "explanation": "Slide 44: Dynamic View là virtual table, không lưu dữ liệu thật mà chạy từ câu SELECT trên base tables/views.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 44"
+      }
+    },
+    {
+      "id": "dbs-ch06-q04",
+      "stem": "Theo Figure 6-4, các lệnh CREATE, ALTER, DROP và TRUNCATE TABLE thuộc nhóm ngôn ngữ nào và bắt đầu dùng ở pha nào của SDLC?",
+      "options": [
+        "DML — bắt đầu ở Implementation",
+        "DDL — bắt đầu ở Physical Design",
+        "DCL — bắt đầu ở Analysis",
+        "DDL — bắt đầu ở Planning"
+      ],
+      "answer": 1,
+      "explanation": "Slide 9 (Figure 6-4): DDL gồm CREATE, ALTER, DROP/TRUNCATE tables, dùng trong pha Physical Design và Maintenance.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 9"
+      }
+    },
+    {
+      "id": "dbs-ch06-q05",
+      "stem": "Trong Table 6-2, kiểu dữ liệu BOOLEAN trong SQL có thể lưu những giá trị chân lý nào?",
+      "options": [
+        "Chỉ TRUE và FALSE",
+        "0 và 1",
+        "TRUE, FALSE, hoặc UNKNOWN",
+        "YES, NO, hoặc MAYBE"
+      ],
+      "answer": 2,
+      "explanation": "Slide 11 (Table 6-2): BOOLEAN — Stores truth values: TRUE, FALSE, or UNKNOWN.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-ch06-q06",
+      "stem": "Khi thiết lập toàn vẹn tham chiếu (Figure 6-7), hành động nào gán khóa ngoại ở bảng con thành NULL khi giá trị khóa chính ở bảng cha bị thay đổi/xóa?",
+      "options": [
+        "RESTRICT",
+        "CASCADE",
+        "SET NULL",
+        "SET DEFAULT"
+      ],
+      "answer": 2,
+      "explanation": "Slide 23 (Figure 6-7): ON UPDATE/DELETE SET NULL đặt giá trị FK tương ứng ở bảng con thành NULL.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "dbs-ch06-q07",
+      "stem": "Trong truy vấn Slide 43 (`HAVING AVG(ProductStandardPrice) < 750`), vì sao nhóm `White Ash` (có duy nhất 1 sản phẩm giá $750.00) KHÔNG xuất hiện trong bảng kết quả?",
+      "options": [
+        "Vì `White Ash` không có trong mệnh đề `WHERE ProductFinish IN (...)`",
+        "Vì điều kiện `HAVING` yêu cầu trung bình nhỏ hơn hẳn 750 (`< 750`), còn 750 không thỏa",
+        "Vì `GROUP BY` tự động loại nhóm chỉ có 1 hàng",
+        "Vì `ORDER BY` giới hạn tối đa 3 nhóm"
+      ],
+      "answer": 1,
+      "explanation": "Slide 43: `White Ash` nằm trong danh sách `WHERE IN`, nhưng AVG của nó là 750.00 nên không thỏa `HAVING AVG(ProductStandardPrice) < 750`.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 43"
+      }
+    },
+    {
+      "id": "dbs-ch06-q08",
+      "stem": "Mệnh đề nào trong câu lệnh CREATE VIEW ngăn việc INSERT hoặc UPDATE qua view tạo ra những dòng không thỏa điều kiện WHERE của view đó?",
+      "options": [
+        "ON COMMIT PRESERVE ROWS",
+        "WITH CHECK OPTION",
+        "GENERATED ALWAYS AS IDENTITY",
+        "ON UPDATE CASCADE"
+      ],
+      "answer": 1,
+      "explanation": "Slide 45: WITH CHECK OPTION áp dụng cho updateable views để ngăn các cập nhật tạo ra hàng không thuộc view.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 45"
+      }
+    },
+    {
+      "id": "dbs-ch06-q09",
+      "stem": "Khi định nghĩa bảng `OrderLine_T` (Slide 19), vì sao phải dùng cú pháp `CONSTRAINT OrderLine_PK PRIMARY KEY (OrderID, ProductID)` ở cuối bảng?",
+      "options": [
+        "Vì OrderLine_T có composite primary key gồm 2 thuộc tính OrderID và ProductID",
+        "Vì Oracle không cho phép đặt tên ràng buộc trên cột đơn",
+        "Vì OrderLine_T không có khóa ngoại nào",
+        "Vì bảng này là materialized view"
+      ],
+      "answer": 0,
+      "explanation": "Slide 19: Some primary keys are composite–composed of multiple attributes (`OrderID`, `ProductID`), nên phải khai báo dưới dạng table-level constraint.",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 19"
+      }
+    },
+    {
+      "id": "dbs-ch06-q10",
+      "stem": "Phát biểu nào ĐÚNG về chuẩn bảo mật của View theo Slide 46?",
+      "options": [
+        "View là cơ chế bảo mật tối thượng thay thế hoàn toàn quyền GRANT/REVOKE",
+        "View hỗ trợ bảo mật dữ liệu nhưng không nên phụ thuộc hoàn toàn vào View vì còn các biện pháp bảo mật quan trọng hơn",
+        "View không bao giờ hỗ trợ bảo mật dữ liệu",
+        "Chỉ Materialized View mới ẩn được cột"
+      ],
+      "answer": 1,
+      "explanation": "Slide 46 ghi rõ: \"Assist with data security (but don't rely on views for security, there are more important security measures)\".",
+      "source": {
+        "file": "Chapter 06.pdf",
+        "loc": "Slide 46"
+      }
+    }
   ]
 }

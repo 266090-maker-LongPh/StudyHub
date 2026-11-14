@@ -1,28 +1,2536 @@
 {
-  "id": "dbs-lab-adv", "order": 10,
+  "id": "dbs-lab-adv",
+  "order": 10,
   "title": "Lab 5–8: Aggregate, Join, Functions và Subquery",
-  "summary": [
-    { "h": "Aggregate, GROUP BY, HAVING (Lab 5)", "text": "COUNT(*) đếm mọi hàng, COUNT(cột) bỏ qua NULL, COUNT(DISTINCT cột) đếm giá trị khác nhau. ORDER BY ASC/DESC, có thể nhiều cột.", "code": { "lang": "sql", "text": "SELECT park_code, COUNT(*) AS 'Total attractions'\nFROM attraction\nWHERE park_code LIKE 'UK%'\nGROUP BY park_code\nHAVING COUNT(*) > 3\nORDER BY park_code DESC;" } },
-    { "h": "Joins (Lab 6)", "text": "Join kiểu cũ: FROM T1, T2 WHERE T1.col = T2.col; N bảng cần N−1 điều kiện. CROSS JOIN là tích Descartes (19 × 31 = 589 hàng trong ví dụ). NATURAL JOIN và JOIN ... USING không cần qualifier cho cột chung; JOIN ... ON cần qualifier. LEFT/RIGHT JOIN giữ hàng không khớp.", "code": { "lang": "sql", "text": "SELECT * FROM attraction INNER JOIN themepark\n  ON attraction.park_code = themepark.park_code;\nSELECT * FROM attraction NATURAL JOIN themepark;\nSELECT * FROM themepark LEFT JOIN attraction\n  ON attraction.park_code = themepark.park_code;" } },
-    { "h": "SQL functions (Lab 7)", "text": "Ngày giờ: DATE_FORMAT, CURDATE, CURTIME, DAYOFMONTH, MONTH, YEAR, DATEDIFF, DATE_ADD/ADDDATE, DATE_SUB, LAST_DAY. Số: ABS, ROUND, TRUNCATE, MOD. Chuỗi: CONCAT, UPPER, LOWER, SUBSTR, LENGTH. Chuyển đổi/điều kiện: CAST, CONVERT, IFNULL (tương đương NVL của Oracle), CASE.", "code": { "lang": "sql", "text": "SELECT IFNULL(EMP_HIRE_DATE, 'N/A') FROM EMPLOYEE;\nSELECT CASE WHEN TICKET_PRICE > 30 THEN 'High' ELSE 'Low' END FROM TICKET;" } },
-    { "h": "Subquery (Lab 8)", "text": "Subquery trả về giá trị vô hướng, danh sách giá trị hoặc bảng ảo. Gồm scalar subquery với toán tử so sánh, IN, HAVING subquery, toán tử ALL, inline subquery trong SELECT, correlated subquery với EXISTS / NOT EXISTS.", "code": { "lang": "sql", "text": "SELECT * FROM ticket\nWHERE ticket_price = (SELECT MIN(ticket_price) FROM ticket);\nSELECT * FROM employee\nWHERE emp_num IN (SELECT DISTINCT emp_num FROM hours WHERE hour_rate > 6);" } }
-  ],
+  "audit": {
+    "sourceFile": "MySQL Lab 5-6.pdf (27 trang) + Lab 7 - 8.pdf (33 trang) + Advanced SQL and Join 10.10.sql (78 dòng)",
+    "totalPages": 60,
+    "extractedPages": 60,
+    "ocrNotes": [
+      "Đã trích xuất đầy đủ 27/27 trang từ MySQL Lab 5-6.pdf (Lab 5–6, trang sách 63–89), 33/33 trang từ Lab 7 - 8.pdf (Lab 7–8, trang sách 90–122) và toàn bộ file script Advanced SQL and Join 10.10.sql (78 dòng) nguyên văn.",
+      "Tài liệu Lab gốc (Keeley Crockett) có một số lỗi biên tập được giữ nguyên văn ở phần nội dung và giải thích rõ ở từng trang: (Lab 5–6) đánh số trùng `Task 5.7`, viết `ATTRACT-NO`, chép nhầm `PRODUCT and VENDOR tables` ở tr.15, `SALEs_LINE` ở tr.20, nhảy từ mục `6.7` sang `6.9 Exercises`, Task 6.3 yêu cầu `DATE_WORKED` nhưng ảnh Figure 49 không có cột này; (Lab 7–8) `TIMESTAMP YYYYMMDDHHSSMM` thay vì `HHMMSS`, `TRUNC(...)` và `MOD(m.n)` trong Table 4, lặp alias `\"LINE_PRICE1\"` ở Figure 60, bỏ qua `Task 7.5` và `Task 7.9`, lặp `Task 7.3`, `Task 7.10` Figure 64 hiển thị tiền tố `19` (năm) thay vì ngày sinh, `Task 7.11` ghi `LINE_PRICE` trong đề nhưng SQL dùng `ITEM_PRICE`, `CASE ... ELSE' Unknown'`, thiếu dấu nháy cuối `'Unknown;` ở tr.20, chú thích Figure 68 gọi là `DECODE function`, Lab 8 tr.23 viết `less than or equal` nhưng SQL tr.24 dùng `>=`, Task 8.3 hỏi `less that` nhưng Figure 73 dùng `>` và sinh `1 warning` do `DATE_WORKED LIKE '%-05%'`, `SA. TRANSACTION_NO` có khoảng trắng sau dấu chấm."
+    ]
+  },
   "sources": [
-    { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 5–6 (27 trang)" },
-    { "file": "Lab 7 - 8.pdf", "loc": "Lab 7–8 (33 trang)" },
-    { "file": "Advanced SQL and Join 10.10.sql", "loc": "dòng 1–78" }
+    {
+      "file": "MySQL Lab 5-6.pdf",
+      "loc": "Lab 5–6 — Trang 1–27 (sách tr. 63–89)"
+    },
+    {
+      "file": "Lab 7 - 8.pdf",
+      "loc": "Lab 7–8 — Trang 1–33 (sách tr. 90–122)"
+    },
+    {
+      "file": "Advanced SQL and Join 10.10.sql",
+      "loc": "Dòng 1–78 (script thực hành trên lớp)"
+    }
+  ],
+  "summary": [
+    {
+      "h": "Lab 5: Sắp xếp (ORDER BY), DISTINCT và Hàm tổng hợp (Aggregate, GROUP BY, HAVING)",
+      "text": "Học cách sắp xếp kết quả truy vấn (ORDER BY ASC/DESC, sắp xếp tầng nhiều cột), lọc giá trị duy nhất bằng DISTINCT và áp dụng 5 hàm tổng hợp cơ bản (COUNT, MIN, MAX, SUM, AVG) kết hợp GROUP BY và HAVING.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 1–12 (sách tr. 63–74)"
+      },
+      "digest": {
+        "keyPoints": [
+          "`ORDER BY` mặc định sắp tăng dần (`ASC`), có thể dùng `DESC` và liệt kê nhiều cột để sắp xếp theo tầng (`EMP_LNAME, EMP_FNAME`).",
+          "`DISTINCT(cột)` loại bỏ các giá trị trùng lặp trong kết quả truy vấn; kết hợp `COUNT(DISTINCT(cột))` để đếm số giá trị khác nhau.",
+          "`COUNT(*)` đếm mọi hàng kể cả hàng chứa NULL (`11`), còn `COUNT(cột)` chỉ đếm các giá trị khác NULL (`10` với `ATTRACT_NAME`).",
+          "`GROUP BY` gom nhóm theo các cột không nằm trong hàm tổng hợp; `HAVING` lọc điều kiện trên nhóm sau khi `GROUP BY` (khác `WHERE` lọc từng hàng trước khi gom nhóm)."
+        ],
+        "terms": [
+          {
+            "term": "Cascading order sequence",
+            "meaning": "Sắp xếp phân tầng theo danh sách cột trong `ORDER BY col1, col2`: sắp theo `col1` trước, các hàng trùng `col1` mới xét tiếp `col2`."
+          },
+          {
+            "term": "Aggregate functions",
+            "meaning": "Các hàm tính toán trên nhiều hàng trả về 1 giá trị tóm tắt cho mỗi nhóm: `COUNT`, `MIN`, `MAX`, `SUM`, `AVG`."
+          },
+          {
+            "term": "HAVING clause",
+            "meaning": "Mệnh đề mở rộng của `GROUP BY`, lọc các nhóm thỏa mãn điều kiện tổng hợp (như `AVG(TICKET_PRICE) >= 24.99`)."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm lẫn `COUNT(*)` với `COUNT(tên_cột)`: nếu cột có giá trị `NULL` (như `ATTRACT_NAME` ở 1 dòng), `COUNT(cột)` bỏ qua dòng NULL đó.",
+          "Quên đưa cột thường trong `SELECT` vào `GROUP BY`: vi phạm chuẩn SQL (MySQL 5.0 có thể chạy nhưng trả giá trị bất kỳ nếu không bật `ONLY_FULL_GROUP_BY`).",
+          "Dùng `WHERE` thay vì `HAVING` để lọc điều kiện chứa hàm tổng hợp (`AVG`, `SUM`, `COUNT`) sẽ gây lỗi cú pháp."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 5 • Trang 1",
+          "pageNumber": 1,
+          "title": "Lab 5: Advanced SELECT Statements — 5.1 Sorting Data",
+          "paragraphs": [
+            "MySQL Lab Guide",
+            "Lab 5: Advanced SELECT Statements",
+            "The learning objectives of this lab are to",
+            "5.1 Sorting Data",
+            "The ORDER BY clause is especially useful when the listing order of the query is important. Although you have the option of declaring the order type—ascending (ASC) or descending (DESC) —the default order is ascending. For example, if you want to display all employees listed by EMP_HIRE_DATE in descending order you would write the following query. The output is shown in Figure 34."
+          ],
+          "bullets": [
+            "Sort the data in the resulting query",
+            "Apply SQL aggregate functions"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\t*\nFROM\tEMPLOYEE\nORDER BY EMP_HIRE_DATE DESC;"
+          },
+          "explanation": [
+            "Lab 5 tập trung hai kỹ năng nâng cao của `SELECT`: sắp xếp tập kết quả (`ORDER BY`) và tính toán tóm tắt theo nhóm (`Aggregate Functions`).",
+            "Mệnh đề `ORDER BY` mặc định sắp tăng dần (`ASC`); để xếp giảm dần (ví dụ nhân viên mới vào làm nhất lên đầu), phải ghi rõ từ khóa `DESC` sau tên cột `EMP_HIRE_DATE`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 1 (sách tr. 63)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 2",
+          "pageNumber": 2,
+          "title": "Figure 34 & Cascading Order Sequence (Task 5.1)",
+          "paragraphs": [
+            "Figure 34: Displaying all employees in descending order of EMP_HIRE_DATE.",
+            "The ORDER BY command can also be used to produce a cascading order sequence. This is where the query results are ordered against a sequence of attributes.",
+            "Task 5.1 Enter the following query which contains an example of a cascading order sequence, by ordering the rows in the employee table by the employee’s last then first names."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\t*\nFROM\tEMPLOYEE\nORDER BY EMP_LNAME, EMP_FNAME;"
+          },
+          "diagramText": [
+            "Figure 34 — Output của SELECT * FROM EMPLOYEE ORDER BY EMP_HIRE_DATE DESC;",
+            "EMP_NUM | EMP_TITLE | EMP_LNAME  | EMP_FNAME | EMP_DOB    | EMP_HIRE_DATE | EMP_AREA_CODE | EMP_PHONE | PARK_CODE",
+            "105     | Ms        | Namowa     | Mirrelle  | 1990-03-14 | 2006-11-08    | 0181          | 890-3243  | FR1001",
+            "104     | Mr        | Denver     | Enrica    | 1980-11-08 | 2001-10-20    | 7253          | 504-4434  | ZA1342",
+            "101     | Ms        | Ricardo    | Marshel   | 1978-03-19 | 1996-04-25    | 0181          | 324-4472  | UK3452",
+            "103     | Ms        | Roberts    | Anne      | 1974-10-16 | 1994-08-16    | 0181          | 898-3456  | UK3452",
+            "100     | Ms        | Calderdale | Emma      | 1972-06-15 | 1992-03-15    | 0181          | 324-9134  | FR1001",
+            "102     | Mr        | Arshad     | Arif      | 1969-11-14 | 1990-12-20    | 7253          | 675-8993  | FR1001",
+            "106     | Mrs       | Smith      | Gemma     | 1968-02-12 | 1989-01-05    | 0181          | 324-7845  | ZA1342",
+            "7 rows in set (0.03 sec)"
+          ],
+          "explanation": [
+            "Figure 34 chứng minh 7 nhân viên được liệt kê từ ngày tuyển dụng mới nhất (`2006-11-08` của mã `105`) đến lâu năm nhất (`1989-01-05` của mã `106`).",
+            "Task 5.1 minh họa **cascading order sequence** (sắp xếp phân tầng): sắp tăng dần theo họ (`EMP_LNAME`) trước; nếu có nhân viên trùng họ mới so sánh tiếp tên (`EMP_FNAME`)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 2 (sách tr. 64)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 3",
+          "pageNumber": 3,
+          "title": "Thứ tự NULL, vị trí ORDER BY (Task 5.2) & 5.2 Listing Unique Values",
+          "paragraphs": [
+            "It is worth noting that if the ordering column has nulls, they are listed either first or last (depending on the RDBMS). The ORDER BY clause can be used in conjunction with other SQL commands and is listed last in the SELECT command sequence.",
+            "Task 5.2 Enter the following query and check your output against the results shown in Figure 35. Describe in your own words what this query is actually doing.",
+            "Figure 35: Query results for Task 5.2.",
+            "5.2 Listing Unique Values"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTICKET_TYPE, PARK_CODE\nFROM\tTICKET\nWHERE\t(TICKET_PRICE > 15 AND TICKET_TYPE LIKE 'Child')\nORDER BY TICKET_NO DESC;"
+          },
+          "diagramText": [
+            "Figure 35 — Output của Task 5.2:",
+            "TICKET_TYPE | PARK_CODE",
+            "Child       | UK3452",
+            "Child       | ZA1342",
+            "Child       | FR1001",
+            "3 rows in set (0.00 sec)"
+          ],
+          "explanation": [
+            "Hai quy tắc quan trọng của `ORDER BY`: (1) giá trị `NULL` đứng đầu hay cuối phụ thuộc vào hệ quản trị CSDL (trong MySQL mặc định `NULL` được coi là nhỏ nhất khi `ASC` nên đứng đầu); (2) `ORDER BY` luôn nằm ở cuối câu lệnh `SELECT`.",
+            "Giải thích Task 5.2: truy vấn tìm các vé trẻ em (`TICKET_TYPE LIKE 'Child'`) có giá lớn hơn `15`, sau đó sắp xếp kết quả theo mã vé `TICKET_NO` giảm dần rồi chỉ hiển thị 2 cột `TICKET_TYPE` và `PARK_CODE` (chú ý ta có thể `ORDER BY` theo cột `TICKET_NO` dù cột này không nằm trong danh sách `SELECT`)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 3 (sách tr. 65)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 4",
+          "pageNumber": 4,
+          "title": "DISTINCT (Figure 36) & 5.3 Aggregate Functions (Table 3)",
+          "paragraphs": [
+            "The SQL command DISTINCT is used to produce a list of only those values that are different from one another. For example to list only the different Theme parks from within the ATTRACTION table, you would enter the following query.",
+            "Figure 36 shows that the query only displays the rows that are different.",
+            "Figure 36: Displaying DISTINCT rows.",
+            "5.3 Aggregate Functions",
+            "SQL can perform mathematical summaries through the use of aggregate (or group) functions. Aggregate functions return results based on groups of rows. By default, the entire result is treated as one group. Table 3 shows some of the basic aggregate functions.",
+            "Table 3 Basic SQL Aggregate Functions"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tDISTINCT(PARK_CODE)\nFROM\tATTRACTION;"
+          },
+          "table": {
+            "caption": "Table 3 Basic SQL Aggregate Functions (phần đầu, tiếp tục ở trang 5)",
+            "headers": [
+              "FUNCTION",
+              "OUTPUT"
+            ],
+            "rows": []
+          },
+          "diagramText": [
+            "Figure 36 — SELECT DISTINCT(PARK_CODE) FROM ATTRACTION;:",
+            "PARK_CODE",
+            "FR1001",
+            "UK3452",
+            "ZA1342",
+            "3 rows in set (0.01 sec)"
+          ],
+          "explanation": [
+            "`DISTINCT` loại bỏ các giá trị trùng lặp để chỉ liệt kê danh sách các công viên thực sự có trò chơi trong bảng `ATTRACTION` (3 mã `FR1001`, `UK3452`, `ZA1342` thay vì 11 dòng lặp lại).",
+            "Hàm tổng hợp (aggregate function) tính toán tóm tắt trên tập nhiều hàng; khi chưa có `GROUP BY`, toàn bộ kết quả truy vấn được xem như một nhóm duy nhất."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 4 (sách tr. 66)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 5",
+          "pageNumber": 5,
+          "title": "Table 3 (tiếp) & Hàm COUNT (Figure 37)",
+          "paragraphs": [
+            "COUNT",
+            "The COUNT function is used to tally the number of non-null values of an attribute. COUNT can be used in conjunction with the DISTINCT clause. If you wanted to find out how many different theme parks contained attractions from the ATTRACTION table you would write the following query:",
+            "The query would return 11 rows as shown in Figure 37.",
+            "Figure 37: Counting the number of Theme parks in ATTRACTION."
+          ],
+          "table": {
+            "caption": "Table 3 Basic SQL Aggregate Functions (nội dung đầy đủ)",
+            "headers": [
+              "FUNCTION",
+              "OUTPUT"
+            ],
+            "rows": [
+              [
+                "COUNT",
+                "The number of rows containing non-null values"
+              ],
+              [
+                "MIN",
+                "The minimum attribute value encountered in a given column"
+              ],
+              [
+                "MAX",
+                "The maximum attribute value encountered in a given column"
+              ],
+              [
+                "SUM",
+                "The sum of all values for a given column"
+              ],
+              [
+                "AVG",
+                "The arithmetic mean (average) for a specified column"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tCOUNT(PARK_CODE)\nFROM\tATTRACTION;"
+          },
+          "diagramText": [
+            "Figure 37 — SELECT COUNT(PARK_CODE) FROM ATTRACTION;:",
+            "COUNT(PARK_CODE)",
+            "11",
+            "1 row in set (0.02 sec)"
+          ],
+          "explanation": [
+            "Table 3 tổng hợp 5 hàm aggregate chuẩn SQL: `COUNT` (đếm hàng khác NULL), `MIN`, `MAX`, `SUM` và `AVG`.",
+            "Lưu ý câu ví dụ `SELECT COUNT(PARK_CODE) FROM ATTRACTION;` trả về `11` (tổng số dòng có `PARK_CODE` khác NULL trong bảng `ATTRACTION`), tức chưa lọc trùng công viên — muốn đếm số công viên *khác nhau* phải thêm `DISTINCT` như trang 6."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 5 (sách tr. 67)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 6",
+          "pageNumber": 6,
+          "title": "COUNT(DISTINCT ...) & Task 5.3",
+          "paragraphs": [
+            "However, if you wanted to know how many different Theme parks were in the ATTRACTION table, you would modify the query as follows (For the output see Figure 38):",
+            "Figure 38: Counting the number of DISTINCT Theme parks in ATTRACTION.",
+            "Task 5.3 Write a query that displays the number of distinct employees in the HOURS table. You should label the column “Number of Employees”. Your output should match that shown in Figure 39."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tCOUNT(DISTINCT(PARK_CODE))\nFROM\tATTRACTION;"
+          },
+          "diagramText": [
+            "Figure 38 — SELECT COUNT(DISTINCT(PARK_CODE)) FROM ATTRACTION; → 3 (1 row in set, 0.03 sec)",
+            "Figure 39 (Task 5.3) — SELECT COUNT(DISTINCT(EMP_NUM)) \"Number of Employees\" FROM HOURS; → Number of Employees: 5 (1 row in set, 0.02 sec)"
+          ],
+          "explanation": [
+            "Kết hợp `COUNT(DISTINCT(PARK_CODE))` trả về `3` — số lượng mã công viên khác nhau có mặt trong bảng `ATTRACTION`.",
+            "Lời giải Task 5.3 (hiển thị ngay trong cửa sổ lệnh Figure 39): `SELECT COUNT(DISTINCT(EMP_NUM)) \"Number of Employees\" FROM HOURS;` cho kết quả `5` nhân viên khác nhau có ghi nhận giờ làm."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 6 (sách tr. 68)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 7",
+          "pageNumber": 7,
+          "title": "COUNT(*) vs COUNT(cột) — Task 5.4 (Figure 40)",
+          "paragraphs": [
+            "Figure 39: Query output for Task 5.3",
+            "COUNT always returns the number of non-null values in the given column. Another use for the COUNT function is to display the number of rows returned by a query, including the rows that contain rows using the syntax COUNT(*).",
+            "Task 5.4 Enter the following two queries and examine their output shown in Figure 40. Can you explain why the number of rows returned is different?",
+            "Figure 40: Examples of using the COUNT function"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tCOUNT(*)\nFROM\tATTRACTION;\n\nSELECT\tCOUNT(ATTRACT_NAME)\nFROM\tATTRACTION;"
+          },
+          "diagramText": [
+            "Figure 40 — So sánh hai lệnh COUNT:",
+            "• SELECT COUNT(*) FROM ATTRACTION; → 11 (1 row in set, 0.00 sec)",
+            "• SELECT COUNT(ATTRACT_NAME) FROM ATTRACTION; → 10 (1 row in set, 0.00 sec)"
+          ],
+          "explanation": [
+            "Giải thích Task 5.4: `COUNT(*)` đếm toàn bộ số hàng của bảng `ATTRACTION` (bất kể cột nào mang `NULL`) nên trả về `11`.",
+            "Ngược lại, `COUNT(ATTRACT_NAME)` chỉ đếm các hàng có giá trị `ATTRACT_NAME` khác `NULL`; vì trò chơi mã `10082` (thuộc `ZA1342`) bị bỏ trống tên (`NULL`), kết quả chỉ còn `10`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 7 (sách tr. 69)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 8",
+          "pageNumber": 8,
+          "title": "MAX, MIN (Task 5.5) & Giới thiệu SUM, AVG",
+          "paragraphs": [
+            "MAX and MIN",
+            "The MAX and MIN functions are used to find answers to problems such as",
+            "What is the highest and lowest ticket price sold in all Theme parks.",
+            "Task 5.5 Enter the following query which illustrates the use of the MIN and Max functions. Check the query results with those shown in Figure 41.",
+            "Figure 41: Examples of using the MIN and MAX functions",
+            "SUM and AVG",
+            "The SUM function computes the total sum for any specified attribute, using whatever condition(s) you have imposed. The AVG function calculates the arithmetic mean (average) for a specified attribute. The following query displays the average amount spent on Theme park tickets per customer (LINE_PRICE) and the total number of tickets purchase (LINE_QTY). Figure 42 shows the output for this query."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT MIN(TICKET_PRICE),max(TICKET_PRICE)\nFROM TICKET;"
+          },
+          "diagramText": [
+            "Figure 41 — Output của Task 5.5:",
+            "MIN(TICKET_PRICE) | max(TICKET_PRICE)",
+            "10.99             | 42.10",
+            "1 row in set (0.00 sec)"
+          ],
+          "explanation": [
+            "`MIN` và `MAX` tìm giá trị nhỏ nhất và lớn nhất trong một cột trên toàn bộ tập hàng (hoặc trong từng nhóm nếu có `GROUP BY`).",
+            "Cú pháp tên hàm SQL không phân biệt chữ hoa/thường (`MIN` và `max` dùng chung được, kết quả Figure 41 là `10.99` và `42.10`).",
+            "`SUM` cộng dồn giá trị số của một cột còn `AVG` tính trung bình cộng (cũng bỏ qua các ô mang `NULL`)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 8 (sách tr. 70)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 9",
+          "pageNumber": 9,
+          "title": "Ví dụ AVG/SUM (Task 5.6–5.7) & Mệnh đề GROUP BY",
+          "paragraphs": [
+            "Figure 42: Example showing the AVG and SUM functions",
+            "Task 5.6 Write a query that displays the average hourly rate that has been paid to all employees. Hint use the HOURS table. Your query should return €7.03.",
+            "Task 5.7 Write a query that displays the average attraction age for all attractions where the PARK_CODE = ‘UK3452’. Your query should return 7.25 years.",
+            "GROUP BY",
+            "The GROUP BY clause is generally used when you have attribute columns combined with aggregate functions in the SELECT statement. It is valid only when used in conjunction with one of the SQL aggregate functions, such as COUNT, MIN, MAX, AVG and SUM. The GROUP BY clause appears after the WHERE statement. When using GROUP BY you should include all the attributes that are in the SELECT statement that do not use an aggregate function. The following query displays the minimum and"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT AVG(LINE_PRICE), SUM(LINE_QTY)\nFROM SALES_LINE;"
+          },
+          "diagramText": [
+            "Figure 42 — SELECT AVG(LINE_PRICE), SUM(LINE_QTY) FROM SALES_LINE;:",
+            "AVG(LINE_PRICE) | SUM(LINE_QTY)",
+            "54.245161       | 61",
+            "1 row in set (0.00 sec)"
+          ],
+          "explanation": [
+            "Lời giải Task 5.6: `SELECT ROUND(AVG(HOUR_RATE), 2) FROM HOURS;` (hoặc `SELECT AVG(HOUR_RATE) FROM HOURS;` cho `7.0309...` ≈ `€7.03`).",
+            "Lời giải Task 5.7 (đầu tiên): `SELECT AVG(ATTRACT_AGE) FROM ATTRACTION WHERE PARK_CODE = 'UK3452';` trả về `7.2500` năm.",
+            "Quy tắc vàng của `GROUP BY`: đứng ngay sau `WHERE` (nếu có), và mọi cột thông thường xuất hiện ở mệnh đề `SELECT` không nằm trong hàm aggregate đều phải được liệt kê trong `GROUP BY`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 9 (sách tr. 71)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 10",
+          "pageNumber": 10,
+          "title": "Ví dụ GROUP BY (Figure 43), Task 5.7 & Mệnh đề HAVING",
+          "paragraphs": [
+            "maximum ticket price of all parks. The output is shown in Figure 43. Notice that the query groups only by the PARK_CODE as no aggregate function is applied to this attribute in the SELECT statement.",
+            "Figure 43: Displaying minimum and maximum ticket prices for each PARK_CODE",
+            "Task 5.7 Enter the query above and check the results against the output shown in Figure 43. What happens if you miss out the GROUP BY clause?",
+            "HAVING",
+            "The HAVING clause is an extension to the GROUP BY clause and is applied to the output of a GROUP BY operation. Supposing you wanted to list the average ticket price at each Theme Park but wanted to limit the listing to Theme Parks whose average ticket"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tPARK_CODE, MIN(TICKET_PRICE),MAX(TICKET_PRICE)\nFROM\tTICKET\nGROUP BY PARK_CODE;"
+          },
+          "diagramText": [
+            "Figure 43 — SELECT PARK_CODE, MIN(TICKET_PRICE), MAX(TICKET_PRICE) FROM TICKET GROUP BY PARK_CODE;:",
+            "PARK_CODE | MIN(TICKET_PRICE) | MAX(TICKET_PRICE)",
+            "FR1001    | 18.99             | 34.99",
+            "SP4533    | 10.99             | 24.99",
+            "UK3452    | 10.99             | 42.10",
+            "ZA1342    | 12.12             | 28.67",
+            "4 rows in set (0.00 sec)"
+          ],
+          "explanation": [
+            "Lưu ý lỗi đánh số trong sách gốc: Task ở trang 10 bị đánh trùng tên `Task 5.7` (sau `Task 5.7` ở trang 9).",
+            "Giải đáp câu hỏi Task 5.7 trang 10: nếu bỏ `GROUP BY PARK_CODE;`, ở chuẩn SQL (hoặc MySQL bật `ONLY_FULL_GROUP_BY`) sẽ báo lỗi *not a single-group group function* / *nonaggregated column* vì `SELECT` trộn cột `PARK_CODE` với hàm `MIN`/`MAX`; còn ở MySQL 5.0 mặc định thì chỉ trả về 1 dòng duy nhất lấy `PARK_CODE` ngẫu nhiên kèm giá MIN/MAX toàn bảng.",
+            "`HAVING` đóng vai trò tương tự `WHERE` nhưng hoạt động **sau** khi `GROUP BY` đã gom nhóm để lọc theo kết quả của hàm tổng hợp."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 10 (sách tr. 72)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 11",
+          "pageNumber": 11,
+          "title": "Ví dụ HAVING (Figure 44) & Task 5.8",
+          "paragraphs": [
+            "price was greater or equal to €24.99. This can be achieved by the following query whose output is shown in Figure 44.",
+            "Figure 44: Example of the HAVING clause",
+            "Task 5.8 Using the HOURS table, write a query to display the employee number (EMP_NUM), the attraction number (ATTRACT-NO) and the average hours worked per attraction (HOURS_PER_ATTRACT) limiting the result to where the average hours worked per attraction is greater or equal to 5. Check your results against those shown in Figure 45."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tPARK_CODE, AVG(TICKET_PRICE)\nFROM\tTICKET\nGROUP BY PARK_CODE\nHAVING\tAVG(TICKET_PRICE) >= 24.99;"
+          },
+          "diagramText": [
+            "Figure 44 — Output ví dụ HAVING:",
+            "PARK_CODE | AVG(TICKET_PRICE)",
+            "FR1001    | 24.990000",
+            "UK3452    | 25.196667",
+            "2 rows in set (0.01 sec)"
+          ],
+          "explanation": [
+            "Ví dụ Figure 44 gom bảng `TICKET` theo từng `PARK_CODE`, tính `AVG(TICKET_PRICE)` rồi dùng `HAVING AVG(TICKET_PRICE) >= 24.99` để chỉ giữ lại hai công viên `FR1001` (`24.990000`) và `UK3452` (`25.196667`).",
+            "Lưu ý lỗi đánh máy nhỏ trong đề Task 5.8 viết `ATTRACT-NO` (dấu gạch nối) trong khi tên cột thực tế trong bảng `HOURS` là `ATTRACT_NO` (dấu gạch dưới)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 11 (sách tr. 73)"
+          }
+        },
+        {
+          "slideNumber": "Lab 5 • Trang 12",
+          "pageNumber": 12,
+          "title": "Figure 45 (Task 5.8) & 5.4 Exercises (E5.1–E5.5)",
+          "paragraphs": [
+            "Figure 45: Query output for Task 5.8",
+            "5.4 Exercises",
+            "E5.1 Write a query to display all unique employees that exist in the HOURS table;",
+            "E5.2 Display the employee numbers of all employees and the total number of hours they have worked.",
+            "E5.3. Show the attraction number and the minimum and maximum hourly rate for each attraction.",
+            "E5.4 Write a query to show the transaction numbers and line prices (in the SALES_LINE table) that are greater than €50.",
+            "E5.5 Display all information from the SALES table in descending order of the sale date."
+          ],
+          "diagramText": [
+            "Figure 45 — Lệnh và Output của Task 5.8:",
+            "mysql> SELECT EMP_NUM, ATTRACT_NO, AVG(HOURS_PER_ATTRACT)",
+            "    -> FROM HOURS",
+            "    -> GROUP BY EMP_NUM, ATTRACT_NO",
+            "    -> HAVING AVG(HOURS_PER_ATTRACT) >= 5;",
+            "EMP_NUM | ATTRACT_NO | AVG(HOURS_PER_ATTRACT)",
+            "100     | 10034      | 6.0000",
+            "101     | 10034      | 6.0000",
+            "104     | 30011      | 6.0000",
+            "104     | 30012      | 6.0000",
+            "4 rows in set (0.00 sec)"
+          ],
+          "explanation": [
+            "Figure 45 minh họa gom nhóm theo **nhiều cột** (`GROUP BY EMP_NUM, ATTRACT_NO`): cả `EMP_NUM` lẫn `ATTRACT_NO` không dùng hàm tổng hợp nên đều phải có mặt trong `GROUP BY`.",
+            "Lời giải 5 bài tập cuối Lab 5 (E5.1–E5.5):",
+            "• E5.1: `SELECT DISTINCT(EMP_NUM) FROM HOURS;` | E5.2: `SELECT EMP_NUM, SUM(HOURS_PER_ATTRACT) FROM HOURS GROUP BY EMP_NUM;` | E5.3: `SELECT ATTRACT_NO, MIN(HOUR_RATE), MAX(HOUR_RATE) FROM HOURS GROUP BY ATTRACT_NO;`",
+            "• E5.4: `SELECT TRANSACTION_NO, LINE_PRICE FROM SALES_LINE WHERE LINE_PRICE > 50;` | E5.5: `SELECT * FROM SALES ORDER BY SALE_DATE DESC;`"
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 12 (sách tr. 74)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 6: Kết nối bảng (Cross Join, Natural Join, JOIN USING, JOIN ON, Outer Join)",
+      "text": "Học đầy đủ các kỹ thuật JOIN bảng trong MySQL: kết nối kiểu cũ trong WHERE với alias, CROSS JOIN (tích Descartes), NATURAL JOIN, JOIN ... USING, JOIN ... ON và LEFT/RIGHT OUTER JOIN giữ lại các hàng không khớp.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 13–27 (sách tr. 75–89)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Khi join `N` bảng theo kiểu cũ (`FROM T1, T2, ... WHERE ...`), cần tối thiểu `N - 1` điều kiện join nối với nhau bằng `AND`, và phải gắn prefix tên bảng/alias (`THEMEPARK.PARK_CODE`) ở cột trùng tên.",
+          "`CROSS JOIN` tạo tích Descartes giữa hai bảng (ví dụ `SALES` 19 hàng × `SALES_LINE` 31 hàng = `589` hàng). Lưu ý đặc biệt trong MySQL: `CROSS JOIN` và `INNER JOIN` có thể thay thế cú pháp cho nhau.",
+          "`NATURAL JOIN` tự động ghép theo mọi cột cùng tên và tương thích kiểu dữ liệu, loại bỏ cột trùng và **không cần** prefix tên bảng cho cột chung.",
+          "`JOIN ... USING (cột)` chỉ định rõ cột chung cần ghép và **không cần** prefix; `JOIN ... ON điều_kiện` hỗ trợ ghép ngay cả khi hai cột khác tên nhưng **bắt buộc** ghi prefix `tên_bảng.cột` trong `SELECT` nếu cột trùng tên.",
+          "`LEFT [OUTER] JOIN` giữ toàn bộ hàng của bảng bên trái (ghi `NULL` cho cột bảng phải nếu không khớp); `RIGHT [OUTER] JOIN` làm ngược lại cho bảng bên phải."
+        ],
+        "terms": [
+          {
+            "term": "Cross Join",
+            "meaning": "Phép tích Descartes ghép từng hàng của bảng 1 với mọi hàng của bảng 2 (`N × M` hàng)."
+          },
+          {
+            "term": "Natural Join",
+            "meaning": "Phép join tự động dựa trên mọi cột trùng tên giữa hai bảng, không cần chỉ rõ `ON` hay `USING`."
+          },
+          {
+            "term": "Outer Join (LEFT / RIGHT)",
+            "meaning": "Phép kết ngoài: ngoài các hàng khớp điều kiện join, vẫn giữ nguyên hàng không có đối ứng ở bảng trái (`LEFT`) hoặc bảng phải (`RIGHT`) với giá trị `NULL` điền vào cột thiếu."
+          }
+        ],
+        "pitfalls": [
+          "Trong `JOIN ... ON` hoặc join kiểu cũ ở `WHERE`, nếu chọn cột trùng tên ở `SELECT` mà quên prefix tên bảng/alias sẽ gặp lỗi `Column '...' in field list is ambiguous`.",
+          "`NATURAL JOIN` rất dễ gài bẫy nếu hai bảng tình cờ có thêm một cột trùng tên ngoài ý muốn (như `PARK_CODE` vừa có ở `EMPLOYEE` vừa có ở `THEMEPARK`/`ATTRACTION`) khiến phép ghép bị siết điều kiện hoặc thành tích Descartes nếu không có cột chung.",
+          "Đặt điều kiện lọc bảng phải ở `WHERE` sau `LEFT JOIN` (thay vì `ON`) hoặc dùng `INNER JOIN` nhầm sẽ vô tình biến `LEFT JOIN` thành `INNER JOIN` và mất các hàng `NULL` cần giữ."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 6 • Trang 13",
+          "pageNumber": 13,
+          "title": "Lab 6: JOINING DATABASE TABLES — 6.1 Introduction to Joins",
+          "paragraphs": [
+            "Lab 6: JOINING DATABASE TABLES",
+            "The learning objectives of this lab are to",
+            "Note",
+            "In MySQL, the CROSS JOIN command is a syntactically equivalent to INNER JOIN (they can replace each other). In standard SQL, they are not equivalent. INNER JOIN is used with an ON clause, CROSS JOIN is used otherwise. For more information, see the MySQL Reference Manual 5.0",
+            "6.1 Introduction to Joins",
+            "The relational join operation merges rows from two or more tables and returns the rows with one of the following conditions:"
+          ],
+          "bullets": [
+            {
+              "text": "Learn how to perform the following types of database joins",
+              "subBullets": [
+                "Cross Join",
+                "Natural Join",
+                "Outer Joins"
+              ]
+            },
+            "Have common values in common columns (natural join)",
+            "Meet a given join condition (equality or inequality)",
+            "Have common values in common columns or have no matching values (outer join)"
+          ],
+          "explanation": [
+            "Lab 6 phân loại 3 nhóm phép kết hợp bảng quan hệ: khớp giá trị trên cột chung (`Natural Join`), thỏa một điều kiện bằng/bất đẳng thức (`Join ON`/`WHERE`), và giữ cả hàng không khớp (`Outer Join`).",
+            "Ghi chú đặc thù MySQL: về mặt cú pháp nội bộ của MySQL, `CROSS JOIN` và `INNER JOIN` có thể thay thế nhau được (tức viết `CROSS JOIN ... ON` cũng chạy như `INNER JOIN`, dù trong chuẩn ANSI SQL thì `INNER JOIN` đi với `ON` còn `CROSS JOIN` không có `ON`)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 13 (sách tr. 75)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 14",
+          "pageNumber": 14,
+          "title": "Old-style Join trong WHERE (THEMEPARK & TICKET)",
+          "paragraphs": [
+            "There are a number of different joins that can be performed. The most common is the natural join. To join tables, you simply enumerate the tables in the FROM clause of the SELECT statement. The DBMS will create the Cartesian product of every table in the FROM clause. However, to get the correct result—that is, a natural join—you must select only the rows in which the common attribute values match. That is done with the WHERE clause. Use the WHERE clause to indicate the common attributes that are used to link the tables (sometimes referred to as the join condition). For example, suppose you want to join the two tables THEMEPARK and TICKET. Because PARK_CODE is the foreign key in the TICKET table and the primary key in the THEMEPARK table, the link is established on PARK_CODE. It is important to note that when the same attribute name appears in more than one of the joined tables, the source table of the attributes listed in the SELECT command sequence must be defined. To join the THEMEPARK and TICKET tables, you would use the following, which produces the output shown in Figure 46."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTHEMEPARK.PARK_CODE, PARK_NAME, TICKET_NO,\n\tTICKET_TYPE, TICKET_PRICE\nFROM\tTHEMEPARK, TICKET\nWHERE\tTHEMEPARK.PARK_CODE = TICKET.PARK_CODE;"
+          },
+          "explanation": [
+            "Về mặt khái niệm, kiểu join cổ điển (`FROM T1, T2 WHERE T1.pk = T2.fk`) trước hết hình thành tích Descartes trong `FROM`, rồi dùng `WHERE` để chỉ giữ các cặp hàng có khóa chính bằng khóa ngoại.",
+            "Vì `PARK_CODE` xuất hiện ở cả `THEMEPARK` và `TICKET`, câu lệnh buộc phải viết rõ tên bảng nguồn như `THEMEPARK.PARK_CODE` trong cả `SELECT` lẫn `WHERE`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 14 (sách tr. 76)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 15",
+          "pageNumber": 15,
+          "title": "Figure 46 & Các nguyên tắc Join nhiều bảng",
+          "paragraphs": [
+            "Figure 46: Natural Join between THEMEPARK and TICKET tables",
+            "As you examine the preceding query, note the following points:"
+          ],
+          "bullets": [
+            "The FROM clause indicates which tables are to be joined. If three or more tables are included, the join operation takes place two tables at a time, starting from left to right. For example, if you are joining tables T1, T2, and T3, first table T1 is joined to T2; the results of that join are then joined to table T3.",
+            "The join condition in the WHERE clause tells the SELECT statement which rows will be returned. In this case, the SELECT statement returns all rows for which the PARK_CODE values in the PRODUCT and VENDOR tables are equal.",
+            "The number of join conditions is always equal to the number of tables being joined minus one. For example, if you join three tables (T1, T2, and T3), you will have two join conditions (j1 and j2). All join conditions are connected through an AND logical"
+          ],
+          "diagramText": [
+            "Figure 46 — 12 rows in set (0.01 sec):",
+            "PARK_CODE | PARK_NAME     | TICKET_NO | TICKET_TYPE | TICKET_PRICE",
+            "SP4533    | AdventurePort | 11001     | Adult       | 24.99",
+            "SP4533    | AdventurePort | 11002     | Child       | 14.99",
+            "SP4533    | AdventurePort | 11003     | Senior      | 10.99",
+            "FR1001    | FairyLand     | 13001     | Child       | 18.99",
+            "FR1001    | FairyLand     | 13002     | Adult       | 34.99",
+            "FR1001    | FairyLand     | 13003     | Senior      | 20.99",
+            "ZA1342    | GoldTown      | 67832     | Child       | 18.56",
+            "ZA1342    | GoldTown      | 67833     | Adult       | 28.67",
+            "ZA1342    | GoldTown      | 67855     | Senior      | 12.12",
+            "UK3452    | PleasureLand  | 88567     | Child       | 22.50",
+            "UK3452    | PleasureLand  | 88568     | Adult       | 42.10",
+            "UK3452    | PleasureLand  | 89720     | Senior      | 10.99"
+          ],
+          "explanation": [
+            "Nguyên tắc quan trọng khi kết hợp nhiều hơn 2 bảng (`T1, T2, T3`): DBMS xử lý tuần tự từng cặp từ trái sang phải (`(T1 ⋈ T2) ⋈ T3`) và số điều kiện join tối thiểu luôn là **`N - 1`** (nối bằng `AND`).",
+            "Lưu ý lỗi biên tập ở gạch đầu dòng thứ 2: tài liệu ghi nhầm `PRODUCT and VENDOR tables` (sót từ giáo trình Rob & Coronel) thay vì `THEMEPARK and TICKET tables`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 15 (sách tr. 77)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 16",
+          "pageNumber": 16,
+          "title": "Điều kiện Join PK=FK & Task 6.1 (Figure 47)",
+          "paragraphs": [
+            "operator. The first join condition (j1) defines the join criteria for T1 and T2. The second join condition (j2) defines the join criteria for the output of the first join and table T3.",
+            "Task 6.1 Execute the following query and check your results with those shown in Figure 47. Then modify the SELECT statement and change THEMEPARK.PARK_CODE to just PARK_CODE. What happens?",
+            "Figure 47: Query output for task 6.1"
+          ],
+          "bullets": [
+            "Generally, the join condition will be an equality comparison of the primary key in one table and the related foreign key in the second table."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTHEMEPARK.PARK_CODE, PARK_NAME, ATTRACT_NAME,\n\tATTRACT_CAPACITY\nFROM\tTHEMEPARK, ATTRACTION\nWHERE\tTHEMEPARK.PARK_CODE = ATTRACTION.PARK_CODE;"
+          },
+          "diagramText": [
+            "Figure 47 — Output của Task 6.1 (11 rows in set, 0.00 sec):",
+            "FR1001 | FairyLand    | ThunderCoaster  | 34",
+            "FR1001 | FairyLand    | SpinningTeacups | 62",
+            "FR1001 | FairyLand    | FlightToStars   | 24",
+            "FR1001 | FairyLand    | Ant-Trap        | 30",
+            "ZA1342 | GoldTown     | NULL            | 40",
+            "FR1001 | FairyLand    | Carnival        | 120",
+            "UK3452 | PleasureLand | 3D-Lego_Show    | 200",
+            "UK3452 | PleasureLand | BlackHole2      | 34",
+            "UK3452 | PleasureLand | Pirates         | 42",
+            "UK3452 | PleasureLand | UnderSeaWord    | 80",
+            "ZA1342 | GoldTown     | GoldRush        | 80"
+          ],
+          "explanation": [
+            "Giải đáp Task 6.1: nếu đổi `THEMEPARK.PARK_CODE` thành `PARK_CODE` trong mệnh đề `SELECT`, MySQL báo lỗi **`ERROR 1052 (23000): Column 'PARK_CODE' in field list is ambiguous`** vì cả `THEMEPARK` và `ATTRACTION` đều có cột `PARK_CODE`.",
+            "Chú ý trong ảnh kết quả Figure 47 vẫn xuất hiện `NULL` ở cột `ATTRACT_NAME` vì đó là giá trị dữ liệu của trò chơi thứ 5 trong bảng `ATTRACTION`, không phải do Outer Join."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 16 (sách tr. 78)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 17",
+          "pageNumber": 17,
+          "title": "6.2 Joining tables with an alias & 6.3 Cross Join (Task 6.2)",
+          "paragraphs": [
+            "6.2 Joining tables with an alias",
+            "An alias may be used to identify the source table from which the data are taken. For example, the aliases P and T can be used to label the THEMEPARK and TICKET tables as shown in the query below (which produces the same output as shown in Figure 46). Any legal table name may be used as an alias.",
+            "6.3 Cross Join",
+            "A cross join performs a relational product (also known as the Cartesian product) of two tables. The cross join syntax is:",
+            "SELECT column-list FROM table1 CROSS JOIN table2",
+            "For example,",
+            "SELECT * FROM SALES CROSS JOIN SALES_LINE;",
+            "performs a cross join of the SALES and SALES_LINE tables. That CROSS JOIN query generates 589 rows. (There were 19 sales rows and 31 SALES_LINE rows, thus giving 19 × 31 = 589 rows.)",
+            "Task 6.2 Write a CROSS JOIN query which selects all rows from the EMPLOYEE and HOURS tables. How many rows were returned?"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tP.PARK_CODE, PARK_NAME, TICKET_NO, TICKET_TYPE,\n\tTICKET_PRICE\nFROM\tTHEMEPARK P, TICKET T\nWHERE\tP.PARK_CODE =T.PARK_CODE;"
+          },
+          "explanation": [
+            "Dùng bí danh bảng (table alias) như `THEMEPARK P, TICKET T` giúp viết `P.PARK_CODE = T.PARK_CODE` gọn gàng hơn nhiều so với tên đầy đủ, đồng thời là **bắt buộc** khi join một bảng với chính nó (self-join).",
+            "`CROSS JOIN` ghép từng hàng bảng 1 với mọi hàng bảng 2 nên tổng số hàng luôn là tích `N × M` (ví dụ `19 × 31 = 589` hàng).",
+            "Lời giải Task 6.2: `SELECT * FROM EMPLOYEE CROSS JOIN HOURS;` — vì `EMPLOYEE` có 7 hàng và `HOURS` có 11 hàng, truy vấn trả về `7 × 11 = 77` hàng."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 17 (sách tr. 79)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 18",
+          "pageNumber": 18,
+          "title": "6.4 Natural Join — Cơ chế và cú pháp",
+          "paragraphs": [
+            "6.4 Natural Join",
+            "The natural join returns all rows with matching values in the matching columns and eliminates duplicate columns. That style of query is used when the tables share one or more common attributes with common names. The natural join syntax is:",
+            "SELECT column-list FROM table1 NATURAL JOIN table2",
+            "The natural join will perform the following tasks:",
+            "The following example performs a natural join of the SALES and SALES_LINE tables and returns only selected attributes:",
+            "The results of this query can be seen in Figure 48."
+          ],
+          "bullets": [
+            "Determine the common attribute(s) by looking for attributes with identical names and compatible data types",
+            "Select only the rows with common values in the common attribute(s)",
+            "If there are no common attributes, return the relational product of the two tables"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTRANSACTION_NO, SALE_DATE, LINE_NO, LINE_QTY,\n\tLINE_PRICE\nFROM\tSALES NATURAL JOIN SALES_LINE;"
+          },
+          "explanation": [
+            "`NATURAL JOIN` thực hiện 3 bước: (1) tìm mọi cột có **cùng tên** và **kiểu tương thích**, (2) giữ các hàng bằng nhau ở mọi cột chung đó và tự động loại cột trùng lặp, (3) nếu không có cột nào trùng tên, kết quả thoái hóa thành tích Descartes (`CROSS JOIN`).",
+            "Ở ví dụ `SALES NATURAL JOIN SALES_LINE`, cột chung duy nhất là `TRANSACTION_NO`, nên trong `SELECT` ta viết thẳng `TRANSACTION_NO` mà không cần `SALES.`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 18 (sách tr. 80)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 19",
+          "pageNumber": 19,
+          "title": "Figure 48 (NATURAL JOIN) & Task 6.3",
+          "paragraphs": [
+            "Figure 48: Results of SALES NATURAL JOIN SALES_LINE;",
+            "One important difference between the natural join and the “old-style” join syntax as illustrated in Figure 46, Section 6.1, is that the NATURAL JOIN command does not require the use of a table qualifier for the common attributes.",
+            "Task 6.3 Write a query that displays the employees first and last name (EMP_FNAME and EMP_LNAME), the attraction number (ATTRACT_NO) and the date worked. Hint:"
+          ],
+          "diagramText": [
+            "Figure 48 — SELECT TRANSACTION_NO, SALE_DATE, LINE_NO, LINE_QTY, LINE_PRICE FROM SALES NATURAL JOIN SALES_LINE;:",
+            "Hiển thị 31 dòng chi tiết hóa đơn (TRANSACTION_NO từ 12781 đến 67593, SALE_DATE đều là 2007-05-18).",
+            "31 rows in set (0.00 sec)"
+          ],
+          "explanation": [
+            "Điểm khác biệt cốt lõi so với join kiểu cũ (`Figure 46`): `NATURAL JOIN` tự gộp cột trùng thành một cột duy nhất nên **không cần** tiền tố bảng (table qualifier) khi chiếu cột chung.",
+            "Yêu cầu Task 6.3 (xem tiếp trang 20): lấy tên nhân viên (`EMP_FNAME`, `EMP_LNAME`), mã trò chơi (`ATTRACT_NO`) và ngày làm việc (`DATE_WORKED`)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 19 (sách tr. 81)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 20",
+          "pageNumber": 20,
+          "title": "Figure 49 (Task 6.3) & 6.5 Join USING",
+          "paragraphs": [
+            "You will have to join the HOURS and the EMPLOYEE tables. Check your results with those shown in Figure 49.",
+            "Figure 49: Query results for Task 6.3",
+            "6.5 Join USING",
+            "A second way to express a join is through the USING keyword. That query returns only the rows with matching values in the column indicated in the USING clause—and that column must exist in both tables. The syntax is:",
+            "SELECT column-list FROM table1 JOIN table2 USING (common-column)",
+            "To see the JOIN USING query in action, let’s perform a join of the SALES and SALEs_LINE tables by writing:",
+            "The SQL statement produces the results shown in Figure 50."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTRANSACTION_NO, SALE_DATE, LINE_NO, LINE_QTY,\n\tLINE_PRICE\nFROM\tSALES JOIN SALES_LINE USING (TRANSACTION_NO);"
+          },
+          "diagramText": [
+            "Figure 49 — Output Task 6.3 (11 rows in set, 0.01 sec):",
+            "Emma Calderdale 10034 (×2) | Marshel Ricardo 10034 | Arif Arshad 30012 | Arif Arshad 30044 (×2) | Enrica Denver 30011 | Enrica Denver 30012 | Mirrelle Namowa 10078 | Mirrelle Namowa 10098 (×2)."
+          ],
+          "explanation": [
+            "Lời giải Task 6.3: `SELECT EMP_FNAME, EMP_LNAME, ATTRACT_NO, DATE_WORKED FROM EMPLOYEE NATURAL JOIN HOURS;` (chú ý trong ảnh Figure 49 tác giả lại quên chọn `DATE_WORKED` dù đề bài có yêu cầu!).",
+            "`JOIN ... USING (cột)` an toàn hơn `NATURAL JOIN` khi hai bảng có nhiều cột trùng tên nhưng bạn chỉ muốn ghép theo **đúng cột khóa chỉ định** (và tên cột phải giống nhau ở cả hai bảng; sách gốc viết nhầm hoa/thường `SALEs_LINE`)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 20 (sách tr. 82)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 21",
+          "pageNumber": 21,
+          "title": "Figure 50 (JOIN USING) & Task 6.4 (Join 3 bảng)",
+          "paragraphs": [
+            "Figure 50: Query results for SALES JOIN SALES_LINE USING TRANSACTION_NO",
+            "As was the case with the NATURAL JOIN command, the JOIN USING operand does not require table qualifiers.",
+            "Task 6.4 Rewrite the query you wrote in Task 6.3 so that the attraction name (ATTRACT_NAME located in the ATTRACTION table) is also displayed. Express the joins through the USING keyword. Hint: You will need to join three tables. Your output should match that shown in Figure 51."
+          ],
+          "diagramText": [
+            "Figure 50 — Output của SALES JOIN SALES_LINE USING (TRANSACTION_NO):",
+            "Tương tự Figure 48: 31 rows in set (0.00 sec), cột TRANSACTION_NO được tự động khử trùng."
+          ],
+          "explanation": [
+            "Giống `NATURAL JOIN`, mệnh đề `JOIN ... USING (cột)` tự hợp nhất cột trong `USING` nên không đòi hỏi prefix bảng khi `SELECT`.",
+            "Lời giải Task 6.4 (join 3 bảng bằng `USING`): `SELECT EMP_FNAME, EMP_LNAME, ATTRACT_NO, ATTRACT_NAME FROM EMPLOYEE JOIN HOURS USING (EMP_NUM) JOIN ATTRACTION USING (ATTRACT_NO);`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 21 (sách tr. 83)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 22",
+          "pageNumber": 22,
+          "title": "Figure 51 (Task 6.4) & 6.6 Join ON",
+          "paragraphs": [
+            "Figure 51: Query results for Task 6.4",
+            "6.6 Join ON",
+            "The previous two join styles used common attribute names in the joining tables. Another way to express a join when the tables have no common attribute names is to use the JOIN ON operand. That query will return only the rows that meet the indicated join condition. The join condition will typically include an equality comparison expression of two columns. (The columns may or may not share the same name but, obviously, must have comparable data types.) The syntax is:",
+            "SELECT column-list FROM table1 JOIN table2 ON join-condition",
+            "The following example performs a join of the SALES and SALES_LINE tables, using the ON clause. The result is shown in Figure 52."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tSALES.TRANSACTION_NO, SALE_DATE, LINE_NO, LINE_QTY,\n\tLINE_PRICE"
+          },
+          "diagramText": [
+            "Figure 51 — Output Task 6.4 (11 rows in set, 0.00 sec):",
+            "Emma Calderdale 10034 ThunderCoaster (×2) | Marshel Ricardo 10034 ThunderCoaster | Arif Arshad 30012 Pirates | Arif Arshad 30044 UnderSeaWord (×2) | Enrica Denver 30011 BlackHole2 | Enrica Denver 30012 Pirates | Mirrelle Namowa 10078 Ant-Trap | Mirrelle Namowa 10098 Carnival (×2)."
+          ],
+          "explanation": [
+            "`JOIN ... ON điều_kiện` là dạng linh hoạt nhất vì **không yêu cầu hai cột khóa phải trùng tên** (chỉ cần cùng/tương thích kiểu dữ liệu), và có thể viết điều kiện tổng quát hơn dấu `=`.",
+            "Lệnh ví dụ bắt đầu bằng `SELECT SALES.TRANSACTION_NO, ...` (phần `FROM` xem tiếp trang 23) — chú ý phải ghi `SALES.TRANSACTION_NO` chứ không được viết trơn `TRANSACTION_NO`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 22 (sách tr. 84)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 23",
+          "pageNumber": 23,
+          "title": "Figure 52 (JOIN ON) & 6.7 The Outer Join",
+          "paragraphs": [
+            "Figure 52: Query results for SALES JOIN SALES_LINE ON",
+            "Note that unlike the NATURAL JOIN and the JOIN USING operands, the JOIN ON clause requires a table qualifier for the common attributes. If you do not specify the table qualifier, you will get a “column ambiguously defined” error message.",
+            "6.7 The Outer Join"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "FROM\tSALES JOIN SALES_LINE ON SALES.TRANSACTION_NO =\n\tSALES_LINE.TRANSACTION_NO;"
+          },
+          "diagramText": [
+            "Figure 52 — Output của SALES JOIN SALES_LINE ON ...: 31 rows in set (0.00 sec)."
+          ],
+          "explanation": [
+            "Khác với `NATURAL JOIN` và `JOIN USING`, `JOIN ... ON` giữ cả hai bản sao cột từ hai bảng nên **bắt buộc phải gắn table qualifier** (`SALES.TRANSACTION_NO`), nếu không DBMS báo lỗi mơ hồ tên cột (*column ambiguously defined* / *ambiguous*).",
+            "Mục 6.7 chuyển sang nhóm **Outer Join** (kết ngoài) để giữ lại cả những bản ghi mồ côi/chưa có đối ứng ở bảng bên kia."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 23 (sách tr. 85)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 24",
+          "pageNumber": 24,
+          "title": "Phân biệt Left/Right/Full Outer Join & Cú pháp LEFT OUTER JOIN",
+          "paragraphs": [
+            "An outer join returns not only the rows matching the join condition (that is, rows with matching values in the common columns), but also the rows with unmatched values. The ANSI standard defines three types of outer joins: left, right, and full. The left and right designations reflect the order in which the tables are processed by the DBMS. Remember that join operations take place two tables at a time. The first table named in the FROM clause will be the left side, and the second table named will be the right side. If three or more tables are being joined, the result of joining the first two tables becomes the left side; the third table becomes the right side.",
+            "LEFT OUTER JOIN",
+            "The left outer join returns not only the rows matching the join condition (that is, rows with matching values in the common column), but also the rows in the left side table with unmatched values in the right side table. The syntax is:",
+            "SELECT\tcolumn-list",
+            "FROM\ttable1 LEFT [OUTER] JOIN table2 ON join-condition",
+            "For example, the following query lists the park code, park name, and attraction name for all attractions and includes those Theme parks with no currently listed attractions:",
+            "The results of this query are shown in Figure 53."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTHEMEPARK.PARK_CODE, PARK_NAME, ATTRACT_NAME\nFROM\tTHEMEPARK LEFT JOIN ATTRACTION ON\n\tTHEMEPARK.PARK_CODE = ATTRACTION.PARK_CODE;"
+          },
+          "explanation": [
+            "Khái niệm **left** và **right** phụ thuộc vào **thứ tự xuất hiện trong mệnh đề `FROM`**: bảng viết trước từ khóa `JOIN` là bảng trái (`table1`), bảng viết sau là bảng phải (`table2`); nếu join nhiều hơn 2 bảng, kết quả tạm của cặp trước trở thành bảng trái cho phép join kế tiếp.",
+            "`LEFT [OUTER] JOIN` trả về mọi cặp khớp giống `INNER JOIN`, **cộng thêm** các hàng thuộc bảng trái (`THEMEPARK`) chưa có bản ghi nào trong `ATTRACTION` (như công viên chưa có trò chơi)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 24 (sách tr. 86)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 25",
+          "pageNumber": 25,
+          "title": "Figure 53 (LEFT JOIN), Task 6.5 & RIGHT OUTER JOIN",
+          "paragraphs": [
+            "Figure 53: LEFT OUTER JOIN example",
+            "Task 6.5 Enter the query above and check your results with those shown in Figure 53.",
+            "RIGHT OUTER JOIN",
+            "The right outer join returns not only the rows matching the join condition (that is, rows with matching values in the common column), but also the rows in the right side table with unmatched values in the left side table. The syntax is:",
+            "SELECT\tcolumn-list",
+            "FROM\ttable1 RIGHT [OUTER] JOIN table2 ON join-condition",
+            "For example, the following query lists the park code, park name, and attraction name for all attractions and also includes those attractions that do not have a matching park code:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTHEMEPARK.PARK_CODE, PARK_NAME, ATTRACT_NAME\nFROM\tTHEMEPARK RIGHT JOIN ATTRACTION ON\n\tTHEMEPARK.PARK_CODE = ATTRACTION.PARK_CODE;"
+          },
+          "diagramText": [
+            "Figure 53 — LEFT OUTER JOIN (15 rows in set, 0.00 sec):",
+            "FR1001 FairyLand (5 trò chơi) | NL1202 Efling (NULL) | SP4533 AdventurePort (NULL) | SW2323 Labyrinthe (NULL) | UK2622 Miniland (NULL) | UK3452 PleasureLand (4 trò chơi) | ZA1342 GoldTown (NULL & GoldRush)."
+          ],
+          "explanation": [
+            "Figure 53 cho thấy 4 công viên chưa có trò chơi (`NL1202`, `SP4533`, `SW2323`, `UK2622`) vẫn xuất hiện đầy đủ trong kết quả `LEFT JOIN` với `ATTRACT_NAME = NULL`, nâng tổng số hàng từ 11 lên 15.",
+            "Ngược lại, `RIGHT OUTER JOIN` giữ toàn bộ hàng bảng phải (`ATTRACTION`) kể cả trò chơi không có `PARK_CODE` khớp ở `THEMEPARK` (từ khóa `OUTER` mang tính tùy chọn trong SQL)."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 25 (sách tr. 87)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 26",
+          "pageNumber": 26,
+          "title": "Figure 54 (RIGHT JOIN), Task 6.6 & 6.9 Exercises (E6.1–E6.3)",
+          "paragraphs": [
+            "The results of this query are shown in Figure 54.",
+            "Figure 54: RIGHT OUTER JOIN example",
+            "Task 6.6 Enter the query above and check your results with those shown in Figure 54.",
+            "6.9 Exercises",
+            "E6.1 Use the cross join to display all rows in the EMPLOYEE and HOURS tables. How many rows were returned?",
+            "E6.2 Write a query to display the attraction number, employee first and last names and the date they worked on the attraction. Order the results by the date worked.",
+            "E6.3 Display the park names and total sales for Theme Parks who are located in the country ‘UK’ or ‘FR’."
+          ],
+          "diagramText": [
+            "Figure 54 — RIGHT OUTER JOIN (11 rows in set, 0.00 sec):",
+            "Chỉ còn 11 dòng thuộc bảng ATTRACTION (4 công viên không có trò chơi đã biến mất vì mọi attraction đều có PARK_CODE hợp lệ ở THEMEPARK)."
+          ],
+          "explanation": [
+            "Figure 54 chỉ ra `THEMEPARK RIGHT JOIN ATTRACTION` trả về đúng 11 hàng vì mọi trò chơi trong bảng `ATTRACTION` đều đã gắn `PARK_CODE` hợp lệ trỏ về `THEMEPARK` (do ràng buộc khóa ngoại).",
+            "Lưu ý sách đánh số nhảy từ mục `6.7` sang `6.9 Exercises` (bỏ qua 6.8). Lời giải E6.1–E6.3:",
+            "• E6.1: `SELECT * FROM EMPLOYEE CROSS JOIN HOURS;` (`7 × 11 = 77` hàng). | E6.2: `SELECT H.ATTRACT_NO, E.EMP_FNAME, E.EMP_LNAME, H.DATE_WORKED FROM EMPLOYEE E JOIN HOURS H ON E.EMP_NUM = H.EMP_NUM ORDER BY H.DATE_WORKED;`",
+            "• E6.3: `SELECT P.PARK_NAME, SUM(L.LINE_PRICE) AS TOTAL_SALES FROM THEMEPARK P JOIN SALES S ON P.PARK_CODE = S.PARK_CODE JOIN SALES_LINE L ON S.TRANSACTION_NO = L.TRANSACTION_NO WHERE P.PARK_COUNTRY IN ('UK','FR') GROUP BY P.PARK_CODE, P.PARK_NAME;`"
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 26 (sách tr. 88)"
+          }
+        },
+        {
+          "slideNumber": "Lab 6 • Trang 27",
+          "pageNumber": 27,
+          "title": "6.9 Exercises (tiếp: E6.4–E6.5)",
+          "paragraphs": [
+            "E6.4 Write a query to display the names of attractions that currently have not had any employees working on them.",
+            "E6.5 List the sale date, line quantity and line price of all transactions on the 18th May 2007. (Hint: Remember the format of MySQL dates is ‘2007-05-18’)."
+          ],
+          "explanation": [
+            "Lời giải E6.4 (dùng `LEFT JOIN ... WHERE ... IS NULL` — tìm trò chơi chưa từng có bản ghi ở `HOURS`): `SELECT A.ATTRACT_NAME FROM ATTRACTION A LEFT JOIN HOURS H ON A.ATTRACT_NO = H.ATTRACT_NO WHERE H.ATTRACT_NO IS NULL;`.",
+            "Lời giải E6.5: `SELECT S.SALE_DATE, L.LINE_QTY, L.LINE_PRICE FROM SALES S JOIN SALES_LINE L ON S.TRANSACTION_NO = L.TRANSACTION_NO WHERE S.SALE_DATE = '2007-05-18';`."
+          ],
+          "source": {
+            "file": "MySQL Lab 5-6.pdf",
+            "loc": "Trang 27 (sách tr. 89)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 7 (Phần 1): Hàm Ngày & Giờ trong MySQL (DATE_FORMAT, DATEDIFF, ADDDATE, LAST_DAY)",
+      "text": "Tìm hiểu các kiểu dữ liệu thời gian của MySQL (Table 7.1), bộ ký tự định dạng ngày giờ đầy đủ của DATE_FORMAT (Table 7.2) và các hàm xử lý/tính toán ngày tháng (CURDATE, CURTIME, DAYOFMONTH, MONTH, YEAR, DATEDIFF, DATE_ADD/DATE_SUB, LAST_DAY).",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 1–9 (sách tr. 90–98)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Kiểu `DATE` trong MySQL lưu theo chuẩn `'YYYY-MM-DD'`; nếu nhập sai định dạng, MySQL có thể chấp nhận nhưng lưu sai giá trị mong muốn.",
+          "`DATE_FORMAT(date, format)` định dạng ngày thành chuỗi hiển thị bằng các specifier bắt đầu bằng `%` (`%D` ngày có hậu tố `18th`, `%b` tháng viết tắt `May`, `%M` tên tháng đủ `May`/`January`, `%Y` năm 4 chữ số, `%y` năm 2 số, `%a` thứ viết tắt).",
+          "Tách thành phần ngày dùng `DAYOFMONTH(date)`, `MONTH(date)`, `YEAR(date)`; lấy ngày giờ hiện tại dùng `CURRENT_DATE()` (`CURDATE()`) và `CURRENT_TIME()` (`CURTIME()`).",
+          "Tính số ngày chênh lệch dùng `DATEDIFF(date1, date2)` (`date1 - date2`); cộng/trừ khoảng thời gian dùng `DATE_ADD`/`ADDDATE(date, INTERVAL expr unit)` và `DATE_SUB`; tìm ngày cuối tháng dùng `LAST_DAY(date)`."
+        ],
+        "terms": [
+          {
+            "term": "DATE_FORMAT(date, format)",
+            "meaning": "Hàm chuyển giá trị `DATE`/`DATETIME` thành chuỗi định dạng theo mẫu (ví dụ `'%D %b %Y'` cho `'18th May 2007'`)."
+          },
+          {
+            "term": "DATEDIFF(d1, d2)",
+            "meaning": "Trả về số ngày chênh lệch `d1 - d2` (dương nếu `d1 > d2`)."
+          },
+          {
+            "term": "ADDDATE / DATE_ADD",
+            "meaning": "Cộng thêm một khoảng thời gian (`INTERVAL expr unit` như `INTERVAL 12 MONTH`) vào một ngày cho trước."
+          },
+          {
+            "term": "LAST_DAY(date)",
+            "meaning": "Trả về ngày cuối cùng của tháng chứa `date` (hữu ích để kiểm tra giao dịch cuối tháng)."
+          }
+        ],
+        "pitfalls": [
+          "Table 7.1 gốc in nhầm định dạng `TIMESTAMP` là `YYYYMMDDHHSSMM` (đảo `SS` lên trước `MM`, đúng phải là `HHMMSS`).",
+          "Trong `Table 7.2` gốc: `%c` và `%m` ghi chú `(0..12)` / `(00..12)` (thực tế tháng chỉ từ `1..12` hoặc `00` với zero-date).",
+          "Ở `Task 7.7`, viết `LAST_DAY(SALE_DATE)-20` trong MySQL dùng phép trừ số học trên `DATE` (chuyển sang số `YYYYMMDD`) — trong thực tế dễ sai khi vượt ranh giới tháng, nên ưu tiên `DATE_SUB(LAST_DAY(SALE_DATE), INTERVAL 20 DAY)`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 7 • Trang 1",
+          "pageNumber": 1,
+          "title": "Lab 7: SQL Functions — 7.1 Date and Time Functions (Table 7.1)",
+          "paragraphs": [
+            "MySQL Lab Guide",
+            "Lab 7: SQL Functions",
+            "The learning objectives of this lab are to",
+            "There are many types of SQL functions, such as arithmetic, trigonometric, string, date, and time functions. Lab 7 will cover a selection of these SQL functions that are implemented in MySQL in detail. Functions always use a numerical, date, or string value. The value may be part of the command itself (a constant or literal) or it may be an attribute located in a table. Therefore, a function may appear anywhere in a SQL statement where a value or an attribute can be used.",
+            "7.1 Date and Time Functions",
+            "In MySQL there are a number of useful date and time functions. However, first it is important to briefly look at the main date and time types are available to MySQL. These are shown in the table below:"
+          ],
+          "bullets": [
+            "Learn about selected MySQL date and time functions",
+            "Be able to perform string manipulations",
+            "Utilise single row numeric functions",
+            "Perform conversions between data types"
+          ],
+          "table": {
+            "caption": "Table 7.1 MySQL Date and Time data types (phần đầu, YEAR tiếp ở trang 2)",
+            "headers": [
+              "Type",
+              "Format"
+            ],
+            "rows": [
+              [
+                "DATETIME",
+                "YYYY-MM-DD HH:MM:SS"
+              ],
+              [
+                "DATE",
+                "YYYY-MM-DD"
+              ],
+              [
+                "TIMESTAMP",
+                "YYYYMMDDHHSSMM"
+              ],
+              [
+                "TIME",
+                "HH:MM:SS"
+              ]
+            ]
+          },
+          "explanation": [
+            "Lab 7 giới thiệu 4 nhóm hàm đơn dòng (single-row functions) trong MySQL: ngày giờ, chuỗi, số học và chuyển đổi kiểu dữ liệu; các hàm có thể đặt ở bất kỳ đâu cho phép dùng hằng hay tên cột.",
+            "Table 7.1 liệt kê 5 kiểu ngày giờ chính (dòng `YEAR` chuyển sang trang 2); lưu ý trong tài liệu gốc ghi nhầm định dạng `TIMESTAMP` là `YYYYMMDDHHSSMM` (đảo giây trước phút)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 1 (sách tr. 90)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 2",
+          "pageNumber": 2,
+          "title": "Table 7.1 (tiếp), Task 7.1 & Hàm DATE_FORMAT()",
+          "paragraphs": [
+            "As you can see from Table 7.1, the DATE type is stored in a special internal format that includes just the year, month and day whilst the DATETIME data type also stores the hours, minutes, and seconds. If you try to enter a date in a format other than the Year-Month-Day format then it might work, but it won't be storing them as you expect!",
+            "Task 7.1 Enter the following query and examine how the date is displayed.",
+            "It is possible to change the format of the date using the DATE_FORMAT() function. The syntax of this function is",
+            "DATE_FORMAT(date,format)",
+            "The function formats the date value according to the format string.",
+            "For example, the following query formats the date as 18th May 2007 using ‘ date specifiers’ as shown in Figure 55."
+          ],
+          "table": {
+            "caption": "Table 7.1 MySQL Date and Time data types (tiếp theo)",
+            "headers": [
+              "Type",
+              "Format"
+            ],
+            "rows": [
+              [
+                "YEAR",
+                "YYYY"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tDISTINCT(SALE_DATE )\nFROM\tSALES;\n\nSELECT\tDISTINCT(DATE_FORMAT(SALE_DATE, ‘%D %b %Y’))\nFROM\tSALES;"
+          },
+          "explanation": [
+            "MySQL lưu nội bộ kiểu `DATE` theo `YYYY-MM-DD`, nên khi cần trình bày thân thiện cho người dùng (như `18th May 2007`), ta dùng `DATE_FORMAT(date, format)`.",
+            "Trong ví dụ `%D %b %Y`: `%D` in ngày kèm hậu tố tiếng Anh (`18th`), `%b` in tên tháng viết tắt 3 chữ (`May`), `%Y` in năm đủ 4 chữ số (`2007`). (Lưu ý trong câu lệnh thực tế chạy trên MySQL phải dùng nháy đơn thẳng `'...'` thay vì nháy cong `‘...’` như bản in)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 2 (sách tr. 91)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 3",
+          "pageNumber": 3,
+          "title": "Figure 55 & Table 7.2 Specifiers của DATE_FORMAT (phần 1)",
+          "paragraphs": [
+            "Figure 55 Formatting Dates in MySQL",
+            "Table 7.2 taken directly from the MySQL Manual 5.0 shows a complete list of specifiers that can be used in the format string."
+          ],
+          "table": {
+            "caption": "Table 7.2 Date specifiers từ MySQL Manual 5.0 (phần 1/2)",
+            "headers": [
+              "Specifier",
+              "Description"
+            ],
+            "rows": [
+              [
+                "%a",
+                "Abbreviated weekday name (Sun..Sat)"
+              ],
+              [
+                "%b",
+                "Abbreviated month name (Jan..Dec)"
+              ],
+              [
+                "%c",
+                "Month, numeric (0..12)"
+              ],
+              [
+                "%D",
+                "Day of the month with English suffix (0th, 1st, 2nd, 3rd, …)"
+              ],
+              [
+                "%d",
+                "Day of the month, numeric (00..31)"
+              ],
+              [
+                "%e",
+                "Day of the month, numeric (0..31)"
+              ],
+              [
+                "%f",
+                "Microseconds (000000..999999)"
+              ],
+              [
+                "%H",
+                "Hour (00..23)"
+              ],
+              [
+                "%h",
+                "Hour (01..12)"
+              ],
+              [
+                "%I",
+                "Hour (01..12)"
+              ],
+              [
+                "%i",
+                "Minutes, numeric (00..59)"
+              ],
+              [
+                "%j",
+                "Day of year (001..366)"
+              ],
+              [
+                "%k",
+                "Hour (0..23)"
+              ],
+              [
+                "%l",
+                "Hour (1..12)"
+              ],
+              [
+                "%M",
+                "Month name (January..December)"
+              ],
+              [
+                "%m",
+                "Month, numeric (00..12)"
+              ],
+              [
+                "%p",
+                "AM or PM"
+              ],
+              [
+                "%r",
+                "Time, 12-hour (hh:mm:ss followed by AM or PM)"
+              ],
+              [
+                "%S",
+                "Seconds (00..59)"
+              ],
+              [
+                "%s",
+                "Seconds (00..59)"
+              ],
+              [
+                "%T",
+                "Time, 24-hour (hh:mm:ss)"
+              ],
+              [
+                "%U",
+                "Week (00..53), where Sunday is the first day of the week"
+              ],
+              [
+                "%u",
+                "Week (00..53), where Monday is the first day of the week"
+              ],
+              [
+                "%V",
+                "Week (01..53), where Sunday is the first day of the week; used with %X"
+              ]
+            ]
+          },
+          "diagramText": [
+            "Figure 55 — Output: 18th May 2007 (1 row in set, 0.00 sec)."
+          ],
+          "explanation": [
+            "Table 7.2 là bảng tra cứu chuẩn để lắp ghép chuỗi định dạng ngày giờ; chú ý phân biệt chữ hoa và chữ thường vì nghĩa khác nhau hoàn toàn (`%M` là tên tháng đầy đủ `May`/`January`, còn `%m` là tháng dạng số `05`).",
+            "Tương tự `%d` có số `0` đệm đầu (`00..31`) còn `%e` bỏ số `0` đầu (`0..31`); `%H` là 24 giờ còn `%h`/`%I` là 12 giờ."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 3 (sách tr. 92)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 4",
+          "pageNumber": 4,
+          "title": "Table 7.2 (phần 2), Task 7.2 & CURRENT_DATE / CURRENT_TIME (Task 7.3)",
+          "paragraphs": [
+            "Task 7.2 Using the date specifiers in Table 7.2, modify the query shown in Figure 55 to display the date in the format 'Fri – 18 – 5 – 07'.",
+            "You will now explore some of the main MySQL date / time functions.",
+            "CURRENT DATE and CURRENT TIME",
+            "The CURRENT_DATE function returns today’s date while the CURRENT_TIME function returns the current time.",
+            "Task 7.3 Enter the following query to display today’s date and time. Notice that in MySQL the functions are called using the SELECT statement but no FROM clause is needed."
+          ],
+          "table": {
+            "caption": "Table 7.2 Date specifiers từ MySQL Manual 5.0 (phần 2/2)",
+            "headers": [
+              "Specifier",
+              "Description"
+            ],
+            "rows": [
+              [
+                "%v",
+                "Week (01..53), where Monday is the first day of the week; used with %x"
+              ],
+              [
+                "%W",
+                "Weekday name (Sunday..Saturday)"
+              ],
+              [
+                "%w",
+                "Day of the week (0=Sunday..6=Saturday)"
+              ],
+              [
+                "%X",
+                "Year for the week where Sunday is the first day of the week, numeric, four digits; used with %V"
+              ],
+              [
+                "%x",
+                "Year for the week, where Monday is the first day of the week, numeric, four digits; used with %v"
+              ],
+              [
+                "%Y",
+                "Year, numeric, four digits"
+              ],
+              [
+                "%y",
+                "Year, numeric (two digits)"
+              ],
+              [
+                "%%",
+                "A literal ‘%’ character"
+              ],
+              [
+                "%x",
+                "x, for any ‘x’ not listed above"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "sql",
+            "text": "mysql> SELECT CURRENT_DATE(), CURRENT_TIME();"
+          },
+          "explanation": [
+            "Lời giải Task 7.2 để xuất `'Fri – 18 – 5 – 07'` (ngày 18/05/2007 không có số 0 đứng trước tháng): `SELECT DISTINCT(DATE_FORMAT(SALE_DATE, '%a – %e – %c – %y')) FROM SALES;` (`%a` = `Fri`, `%e` = ngày không số 0 đầu, `%c` = `5`, `%y` = `07`).",
+            "Khác Oracle (phải viết `FROM DUAL`), MySQL cho phép gọi trực tiếp hàm với `SELECT` mà **không cần mệnh đề `FROM`**."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 4 (sách tr. 93)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 5",
+          "pageNumber": 5,
+          "title": "Figure 56 & Tách thành phần bằng MONTH, DAYOFMONTH, YEAR",
+          "paragraphs": [
+            "Note",
+            "CURRENT_TIME and CURRENT_DATE are synonyms for CURTIME() and CURDATE respectively.",
+            "The output for this query is shown in Figure 56.",
+            "Figure 56 Displaying the current date and time.",
+            "MONTH, DAYOFMONTH and YEAR",
+            "MySQL provides functions for extracting the month, day or year from any given date. The syntax of each function is as follows:",
+            "DAYOFMONTH(date) returns the day of the month for date, in the range 0 to 31.",
+            "MONTH(date) returns the month for date, in the range 0 to 12.",
+            "YEAR(date) returns the year for date, in the range 1000 to 9999, or 0 for the “zero” date.",
+            "The following query shows how these three functions can be used to display different parts of an employee’s date of birth. The output of this query is shown in Figure 57."
+          ],
+          "diagramText": [
+            "Figure 56 — SELECT CURRENT_DATE(), CURRENT_TIME();:",
+            "CURRENT_DATE() | CURRENT_TIME()",
+            "2007-11-10     | 18:52:13",
+            "1 row in set (0.00 sec)"
+          ],
+          "explanation": [
+            "`CURRENT_DATE()`/`CURDATE()` và `CURRENT_TIME()`/`CURTIME()` đồng nghĩa nhau hoàn toàn, dùng để lấy ngày giờ hiện tại của máy chủ MySQL.",
+            "Khi cần tính toán hoặc lọc riêng từng thành phần số nguyên của cột ngày tháng, dùng bộ ba `DAYOFMONTH(date)`, `MONTH(date)` và `YEAR(date)`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 5 (sách tr. 94)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 6",
+          "pageNumber": 6,
+          "title": "Figure 57, Task 7.3 (Figure 58) & Hàm DATEDIFF",
+          "paragraphs": [
+            "Figure 57 Using the MONTH, DAYOFMONTH and YEAR functions.",
+            "Task 7.3 Write a query that displays all employees who were born in November. Your output should match that shown in Figure 58.",
+            "Figure 58 Output for Task 7.3.",
+            "DATEDIFF"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT DAYOFMONTH(EMP_DOB) AS “Day”, MONTH(EMP_DOB) AS “Month”,\nYEAR(EMP_DOB) AS “Year”\nFROM EMPLOYEE;"
+          },
+          "diagramText": [
+            "Figure 57 — 7 rows in set (0.00 sec): (15,6,1972), (19,3,1978), (14,11,1969), (16,10,1974), (8,11,1980), (14,3,1990), (12,2,1968).",
+            "Figure 58 (Task 7.3) — SELECT EMP_LNAME, EMP_FNAME, EMP_DOB, DATE_FORMAT(EMP_DOB,'%b') AS MONTH FROM EMPLOYEE WHERE month(EMP_DOB) = '11';:",
+            "EMP_LNAME | EMP_FNAME | EMP_DOB    | MONTH",
+            "Arshad    | Arif      | 1969-11-14 | Nov",
+            "Denver    | Enrica    | 1980-11-08 | Nov",
+            "2 rows in set (0.00 sec)"
+          ],
+          "explanation": [
+            "Lưu ý sách đánh số trùng `Task 7.3` (đã có Task 7.3 ở trang 4). Figure 58 cho thấy lời giải dùng đồng thời `MONTH(EMP_DOB)` trong `WHERE` để lọc tháng `11` và `DATE_FORMAT(EMP_DOB, '%b')` để in tên tháng viết tắt `Nov`.",
+            "Kết hợp các hàm tách ngày/tháng giúp đặt alias cột dễ đọc (`AS \"Day\"`, `AS \"Month\"`, `AS \"Year\"`)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 6 (sách tr. 95)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 7",
+          "pageNumber": 7,
+          "title": "DATEDIFF (Task 7.4) & Cú pháp DATE_ADD / DATE_SUB",
+          "paragraphs": [
+            "The DATEDIFF function subtracts two dates and returns a value in days from one date to the other. The following example calculates the number of days between the 1st January 2008 and the 25th December 2008.",
+            "Task 7.4 Enter the query above and see how many days it is until the 25th December. Then modify the query to see how many days it is from today’s date until 25th December 2009.",
+            "DATE_ADD and DATE_SUB",
+            "The DATE_ADD and DATE_SUB functions both perform date arithmetic and allow you to either add or subtract two dates from one another. The syntax of these functions is:",
+            "DATE_ADD(date,INTERVAL expr unit)",
+            "DATE_SUB(date,INTERVAL expr unit)",
+            "Where expr is an expression specifying the interval value to be added or subtracted from the starting date and unit is a keyword indicating the units in which the expression should be interpreted.",
+            "For example, the following query adds 11 months to the date 1st January 2008 to display a new date of 1st December 2008. The output for this query is shown in Figure 59."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT DATEDIFF(‘2008-12-25’,‘2008-01-01’);"
+          },
+          "explanation": [
+            "`DATEDIFF(date1, date2)` thực hiện phép trừ `date1 - date2` trả về số ngày; do đó `DATEDIFF('2008-12-25', '2008-01-01')` trả về `359` ngày (năm 2008 nhuận).",
+            "Giải pháp cho phần 2 của Task 7.4 (từ hôm nay đến 25/12/2009): `SELECT DATEDIFF('2009-12-25', CURDATE());`.",
+            "`DATE_ADD` và `DATE_SUB` cộng/trừ khoảng thời gian tùy đơn vị (`DAY`, `MONTH`, `YEAR`, `HOUR`,...) thông qua từ khóa `INTERVAL expr unit`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 7 (sách tr. 96)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 8",
+          "pageNumber": 8,
+          "title": "ADDDATE (Figure 59), Task 7.6 & Hàm LAST_DAY",
+          "paragraphs": [
+            "Figure 59 Adding months to a date",
+            "A full list of the different interval types can be found in the MySQL Reference Manual 5.0.",
+            "Task 7.6 Enter the following query which lists the hire dates of all employees along with the date of their first work appraisal (one year from the hiredate). Check that the output is correct.",
+            "LAST_DAY",
+            "The function LAST_DAY returns the date of the last day of the month given in a date.",
+            "The syntax is",
+            "LAST_DAY(date_value)."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ADDDATE(‘2008-01-01’, INTERVAL 11 MONTH );\n\nSELECT EMP_LNAME, EMP_FNAME, EMP_HIRE_DATE,\nADDDATE(EMP_HIRE_DATE, INTERVAL 12 MONTH )AS “FIRST APPRAISAL”\nFROM EMPLOYEE;"
+          },
+          "diagramText": [
+            "Figure 59 — Output: 2008-12-01 (1 row in set, 0.00 sec)."
+          ],
+          "explanation": [
+            "`ADDDATE` là tên đồng nghĩa (synonym) với `DATE_ADD` khi dùng cú pháp `INTERVAL`; Task 7.6 (sách đánh nhảy từ 7.4 lên 7.6) cộng thêm `12 MONTH` vào `EMP_HIRE_DATE` để tính ngày đánh giá công việc đầu tiên sau đúng 1 năm.",
+            "`LAST_DAY(date_value)` trả về ngày cuối tháng (ví dụ `28`/`29` tháng 2 hoặc `30`/`31`), tự động xử lý chính xác năm nhuận."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 8 (sách tr. 97)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 9",
+          "pageNumber": 9,
+          "title": "Task 7.7 (LAST_DAY) & 7.2 Numeric Functions (Table 4)",
+          "paragraphs": [
+            "Task 7.7 Enter the following query which lists all sales transactions that were made in the last 20 days of a month:",
+            "7.2 Numeric Functions",
+            "In this section, you will learn about MySQL single row numeric functions. Numeric functions take one numeric parameter and return one value. A description of the functions you will explore in this lab can be found in Table 4.",
+            "Note",
+            "Do not confuse the SQL aggregate functions you saw in the previous chapter with the numeric functions in this section. The first group operates over a set of values (multiple rows—hence, the name aggregate functions), while the numeric functions covered here operate over a single row."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT *\nFROM SALES\nWHERE SALE_DATE >= LAST_DAY(SALE_DATE)-20;"
+          },
+          "table": {
+            "caption": "Table 4 Selected Numeric Functions (phần đầu, tiếp tục ở trang 10)",
+            "headers": [
+              "Function",
+              "Description"
+            ],
+            "rows": [
+              [
+                "ABS",
+                "Returns the absolute value of a number\nSyntax: ABS(numeric_value)"
+              ],
+              [
+                "ROUND",
+                "Rounds a value to a specified precision (number of digits)"
+              ]
+            ]
+          },
+          "explanation": [
+            "Task 7.7 dùng `LAST_DAY(SALE_DATE) - 20` để tìm giao dịch diễn ra trong 20 ngày cuối tháng (nhắc lại: cách trừ số nguyên trực tiếp trên `DATE` trong MySQL chuyển ngày thành số `YYYYMMDD` nên chỉ an toàn khi không lùi qua đầu tháng; chuẩn nhất nên viết `DATE_SUB(LAST_DAY(SALE_DATE), INTERVAL 20 DAY)`).",
+            "Hộp Note nhấn mạnh ranh giới rõ ràng: **Aggregate functions** (Lab 5) gom nhiều hàng trả về 1 trị cho mỗi nhóm, còn **Numeric functions** (Lab 7) xử lý độc lập từng hàng một (single-row)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 9 (sách tr. 98)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 7 (Phần 2): Hàm số, Hàm chuỗi, Hàm chuyển đổi (CAST, IFNULL, CASE) và Bài tập",
+      "text": "Thực hành các hàm số học đơn dòng (ABS, ROUND, TRUNCATE, MOD), hàm xử lý chuỗi (CONCAT, UPPER, LOWER, SUBSTR, LENGTH), hàm chuyển đổi kiểu/xử lý NULL/rẽ nhánh (CAST, CONVERT, IFNULL, CASE) và 4 bài tập E7.1–E7.4.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 10–21 (sách tr. 99–110)"
+      },
+      "digest": {
+        "keyPoints": [
+          "`ROUND(x, p)` làm tròn (ví dụ `114.68` → `115`), còn `TRUNCATE(x, p)` cắt bỏ phần thập phân dư không làm tròn (`114.68` → `114`); `MOD(m, n)` trả về số dư phép chia.",
+          "Hàm chuỗi: `CONCAT(s1, s2)` nối chuỗi, `UPPER`/`LOWER` đổi hoa/thường, `SUBSTR(str, p, l)` trích chuỗi con bắt đầu từ vị trí `p` (đánh số từ `1`) dài `l` ký tự, `LENGTH(str)` đếm độ dài chuỗi (`NULL` → `NULL`).",
+          "MySQL có thể ép kiểu ngầm (`10 + '10'` = `20`), nhưng MySQL 5.0 khuyến nghị dùng `CAST(expr AS type)` (hoặc `CONVERT`) khi ép kiểu tường minh.",
+          "`IFNULL(expr1, expr2)` tương đương `NVL` trong Oracle, thay thế `NULL` (như `0`) trước khi nhân/cộng để kết quả biểu thức không bị biến thành `NULL`.",
+          "`CASE` có 2 dạng (`CASE col WHEN val THEN ...` và `CASE WHEN cond THEN ...`), tương đương cấu trúc `DECODE` hoặc `IF-ELSIF-ELSE`."
+        ],
+        "terms": [
+          {
+            "term": "ROUND vs TRUNCATE",
+            "meaning": "`ROUND(n, p)` làm tròn lên/xuống theo chữ số kế tiếp; `TRUNCATE(n, p)` chặt cụt ở đúng `p` chữ số thập phân."
+          },
+          {
+            "term": "SUBSTR(s, p, l)",
+            "meaning": "Trích chuỗi con từ vị trí `p` (1-based trong SQL) lấy `l` ký tự."
+          },
+          {
+            "term": "IFNULL(expr1, expr2)",
+            "meaning": "Trả về `expr1` nếu khác NULL, ngược lại trả về `expr2` (tránh phép tính `NULL * price = NULL`)."
+          },
+          {
+            "term": "CASE expression",
+            "meaning": "Biểu thức điều kiện đa nhánh trong SQL, kết thúc bằng `END` (tùy chọn `ELSE`)."
+          }
+        ],
+        "pitfalls": [
+          "Cột `ATTRACT_NAME` chứa giá trị `NULL` thì `LENGTH(ATTRACT_NAME)` cũng trả về `NULL` chứ không phải `0`.",
+          "Trong SQL, vị trí ký tự đầu tiên của `SUBSTR` là **`1`** (khác Java/Python bắt đầu từ `0`).",
+          "Trong `Table 4` gốc ghi `Syntax: TRUNC(...)` (tên hàm của Oracle) và `MOD(m.n)` (dấu chấm thay dấu phẩy) — khi chạy trên MySQL phải viết `TRUNCATE(x, p)` và `MOD(m, n)`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 7 • Trang 10",
+          "pageNumber": 10,
+          "title": "Table 4 (tiếp: ROUND, TRUNCATE, MOD) & Figure 60",
+          "paragraphs": [
+            "The following example displays the individual LINE_PRICE from the sales line table, rounded to one and zero places and truncated where the quantity of tickets purchased on that line is greater than 2.",
+            "The output for this query can be seen in Figure 60.",
+            "Figure 60 Example of ROUND and TRUNC"
+          ],
+          "table": {
+            "caption": "Table 4 Selected Numeric Functions (tiếp theo)",
+            "headers": [
+              "Function",
+              "Description"
+            ],
+            "rows": [
+              [
+                "ROUND (cont.)",
+                "Syntax: ROUND(numeric_value, p) where p = precision"
+              ],
+              [
+                "TRUNCATE",
+                "Truncates a value to a specified precision (number of digits)\nSyntax: TRUNC(numeric_value, p) where p = precision"
+              ],
+              [
+                "MOD",
+                "Returns the remainder of division.\nSyntax MOD(m.n) where m is divided by n."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tLINE_PRICE, ROUND(LINE_PRICE,1) AS “LINE_PRICE1”,\n\t\t\tROUND(LINE_PRICE,0) AS “LINE_PRICE1”,\nTRUNCATE(LINE_PRICE,0) AS “TRUNCATED VALUE”\nFROM SALES_LINE\nWHERE LINE_QTY > 2;"
+          },
+          "diagramText": [
+            "Figure 60 — Output (4 rows in set, 0.00 sec):",
+            "LINE_PRICE | LINE_PRICE1 | LINE_PRICE1 | TRUNCATED VALUE",
+            "139.96     | 140.0       | 140         | 139",
+            "168.40     | 168.4       | 168         | 168",
+            "168.40     | 168.4       | 168         | 168",
+            "114.68     | 114.7       | 115         | 114"
+          ],
+          "explanation": [
+            "Figure 60 cho thấy rõ sự khác biệt giữa `ROUND(..., 0)` và `TRUNCATE(..., 0)`: với `139.96` và `114.68`, `ROUND` làm tròn lên `140` và `115`, còn `TRUNCATE` cắt thẳng phần thập phân thành `139` và `114`.",
+            "Lưu ý hai lỗi biên tập của tài liệu gốc: trong bảng Table 4 ghi `TRUNC(...)` (kiểu Oracle) và `MOD(m.n)` (dấu chấm), còn trong truy vấn ví dụ đặt trùng tên alias `\"LINE_PRICE1\"` cho cả hai cột `ROUND`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 10 (sách tr. 99)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 11",
+          "pageNumber": 11,
+          "title": "Task 7.8 (MOD) & 7.3 String Functions (Table 5)",
+          "paragraphs": [
+            "Task 7.8 Enter the following query and execute it. Can you explain the results of this query?",
+            "7.3 String Functions",
+            "String manipulation functions are amongst the most-used functions in programming. Table 5 shows a subset of the most useful string manipulation functions in MySQL.",
+            "Table 5 Selected MySQL string functions.",
+            "We will now look at examples of some of these string functions.",
+            "CONCAT"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT TRANSACTION_NO, LINE_PRICE, MOD(LINE_PRICE, 10)\nFROM SALES_LINE\nWHERE LINE_QTY > 2;"
+          },
+          "table": {
+            "caption": "Table 5 Selected MySQL string functions.",
+            "headers": [
+              "Function",
+              "Description"
+            ],
+            "rows": [
+              [
+                "CONCAT",
+                "Concatenates data from two different character columns and returns a single column.\nSyntax: CONCAT(strg_value, strg_value)"
+              ],
+              [
+                "UPPER/LOWER",
+                "Returns a string in all capital or all lowercase letters\nSyntax: UPPER(strg_value) , LOWER(strg_value)"
+              ],
+              [
+                "SUBSTR",
+                "Returns a substring or part of a given string parameter\nSyntax:\nSUBSTR(strg_value, p, l) where p = start position and l = length of characters"
+              ],
+              [
+                "LENGTH",
+                "Returns the number of characters in a string value\nSyntax: LENGTH(strg_value)"
+              ]
+            ]
+          },
+          "explanation": [
+            "Giải thích Task 7.8: `MOD(LINE_PRICE, 10)` chia `LINE_PRICE` cho `10` và lấy phần dư (ví dụ `139.96 MOD 10 = 9.96`, `168.40 MOD 10 = 8.40`, `114.68 MOD 10 = 4.68`), tức tách riêng chữ số hàng đơn vị kèm phần thập phân.",
+            "Table 5 giới thiệu 4 hàm xử lý chuỗi thông dụng: `CONCAT`, `UPPER`/`LOWER`, `SUBSTR(chuỗi, vị_trí_bắt_đầu, độ_dài)` và `LENGTH`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 11 (sách tr. 100)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 12",
+          "pageNumber": 12,
+          "title": "CONCAT (Figure 61) & UPPER/LOWER (Figure 62)",
+          "paragraphs": [
+            "The following query illustrates the CONCAT function. It lists all employee first and last names concatenated together. The output for this query can be seen in Figure 61.",
+            "Figure 61 Concatenation of employee’s first and last names",
+            "UPPER/LOWER",
+            "The following query lists all employee last names in all capital letters and all first names in all lowercase letters. The output for the query is shown in Figure 62."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CONCAT(EMP_LNAME ,EMP_FNAME) AS NAME\nFROM EMPLOYEE;\n\nSELECT CONCAT(UPPER(EMP_LNAME),LOWER(EMP_FNAME)) AS NAME\nFROM EMPLOYEE;"
+          },
+          "diagramText": [
+            "Figure 61 (7 rows in set, 0.00 sec): CalderdaleEmma, RicardoMarshel, ArshadArif, RobertsAnne, DenverEnrica, NamowaMirrelle, SmithGemma.",
+            "Screenshot trước Figure 62 (7 rows in set, 0.00 sec): CALDERDALEemma, RICARDOmarshel, ARSHADarif, ROBERTSanne, DENVERenrica, NAMOWAmirrelle, SMITHgemma."
+          ],
+          "explanation": [
+            "`CONCAT(EMP_LNAME, EMP_FNAME)` nối liền trực tiếp hai chuỗi không tự thêm khoảng trắng (nếu muốn có dấu cách phải viết `CONCAT(EMP_LNAME, ' ', EMP_FNAME)`).",
+            "Hàm có thể lồng nhau (`CONCAT(UPPER(EMP_LNAME), LOWER(EMP_FNAME))`), trong đó hàm bên trong (`UPPER`, `LOWER`) thực thi trước rồi truyền kết quả ra hàm ngoài (`CONCAT`)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 12 (sách tr. 101)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 13",
+          "pageNumber": 13,
+          "title": "Figure 62, SUBSTR (Figure 63) & Task 7.10 (Figure 64)",
+          "paragraphs": [
+            "Figure 62 Displaying upper and lower case employee names.",
+            "SUBSTR",
+            "The following example lists the first three characters of all the employees’ first name.",
+            "The output of this query is shown in Figure 63.",
+            "Figure 63 Displaying the first 3 characters of the employees first name",
+            "Task 7.10 Write a query which generates a list of employee user IDs, using the first day of the month they were born and the first six characters of last name in UPPER case. Your query should return the results shown in Figure 64.",
+            "Figure 64 Results for Task 7.10."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT EMP_PHONE, SUBSTR(EMP_FNAME,1,3)\nFROM EMPLOYEE;"
+          },
+          "diagramText": [
+            "Figure 63 (7 rows in set, 0.02 sec): 324-9134|Emm, 324-4472|Mar, 675-8993|Ari, 898-3456|Ann, 504-4434|Enr, 890-3243|Mir, 324-7845|Gem.",
+            "Figure 64 — Kết quả in trên màn hình cho Task 7.10 (7 rows in set, 0.00 sec): Emma Calderdale 19CALDER, Marshel Ricardo 19RICARD, Arif Arshad 19ARSHAD, Anne Roberts 19ROBERT, Enrica Denver 19DENVER, Mirrelle Namowa 19NAMOWA, Gemma Smith 19SMITH."
+          ],
+          "explanation": [
+            "Trong `SUBSTR(EMP_FNAME, 1, 3)`, vị trí bắt đầu là `1` (ký tự đầu tiên của chuỗi) và lấy `3` ký tự.",
+            "Phát hiện thú vị ở Task 7.10 (lưu ý sách bỏ qua `Task 7.9`): đề yêu cầu lấy ngày sinh (`day of the month`), nếu viết đúng theo đề thì phải là `SELECT EMP_FNAME, EMP_LNAME, CONCAT(DAYOFMONTH(EMP_DOB), UPPER(SUBSTR(EMP_LNAME, 1, 6))) AS USER_ID FROM EMPLOYEE;`. Tuy nhiên trong ảnh Figure 64, tác giả lại lỡ viết `SUBSTR(EMP_DOB, 1, 2)` khiến cả 7 nhân viên đều ra tiền tố `19` (hai chữ số đầu của năm `19xx`)!"
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 13 (sách tr. 102)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 14",
+          "pageNumber": 14,
+          "title": "LENGTH (Figure 65) & 7.4 Conversion Functions",
+          "paragraphs": [
+            "LENGTH",
+            "The following example lists all attraction names and the length of their names; ordered descended by attraction name length. The output of this query is shown in Figure 65.",
+            "Figure 65 Displaying the length of attraction names.",
+            "7.4 Conversion Functions",
+            "Conversion functions allow you to take a value of a given data type and convert it to the equivalent value in another data type. In MySQL, some conversions occur implicitly. For example, MySQL automatically converts numbers to strings when needed, and vice versa.",
+            "So if you enter the following query:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ATTRACT_NAME, LENGTH(ATTRACT_NAME) AS NAMESIZE\nFROM ATTRACTION\nORDER BY NAMESIZE DESC;"
+          },
+          "diagramText": [
+            "Figure 65 — Output (11 rows in set, 0.08 sec):",
+            "SpinningTeacups (15), ThunderCoaster (14), FlightToStars (13), UnderSeaWord (12), 3D-Lego_Show (12), BlackHole2 (10), Carnival (8), Ant-Trap (8), GoldRush (8), Pirates (7), NULL (NULL)."
+          ],
+          "explanation": [
+            "Figure 65 minh họa có thể `ORDER BY` theo chính **column alias** (`NAMESIZE`) vừa định nghĩa trong mệnh đề `SELECT`, và khi `ATTRACT_NAME` là `NULL` thì `LENGTH(NULL)` cũng trả về `NULL` (xếp cuối khi `DESC`).",
+            "MySQL có cơ chế ép kiểu ngầm (implicit conversion) khá linh hoạt giữa số và chuỗi (ví dụ `'10'` tự chuyển thành `10` trong phép cộng)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 14 (sách tr. 103)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 15",
+          "pageNumber": 15,
+          "title": "Ép kiểu ngầm (SELECT 10 + '10') & Hàm CAST (Figure 66)",
+          "paragraphs": [
+            "SELECT 10 + ‘10’",
+            "MySQL would give you an answer of 20 as it would automatically convert the string containing ‘10’ into the number 10 (see figure 66).",
+            "If you want to explicitly convert a number to a string then you can use either the CAST or CONCAT function. However MySQL 5.0 recommends only the CAST function is used. Let’s look at an example. The following query produces the output shown in Figure 66.",
+            "Figure 66 Example of type conversions"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT 10, CAST(10 AS CHAR);"
+          },
+          "diagramText": [
+            "Figure 66 — Kết quả hai câu lệnh:",
+            "• SELECT 10 + '10'; → 20 (1 row in set, 0.02 sec)",
+            "• SELECT 10, CAST(10 AS CHAR); → 10 | 10 (1 row in set, 0.02 sec)"
+          ],
+          "explanation": [
+            "Khi cộng số với chuỗi số (`10 + '10'`), MySQL tự ép `'10'` thành `10` để ra `20` (khác hoàn toàn phép nối chuỗi `+` trong một số ngôn ngữ lập trình).",
+            "Khi cần ép kiểu tường minh (explicit conversion) theo chuẩn SQL trên MySQL 5.0, dùng `CAST(biểu_thức AS kiểu_đích)` (như `CAST(10 AS CHAR)`)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 15 (sách tr. 104)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 16",
+          "pageNumber": 16,
+          "title": "CONVERT, Hàm IFNULL & Task 7.11 (sales_copy.sql)",
+          "paragraphs": [
+            "Note",
+            "The MySQL Reference Manual 5.0 provides a set of rules that allow us to determine how the coversion will occur when using the CONVERT function on different data types.",
+            "IFNULL",
+            "The IFNULL function lets you substitute a value when a null value is encountered in the results of a query. The syntax is:",
+            "IFNULL(expr1,expr2)",
+            "If expr1 is not NULL, IFNULL() returns expr1; otherwise it returns expr2. It is equivalent to Oracle’s NVL function. It is useful for avoiding errors caused by incorrect calculation when one of the arguments is null.",
+            "Task 7.11 Load and run the script sales_copy.sql which accompanies this lab guide. DESCRIBE the structure of the SALES_COPY table and examine the lack of constraints on this table. Write a query to view all the rows and notice that in some rows no values have been entered for LINE_QTY or LINE_PRICE. (In these instances these rows have NULL values.) Next, enter the following query which displays to the screen the Total of the LINE_QTY * LINE_PRICE. Notice that this query does not use the IFNULL function and in two rows the calculation can not be made."
+          ],
+          "explanation": [
+            "`IFNULL(expr1, expr2)` trong MySQL tương đương với `NVL` trong Oracle: nếu `expr1` khác `NULL` thì giữ nguyên `expr1`, còn nếu là `NULL` thì thay bằng giá trị dự phòng `expr2`.",
+            "Mục đích của Task 7.11 (trên bảng `SALES_COPY` không có ràng buộc `NOT NULL`) là chứng minh trong SQL, mọi phép toán chứa `NULL` đều trả về `NULL` nếu không dùng `IFNULL`. (Chú ý sách gốc viết nhầm `coversion` và ghi `LINE_PRICE` trong đề trong khi tên cột ở trang 17–18 là `ITEM_PRICE`)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 16 (sách tr. 105)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 17",
+          "pageNumber": 17,
+          "title": "Task 7.11 (tiếp): So sánh truy vấn không dùng và có dùng IFNULL",
+          "paragraphs": [
+            "Next run the following version of the query which uses the IFNULL function and notice that the calculation has been achieved for all rows.",
+            "The results of running both these queries can be seen in Figure 67."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT TRANSACTION_NO, LINE_NO, LINE_QTY, ITEM_PRICE,\nLINE_QTY*ITEM_PRICE AS \"TOTAL SALES PER LINE\"\nFROM SALES_COPY;\n\nSELECT TRANSACTION_NO, LINE_NO,\nIFNULL(LINE_QTY,0),ITEM_PRICE,(IFNULL(LINE_QTY,0))*ITEM_PRICE AS\n\"TOTAL SALES PER LINE\"\nFROM SALES_COPY;"
+          },
+          "explanation": [
+            "Truy vấn 1 nhân trực tiếp `LINE_QTY * ITEM_PRICE`, nên ở 2 dòng có `LINE_QTY IS NULL`, cột thành tiền ra `NULL`.",
+            "Truy vấn 2 bọc `IFNULL(LINE_QTY, 0)` biến `NULL` thành `0`, nhờ vậy biểu thức `(IFNULL(LINE_QTY,0))*ITEM_PRICE` tính ra `0` hợp lệ cho mọi dòng."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 17 (sách tr. 106)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 18",
+          "pageNumber": 18,
+          "title": "Figure 67 (IFNULL) & Hàm CASE (dạng 1)",
+          "paragraphs": [
+            "Figure 67 Illustration of the IFNULL function.",
+            "CASE",
+            "The CASE function compares an attribute or expression with a series of values and returns an associated value or a default value if no match is found. There are two versions of the CASE function. The syntax of each is shown below.",
+            "CASE value WHEN [compare_value] THEN result [WHEN [compare_value] THEN result ...] [ELSE result] END"
+          ],
+          "diagramText": [
+            "Figure 67 — Bảng SALES_COPY (8 rows):",
+            "• Không IFNULL (0.00 sec): 10000001/1→22, 10000001/2→30, 10000002/1→11, 10000002/2→21, 10000003/1→NULL (qty=NULL), 10000003/2→NULL (qty=NULL), 10000004/1→30, 10000004/2→42.",
+            "• Có IFNULL(LINE_QTY,0) (0.01 sec): hai dòng 10000003 chuyển thành qty=0 và TOTAL SALES PER LINE = 0."
+          ],
+          "explanation": [
+            "Figure 67 đối chiếu trực quan 8 dòng của `SALES_COPY` trước và sau khi áp dụng `IFNULL` cho hai hóa đơn số `10000003` bị thiếu `LINE_QTY`.",
+            "Biểu thức `CASE` dạng 1 (Simple CASE): so sánh giá trị `value` lần lượt bằng `=` với từng `[compare_value]`, giống cấu trúc `switch-case`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 18 (sách tr. 107)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 19",
+          "pageNumber": 19,
+          "title": "CASE (dạng 2) & Ví dụ giải mã mã quốc gia (Figure 68)",
+          "paragraphs": [
+            "CASE WHEN [condition] THEN result [WHEN [condition] THEN result ...] [ELSE result] END",
+            "The first version returns the result where value=compare_value. The second version returns the result for the first condition that is true. If there was no matching result value, the result after ELSE is returned, or NULL if there is no ELSE part.",
+            "Let’s now look at the following example, which compares the country code in the PARK_COUNTRY field and decodes it into the name of the country. If there is no match, it returns the value ‘Unknown’. The output is shown in Figure 68.",
+            "Figure 68 Displaying the names of countries using the DECODE function."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT PARK_CODE, PARK_COUNTRY, (CASE PARK_COUNTRY WHEN 'UK'\nTHEN 'United Kingdom' WHEN 'FR' THEN 'France' WHEN 'NL' THEN 'The\nNetherlands' WHEN 'SP' THEN 'Spain' WHEN 'ZA' THEN 'South Africa' WHEN 'SW'\nTHEN 'Switzerland' ELSE' Unknown' END) AS COUNTRY\nFROM THEMEPARK;"
+          },
+          "diagramText": [
+            "Figure 68 — 7 rows in set (0.00 sec):",
+            "FR1001→France | NL1202→The Netherlands | SP4533→Spain | SW2323→Switzerland | UK2622→United Kingdom | UK3452→United Kingdom | ZA1342→South Africa."
+          ],
+          "explanation": [
+            "`CASE` dạng 2 (Searched CASE: `CASE WHEN [condition] THEN ...`) cho phép đặt các điều kiện bất kỳ (như `>`, `<`, `AND`, `IS NULL`), trả về nhánh đầu tiên đúng; nếu bỏ `ELSE` mà không khớp nhánh nào thì trả `NULL`.",
+            "Chú thích Figure 68 viết `DECODE function` (tên hàm của Oracle tương ứng với `CASE` dạng 1 trong MySQL); đồng thời trong code mẫu chuỗi `ELSE' Unknown'` có một dấu cách thừa đầu chữ `Unknown`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 19 (sách tr. 108)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 20",
+          "pageNumber": 20,
+          "title": "Tương đương IF-THEN-ELSE & 7.5 Exercises (E7.1–E7.3)",
+          "paragraphs": [
+            "It is worth noting that the above decode statement is equivalent to the following IF-THEN-ELSE statement:",
+            "7.5 Exercises",
+            "E7.1 Write a query which lists the names and dates of births of all employees born on the 14th day of the month.",
+            "E7.2 Write a query which lists the approximate age of the employees on the company’s tenth anniversary date (11/25/2008).",
+            "E7.3 Write a query which generates a list of employee user passwords, using the first three digits of their phone number, and the first two characters of first name in lower case. Label the column USER_PASSWORD;"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "IF PARK_COUNTRY = ‘UK’ THEN\n  result := 'United Kingdom';\nELSIF PARK_COUNTRY = ‘FR’ THEN\n  result := 'FRANCE';\nELSIF PARK_COUNTRY = ‘NL’ THEN\n  result := 'The Netherlands';\nELSIF PARK_COUNTRY = ‘SP’ THEN\n  result := 'Spain';\nELSIF PARK_COUNTRY = ‘ZA’ THEN\n  result := 'South Africa';\nELSIF PARK_COUNTRY = ‘SW’ THEN\n  result := 'Switzerland';\nELSE\n  result := 'Unknown;\nEND IF;"
+          },
+          "explanation": [
+            "Khối mã giả PL/SQL `IF ... ELSIF ... ELSE ... END IF;` giúp hình dung logic tuần tự của `CASE` (trong bản in dòng `result := 'Unknown;` thiếu dấu nháy đóng).",
+            "Lời giải E7.1–E7.3:",
+            "• E7.1: `SELECT EMP_LNAME, EMP_FNAME, EMP_DOB FROM EMPLOYEE WHERE DAYOFMONTH(EMP_DOB) = 14;` | E7.2: `SELECT EMP_LNAME, EMP_FNAME, TRUNCATE(DATEDIFF('2008-11-25', EMP_DOB)/365, 0) AS APPROX_AGE FROM EMPLOYEE;` (hoặc `YEAR('2008-11-25') - YEAR(EMP_DOB)`).",
+            "• E7.3: `SELECT EMP_LNAME, EMP_FNAME, CONCAT(SUBSTR(EMP_PHONE, 1, 3), LOWER(SUBSTR(EMP_FNAME, 1, 2))) AS USER_PASSWORD FROM EMPLOYEE;`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 20 (sách tr. 109)"
+          }
+        },
+        {
+          "slideNumber": "Lab 7 • Trang 21",
+          "pageNumber": 21,
+          "title": "7.5 Exercises (tiếp: E7.4)",
+          "paragraphs": [
+            "E7.4 Write a query which displays the last date a ticket was purchased in all Theme Parks. You should also display the Theme Park name. Print the date in the format 12th January 2007."
+          ],
+          "explanation": [
+            "Lời giải E7.4 (kết hợp JOIN 2 bảng, `MAX`, `GROUP BY` và `DATE_FORMAT`): `SELECT P.PARK_NAME, DATE_FORMAT(MAX(S.SALE_DATE), '%D %M %Y') AS LAST_PURCHASE_DATE FROM THEMEPARK P JOIN SALES S ON P.PARK_CODE = S.PARK_CODE GROUP BY P.PARK_CODE, P.PARK_NAME;` (dùng `LEFT JOIN` nếu muốn liệt kê cả công viên chưa từng có giao dịch bán vé).",
+            "Chú ý dùng `%M` (tên tháng đầy đủ `January`) thay vì `%b` (`Jan`) để khớp đúng mẫu `12th January 2007` của đề."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 21 (sách tr. 110)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lab 8: Truy vấn lồng (Subqueries: SELECT, IN, HAVING, ALL, Inline & Correlated EXISTS)",
+      "text": "Nắm vững khái niệm và 3 dạng kết quả của truy vấn lồng (1 giá trị vô hướng, danh sách 1 cột nhiều hàng, bảng ảo), cách viết subquery trong WHERE/IN/HAVING/ALL/SELECT list và cơ chế thực thi truy vấn lồng tương quan (correlated subquery) với EXISTS / NOT EXISTS.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 22–33 (sách tr. 111–122)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Truy vấn lồng thông thường (nested/non-correlated) đặt trong ngoặc đơn `(...)`, thực thi **inner query trước** rồi lấy kết quả làm đầu vào cho outer query.",
+          "Ba dạng kết quả của subquery: (1) một giá trị duy nhất (1×1, dùng với `=`, `>`, `<`, `>=`, `<=` hoặc trong `SELECT` list), (2) danh sách 1 cột nhiều hàng (dùng với `IN`, `ALL`, `ANY`), (3) bảng ảo nhiều cột nhiều hàng (dùng trong `FROM`).",
+          "Toán tử `ALL` cho phép so sánh bất đẳng thức (`>`, `<`) với tập nhiều giá trị: `> ALL (...)` tương đương lớn hơn `MAX(...)` của danh sách.",
+          "Attribute list subquery (inline subquery trong `SELECT`) buộc phải trả đúng 1 giá trị; **không được** dùng alias cột vừa định nghĩa để tính cột khác trong cùng `SELECT` list mà phải lặp lại biểu thức.",
+          "Correlated subquery (truy vấn lồng tương quan) thực thi inner query **một lần cho mỗi hàng** của outer query vì inner query tham chiếu cột của outer query (ví dụ kiểm tra tồn tại bằng `EXISTS` / `NOT EXISTS`)."
+        ],
+        "terms": [
+          {
+            "term": "Inner vs Outer query",
+            "meaning": "Inner query là câu `SELECT` nằm bên trong ngoặc đơn; Outer query là câu `SELECT` bên ngoài sử dụng kết quả của inner query."
+          },
+          {
+            "term": "ALL operator",
+            "meaning": "Toán tử đa hàng yêu cầu phép so sánh (`>`, `<`, ...) phải đúng với **mọi** phần tử trong danh sách subquery trả về."
+          },
+          {
+            "term": "Inline / Attribute list subquery",
+            "meaning": "Subquery đơn trị đặt trực tiếp trong danh sách cột của mệnh đề `SELECT` (như cột `AVGPRICE`)."
+          },
+          {
+            "term": "Correlated subquery",
+            "meaning": "Truy vấn lồng có tham chiếu cột của bảng ngoài nên chạy lặp lại theo từng hàng của truy vấn ngoài; thường kết hợp alias bảng và `EXISTS`."
+          }
+        ],
+        "pitfalls": [
+          "Dùng subquery trả về > 1 hàng bên phải toán tử so sánh đơn (`=`, `>`, `<`) hoặc trong danh sách `SELECT` sẽ làm DBMS báo lỗi *Subquery returns more than 1 row*.",
+          "Cố tình dùng alias vừa khai báo (ví dụ `TICKET_PRICE - AVGPRICE`) ngay trong cùng danh sách `SELECT` sẽ gây lỗi *Unknown column 'AVGPRICE' in 'field list'*.",
+          "Nếu subquery không trả hàng nào (tập rỗng / NULL), outer query có thể ra tập rỗng (như `> ALL (empty)` hoặc `IN (empty)`) hoặc báo lỗi tùy ngữ cảnh; ngoài ra dùng `NOT IN` khi inner query có `NULL` sẽ luôn ra rỗng (nên ưu tiên `NOT EXISTS`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Lab 8 • Trang 22",
+          "pageNumber": 22,
+          "title": "Lab 8: Subqueries — Đặc điểm & Ba dạng kết quả (phần 1)",
+          "paragraphs": [
+            "Lab 8: Subqueries",
+            "The learning objectives of this lab are to",
+            "First let’s outline the basic characteristics of a subquery, which were introduced in Chapter 8, Introduction to Structured Query Language.",
+            "A subquery can return one value or multiple values. To be precise, the subquery can return:"
+          ],
+          "bullets": [
+            "Learn how to use subqueries to extract rows from processed data",
+            "Select the most suitable subquery format",
+            "Use correlated subqueries",
+            "A subquery is a query (SELECT statement) inside a query",
+            "A subquery is normally expressed inside parentheses",
+            "The first query in the SQL statement is known as the outer query",
+            "The query inside the SQL statement is known as the inner query",
+            "The inner query is executed first",
+            "The output of an inner query is used as the input for the outer query",
+            "The entire SQL statement is sometimes referred to as a nested query",
+            "One single value (one column and one row). This subquery is used anywhere a single value is expected, as in the right side of a comparison expression. Obviously, when you assign a value to an attribute, that value is a single value, not a list of values. Therefore, the subquery must return only one value"
+          ],
+          "explanation": [
+            "Quy trình chạy của truy vấn lồng (nested query) thông thường: DBMS chạy **inner query** bên trong cặp ngoặc `(...)` trước, lấy kết quả xuất ra đưa làm đầu vào cho **outer query** bên ngoài.",
+            "Dạng 1 (scalar subquery — 1 cột 1 hàng): dùng ở bất kỳ vị trí nào đòi hỏi một giá trị đơn lẻ, chẳng hạn vế phải phép `=`, `>`, `<`, `>=`, `<=`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 22 (sách tr. 111)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 23",
+          "pageNumber": 23,
+          "title": "Ba dạng kết quả (tiếp) & 8.1 SELECT Subqueries",
+          "paragraphs": [
+            "(one column, one row). If the query returns multiple values, the DBMS will generate an error.",
+            "It’s important to note that a subquery can return no values at all; it is a NULL. In such cases, the output of the outer query may result in an error or a null empty set depending where the subquery is used (in a comparison, an expression, or a table set).",
+            "In the following sections, you will learn how to write subqueries within the SELECT statement to retrieve data from the database.",
+            "Note",
+            "You can also read more about subqueries in Chapter 9 Advanced SQL.",
+            "8.1 SELECT Subqueries",
+            "The most common type of subquery uses an inner SELECT subquery on the right side of a WHERE comparison expression. For example, to find the prices of all tickets with a price less than or equal to the average ticket price, you write the following query:"
+          ],
+          "bullets": [
+            "A list of values (one column and multiple rows). This type of subquery is used anywhere a list of values is expected, such as when using the IN clause. This type of subquery is used frequently in combination with the IN operator in a WHERE conditional expression.",
+            "A virtual table (multicolumn, multirow set of values). This type of subquery can be used anywhere a table is expected, such as when using the FROM clause."
+          ],
+          "explanation": [
+            "Hai dạng còn lại: Dạng 2 (1 cột nhiều hàng) ghép với `IN`/`ALL`/`ANY` trong `WHERE` hoặc `HAVING`; Dạng 3 (bảng ảo nhiều cột nhiều hàng) dùng làm nguồn dữ liệu trong mệnh đề `FROM` (derived table).",
+            "Lưu ý lỗi mâu thuẫn trong văn bản trang 23–24: lời dẫn viết *\"less than or equal to the average ticket price\"* (`<=`), nhưng câu SQL ở trang 24 lại viết dấu **`>=`** (lớn hơn hoặc bằng)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 23 (sách tr. 112)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 24",
+          "pageNumber": 24,
+          "title": "Ví dụ SELECT Subquery (Figure 69) & Task 8.1",
+          "paragraphs": [
+            "The output of the query is shown in Figure 69.",
+            "Figure 69 Example of SELECT Subquery",
+            "Note that this type of query, when used in a >, <, =, >=, or <= conditional expression, requires a subquery that returns only one single value (one column, one row). The value generated by the subquery must be of a “comparable” data type; if the attribute to the left of the comparison symbol is a character type, the subquery must return a character string. Also, if the query returns more than a single value, the DBMS will generate an error.",
+            "Task 8.1 Write a query that displays the first name, last name of all employees who earn more than the average hourly rate. Do not display duplicate rows. Your output should match that shown in Figure 70."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTICKET_NO, TICKET_TYPE, TICKET_PRICE\nFROM\tTICKET\nWHERE\tTICKET_PRICE >= (SELECT AVG(TICKET_PRICE) FROM TICKET);"
+          },
+          "diagramText": [
+            "Figure 69 — Output (5 rows in set, 0.00 sec):",
+            "11001 Adult 24.99 | 13002 Adult 34.99 | 67833 Adult 28.67 | 88567 Child 22.50 | 88568 Adult 42.10."
+          ],
+          "explanation": [
+            "Truy vấn lồng ở Figure 69 chạy `(SELECT AVG(TICKET_PRICE) FROM TICKET)` trước (ra `21.74`), rồi lọc ra 5 vé có `TICKET_PRICE >= 21.74` — sở dĩ cần subquery vì SQL không cho viết `WHERE TICKET_PRICE >= AVG(TICKET_PRICE)` trực tiếp.",
+            "Hai ràng buộc khi dùng subquery với `=, >, <, >=, <=`: (1) chỉ trả đúng **1 cột 1 hàng** (trả >1 hàng sẽ lỗi), (2) phải **tương thích kiểu dữ liệu** với vế trái."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 24 (sách tr. 113)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 25",
+          "pageNumber": 25,
+          "title": "Figure 70 (Task 8.1) & 8.2 IN Subqueries",
+          "paragraphs": [
+            "Figure 70 Output for task 8.1",
+            "8.2 IN Subqueries",
+            "The following query displays all employees who work in a Theme Park that has the word ‘Fairy’ in its name. As there are a number of different Theme Parks that match this criteria you need to compare the PARK_CODE not to one park code (single value), but to a list of park codes. When you want to compare a single attribute to a list of values, you use the IN operator. When the PARK_CODE values are not known beforehand but they can be derived using a query, you must use an IN subquery. The following example lists all employees who have worked in such a Theme Park."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tDISTINCT EMP_NUM, EMP_LNAME, EMP_FNAME, PARK_NAME\nFROM\tEMPLOYEE NATURAL JOIN HOURS NATURAL JOIN\nATTRACTION NATURAL JOIN THEMEPARK\nWHERE\tPARK_CODE IN (SELECT THEMEPARK.PARK_CODE FROM\nTHEMEPARK WHERE\tPARK_NAME LIKE ‘%Fairy%’);"
+          },
+          "diagramText": [
+            "Figure 70 (Task 8.1) — SELECT DISTINCT(EMP_FNAME), EMP_LNAME FROM EMPLOYEE NATURAL JOIN HOURS WHERE HOUR_RATE > (SELECT AVG(HOUR_RATE) FROM HOURS);:",
+            "EMP_FNAME | EMP_LNAME",
+            "Enrica    | Denver",
+            "Mirrelle  | Namowa",
+            "2 rows in set (0.08 sec)"
+          ],
+          "explanation": [
+            "Figure 70 trình bày lời giải Task 8.1: join `EMPLOYEE` với `HOURS`, lọc `HOUR_RATE > (SELECT AVG(HOUR_RATE) FROM HOURS)` và dùng `DISTINCT` để mỗi nhân viên chỉ hiện một lần.",
+            "Khi tiêu chí có thể khớp **nhiều giá trị** (ví dụ nhiều công viên chứa chữ `'Fairy'`), không dùng `=` được mà phải dùng **`IN`** kết hợp subquery trả về 1 cột nhiều hàng."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 25 (sách tr. 114)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 26",
+          "pageNumber": 26,
+          "title": "Figure 71 (Task 8.2) & 8.3 HAVING Subqueries",
+          "paragraphs": [
+            "The result of that query is shown in Figure 71.",
+            "Figure 71 Employees who work in a Theme Park LIKE ‘Fairy’.",
+            "Task 8.2 Enter and execute the above query and compare your output with that shown in Figure 71.",
+            "8.3 HAVING Subqueries",
+            "A subquery can also be used with a HAVING clause. Remember that the HAVING clause is used to restrict the output of a GROUP BY query by applying a conditional criteria to the grouped rows. For example, to list all PARK_CODEs where the total quantity of tickets sold is greater than the average quantity sold, you would write the following query:"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tPARK_CODE, SUM(LINE_QTY)\nFROM\tSALES_LINE NATURAL JOIN TICKET\nGROUP BY PARK_CODE\nHAVING\tSUM(LINE_QTY) > (SELECT AVG(LINE_QTY) FROM SALES_LINE);"
+          },
+          "diagramText": [
+            "Figure 71 — 2 rows in set (0.02 sec): 100 | Calderdale | Emma | FairyLand; 105 | Namowa | Mirrelle | FairyLand."
+          ],
+          "explanation": [
+            "Ở mục 8.3, subquery được đặt trong mệnh đề `HAVING`: đầu tiên `GROUP BY PARK_CODE` tính tổng số vé bán của từng công viên (`SUM(LINE_QTY)`), sau đó so sánh từng tổng đó với giá trị trung bình của toàn bộ các dòng bán (`SELECT AVG(LINE_QTY) FROM SALES_LINE`).",
+            "Đây là mẫu rất hay dùng khi muốn so sánh **tổng của mỗi nhóm** với **giá trị trung bình chuẩn** của toàn bảng."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 26 (sách tr. 115)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 27",
+          "pageNumber": 27,
+          "title": "Figure 72 & Task 8.3 (Figure 73)",
+          "paragraphs": [
+            "The result of that query is shown in Figure 72.",
+            "Figure 72 PARK_CODES where tickets are selling above average.",
+            "Task 8.3 Using the query above as a guide, write a new query to display the first and last names of all employees who have worked in total less that the average number of hours in total during May 2007. Your output should match that shown in Figure 73.",
+            "Figure 73 Output for task 8.3"
+          ],
+          "diagramText": [
+            "Figure 72 — 3 rows in set (0.00 sec): FR1001 (14), UK3452 (29), ZA1342 (18).",
+            "Figure 73 (Task 8.3) — SELECT DISTINCT EMP_FNAME, EMP_LNAME, SUM(HOURS_PER_ATTRACT) FROM EMPLOYEE NATURAL JOIN HOURS WHERE DATE_WORKED LIKE '%-05%' GROUP BY EMP_FNAME, EMP_LNAME, DATE_WORKED HAVING SUM(HOURS_PER_ATTRACT) > (SELECT AVG(HOURS_PER_ATTRACT) FROM HOURS); → 5 rows (Arif Arshad 6, Emma Calderdale 6, Enrica Denver 6, Marshel Ricardo 6, Mirrelle Namowa 6) — 5 rows in set, 1 warning (0.00 sec)."
+          ],
+          "explanation": [
+            "Hai lỗi thú vị cần chú ý ở Task 8.3 & Figure 73: (1) đề viết `less that` (đúng ra là `less than`, tức `<`), nhưng lệnh chạy trong Figure 73 lại dùng `>` (`HAVING SUM(HOURS_PER_ATTRACT) > ...`) để khớp ảnh; (2) lệnh tạo `1 warning` do viết `DATE_WORKED LIKE '%-05%'` trên cột kiểu `DATE` (trong SQL chuẩn nên dùng `YEAR(DATE_WORKED)=2007 AND MONTH(DATE_WORKED)=5`).",
+            "Ngoài ra vì nhân viên `101 Marshel Ricardo` có `EMP_NUM` làm việc ngày khác hoặc ghép trong `GROUP BY EMP_FNAME, EMP_LNAME, DATE_WORKED` cho ra 5 người đều đạt tổng `6` giờ."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 27 (sách tr. 116)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 28",
+          "pageNumber": 28,
+          "title": "8.4 Multirow Subquery operator ALL (Figure 74)",
+          "paragraphs": [
+            "8.4 Multirow Subquery operator ALL.",
+            "So far, you have learned that you must use an IN subquery when you need to compare a value to a list of values. But the IN subquery uses an equality operator; that is, it selects only those rows that match (are equal to) at least one of the values in the list. What happens if you need to do an inequality comparison (> or <) of one value to a list of values? For example, to find the ticket_numbers and corresponding park_codes of the tickets that are priced higher than the highest-priced ‘Child’ ticket you could write the following query.",
+            "The output of that query is shown in Figure 74.",
+            "Figure 74 Example of ALL."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT TICKET_NO, PARK_CODE\nFROM TICKET\nWHERE TICKET_PRICE > ALL (SELECT TICKET_PRICE FROM TICKET\n\t\tWHERE TICKET_TYPE = 'CHILD');"
+          },
+          "diagramText": [
+            "Figure 74 — Output (4 rows in set, 0.00 sec):",
+            "11001 SP4533 | 13002 FR1001 | 67833 ZA1342 | 88568 UK3452."
+          ],
+          "explanation": [
+            "`IN` chỉ kiểm tra bằng một trong các phần tử (`= ANY`), còn khi cần so sánh bất đẳng thức (`>`, `<`, `>=`, `<=`) với **tất cả** giá trị trong danh sách subquery trả về, ta dùng toán tử `ALL`.",
+            "Ở Figure 74, inner query trả về danh sách giá vé trẻ em (`14.99, 18.99, 18.56, 22.50`), nên `TICKET_PRICE > ALL (...)` chỉ giữ 4 vé người lớn đắt hơn hẳn `22.50`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 28 (sách tr. 117)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 29",
+          "pageNumber": 29,
+          "title": "Cơ chế ALL & 8.5 Attribute list Subqueries (Inline Subquery)",
+          "paragraphs": [
+            "This query is a typical example of a nested query. The use of the ALL operator allows you to compare a single value (TICKET_PRICE) with a list of values returned by the nested query, using a comparison operator other than equals. For a row to appear in the result set, it has to meet the criterion TICKET_PRICE > ALL of the individual values returned by the nested query.",
+            "8.5 Attribute list Subqueries",
+            "The SELECT statement uses the attribute list to indicate what columns to project in the resulting set. Those columns can be attributes of base tables or computed attributes or the result of an aggregate function. The attribute list can also include a subquery expression, also known as an inline subquery. A subquery in the attribute list must return one single value; otherwise, an error code is raised. For example, a simple inline query can be used to list the difference between each tickets’ price and the average ticket price:",
+            "The output for this query is shown in Figure 75."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTICKET_NO, TICKET_PRICE,\n\t(SELECT AVG(TICKET_PRICE) FROM TICKET) AS AVGPRICE,\n\tTICKET_PRICE - (SELECT AVG(TICKET_PRICE) FROM TICKET) AS DIFF\nFROM\tTICKET;"
+          },
+          "explanation": [
+            "**Attribute list subquery** (inline subquery) đặt ngay trong mệnh đề `SELECT` để đưa kết quả tổng hợp (như giá trung bình `AVGPRICE`) vào cạnh từng dòng chi tiết mà không cần `GROUP BY` làm mất dòng chi tiết.",
+            "Subquery đặt trong `SELECT` bắt buộc trả về đúng **1 ô duy nhất** (1 cột 1 hàng), nếu trả > 1 hàng sẽ báo lỗi."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 29 (sách tr. 118)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 30",
+          "pageNumber": 30,
+          "title": "Figure 75, Quy tắc Alias trong SELECT, Task 8.4 & 8.6 Correlated Subqueries",
+          "paragraphs": [
+            "Figure 75 Displaying the difference in ticket prices.",
+            "This inline query output returns one single value (the average ticket’s price) and that the value is the same in every row. Note also that the query used the full expression instead of the column aliases when computing the difference. In fact, if you try to use the alias in the difference expression, you will get an error message. The column alias cannot be used in computations in the attribute list when the alias is defined in the same attribute list.",
+            "Task 8.4 Write a query to display an employee’s first name, last name and date worked which lists the difference between the number of hours an employee has worked on an attraction and the average hours worked on that attraction. Label this column ‘DIFFERENCE’ and the average hours column ‘AVERAGE’.",
+            "8.6 Correlated Subqueries"
+          ],
+          "diagramText": [
+            "Figure 75 — 12 rows in set (0.00 sec):",
+            "11001: 24.99 | 21.740000 | +3.250000",
+            "11002: 14.99 | 21.740000 | -6.750000",
+            "11003: 10.99 | 21.740000 | -10.750000",
+            "... (12 vé, cột AVGPRICE đều là 21.740000)"
+          ],
+          "explanation": [
+            "Quy tắc quan trọng của SQL: **không thể** lấy column alias (`AVGPRICE`) vừa định nghĩa trong mệnh đề `SELECT` để tính toán cho cột kế bên (`TICKET_PRICE - AVGPRICE`) trong cùng mệnh đề `SELECT`, mà phải viết lại toàn bộ biểu thức subquery.",
+            "Lời giải Task 8.4 (dùng correlated inline subquery theo từng `ATTRACT_NO`): `SELECT E.EMP_FNAME, E.EMP_LNAME, H.DATE_WORKED, (SELECT AVG(H2.HOURS_PER_ATTRACT) FROM HOURS H2 WHERE H2.ATTRACT_NO = H.ATTRACT_NO) AS AVERAGE, H.HOURS_PER_ATTRACT - (SELECT AVG(H2.HOURS_PER_ATTRACT) FROM HOURS H2 WHERE H2.ATTRACT_NO = H.ATTRACT_NO) AS DIFFERENCE FROM EMPLOYEE E JOIN HOURS H ON E.EMP_NUM = H.EMP_NUM;`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 30 (sách tr. 119)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 31",
+          "pageNumber": 31,
+          "title": "8.6 Correlated Subqueries — Cơ chế 2 bước & Ví dụ SALES_LINE",
+          "paragraphs": [
+            "A correlated subquery is a subquery that executes once for each row in the outer query.",
+            "The relational DBMS uses the same sequence to produce correlated subquery results:",
+            "That process is the opposite of the subqueries you have seen so far. The query is called a correlated subquery because the inner query is related to the outer query because the inner query references a column of the outer subquery. For example, suppose you want to know all the ticket sales in which the quantity sold value is greater than the average quantity sold value for that ticket (as opposed to the average for all tickets). The following correlated query completes the preceding two-step process:"
+          ],
+          "bullets": [
+            "1. It initiates the outer query.",
+            "2. For each row of the outer query result set, it executes the inner query by passing the outer row to the inner query."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tTRANSACTION_NO, LINE_NO, LINE_QTY, LINE_PRICE\nFROM\tSALES_LINE SL\nWHERE\tSL.LINE_QTY > (SELECT AVG(LINE_QTY)\nFROM\tSALES_LINE SA\nWHERE\tSA. TRANSACTION_NO = SL. TRANSACTION_NO);"
+          },
+          "explanation": [
+            "Ngược hẳn với subquery thường (chạy inner 1 lần duy nhất trước), **correlated subquery** (truy vấn lồng tương quan) khởi chạy outer query trước, rồi **với mỗi dòng ngoài lại chạy lại inner query** bằng cách truyền giá trị cột của dòng ngoài (`SL.TRANSACTION_NO`) vào trong.",
+            "Trong ví dụ trên, bảng `SALES_LINE` xuất hiện ở cả trong và ngoài nên buộc phải đặt 2 alias khác nhau (`SL` và `SA`) để phân biệt bản sao đang xét."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 31 (sách tr. 120)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 32",
+          "pageNumber": 32,
+          "title": "Figure 76 & Correlated Subquery với toán tử EXISTS",
+          "paragraphs": [
+            "Figure 76 Example of a correlated subquery",
+            "As you examine the output shown in figure 76, note that the SALES_LINE table is used more than once; so you must use table aliases.",
+            "Correlated subqueries can also be used with the EXISTS special operator. For example, suppose you want to know all the names of all Theme Parks where tickets have been recently sold. In that case, you could use a correlated subquery as follows:",
+            "The output for this query is shown in figure 77."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT\tPARK_CODE, PARK_NAME, PARK_COUNTRY\nFROM\tTHEMEPARK\nWHERE\tEXISTS (SELECT PARK_CODE FROM SALES\nWHERE\tSALES.PARK_CODE = THEMEPARK.PARK_CODE);"
+          },
+          "diagramText": [
+            "Figure 76 — 5 rows in set (0.00 sec):",
+            "12781 / 1 / 2 / 69.98 | 12785 / 3 / 4 / 139.96 | 34534 / 1 / 4 / 168.40 | 34537 / 1 / 2 / 84.20 | 34540 / 1 / 4 / 160.40."
+          ],
+          "explanation": [
+            "Toán tử `EXISTS (subquery)` kiểm tra tính **tồn tại** của bản ghi liên kết: trả về `TRUE` ngay khi inner query tìm được ít nhất 1 dòng thỏa điều kiện tương quan `SALES.PARK_CODE = THEMEPARK.PARK_CODE`, ngược lại trả về `FALSE`.",
+            "Vì `EXISTS` chỉ kiểm tra có dòng hay không chứ không lấy giá trị cột, ta thường viết `SELECT 1` hoặc `SELECT *` bên trong (ở đây sách viết `SELECT PARK_CODE`)."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 32 (sách tr. 121)"
+          }
+        },
+        {
+          "slideNumber": "Lab 8 • Trang 33",
+          "pageNumber": 33,
+          "title": "Figure 77 (EXISTS), Task 8.5 & Task 8.6 (NOT EXISTS)",
+          "paragraphs": [
+            "Figure 77 Example of correlated subqueries",
+            "Task 8.5 Type in and execute the two correlated subqueries in this section and check your output against that shown in figures 76 and 77.",
+            "Task 8.6 Modify the second query you entered in task 8.5 to display all the theme parks where there have been no recorded tickets sales recently."
+          ],
+          "diagramText": [
+            "Figure 77 — EXISTS output (3 rows in set, 0.00 sec):",
+            "FR1001 | FairyLand | FR",
+            "UK3452 | PleasureLand | UK",
+            "ZA1342 | GoldTown | ZA"
+          ],
+          "explanation": [
+            "Figure 77 cho thấy chỉ có 3 công viên (`FR1001`, `UK3452`, `ZA1342`) từng ghi nhận giao dịch bán vé trong bảng `SALES`.",
+            "Lời giải Task 8.6 (dùng `NOT EXISTS` để tìm công viên **chưa có** giao dịch bán vé nào — sẽ trả về 4 công viên còn lại `NL1202`, `SP4533`, `SW2323`, `UK2622`): `SELECT PARK_CODE, PARK_NAME, PARK_COUNTRY FROM THEMEPARK WHERE NOT EXISTS (SELECT PARK_CODE FROM SALES WHERE SALES.PARK_CODE = THEMEPARK.PARK_CODE);`."
+          ],
+          "source": {
+            "file": "Lab 7 - 8.pdf",
+            "loc": "Trang 33 (sách tr. 122)"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Script thực hành trên lớp: Advanced SQL and Join 10.10.sql (dòng 1–78)",
+      "text": "Toàn bộ file script giảng dạy trên lớp minh họa các hàm Aggregate (COUNT, SUM, AVG, MIN, MAX), GROUP BY, HAVING kết hợp WHERE/LIKE/ORDER BY, ba cách viết INNER JOIN, LEFT/RIGHT JOIN, CROSS JOIN, multi-join và bài tập cuối buổi.",
+      "source": {
+        "file": "Advanced SQL and Join 10.10.sql",
+        "loc": "Dòng 1–78"
+      },
+      "digest": {
+        "keyPoints": [
+          "Phần 1 (dòng 1–38): ôn tập `COUNT(*)`, `SUM`, `AVG`, `MIN`, `MAX`, gom nhóm `GROUP BY park_code`, lọc nhóm `HAVING count(*) > 3` và kết hợp đầy đủ thứ tự `SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY`.",
+          "Phần 2 (dòng 39–78): đối chiếu 3 cách viết `INNER JOIN` (`FROM a, b WHERE ...`, `INNER JOIN ... ON ...`, `NATURAL JOIN`), kiểm chứng `LEFT JOIN`/`RIGHT JOIN` và `CROSS JOIN`, sau đó join nối tiếp 3 bảng (`sales_line` → `sales` → `themepark`).",
+          "Chú ý trong một truy vấn có cả `WHERE`, `GROUP BY`, `HAVING` và `ORDER BY` (dòng 32–37): `WHERE park_code LIKE 'UK%'` lọc hàng **trước** khi gom nhóm, `GROUP BY` gom nhóm, `HAVING count(*) > 3` lọc nhóm **sau** khi gom, rồi `ORDER BY park_code DESC` xếp kết quả cuối."
+        ],
+        "terms": [
+          {
+            "term": "Multi-join",
+            "meaning": "Nối liên tiếp 3 bảng trở lên bằng chuỗi `JOIN ... ON ... JOIN ... ON ...` (ví dụ `sales_line` → `sales` qua `transaction_no`, rồi → `themepark` qua `park_code`)."
+          },
+          {
+            "term": "WHERE vs HAVING trong 1 query",
+            "meaning": "`WHERE` lọc điều kiện ở mức từng dòng dữ liệu trước khi `GROUP BY`; `HAVING` lọc điều kiện ở mức từng nhóm tổng hợp sau khi `GROUP BY`."
+          }
+        ],
+        "pitfalls": [
+          "Dùng nháy kép `\"UK%\"` chỉ chạy được trên MySQL khi không bật chế độ `ANSI_QUOTES`; theo chuẩn SQL nên dùng nháy đơn `'UK%'` cho chuỗi và nháy kép (hoặc backtick) cho alias.",
+          "Hai dòng cuối 76–77 là đề bài chưa viết code SQL (`Tính tổng số lượng line của từng ticket ở themepark có tên là GoldTown`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "SQL Script (1/2)",
+          "title": "Advanced SQL and Join 10.10.sql — Aggregate, GROUP BY & HAVING (dòng 1–38)",
+          "code": {
+            "lang": "sql",
+            "text": "#ADVANCED: Aggregate , group by, having, join, \n# Functions(date time, string, math)\n## COUNT\nselect * from attraction;\nselect * from themepark;\nselect count(*) from attraction;\n## SUM \nselect sum(attract_capacity) from attraction;\n## AVG \nselect avg(attract_capacity) from attraction;\n## MIN, MAX\nselect min(attract_capacity) as \"Min capacity\", \nmax(attract_Capacity) as \"Max capacity\"\nfrom attraction;\n## GROUP BY\nuse themepark;\nselect park_code, count(*) as \"Total attractions\"\nfrom attraction \ngroup by park_code;\n#Min and Max capacity for each themepark\nselect park_code, min(attract_capacity) as Min,\nmax(attract_Capacity) as Max\nfrom attraction \ngroup by park_code;\n#HAVING\nselect park_code, count(*) as \"Total attractions\"\nfrom attraction \ngroup by park_code\nhaving count(*) > 3;\n# find the themepark that contain more than 3\n# attractions in the UK\nselect park_code, count(*) as \"Total attractions\"\nfrom attraction \nwhere park_code like \"UK%\" \ngroup by park_code\nhaving count(*) > 3\norder by park_code desc;\n"
+          },
+          "explanation": [
+            "Dòng 1–14: lần lượt chạy `COUNT(*)`, `SUM`, `AVG`, `MIN`, `MAX` trên cột `attract_capacity` của bảng `attraction` và đặt bí danh cột kết quả bằng `AS \"Min capacity\"` / `\"Max capacity\"`.",
+            "Dòng 15–24: dùng `USE themepark;` rồi gom theo `park_code` (`GROUP BY park_code`) để đếm tổng số trò chơi và tìm sức chứa nhỏ nhất/lớn nhất của **từng công viên**.",
+            "Dòng 25–37: minh họa kết hợp đủ mệnh đề `WHERE park_code LIKE \"UK%\"` (lọc công viên ở Anh trước) → `GROUP BY park_code` → `HAVING count(*) > 3` (chỉ giữ công viên có trên 3 trò chơi) → `ORDER BY park_code DESC`."
+          ],
+          "source": {
+            "file": "Advanced SQL and Join 10.10.sql",
+            "loc": "Dòng 1–38"
+          }
+        },
+        {
+          "slideNumber": "SQL Script (2/2)",
+          "title": "Advanced SQL and Join 10.10.sql — INNER, LEFT/RIGHT, CROSS & Multi-Join (dòng 39–78)",
+          "code": {
+            "lang": "sql",
+            "text": "#INNER JOIN\n### 1st\nselect * from attraction, themepark \nwhere attraction.park_code = themepark.park_code;\n## 2nd\nselect * from attraction inner join themepark\non attraction.park_code = themepark.park_code;\n## 3rd\nselect * from attraction natural join themepark;\n#LEFT JOIN/ RIGHT JOIN\nuse themepark;\nselect * from themepark left join  attraction\non attraction.park_code = themepark.park_code;\nselect * from attraction right join themepark\non attraction.park_code = themepark.park_code;\n# cross join\nselect * from attraction cross join themepark;\n## example\n###1\nselect studentname, dob, classname, formteacher\nfrom student \ninner join class on student.classid = class.classid;\n### 2\nselect studentname, dob, classname, formteacher\nfrom student,class where student.classid = class.classid;\n### 3\nselect studentname, dob, classname, formteacher\nfrom student natural join class ;\n### multi join\nselect ticket_no, line_qty, line_price, sale_date,\npark_name, park_city \nfrom sales_line inner join sales \non sales_line.transaction_no = sales.transaction_no\ninner join themepark \non sales.park_code = themepark.park_code\nwhere line_price> 50\norder by park_city;\n## Tính tổng số lượng line của từng\n## ticket ở themepark có tên là GoldTown\n"
+          },
+          "explanation": [
+            "Dòng 39–47 & 56–66: đối chiếu 3 cú pháp viết `INNER JOIN` cho cùng kết quả trên `attraction`/`themepark` và ví dụ `student`/`class`: (1) kiểu cũ `FROM A, B WHERE A.k = B.k`, (2) `A INNER JOIN B ON A.k = B.k`, (3) `A NATURAL JOIN B` (tự ghép cột trùng tên).",
+            "Dòng 48–55: so sánh `themepark LEFT JOIN attraction` (giữ cả công viên chưa có trò chơi) với `attraction RIGHT JOIN themepark` (vì `themepark` đặt bên phải nên cho kết quả giữ công viên giống hệt trên) và `CROSS JOIN`.",
+            "Dòng 67–75: multi-join 3 bảng `sales_line` → `sales` (qua `transaction_no`) → `themepark` (qua `park_code`), lọc `line_price > 50` và xếp tăng dần theo `park_city`.",
+            "Dòng 76–77 là đề bài tập cuối file (\"Tính tổng số lượng line của từng ticket ở themepark có tên là GoldTown\"). Lời giải chuẩn: `SELECT l.ticket_no, SUM(l.line_qty) AS total_qty FROM sales_line l JOIN sales s ON l.transaction_no = s.transaction_no JOIN themepark p ON s.park_code = p.park_code WHERE p.park_name = 'GoldTown' GROUP BY l.ticket_no;`."
+          ],
+          "source": {
+            "file": "Advanced SQL and Join 10.10.sql",
+            "loc": "Dòng 39–78"
+          }
+        }
+      ]
+    }
   ],
   "cards": [
-    { "id": "dbs-lab2-c01", "front": "COUNT(*), COUNT(cột), COUNT(DISTINCT cột) khác gì?", "back": "COUNT(*) đếm mọi hàng; COUNT(cột) bỏ qua NULL; COUNT(DISTINCT cột) đếm giá trị khác nhau.", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 5, mục 5.3" } },
-    { "id": "dbs-lab2-c02", "front": "CROSS JOIN trả về gì?", "back": "Tích Descartes của hai bảng (ví dụ 19 × 31 = 589 hàng).", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 6, mục 6.3" } },
-    { "id": "dbs-lab2-c03", "front": "NATURAL JOIN, JOIN USING, JOIN ON khác nhau ở qualifier thế nào?", "back": "NATURAL JOIN và USING không cần qualifier cho cột chung; JOIN ON cần qualifier cho cột chung.", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 6, mục 6.4–6.6" } },
-    { "id": "dbs-lab2-c04", "front": "IFNULL trong MySQL tương đương hàm nào của Oracle?", "back": "NVL.", "source": { "file": "Lab 7 - 8.pdf", "loc": "Lab 7, mục 7.4" } },
-    { "id": "dbs-lab2-c05", "front": "Ba dạng kết quả của subquery?", "back": "Giá trị vô hướng; danh sách giá trị (1 cột nhiều hàng); bảng ảo (nhiều cột nhiều hàng).", "source": { "file": "Lab 7 - 8.pdf", "loc": "Lab 8, đầu mục" } },
-    { "id": "dbs-lab2-c06", "front": "Vì sao HAVING dùng cho điều kiện COUNT(*) > 3?", "back": "Vì điều kiện trên nhóm sau GROUP BY; WHERE lọc hàng trước khi nhóm nên không dùng được hàm tổng hợp.", "source": { "file": "Advanced SQL and Join 10.10.sql", "loc": "dòng 25–37" } }
+    {
+      "id": "dbs-lab2-c01",
+      "front": "COUNT(*), COUNT(cột), COUNT(DISTINCT cột) khác gì?",
+      "back": "COUNT(*) đếm mọi hàng; COUNT(cột) bỏ qua NULL; COUNT(DISTINCT cột) đếm giá trị khác nhau.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 6–7 (Lab 5, mục 5.3)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c02",
+      "front": "CROSS JOIN trả về gì?",
+      "back": "Tích Descartes của hai bảng (ví dụ 19 × 31 = 589 hàng). Trong MySQL, `CROSS JOIN` và `INNER JOIN` tương đương về cú pháp.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 13, 17 (Lab 6, mục 6.3)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c03",
+      "front": "NATURAL JOIN, JOIN USING, JOIN ON khác nhau ở qualifier thế nào?",
+      "back": "NATURAL JOIN và USING hợp nhất cột chung nên không cần prefix tên bảng; JOIN ON giữ cả 2 cột nên bắt buộc phải có prefix bảng cho cột chung.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 18–23 (Lab 6, mục 6.4–6.6)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c04",
+      "front": "IFNULL trong MySQL tương đương hàm nào của Oracle?",
+      "back": "Hàm `NVL` (`IFNULL(expr1, expr2)` trả về `expr1` nếu khác NULL, ngược lại trả `expr2`).",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 16 (Lab 7, mục 7.4)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c05",
+      "front": "Ba dạng kết quả của subquery?",
+      "back": "Giá trị vô hướng (1 cột 1 hàng); danh sách giá trị (1 cột nhiều hàng); bảng ảo (nhiều cột nhiều hàng).",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 22–23 (Lab 8)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c06",
+      "front": "Vì sao HAVING dùng cho điều kiện COUNT(*) > 3?",
+      "back": "Vì điều kiện trên nhóm sau GROUP BY; WHERE lọc từng hàng trước khi nhóm nên không dùng được hàm tổng hợp.",
+      "source": {
+        "file": "Advanced SQL and Join 10.10.sql",
+        "loc": "Dòng 25–37"
+      }
+    },
+    {
+      "id": "dbs-lab2-c07",
+      "front": "Khi join N bảng theo kiểu cũ `FROM T1, T2, ... WHERE ...`, cần bao nhiêu điều kiện join?",
+      "back": "Tối thiểu `N - 1` điều kiện join (ví dụ 3 bảng cần 2 điều kiện j1 và j2 nối bằng `AND`).",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 15–16 (Lab 6, mục 6.1)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c08",
+      "front": "LEFT OUTER JOIN và RIGHT OUTER JOIN lấy phần nào?",
+      "back": "LEFT JOIN giữ toàn bộ hàng bảng đứng trước từ khóa JOIN; RIGHT JOIN giữ toàn bộ hàng bảng đứng sau JOIN (cột thiếu điền NULL).",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 24–25 (Lab 6, mục 6.7)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c09",
+      "front": "Phân biệt `DATE_FORMAT` specifier: `%D`, `%b`, `%M`, `%Y`, `%y`?",
+      "back": "`%D` ngày có hậu tố (`18th`), `%b` tháng viết tắt (`May`), `%M` tên tháng đủ (`January..December`), `%Y` năm 4 chữ số, `%y` năm 2 chữ số.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 3–4 (Lab 7, Table 7.2)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c10",
+      "front": "`DATEDIFF(d1, d2)` và `ADDDATE(d, INTERVAL expr unit)` làm gì?",
+      "back": "`DATEDIFF` tính hiệu số ngày `d1 - d2`; `ADDDATE` (synonym của `DATE_ADD`) cộng thêm khoảng thời gian (`INTERVAL 12 MONTH`) vào ngày `d`.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 7–8 (Lab 7, mục 7.1)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c11",
+      "front": "`ROUND(114.68, 0)` và `TRUNCATE(114.68, 0)` cho kết quả gì?",
+      "back": "`ROUND` làm tròn cho ra `115`, còn `TRUNCATE` cắt thẳng phần thập phân cho ra `114`.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 10 (Lab 7, Figure 60)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c12",
+      "front": "Trong MySQL, `SUBSTR(str, p, l)` đánh chỉ số vị trí đầu từ mấy?",
+      "back": "Từ `1` (ví dụ `SUBSTR(EMP_FNAME, 1, 3)` lấy 3 ký tự đầu tiên).",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 11, 13 (Lab 7, mục 7.3)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c13",
+      "front": "Lệnh `SELECT 10 + '10';` và `SELECT CAST(10 AS CHAR);` trả về gì?",
+      "back": "`10 + '10'` tự ép kiểu ngầm thành `20`; `CAST(10 AS CHAR)` ép kiểu tường minh số `10` thành chuỗi `'10'`.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 15 (Lab 7, Figure 66)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c14",
+      "front": "Có thể dùng column alias vừa định nghĩa để tính cột khác trong cùng `SELECT` không?",
+      "back": "Không! Cột tính toán trong `SELECT` list không được tham chiếu alias vừa đặt trong chính `SELECT` list đó mà phải lặp lại biểu thức/subquery.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 30 (Lab 8, mục 8.5)"
+      }
+    },
+    {
+      "id": "dbs-lab2-c15",
+      "front": "Correlated subquery (như với `EXISTS`) thực thi theo trình tự nào?",
+      "back": "Khởi chạy outer query trước, rồi với mỗi hàng của outer query sẽ truyền giá trị sang để thực thi lại inner query một lần.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 31–32 (Lab 8, mục 8.6)"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-lab2-q01", "stem": "Ba cách viết INNER JOIN attraction và themepark theo file Advanced SQL gồm?", "options": ["WHERE, INNER JOIN ... ON, NATURAL JOIN", "UNION, INTERSECT, EXCEPT", "LEFT, RIGHT, FULL", "CASE, IF, IFNULL"], "answer": 0, "explanation": "Script nêu 3 cách: điều kiện trong WHERE, INNER JOIN ... ON, NATURAL JOIN.", "source": { "file": "Advanced SQL and Join 10.10.sql", "loc": "dòng 39–47" } },
-    { "id": "dbs-lab2-q02", "stem": "Mệnh đề nào dùng để lọc theo COUNT(*) sau khi GROUP BY?", "options": ["WHERE", "HAVING", "ORDER BY", "LIMIT"], "answer": 1, "explanation": "HAVING lọc nhóm sau GROUP BY.", "source": { "file": "MySQL Lab 5-6.pdf", "loc": "Lab 5, mục GROUP BY/HAVING" } },
-    { "id": "dbs-lab2-q03", "stem": "Subquery trả về một cột nhiều hàng thường dùng với toán tử nào?", "options": ["=", "IN", "+", "BETWEEN"], "answer": 1, "explanation": "Danh sách giá trị dùng với IN (hoặc ALL/ANY).", "source": { "file": "Lab 7 - 8.pdf", "loc": "Lab 8, mục 8.2" } }
+    {
+      "id": "dbs-lab2-q01",
+      "stem": "Ba cách viết INNER JOIN attraction và themepark theo file Advanced SQL gồm?",
+      "options": [
+        "WHERE, INNER JOIN ... ON, NATURAL JOIN",
+        "UNION, INTERSECT, EXCEPT",
+        "LEFT, RIGHT, FULL",
+        "CASE, IF, IFNULL"
+      ],
+      "answer": 0,
+      "explanation": "Script nêu 3 cách: điều kiện trong WHERE (`attraction.park_code = themepark.park_code`), `INNER JOIN ... ON`, và `NATURAL JOIN`.",
+      "source": {
+        "file": "Advanced SQL and Join 10.10.sql",
+        "loc": "Dòng 39–47"
+      }
+    },
+    {
+      "id": "dbs-lab2-q02",
+      "stem": "Mệnh đề nào dùng để lọc theo COUNT(*) sau khi GROUP BY?",
+      "options": [
+        "WHERE",
+        "HAVING",
+        "ORDER BY",
+        "LIMIT"
+      ],
+      "answer": 1,
+      "explanation": "`HAVING` lọc các nhóm sau khi `GROUP BY` tổng hợp xong; `WHERE` chỉ lọc từng hàng trước khi gom nhóm.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 11–12 (Lab 5, mục HAVING)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q03",
+      "stem": "Subquery trả về một cột nhiều hàng thường dùng với toán tử nào?",
+      "options": [
+        "=",
+        "IN",
+        "+",
+        "BETWEEN"
+      ],
+      "answer": 1,
+      "explanation": "Danh sách giá trị (1 cột nhiều hàng) dùng với `IN` (hoặc `ALL`/`ANY`), không thể dùng phép `=` đơn trị.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 25, 28 (Lab 8, mục 8.2 & 8.4)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q04",
+      "stem": "Trong Task 5.4 (Figure 40), vì sao `SELECT COUNT(*) FROM ATTRACTION;` trả về `11` nhưng `SELECT COUNT(ATTRACT_NAME) FROM ATTRACTION;` chỉ trả về `10`?",
+      "options": [
+        "Vì `COUNT(ATTRACT_NAME)` tự loại bỏ tên trùng nhau",
+        "Vì bảng `ATTRACTION` có 1 hàng chứa giá trị `NULL` ở cột `ATTRACT_NAME`",
+        "Vì `COUNT(*)` đếm cả dòng tiêu đề cột",
+        "Vì `ATTRACT_NAME` là khóa chính"
+      ],
+      "answer": 1,
+      "explanation": "`COUNT(*)` đếm mọi hàng kể cả hàng có giá trị `NULL`, còn `COUNT(tên_cột)` luôn bỏ qua các giá trị `NULL`.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 7 (Lab 5, Figure 40)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q05",
+      "stem": "Khi sửa `THEMEPARK.PARK_CODE` thành `PARK_CODE` trong câu `SELECT PARK_CODE, ... FROM THEMEPARK JOIN ATTRACTION ON THEMEPARK.PARK_CODE = ATTRACTION.PARK_CODE;` (Task 6.1 / mục 6.6), điều gì xảy ra?",
+      "options": [
+        "Trả về kết quả giống hệt như trước",
+        "MySQL tự hiểu lấy cột từ bảng đầu tiên",
+        "Báo lỗi mơ hồ tên cột (column ambiguously defined / ambiguous) vì thiếu table qualifier",
+        "Tự động thực hiện CROSS JOIN"
+      ],
+      "answer": 2,
+      "explanation": "Khác với `NATURAL JOIN` và `JOIN ... USING`, `JOIN ... ON` (và join trong `WHERE`) không gộp cột trùng nên bắt buộc gắn prefix tên bảng/alias cho cột xuất hiện ở cả hai bảng.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 16, 23 (Lab 6, mục 6.1 & 6.6)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q06",
+      "stem": "Với `THEMEPARK` (7 công viên, trong đó 4 công viên chưa có trò chơi) và `ATTRACTION` (11 trò chơi đều gắn `PARK_CODE`), lệnh `SELECT * FROM THEMEPARK LEFT JOIN ATTRACTION ON THEMEPARK.PARK_CODE = ATTRACTION.PARK_CODE;` trả về bao nhiêu hàng (Figure 53)?",
+      "options": [
+        "7 hàng",
+        "11 hàng",
+        "15 hàng",
+        "77 hàng"
+      ],
+      "answer": 2,
+      "explanation": "`LEFT JOIN` giữ lại 11 cặp khớp từ `ATTRACTION` cộng thêm 4 công viên chưa có trò chơi ở bảng trái `THEMEPARK` (với cột `ATTRACTION` mang `NULL`), tổng cộng 15 hàng.",
+      "source": {
+        "file": "MySQL Lab 5-6.pdf",
+        "loc": "Trang 24–25 (Lab 6, Figure 53)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q07",
+      "stem": "Để hiển thị ngày `'2007-05-18'` thành chuỗi `'Fri – 18 – 5 – 07'` (Task 7.2), chuỗi format nào của `DATE_FORMAT` là đúng?",
+      "options": [
+        "'%W – %d – %m – %Y'",
+        "'%a – %e – %c – %y'",
+        "'%a – %D – %b – %Y'",
+        "'%w – %d – %M – %y'"
+      ],
+      "answer": 1,
+      "explanation": "Theo Table 7.2: `%a` là thứ viết tắt (`Fri`), `%e` là ngày không số 0 đầu (`18`), `%c` là tháng số không số 0 đầu (`5`), `%y` là năm 2 chữ số (`07`).",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 3–4 (Lab 7, Table 7.2 & Task 7.2)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q08",
+      "stem": "Ở Task 7.11 trên bảng `SALES_COPY` (có 2 dòng `LINE_QTY` là `NULL`), phép tính nào tránh được kết quả `NULL` trong cột `TOTAL SALES PER LINE`?",
+      "options": [
+        "`LINE_QTY * ITEM_PRICE`",
+        "`(IFNULL(LINE_QTY, 0)) * ITEM_PRICE`",
+        "`CAST(LINE_QTY AS CHAR) * ITEM_PRICE`",
+        "`LENGTH(LINE_QTY) * ITEM_PRICE`"
+      ],
+      "answer": 1,
+      "explanation": "`IFNULL(LINE_QTY, 0)` thay thế các ô `NULL` bằng `0` trước khi nhân với `ITEM_PRICE`, giúp tổng tiền hai dòng đó bằng `0` thay vì `NULL`.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 16–18 (Lab 7, Task 7.11 & Figure 67)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q09",
+      "stem": "Câu lệnh `WHERE TICKET_PRICE > ALL (SELECT TICKET_PRICE FROM TICKET WHERE TICKET_TYPE = 'CHILD')` chọn những vé nào (Figure 74)?",
+      "options": [
+        "Các vé có giá lớn hơn giá vé `CHILD` rẻ nhất",
+        "Các vé có giá lớn hơn mọi giá vé `CHILD` (tức đắt hơn vé `CHILD` cao nhất)",
+        "Chỉ các vé loại `CHILD`",
+        "Các vé có giá bằng trung bình giá vé `CHILD`"
+      ],
+      "answer": 1,
+      "explanation": "`> ALL` đòi hỏi điều kiện `>` phải thỏa mãn với toàn bộ từng giá trị do subquery trả về — tương đương lớn hơn giá trị lớn nhất trong danh sách vé trẻ em.",
+      "source": {
+        "file": "Lab 7 - 8.pdf",
+        "loc": "Trang 28–29 (Lab 8, mục 8.4)"
+      }
+    },
+    {
+      "id": "dbs-lab2-q10",
+      "stem": "Theo thứ tự viết các mệnh đề trong một câu `SELECT` hoàn chỉnh (minh họa ở dòng 32–37 của `Advanced SQL and Join 10.10.sql`), thứ tự nào đúng?",
+      "options": [
+        "SELECT → FROM → GROUP BY → WHERE → HAVING → ORDER BY",
+        "SELECT → FROM → WHERE → HAVING → GROUP BY → ORDER BY",
+        "SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY",
+        "SELECT → WHERE → FROM → GROUP BY → ORDER BY → HAVING"
+      ],
+      "answer": 2,
+      "explanation": "Thứ tự chuẩn trong SQL: `SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...`.",
+      "source": {
+        "file": "Advanced SQL and Join 10.10.sql",
+        "loc": "Dòng 32–37"
+      }
+    }
   ]
 }

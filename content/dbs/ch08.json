@@ -1,25 +1,1833 @@
 {
-  "id": "dbs-ch08", "order": 8,
+  "id": "dbs-ch08",
+  "order": 8,
   "title": "Chương 8: Database Application Development",
-  "summary": [
-    { "h": "Client/server và 3 thành phần logic", "text": "Ba thành phần ứng dụng: Presentation logic (giao diện), Processing logic (xử lý I/O, business rules, quản lý dữ liệu), Storage logic (lưu và truy xuất, hoạt động DBMS). Fat client: client lo presentation và processing, server lo storage. Thin client: client chỉ lo presentation (ví dụ trình duyệt). Application partitioning là đặt các phần mã ở client hoặc server sau khi viết." },
-    { "h": "Two-tier và three-tier", "text": "Two-tier: client lo presentation, data processing, business rules; database server lo lưu trữ và truy cập; phù hợp quy mô phòng ban, ít người dùng. Three-tier: client (thin) – application/web server (business rules, processing) – database server (storage). Lợi ích 3-tier: scalability, linh hoạt công nghệ, giảm chi phí dài hạn, phù hợp nghiệp vụ, cải thiện dịch vụ, lợi thế cạnh tranh, giảm rủi ro." },
-    { "h": "Middleware và API", "text": "Middleware cho phép ứng dụng tương tác với phần mềm khác mà không phải lập trình thao tác cấp thấp. API phổ biến: ODBC, ADO.NET, JDBC. 6 bước dùng database qua API: đăng ký driver, mở kết nối, thực thi truy vấn, xử lý kết quả, lặp lại, đóng kết nối." },
-    { "h": "Stored procedure và connection pooling", "text": "Stored procedure: hiệu năng tốt hơn (SQL biên dịch sẵn), giảm lưu lượng mạng, an toàn hơn, toàn vẹn hơn, client mỏng hơn; nhược điểm: lập trình tốn thời gian và cú pháp phụ thuộc nhà cung cấp. Connection pooling dùng chung và tái sử dụng kết nối." },
-    { "h": "Cloud, XML, Web services", "text": "Cloud: IaaS, PaaS, SaaS. XML Schema (XSD) tương tự CREATE TABLE (metadata), tài liệu XML tương tự bản ghi. 4 cách lưu XML: shredding vào bảng quan hệ, lưu trong BLOB/CLOB, cột XML đặc biệt, native XML database. XPath định vị node; XQuery (FLWOR) truy vấn; XSLT chuyển XML sang HTML. Web services: UDDI (đăng ký/tìm), WSDL (mô tả), SOAP (trao đổi thông điệp), XML, Internet. SOA là tập dịch vụ liên kết lỏng." }
+  "audit": {
+    "sourceFile": "hoffer_mdm12e_pp_ch08.pdf + 8.4.jpg",
+    "totalPages": 45,
+    "extractedPages": 45,
+    "ocrNotes": [
+      "PDF hoffer_mdm12e_pp_ch08.pdf thực tế gồm 45 trang (Slides 1–45), đã trích xuất đầy đủ 45/45 slides kèm pageNumber 1–45.",
+      "Tài liệu bổ sung 8.4.jpg (ảnh chụp màn hình thực hành MySQL Workbench — bài Lab 8 Task 8.4 trên schema themepark) được trích xuất thành mục riêng ở phần cuối Chương 8 kèm diagramText, code SQL, diagramNote và explanation; hai dòng bị cắt mép phải trong cửa sổ soạn thảo (dòng 37 sau 'as total' và dòng 40 sau 'sum(hours_per_attra') được đánh dấu [?cần kiểm tra].",
+      "Một số lỗi chính tả tồn tại sẵn trên slide giáo trình gốc được giữ nguyên kèm chú thích ở ocrNote/explanation: Slide 16 ('Driverd =' thiếu khoảng trắng), Slide 22 ('HML document', 'XMS style sheet'), Slide 33 ('elementname=', namespace 'xsd' dùng trước xmlns:xsd), Slide 38 ('price' vs 'standard price'), Slide 42 (xmlns khác dấu ngoặc và thẻ tự đóng <soap:Envelope .../>), Slide 45 (trang thông báo bản quyền Pearson)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "hoffer_mdm12e_pp_ch08.pdf",
+      "loc": "Slides 1–45 (đầy đủ 45/45 slides)"
+    },
+    {
+      "file": "8.4.jpg",
+      "loc": "Ảnh chụp thực hành MySQL Workbench — Lab 8.4"
+    }
   ],
-  "sources": [{ "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 1–45" }],
+  "summary": [
+    {
+      "h": "Kiến trúc Client/Server, Ba thành phần logic, Application Partitioning & Two-Tier",
+      "text": "Giới thiệu Chương 8, 9 mục tiêu học tập, mô hình Client/Server, 3 thành phần logic ứng dụng (Presentation, Processing, Storage), phân mảnh ứng dụng (Application Partitioning), phân bố logic (Fat Client, Thin Client, Distributed) và đặc điểm kiến trúc Two-tier.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 1–10"
+      },
+      "digest": {
+        "keyPoints": [
+          "Mọi ứng dụng Client/Server gồm 3 lớp logic: Presentation Logic (giao diện GUI, nhập/xuất), Processing Logic (xử lý I/O, business rules, quản lý dữ liệu) và Storage Logic (lưu trữ và truy xuất của DBMS).",
+          "Application Partitioning là việc đặt các phần mã ứng dụng ở Client hay Server sau khi viết xong nhằm tăng hiệu năng, tăng khả năng tương tác và cân bằng tải.",
+          "Trong Two-tier: Fat client giữ cả Presentation và Processing logic; Thin client chỉ giữ Presentation logic (processing nằm trên server); Distributed đặt Processing ở cả hai phía.",
+          "Two-tier database server architecture (DBMS chỉ nằm trên server) phù hợp phạm vi phòng ban (ít người dùng), không mang tính sống còn (not mission-critical) và lượng giao dịch thấp."
+        ],
+        "terms": [
+          {
+            "term": "Client vs Server",
+            "meaning": "Client là máy trạm (PC, smartphone, tablet) yêu cầu và sử dụng dịch vụ; Server là máy tính mạnh cung cấp dịch vụ (database server cho DBMS, web server cho Internet)."
+          },
+          {
+            "term": "Application Partitioning",
+            "meaning": "Đặt các phần mã của ứng dụng ở các vị trí khác nhau (client vs server) sau khi đã viết xong."
+          },
+          {
+            "term": "Fat Client vs Thin Client (trong 2-tier)",
+            "meaning": "Fat client đặt Processing Logic ở client; Thin client đẩy Processing Logic lên server để client chủ yếu xử lý Presentation."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm Thin Client với Zero Storage trong mọi trường hợp: Slide 17 & 19 nhấn mạnh Thin client vẫn có thể xử lý một phần nhỏ ứng dụng và có bộ nhớ cục bộ hạn chế (hoặc không có ổ cứng).",
+          "Trong mô hình Two-tier database server (Slide 8–9), Server chỉ trả về 'Selected data only' qua LAN, nhưng vì client vẫn gánh Business rules và Data processing logic nên rất khó mở rộng cho hàng nghìn người dùng Internet."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "CHAPTER 8: DATABASE APPLICATION DEVELOPMENT",
+          "paragraphs": [
+            "CHAPTER 8: DATABASE APPLICATION DEVELOPMENT",
+            "Modern Database Management (12th Edition) — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi",
+            "Copyright © 2016 Pearson Education, Inc."
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide mở đầu Chương 8: \"Database Application Development\" thuộc giáo trình Modern Database Management (12th Edition).",
+            "Nếu Chương 6–7 nói về ngôn ngữ SQL bên trong CSDL, Chương 8 bước ra tầng kiến trúc phần mềm: cách ứng dụng (Desktop 2-tier, Web 3-tier, Java JDBC, PHP/JSP/ASP.NET, Cloud) kết nối với DBMS, trao đổi dữ liệu qua XML/XQuery/XSLT và kiến trúc hướng dịch vụ Web Services / SOA."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "Explain three components of client/server systems: presentation, processing, and storage",
+            "Distinguish between two-tier and three-tier architectures",
+            "Describe how to connect to databases in 2-tier systems using VB.NET and Java",
+            "Describe key components and information flow in Web applications",
+            "Describe how to connect to databases in 3-tier applications using JSP, PHP, and ASP .NET",
+            "Explain the purpose of XML",
+            "See how XQuery can be used to query XML documents",
+            "Explain how XML fosters Web services and SOAs"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Slide liệt kê 9 mục tiêu học tập bao phủ 3 mảng lớn của Chương 8: (1) Kiến trúc Client/Server (3 logic, 2-tier vs 3-tier, kết nối qua middleware API như JDBC); (2) Phát triển ứng dụng Web 3 tầng (Static vs Dynamic flow, Stored Procedure, Connection Pooling, Cloud); (3) Hệ sinh thái XML (XSD, lưu trữ XML, XPath/XQuery, XSLT) và Web Services / SOA.",
+            "Chú ý: dù mục tiêu có nhắc tới VB.NET, JSP, PHP, nhưng bộ slide bài giảng tập trung ví dụ code chi tiết vào **Java JDBC (Figure 8-5)** cho 2-tier và **ASP .NET (Figure 8-12)** cho 3-tier."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "CLIENT/SERVER ARCHITECTURES",
+          "bullets": [
+            "Networked computing model",
+            "Processes distributed between clients and servers",
+            "Client–Workstation (PC, smartphone, tablet) that requests and uses a service",
+            "Server– Powerful computer (PC/mini/mainframe) that provides a service",
+            "For DBMS, server is a database server",
+            "For the Internet, server is a web server"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Định nghĩa chuẩn mô hình Client/Server: không nhất thiết server phải là siêu máy tính mainframe, điểm phân biệt cốt lõi là **vai trò phân tán tiến trình qua mạng** — Client gửi yêu cầu và thụ hưởng dịch vụ, còn Server tiếp nhận và cung cấp dịch vụ.",
+            "Tùy ngữ cảnh, cùng một kiến trúc Client/Server sẽ có tên server khác nhau: với hệ quản trị CSDL đó là **database server** (nơi chạy DBMS), còn với ứng dụng Web trên Internet đó là **web server**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "APPLICATION LOGIC IN C/S SYSTEMS",
+          "diagramText": [
+            "Presentation Logic: Input–keyboard/mouse; Output–monitor/printer  ↔  GUI Interface",
+            "Processing Logic: I/O processing; Business rules; Data management  ↔  Procedures, functions, programs",
+            "Storage Logic: Data storage/retrieval  ↔  DBMS activities"
+          ],
+          "diagramNote": "Sơ đồ 3 tầng xếp chồng trình bày 3 thành phần logic của một hệ thống ứng dụng Client/Server và cách hiện thực tương ứng bên cột phải.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "Ba thành phần logic này là chìa khóa để phân biệt mọi biến thể kiến trúc trong Chương 8 (Fat client, Thin client, Two-tier, Three-tier, n-tier): khác nhau ở chỗ ta đặt từng khối này lên máy vật lý nào.",
+            "Mẹo nhớ cặp ánh xạ hay ra đề trắc nghiệm: **Presentation Logic** = GUI Interface (nhận input chuột/phím, xuất màn hình/máy in); **Processing Logic** = Procedures, functions, programs (xử lý I/O, quy tắc nghiệp vụ, quản lý dữ liệu); **Storage Logic** = DBMS activities (lưu và đọc dữ liệu đĩa)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "APPLICATION PARTITIONING",
+          "bullets": [
+            "Placing portions of the application code in different locations (client vs. server) after it is written",
+            {
+              "text": "Advantages",
+              "subBullets": [
+                "Improved performance",
+                "Improved interoperability",
+                "Balanced workloads"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Chú ý cụm từ khóa **\"after it is written\"** trong định nghĩa Application Partitioning: lập trình viên có thể viết mã logic trước, sau đó quyết định bố trí các mô-đun chạy trên máy Client hay máy Server tùy hạ tầng và tải thực tế.",
+            "Ba lợi ích cốt lõi của phân mảnh ứng dụng: tối ưu hiệu năng (đặt xử lý nặng gần dữ liệu hoặc CPU mạnh), tăng khả năng phối hợp liên hệ thống (interoperability) và cân bằng tải (tránh dồn hết việc làm nghẽn client yếu hoặc nghẽn cổ chai server)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "FIGURE 8-2 COMMON LOGIC DISTRIBUTIONS — a) Two-tier client-server environments",
+          "paragraphs": [
+            "a) Two-tier client-server environments",
+            "Processing logic could be at client (fat client), server (thin client), or both (distributed environment)."
+          ],
+          "diagramText": [
+            "Fat Client: Server = [Storage Logic] | Client = [Processing Logic] + [Presentation Logic]",
+            "Thin Client: Server = [Storage Logic] + [Processing Logic] | Client = [Presentation Logic]",
+            "Distributed: Server = [Storage Logic] + [Processing Logic] | Client = [Processing Logic] + [Presentation Logic]"
+          ],
+          "diagramNote": "Hình 8-2a so sánh 3 kiểu phân bổ Processing Logic trong môi trường 2 tầng: đặt ở Client (Fat Client), đặt trên Server (Thin Client) hoặc chia đều ở cả Client và Server (Distributed). Storage Logic luôn nằm ở Server, còn Presentation Logic luôn nằm ở Client.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Điểm bất biến trong mô hình 2 tầng: **Storage Logic luôn ở Server** và **Presentation Logic luôn ở Client** — yếu tố duy nhất di chuyển làm nên tên gọi là **Processing Logic**.",
+            "Nếu xử lý nghiệp vụ chạy nặng trên máy trạm (như app desktop kết nối thẳng DB) thì đó là **Fat Client**; nếu Processing chuyển lên Server (client chỉ dựng giao diện như trình duyệt/terminal) thì là **Thin Client**; nếu chia cả hai nơi (ví dụ client kiểm tra hợp lệ biểu mẫu còn server chạy stored procedure) thì gọi là **Distributed**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "FIGURE 8-2 COMMON LOGIC DISTRIBUTIONS — b) Three-tier and n-tier client-server environments",
+          "paragraphs": [
+            "b) Three-tier and n-tier client-server environments",
+            "Processing logic will be at application server or Web server."
+          ],
+          "diagramText": [
+            "Mô hình Three-tier (trái): Database Server [Storage Logic] (Oracle, Unix, SQL*Net, TCP/IP) ↔ Application Server [Processing Logic] (App. Services, SQL*Net, Tuxedo, TCP/IP, Unix) ↔ Client [Presentation Logic] (C++, Tuxedo, TCP/IP, Windows XP)",
+            "Mô hình n-tier Web (phải): Database Server [Storage Logic] (Oracle, Unix, SQL*Net, TCP/IP) ↔ Application Server [Processing Logic] (App/Server, SQL*Net, TCP/IP, Unix) ↔ Web Server [Processing Logic] (HTTP, CGI; TCP/IP, Windows Server, App/Server API) ↔ Client [Presentation Logic] (IE, Safari, Chrome, Firefox, HTTP, TCP/IP, Windows 8, MacOS X, iOS 8, Android)"
+          ],
+          "diagramNote": "Hình 8-2b minh họa 2 kiến trúc đa tầng: bên trái là 3-tier truyền thống tách Application Server riêng; bên phải là n-tier cho ứng dụng Web gồm Web Server (xử lý HTTP/CGI) đứng giữa Client (trình duyệt trên PC/macOS/iOS/Android) và Application Server.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "So với Two-tier (Slide 6), kiến trúc 3-tier/n-tier giải phóng máy Client khỏi toàn bộ gánh nặng nghiệp vụ và driver CSDL: Processing Logic được đặt tập trung trên **Application Server** (hoặc **Web Server**).",
+            "Chú ý cách gọi **n-tier**: thực chất là mở rộng của 3-tier khi tầng giữa được tách thành nhiều máy chủ chuyên trách (Web Server tiếp nhận HTTP từ trình duyệt/mobile, rồi chuyển tiếp yêu cầu động sang Application Server để gọi xuống Database Server)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "TWO-TIER DATABASE SERVER ARCHITECTURES",
+          "bullets": [
+            {
+              "text": "Client workstation is responsible for",
+              "subBullets": [
+                "Presentation logic",
+                "Data processing logic",
+                "Business rules logic"
+              ]
+            },
+            {
+              "text": "Server performs all data storage, access, and processing",
+              "subBullets": [
+                "Typically called a database server",
+                "➔ DBMS is only on server"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "Trong kiến trúc Two-tier database server phổ biến nhất (kiểu Fat Client), phần mềm ứng dụng cài trên máy người dùng vừa vẽ giao diện vừa chứa luôn mã xử lý dữ liệu và luật nghiệp vụ, rồi gửi thẳng câu SQL qua mạng xuống **Database Server**.",
+            "Điểm nhấn màu đỏ trên slide **\"DBMS is only on server\"**: máy khách KHÔNG cài hệ quản trị CSDL, chỉ cài driver kết nối (ODBC/JDBC/ADO.NET); toàn bộ việc lưu trữ, khóa đồng thời, chỉ mục và truy xuất dữ liệu nằm tập trung trên server."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Figure 8-3 Database server architecture (two-tier architecture)",
+          "paragraphs": [
+            "Front-end programs",
+            "Back-end functions"
+          ],
+          "diagramText": [
+            "Front-end programs: Client (PC), Client (Smartphone), Client (Tablet) ↔ LAN",
+            "LAN → Requests for data → Database server",
+            "Database server → Selected data only → LAN → Clients",
+            "Back-end functions: Database server ↔ Data (Database)"
+          ],
+          "diagramNote": "Hình 8-3 vẽ các thiết bị Client (Front-end programs) nối qua mạng LAN tới Database server (Back-end functions). Client gửi yêu cầu dữ liệu (Requests for data) và server chỉ gửi trả phần dữ liệu được chọn lọc (Selected data only) thay vì gửi cả tệp CSDL như kiến trúc file server cũ.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Chi tiết quan trọng trên mũi tên trả về là **`Selected data only`**: khác với mô hình File Server sơ khai (kéo nguyên cả file bảng qua LAN về máy trạm để lọc), Database Server tự thực thi câu truy vấn `SELECT ... WHERE ...` tại server rồi chỉ đẩy những dòng/cột cần thiết về qua mạng LAN.",
+            "Chú ý sự phân chia thuật ngữ **Front-end programs** (chương trình giao diện + nghiệp vụ trên các Client) và **Back-end functions** (Database server + kho Data phía sau)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "CHARACTERISTICS OF TWO-TIER CLIENT/SERVER SYSTEMS",
+          "bullets": [
+            "Departmental in scope (few users)",
+            "Not mission-critical",
+            "Low transaction volumes",
+            {
+              "text": "Common programming languages:",
+              "subBullets": [
+                "Java, VB .NET, C#"
+              ]
+            },
+            "Interface database via middleware, APIs"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "Đề thi rất hay hỏi điều kiện áp dụng kiến trúc Two-tier: chỉ phù hợp **quy mô phòng ban (ít người dùng đồng thời)**, hệ thống không mang tính sống còn (**not mission-critical**) và lưu lượng giao dịch thấp (**low transaction volumes**).",
+            "Tại sao Two-tier không phù hợp hệ thống lớn toàn doanh nghiệp? Vì mỗi máy khách đều tự mở kết nối trực tiếp tới DBMS (tốn tài nguyên kết nối) và mỗi lần đổi luật nghiệp vụ lại phải cài đặt/cập nhật lại phần mềm trên hàng trăm máy trạm."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Middleware, Database APIs (ODBC, ADO.NET, JDBC) & Kết nối Java JDBC",
+      "text": "Vai trò Middleware và Database APIs (ODBC, ADO.NET, JDBC), quy trình 6 bước chuẩn truy cập CSDL qua API, kiến trúc Java JDBC API (java.sql, javax.sql, DriverManager) và phân tích chi tiết ví dụ TestJDBC (Figure 8-5).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 11–16"
+      },
+      "digest": {
+        "keyPoints": [
+          "Middleware giúp ứng dụng giao tiếp với phần mềm khác (như DBMS) mà lập trình viên không phải tự code giao thức mạng/hệ điều hành cấp thấp.",
+          "Ba Database API phổ biến nhất là ODBC (chuẩn mở C/đa nền tảng), ADO .NET (nền tảng .NET/C#/VB.NET) và JDBC (ngôn ngữ Java).",
+          "Quy trình 6 bước chuẩn dùng CSDL qua API: (1) Đăng ký driver → (2) Mở kết nối → (3) Thực thi truy vấn → (4) Xử lý kết quả → (5) Lặp lại bước 3–4 nếu cần → (6) Đóng kết nối.",
+          "Java JDBC API gồm 2 gói `java.sql` và `javax.sql`, dùng lớp `DriverManager` quản lý driver và mở `Connection`, tạo `Statement` để thực thi SQL và duyệt từng dòng bằng `ResultSet`."
+        ],
+        "terms": [
+          {
+            "term": "Middleware",
+            "meaning": "Phần mềm trung gian cho phép ứng dụng phối hợp với phần mềm khác mà người dùng không cần hiểu và lập trình các thao tác cấp thấp."
+          },
+          {
+            "term": "Application Program Interface (API)",
+            "meaning": "Tập các hàm/thủ tục (routines) mà ứng dụng dùng để điều khiển hệ điều hành thực hiện tác vụ; các DB API phổ biến gồm ODBC, ADO .NET, JDBC."
+          },
+          {
+            "term": "DriverManager (JDBC)",
+            "meaning": "Lớp đóng vai trò giao diện giữa người dùng và các driver, theo dõi driver khả dụng và thiết lập kết nối với driver phù hợp."
+          }
+        ],
+        "pitfalls": [
+          "Đừng quên bước cuối (Bước 6): phải luôn `conn.close()` để giải phóng kết nối CSDL (trong Java thực tế nên đóng trong khối `finally` hoặc `try-with-resources`, vì nếu `executeQuery` ném ngoại lệ giữa chừng ở code Slide 16 thì dòng `conn.close()` trong `try` sẽ bị bỏ qua!).",
+          "Slide 16 có lỗi gõ dính chữ `Driverd =` ở dòng đăng ký driver cũ (`Class.forName(...).newInstance()`); khi viết Java thực tế phải tách kiểu rõ `Driver d = ...` và chú ý `DriverManager.registerDriver(...)` tự được gọi bên trong driver JDBC hiện đại."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "MIDDLEWARE AND APIS",
+          "bullets": [
+            "Middleware – software that allows an application to interoperate with other software without requiring user to understand and code low-level operations",
+            "Application Program Interface (API) – routines that an application uses to direct the performance of procedures by the computer’s operating system",
+            "Common database APIs – ODBC, ADO .NET, JDBC"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Tại sao ứng dụng cần **Middleware** và **Database API**? Nếu không có lớp trung gian chuẩn hóa, ứng dụng viết cho Oracle sẽ phải viết lại toàn bộ mã kết nối mạng nếu chuyển sang SQL Server hoặc MySQL.",
+            "Nhớ đúng tên 3 API cơ sở dữ liệu chuẩn trên slide: **ODBC** (Open Database Connectivity), **ADO .NET** (cho hệ sinh thái Microsoft .NET) và **JDBC** (Java Database Connectivity)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "STEPS FOR USING DATABASES VIA MIDDLEWARE APIS",
+          "bullets": [
+            "1. Identify and register a database driver.",
+            "2. Open a connection to a database.",
+            "3. Execute a query against the database.",
+            "4. Process the results of the query.",
+            "5. Repeat steps 3–4 as necessary.",
+            "6. Close the connection to the database."
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "Đây là **quy trình 6 bước kinh điển** (rất hay hỏi sắp xếp đúng thứ tự trong bài thi) áp dụng chung cho hầu hết mọi API từ ODBC, JDBC đến ADO.NET và PHP PDO/MySQLi.",
+            "Cần nhớ logic: Bước 1–2 làm lúc thiết lập phiên (xác định & đăng ký driver → mở connection), Bước 3–5 nằm trong vòng lặp nghiệp vụ (chạy query → duyệt kết quả), và Bước 6 bắt buộc khép lại bằng đóng kết nối để tránh cạn kiệt connection của DBMS."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "JAVA JDBC API",
+          "bullets": [
+            "The Java Database Connectivity (JDBC) API provides universal data access from the Java programming language.",
+            "Using the JDBC API to access virtually any data source, from relational databases to spreadsheets and flat files.",
+            {
+              "text": "The JDBC API is comprised of two packages:",
+              "subBullets": [
+                "java.sql",
+                "javax.sql"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Điểm cần nhớ về **JDBC API**: cung cấp khả năng truy cập dữ liệu phổ quát (universal data access) từ Java tới gần như mọi nguồn dữ liệu (từ RDBMS đến bảng tính Excel, tệp phẳng flat files miễn có driver tương ứng).",
+            "Ghi nhớ chính xác tên **hai package** cấu thành JDBC API cho câu hỏi trắc nghiệm: `java.sql` (giao diện lõi như `Connection`, `Statement`, `ResultSet`, `DriverManager`) và `javax.sql` (mở rộng như `DataSource`, connection pooling)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "JAVA JDBC API (Activities)",
+          "bullets": [
+            {
+              "text": "We can use JDBC API to handle database using Java program and can perform the following activities:",
+              "subBullets": [
+                "1. Connect to the database",
+                "2. Execute queries and update statements to the database",
+                "3. Retrieve the result received from the database."
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "Slide tóm gọn 3 nhóm thao tác chính mà chương trình Java thực hiện qua JDBC API: (1) Kết nối tới CSDL (`DriverManager.getConnection`), (2) Thực thi câu lệnh truy vấn và cập nhật (`executeQuery` cho `SELECT` vs `executeUpdate` cho `INSERT`/`UPDATE`/`DELETE`), (3) Đọc nhận kết quả trả về (`ResultSet`).",
+            "Liên hệ với Slide 16: ba hoạt động này tương ứng trực tiếp với các lớp cốt lõi `Connection` → `Statement` → `ResultSet` trong `java.sql.*`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "DRIVERMANAGER CLASS",
+          "bullets": [
+            "The DriverManager class acts as an interface between users and drivers.",
+            "It keeps track of the drivers that are available and handles establishing a connection between a database and the appropriate driver"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "`DriverManager` đóng vai trò \"người điều phối\" giữa mã nguồn ứng dụng Java và các JDBC driver cụ thể của từng hãng DBMS (Oracle, MySQL, SQL Server...).",
+            "Cơ chế hoạt động: sau khi driver được đăng ký với `DriverManager`, khi ứng dụng gọi `DriverManager.getConnection(url, user, pass)`, nó sẽ kiểm tra tiền tố chuỗi URL (ví dụ `jdbc:oracle:thin:...`) để chọn đúng driver tương ứng trong danh sách đang quản lý và mở kết nối."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "FIGURE 8-5 Database access from a Java program",
+          "code": {
+            "lang": "java",
+            "text": "import java.sql.*;\npublic class TestJDBC {\n  public static void main(String[ ] args) {\n  try {\n    Driverd =\n    (Driver)Class.forName(\"oracle.jdbc.driver.OracleDriver\").newInstance( );\n    System.out.println(d);\n    DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver( ));\n    Connection conn =\n    DriverManager.getConnection (\"jdbc:oracle:thin:@durga.uits.indiana.edu:1\n    521:OED1\", args[0], args[1]);\n\n    Statement st = conn.createStatement( );\n    ResultSet rec = st.executeQuery(\"SELECT * FROM Student\");\n    while(rec.next( )) {\n      System.out.println(rec.getString(\"name\"));}\n    conn.close( );\n    }\n    catch (Exception e) {\n    System.out.println(\"Error – \" + e);\n    }\n  }\n}"
+          },
+          "diagramText": [
+            "Chú thích từng dòng trong Figure 8-5 ánh xạ với quy trình 6 bước (Slide 12):",
+            "• Class.forName(\"oracle.jdbc.driver.OracleDriver\").newInstance() → Register the driver to be used.",
+            "• DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver( )) → Identify the type of driver to be used.",
+            "• DriverManager.getConnection (\"jdbc:oracle:thin:...\", args[0], args[1]) → Open a connection to a database.",
+            "• Statement st = conn.createStatement( ) → Create a Statement variable that can be used to issue queries against the database",
+            "• ResultSet rec = st.executeQuery(\"SELECT * FROM Student\") → Issue a query and get a result.",
+            "• while(rec.next( )) { System.out.println(rec.getString(\"name\")); } → Process the result, one row at a time.",
+            "• conn.close( ) → Close the connection."
+          ],
+          "ocrNote": "Ảnh code trên slide gốc có lỗi đánh máy 'Driverd =' (dính từ Driver d =) và xuống dòng ngắt số cổng '1\\n521:OED1' (cổng đúng là 1521). Chuỗi giữ nguyên nguyên văn như hình.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "Đây là đoạn code mẫu quan trọng nhất phần Java trong Chương 8 vì nó hiện thực hóa trọn vẹn **6 bước dùng API ở Slide 12**: Nạp & đăng ký Oracle JDBC driver → mở `Connection` (truyền URL JDBC + `args[0]` username + `args[1]` password) → tạo `Statement` → gọi `executeQuery` lấy `ResultSet` → dùng vòng lặp `while(rec.next())` đọc từng dòng cột `\"name\"` → đóng kết nối `conn.close()`.",
+            "⚠️ **Lưu ý thực hành Java hiện đại**: (1) Sửa `Driverd` thành `Driver d` và bỏ ngắt dòng giữa cổng `:1521:OED1`; (2) Với JDBC 4.0+, chỉ cần có file JAR driver trong classpath là `DriverManager` tự tìm được driver mà không cần `Class.forName(...).newInstance()`; (3) Đặt `conn.close()` (và đóng `st`, `rec`) trong khối `try-with-resources` hoặc `finally` để tránh rò rỉ kết nối khi xảy ra lỗi."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Kiến trúc Three-Tier, Ứng dụng Web, Stored Procedures & Cloud Computing",
+      "text": "Kiến trúc 3 tầng (Client – Application server – Database server), Thin Client, mạng Intranet/Internet qua Firewall (Figure 8-7), thành phần & ngôn ngữ Web (W3C), luồng xử lý trang tĩnh vs trang động (Figure 8-9), ví dụ ASP .NET (Figure 8-12), Stored Procedures/Transactions/Connection Pooling và Cloud Computing.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 17–30"
+      },
+      "digest": {
+        "keyPoints": [
+          "Kiến trúc Three-tier tách làm 3 lớp rõ rệt: Client (Thin Client — GUI/trình duyệt/mobile app), Application server / Web server (xử lý business rules) và Database server (DBMS lưu trữ dữ liệu).",
+          "Yêu cầu trang tĩnh (`.htm`, `.html`) do Web server trả trực tiếp; yêu cầu trang động (`.jsp`, `.aspx`, `.php`) được định tuyến sang Application server để chạy mã server-side và gọi DBMS qua JDBC/ADO .NET.",
+          "Ba vấn đề cần cân nhắc trong 3-tier: Stored procedures (nhúng logic trong DBMS: nhanh, giảm băng thông, bảo mật, client mỏng hơn, nhưng viết lâu và phụ thuộc nhà cung cấp), Transactions (all-or-nothing) và Connection Pooling (tái sử dụng kết nối đang mở).",
+          "Three-tier đem lại 7 lợi ích (Scalability, Technological flexibility, Long-term cost reduction, Better match to business needs, Improved customer service, Competitive advantage, Reduced risk); Cloud computing có 3 mô hình dịch vụ IaaS, PaaS, SaaS."
+        ],
+        "terms": [
+          {
+            "term": "Three-tier Architecture",
+            "meaning": "Kiến trúc gồm 3 tầng: Client (Presentation/Thin client) – Application/Web server (Business rules) – Database server (Data storage/DBMS)."
+          },
+          {
+            "term": "Connection Pooling",
+            "meaning": "Kỹ thuật duy trì và tái sử dụng các kết nối CSDL đang mở thay vì đóng/mở mới liên tục vì giữ kết nối mở rất tốn tài nguyên."
+          },
+          {
+            "term": "Cloud Computing (IaaS, PaaS, SaaS)",
+            "meaning": "Mô hình truy cập dịch vụ mạng theo nhu cầu với 5 đặc tính (on-demand, broad network access, resource pooling, rapid elasticity, measured service) và 3 loại IaaS, PaaS, SaaS."
+          }
+        ],
+        "pitfalls": [
+          "Nhớ phân biệt vai trò **Web server** (như Apache, IIS — tiếp nhận và phản hồi HTTP) với **Application server** (như ASP .NET framework, Java EE, ColdFusion, PHP — chứa khối xây dựng trang động và xử lý logic nghiệp vụ).",
+          "Trong Slide 28: Stored procedure giúp \"Thinner clients\" và \"Performance improves for compiled SQL statements\", nhưng 2 nhược điểm bắt buộc thuộc để làm trắc nghiệm là: **Programming takes more time** và **Proprietary, so algorithms are not portable**."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "THREE-TIER ARCHITECTURES",
+          "table": {
+            "caption": "Three-Tier Layers, Roles & Technologies",
+            "headers": [
+              "Tier",
+              "Responsibility",
+              "Component / Example"
+            ],
+            "rows": [
+              [
+                "Client",
+                "GUI interface (I/O processing)",
+                "Browser, Mobile App"
+              ],
+              [
+                "Application server",
+                "Business rules",
+                "Web Server"
+              ],
+              [
+                "Database server",
+                "Data storage",
+                "DBMS"
+              ]
+            ]
+          },
+          "bullets": [
+            {
+              "text": "Thin Client",
+              "subBullets": [
+                "PC just for user interface and a little application processing. Limited or no data storage (sometimes no hard drive)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "Bảng phân tầng Three-tier giải quyết triệt để điểm yếu của Two-tier (Slide 8–10): tách **Business rules** ra khỏi máy khách (Thin Client) để đưa lên **Application server**, còn **Database server** vẫn chỉ tập trung vào lưu trữ và quản trị DBMS.",
+            "Chú ý khái niệm **Thin Client**: máy trạm chỉ làm giao diện người dùng và một lượng xử lý rất ít phía giao diện (ví dụ validate ô nhập bằng JavaScript trên trình duyệt/mobile app), hầu như không cần lưu dữ liệu cục bộ."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Figure 8-6a Generic three-tier architecture",
+          "diagramText": [
+            "Client Layer (Thin clients): PC / Desktop / Smartphone & Tablet Clients ↔ LAN",
+            "Business Layer (Business rules on application server): Application server ↔ LAN",
+            "Database Layer (DBMS only on DB server): Database server ↔ Data (Database)"
+          ],
+          "diagramNote": "Hình 8-6a minh họa 3 lớp tách biệt kết nối qua mạng LAN: Client Layer (Thin clients chỉ hiển thị giao diện), Business Layer (Application server chạy quy tắc nghiệp vụ) và Database Layer (DBMS chỉ cài trên DB server quản lý Data).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "Chú ý câu chú thích trên sơ đồ: **Business rules on application server** và **DBMS only on DB server** — mỗi tầng chỉ giữ đúng một trọng trách (separation of concerns).",
+            "Khi quy tắc tính chiết khấu hay thuế thay đổi, lập trình viên chỉ cần cập nhật mã một lần duy nhất trên **Application server** mà không phải cài lại phần mềm cho từng Client."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "THIN CLIENT",
+          "bullets": [
+            "An application where the client accessing the application primarily provides the user interfaces and some application processing, usually with no or limited local data storage.",
+            "Usually, thin client application is a Web browser and the 3-tier architecture involves a Web application."
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Định nghĩa chính thức của **Thin client**: ngày nay ứng dụng thin client phổ biến nhất chính là **trình duyệt Web (Web browser)**, kéo theo kiến trúc 3 tầng thường được triển khai dưới dạng **Web application**.",
+            "Tại sao Thin client đặc biệt thích hợp với người dùng đa thiết bị? Vì chỉ cần một URL và trình duyệt chuẩn, người dùng trên Windows, macOS, Linux, iOS hay Android đều truy cập được cùng một ứng dụng mà không cần biên dịch/cài bộ client riêng cho từng máy."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Figure 8-7 A database-enabled intranet/Internet environment",
+          "diagramText": [
+            "Bên ngoài: Public Internet client & Extranet client ↔ WWW (TCP/IP) ↔ Firewall",
+            "Bên trong (Organization's intranet): Firewall ↔ TCP/IP ↔ Clients w/browsers, Web server, Database server ↔ Database"
+          ],
+          "diagramNote": "Hình 8-7 minh họa hạ tầng triển khai thực tế: người dùng công cộng (Public Internet client) và đối tác (Extranet client) đi qua WWW (TCP/IP) và phải qua bức tường lửa (Firewall) mới tiếp cận được mạng nội bộ (Organization's intranet) gồm Web server, Database server và Database.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 20"
+          },
+          "explanation": [
+            "Phân biệt 3 đối tượng người dùng trong môi trường mạng: **Intranet clients** (nhân viên nội bộ dùng trình duyệt trong mạng cơ quan), **Extranet clients** (đối tác/nhà cung cấp được cấp quyền riêng từ ngoài) và **Public Internet clients** (khách vãng lai).",
+            "**Firewall** đóng vai trò cổng kiểm soát an ninh ngăn chặn truy cập trực tiếp trái phép từ ngoài Internet vào Database server; client bên ngoài chỉ giao tiếp với Web/Application server qua các cổng cho phép (HTTP/HTTPS)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "WEB APPLICATION COMPONENTS",
+          "bullets": [
+            {
+              "text": "Database server – hosts the DBMS",
+              "subBullets": [
+                "e.g. Oracle, SQL Server, Informix, MS Access, MySql"
+              ]
+            },
+            {
+              "text": "Web server – receives and responds to browser requests using HTTP protocol",
+              "subBullets": [
+                "e.g. Apache, Internet Information Services (IIS)"
+              ]
+            },
+            {
+              "text": "Application server – software building blocks for creating dynamic web sites",
+              "subBullets": [
+                "e.g. MS ASP .NET framework, Java EE, ColdFusion, PHP"
+              ]
+            },
+            {
+              "text": "Web browser – client program that sends web requests and receives web pages",
+              "subBullets": [
+                "e.g. Internet Explorer, Firefox, Safari, Google Chrome"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 21"
+          },
+          "explanation": [
+            "Nắm đúng ví dụ đi kèm của 4 thành phần ứng dụng Web cho câu hỏi trắc nghiệm: **Database server** (Oracle, SQL Server, Informix, MS Access, MySQL); **Web server** (Apache, IIS — dùng giao thức HTTP); **Application server** (MS ASP .NET framework, Java EE, ColdFusion, PHP); **Web browser** (IE, Firefox, Safari, Google Chrome).",
+            "Đừng nhầm Apache/IIS (Web server nhận request HTTP và trả HTML/file tĩnh) với PHP/Java EE/ASP.NET (môi trường Application server thực thi code sinh nội dung động)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "LANGUAGES FOR CREATING WEB PAGES",
+          "bullets": [
+            {
+              "text": "Hypertext Markup Language (HTML)",
+              "subBullets": [
+                "Markup language specifically for Web pages"
+              ]
+            },
+            {
+              "text": "Standard Generalized Markup Language (SGML)",
+              "subBullets": [
+                "Markup language standard"
+              ]
+            },
+            {
+              "text": "Extensible Markup Language (XML)",
+              "subBullets": [
+                "Markup language allowing customized tags"
+              ]
+            },
+            {
+              "text": "XHTML",
+              "subBullets": [
+                "XML-compliant extension of HTML"
+              ]
+            },
+            {
+              "text": "JavaScript/VBScript",
+              "subBullets": [
+                "Scripting languages that enable interactivity in HTML documents"
+              ]
+            },
+            {
+              "text": "Cascading Style Sheets (CSS)",
+              "subBullets": [
+                "Control appearance of Web elements in an HML document"
+              ]
+            },
+            {
+              "text": "XSL and XSLT",
+              "subBullets": [
+                "XMS style sheet and transformation to HTML"
+              ]
+            }
+          ],
+          "paragraphs": [
+            "Standards and Web conventions established by World Wide Web Consortium (W3C)"
+          ],
+          "ocrNote": "Slide gốc có hai lỗi gõ chữ nhỏ: 'HML document' (tức HTML document) ở mục CSS và 'XMS style sheet' (tức XML style sheet) ở mục XSL and XSLT.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 22"
+          },
+          "explanation": [
+            "Phân biệt nhanh chức năng từng chuẩn Web do tổ chức **W3C (World Wide Web Consortium)** ban hành: **SGML** là chuẩn gốc của các ngôn ngữ đánh dấu; **HTML** dùng thẻ cố định để hiển thị trang Web; **XML** cho phép tự định nghĩa thẻ (customized tags) để mô tả dữ liệu; **XHTML** là bản mở rộng HTML tuân thủ quy tắc chặt chẽ của XML.",
+            "Ở tầng trình bày & tương tác: **CSS** định dạng kiểu dáng (appearance), **JavaScript/VBScript** tạo tính tương tác trên trình duyệt, còn **XSL/XSLT** biến đổi dữ liệu XML thành HTML hiển thị."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "PROCESSING IN 3-TIER APPLICATIONS",
+          "bullets": [
+            {
+              "text": "Static page requests",
+              "subBullets": [
+                ".htm or .html requests handled by the Web server"
+              ]
+            },
+            {
+              "text": "Dynamic page requests",
+              "subBullets": [
+                ".jsp, .aspx, and .php requests are routed to the application server",
+                "Server-side processing by JSP servlet (Java), ASP .NET application (C# or VB), ColdFusion, or PHP",
+                "Database access via JDBC, ADO .NET, or other database middleware"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 23"
+          },
+          "explanation": [
+            "Tiêu chí phân luồng xử lý tại Web Server dựa vào phần mở rộng hoặc route của trang yêu cầu: file tĩnh (`.htm`, `.html`) có sẵn nội dung cố định nên **Web server** trả ngay mà không cần gọi Application server hay DBMS.",
+            "Ngược lại, trang động (`.jsp`, `.aspx`, `.php`) được chuyển sang **Application server** để chạy code server-side, gọi JDBC / ADO .NET truy vấn CSDL rồi ghép kết quả thành mã HTML trả về cho trình duyệt."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Figure 8-9 Information flow in a three-tier architecture",
+          "diagramText": [
+            "(a) Static page request — No server side processing, just a page return:",
+            "  CLIENT → Request *.html → Web Server [HTML] → Return HTML → CLIENT (không chạm Application Server và Database Server).",
+            "(b) Dynamic page request — Server side processing, including database access (...also *.aspx or *.php):",
+            "  CLIENT → *.jsp → Web Server → Invoke JSP/Servlet → Application Server [JSP/Servlet] → DRIVER → Call Database as necessary → Database Server",
+            "  Database Server → Return Data → DRIVER → Application Server → Web Server → Return HTML → CLIENT."
+          ],
+          "diagramNote": "Hình 8-9 đối chiếu 2 luồng thông tin: (a) Yêu cầu trang tĩnh chỉ đi từ Client tới Web Server lấy HTML trả về; (b) Yêu cầu trang động (.jsp, .aspx, .php) đi qua Web Server → Application Server → Driver → Database Server lấy dữ liệu rồi dựng HTML trả ngược lại Client.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 24"
+          },
+          "explanation": [
+            "Để ý chi tiết **DRIVER** nằm ngay mép phải của **Application Server** ở sơ đồ (b): trong kiến trúc 3 tầng, các máy Client hoàn toàn không cài driver CSDL (JDBC/ODBC/ADO.NET); chỉ Application Server giữ Driver để kết nối tới Database Server.",
+            "Cũng lưu ý dữ liệu từ Database Server trả về Application Server ở dạng dữ liệu thô (`Return Data`), sau đó Application Server mới kết xuất thành HTML thuần (`Return HTML`) gửi qua Web Server về cho trình duyệt Client."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Figure 8-12 A registration page written in ASP .NET — a) Sample ASP .NET code for user registration",
+          "paragraphs": [
+            "a) Sample ASP .NET code for user registration",
+            "A DetailsView is a type of Web control",
+            "Web controls can be databound to data sources, including SqlDataSource."
+          ],
+          "diagramText": [
+            "<%@ Page Language=\"C#\" AutoEventWireup=\"true\" CodeFile=\"users.aspx.cs\" Inherits=\"users\" %>",
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\" >",
+            "<head runat=\"server\"><title>Register</title></head>",
+            "<body><form id=\"form1\" runat=\"server\"><div>",
+            "  <asp:DetailsView ID=\"manageUsers\" runat=\"server\" DataSourceID=\"usersDataSource\">",
+            "    <Fields>",
+            "      <asp:BoundField DataField=\"username\" HeaderText=\"User Name\" />",
+            "      <asp:BoundField DataField=\"first_name\" HeaderText=\"First Name\" />",
+            "      <asp:BoundField DataField=\"last_name\" HeaderText=\"Last Name\" />",
+            "      <asp:BoundField DataField=\"email\" HeaderText=\"Email Address\" />",
+            "      <asp:BoundField DataField=\"password\" HeaderText=\"Password\" />",
+            "      <asp:CommandField ShowInsertButton=\"True\" ButtonType=\"Button\" />",
+            "    </Fields>",
+            "  </asp:DetailsView>",
+            "  <asp:SqlDataSource ID=\"usersDataSource\" runat=\"server\"",
+            "    ConnectionString=\"<%$ ConnectionStrings:StudentConnectionString %>\"",
+            "    InsertCommand=\"INSERT INTO users(username, first_name, last_name, email, password, registration_date) VALUES (@username, @first_name, @last_name, @email, @password, GETDATE())\"",
+            "    SelectCommand=\"SELECT [username], [first_name], [last_name], [email], [password] FROM [users]\">",
+            "  </asp:SqlDataSource>",
+            "</div></form></body></html>"
+          ],
+          "diagramNote": "Mã nguồn ASP .NET Web Forms minh họa cách gắn (data-bind) control giao diện <asp:DetailsView> (với ID=\"manageUsers\") tới nguồn dữ liệu <asp:SqlDataSource> (ID=\"usersDataSource\") chạy trên server (runat=\"server\").",
+          "ocrNote": "Hình ảnh trên slide chụp mã ASP .NET với chữ nhỏ; đã đối chiếu toàn bộ tên thuộc tính (ID, DataField, HeaderText, ConnectionStrings, InsertCommand, SelectCommand).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 25"
+          },
+          "explanation": [
+            "Đây là minh họa đặc trưng của **ASP .NET Web Forms**: lập trình viên khai báo thẻ giao diện `DetailsView` (một Web control hiển thị từng bản ghi để nhập/xem) nối với `SqlDataSource` qua thuộc tính `DataSourceID=\"usersDataSource\"` mà hầu như không phải viết tay mã mở kết nối CSDL.",
+            "Chú ý tính bảo mật và SQL Server trong `InsertCommand`: dùng tham số dạng `@username`, `@first_name`... (giúp tránh lỗi SQL Injection so với ghép chuỗi) và gọi hàm `GETDATE()` (hàm lấy ngày giờ hệ thống đặc trưng của Microsoft SQL Server)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "Figure 8-12 A registration page written in ASP .NET — b) Form for the ASP .NET application",
+          "paragraphs": [
+            "b) Form for the ASP .NET application"
+          ],
+          "table": {
+            "caption": "Rendered ASP .NET DetailsView Form",
+            "headers": [
+              "Label (HeaderText)",
+              "Input Control"
+            ],
+            "rows": [
+              [
+                "User Name",
+                "[Text Box]"
+              ],
+              [
+                "First Name",
+                "[Text Box]"
+              ],
+              [
+                "Last Name",
+                "[Text Box]"
+              ],
+              [
+                "Email Address",
+                "[Text Box]"
+              ],
+              [
+                "Password",
+                "[Text Box]"
+              ],
+              [
+                "Actions",
+                "[Insert] [Cancel]"
+              ]
+            ]
+          },
+          "diagramNote": "Ảnh chụp biểu mẫu web thực tế được Application server ASP .NET kết xuất thành HTML gửi về trình duyệt dựa trên mã DetailsView ở Slide 25, gồm 5 ô nhập liệu và 2 nút bấm Insert, Cancel.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 26"
+          },
+          "explanation": [
+            "Đối chiếu trực tiếp Slide 25 và 26 để thấy rõ bản chất **server-side rendering**: các thẻ `<asp:BoundField ... HeaderText=\"User Name\" />` không bao giờ gửi xuống trình duyệt, mà ASP .NET biên dịch chúng thành bảng HTML chuẩn (`User Name`, `First Name`... kèm nút `Insert`, `Cancel`).",
+            "Khi người dùng điền form và bấm `Insert`, sự kiện postback gửi dữ liệu về server kích hoạt `InsertCommand` của `SqlDataSource` để lưu bản ghi vào bảng `users` kèm thời gian `GETDATE()`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "CONSIDERATIONS IN 3-TIER APPLICATIONS",
+          "bullets": [
+            {
+              "text": "Stored procedures",
+              "subBullets": [
+                "Code logic embedded in DBMS",
+                "Improve performance, but proprietary"
+              ]
+            },
+            {
+              "text": "Transactions",
+              "subBullets": [
+                "Involve many database updates",
+                "Either all must succeed, or none should occur"
+              ]
+            },
+            {
+              "text": "Database connections",
+              "subBullets": [
+                "Maintaining an open connection is resource-intensive",
+                "Use of connection pooling"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 27"
+          },
+          "explanation": [
+            "Ba yếu tố kỹ thuật sống còn khi triển khai ứng dụng 3 tầng phục vụ nhiều người dùng: (1) Cân nhắc đặt bớt logic vào **Stored procedures**; (2) Đảm bảo tính nguyên tử của **Transactions** (all-or-nothing, vì HTTP vốn không có trạng thái nên một thao tác web có thể kéo theo nhiều lệnh `INSERT`/`UPDATE`); (3) Quản lý **Database connections** tối ưu.",
+            "Tại sao phải dùng **Connection pooling**? Vì việc bắt tay TCP + xác thực DBMS để mở mới một kết nối tốn rất nhiều CPU/RAM và thời gian, nhưng giữ mở riêng một kết nối cố định cho mỗi user web sẽ làm sập DBMS. Connection pool giữ sẵn một \"hồ\" kết nối dùng chung và cho các luồng request mượn rồi trả lại ngay sau khi chạy xong truy vấn."
+          ]
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "ADVANTAGES AND DISADVANTAGES OF STORED PROCEDURES",
+          "bullets": [
+            {
+              "text": "Advantages",
+              "subBullets": [
+                "Performance improves for compiled SQL statements",
+                "Reduced network traffic",
+                "Improved security",
+                "Improved data integrity",
+                "Thinner clients"
+              ]
+            },
+            {
+              "text": "Disadvantages",
+              "subBullets": [
+                "Programming takes more time",
+                "Proprietary, so algorithms are not portable"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 28"
+          },
+          "explanation": [
+            "Nhớ chắc 5 ưu điểm và 2 nhược điểm của Stored Procedures để đối chiếu câu hỏi trắc nghiệm: ưu điểm lớn nhất là **SQL đã biên dịch sẵn (compiled SQL)** nên chạy nhanh, chỉ truyền lời gọi tên thủ tục + tham số nên **giảm lưu lượng mạng**, tăng bảo mật (cấp quyền gọi thủ tục thay vì cấp quyền trực tiếp trên bảng gốc), đảm bảo toàn vẹn dữ liệu và giúp client/app server mỏng hơn.",
+            "Hai nhược điểm gắn chặt với Bảng 7-2 Chương 7: lập trình trong ngôn ngữ thủ tục DBMS tốn thời gian hơn và **độc quyền theo từng hãng (proprietary)** (PL/SQL của Oracle khác hoàn toàn T-SQL của SQL Server) nên thuật toán không thể mang nguyên sang DBMS khác."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "BENEFITS OF THREE-TIER ARCHITECTURES",
+          "bullets": [
+            "Scalability",
+            "Technological flexibility",
+            "Long-term cost reduction",
+            "Better match of systems to business needs",
+            "Improved customer service",
+            "Competitive advantage",
+            "Reduced risk"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 29"
+          },
+          "explanation": [
+            "Ghi nhớ bộ 7 lợi ích chiến lược của kiến trúc 3 tầng: nổi bật nhất về mặt kỹ thuật là **Scalability** (dễ mở rộng ngang/nâng cấp riêng từng tầng Web/App/DB khi lượng truy cập tăng) và **Technological flexibility** (thay đổi giao diện Web/Mobile hoặc nâng cấp CSDL độc lập mà không đập bỏ các tầng còn lại).",
+            "Về mặt quản trị kinh doanh: dù chi phí thiết kế ban đầu của 3-tier cao hơn 2-tier, nhưng **giảm chi phí dài hạn** (không phải cài đặt/bảo trì phần mềm trên hàng ngàn máy trạm), bám sát quy trình nghiệp vụ, nâng cao dịch vụ khách hàng và giảm rủi ro công nghệ."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "CLOUD COMPUTING",
+          "bullets": [
+            "A model for creating ubiquitous, convenient, on-demand access to network services",
+            "Characteristics: on-demand, broad network access, resource pooling, rapid elasticity, measured service",
+            {
+              "text": "Types of cloud computing:",
+              "subBullets": [
+                "Infrastructure-as-a-service (IaaS)",
+                "Platform-as-a-service (PaaS)",
+                "Software-as-a-service (SaaS)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 30"
+          },
+          "explanation": [
+            "Nắm đủ **5 đặc tính của Cloud Computing** theo NIST được nêu trên slide: *on-demand* (tự phục vụ theo nhu cầu), *broad network access* (truy cập mạng diện rộng đa thiết bị), *resource pooling* (gộp chung tài nguyên đa người dùng), *rapid elasticity* (co giãn nhanh theo tải) và *measured service* (đo lường trả phí theo mức dùng).",
+            "Phân biệt nhanh 3 mô hình dịch vụ: **IaaS** thuê hạ tầng phần cứng/máy ảo (AWS EC2); **PaaS** thuê nền tảng chạy ứng dụng + CSDL quản lý sẵn (Azure SQL, Google App Engine, Heroku); **SaaS** dùng ngay phần mềm hoàn chỉnh qua trình duyệt (Salesforce, Google Docs)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "XML, XML Schema (XSD), Lưu trữ, Truy vấn (XPath/XQuery) & Hiển thị (XSLT)",
+      "text": "Ngôn ngữ đánh dấu mở rộng XML, so sánh XSD (metadata như CREATE TABLE) với tài liệu XML (record), 4 cách lưu XML trong CSDL, định vị bằng XPath, truy vấn FLWOR bằng XQuery và chuyển đổi hiển thị XML sang HTML/WML bằng XSLT (Figures 8-15a/b/c).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 31–39"
+      },
+      "digest": {
+        "keyPoints": [
+          "XML (eXtensible Markup Language) cho phép tự định nghĩa thẻ để trao đổi dữ liệu qua Internet; Document Structure Declarations (DSD), XML Schema (XSD) và Relax NG thay thế DTD cũ để kiểm chuẩn cấu trúc tài liệu XML, trong đó XSD được W3C khuyến nghị.",
+          "XML Schema (XSD) đóng vai trò định nghĩa bản ghi tương tự lệnh `CREATE TABLE` trong SQL (chứa metadata về phần tử, kiểu dữ liệu, minOccurs, pattern regex); còn tài liệu XML chứa dữ liệu tuân theo XSD tương ứng với một bản ghi (record).",
+          "Lưu XML dưới dạng file rời gặp lại các nhược điểm xử lý file Chương 1; có 4 cách lưu vào CSDL: (1) shredding vào bảng quan hệ, (2) lưu nguyên tài liệu trong trường BLOB/CLOB, (3) cột XML chuyên biệt, (4) native XML database (phi quan hệ).",
+          "XPath định vị nút trong cây XML; XQuery dùng biểu thức FLWOR (`for ... where ... order by ... return`) truy vấn cả dữ liệu quan hệ lẫn XML; XSLT biến đổi một tài liệu XML sang HTML hoặc WAP/WML."
+        ],
+        "terms": [
+          {
+            "term": "XML Schema (XSD)",
+            "meaning": "Ngôn ngữ chuẩn do W3C khuyến nghị dùng để định nghĩa cấu trúc, kiểu dữ liệu và ràng buộc cho dữ liệu XML (tương đương metadata của CREATE SQL)."
+          },
+          {
+            "term": "Shredding XML",
+            "meaning": "Tách nhỏ các phần tử/thuộc tính trong tài liệu XML để lưu phân rã vào các cột/hàng của bảng quan hệ."
+          },
+          {
+            "term": "XPath vs XQuery vs XSLT",
+            "meaning": "XPath định vị node trong XML; XQuery (for/where/order by/return) truy vấn dữ liệu XML và quan hệ; XSLT chuyển đổi tài liệu XML thành XML khác, HTML hoặc WAP/WML."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm XSD với bản thân dữ liệu: XSD mô tả cấu trúc/ràng buộc (analogous to `CREATE SQL statement` → metadata), còn tệp XML chứa giá trị cụ thể như `Doug Henny` mới tương ứng với bản ghi (analogous to `record in a database`).",
+          "Trong các slide ví dụ XML/XSLT có vài lỗi nhỏ từ giáo trình gốc: `<standard price>` có khoảng trắng trong tên thẻ ở Slide 32 & 39, `<xsd:elementname=...>` dính chữ ở Slide 33, và `<xsl:value-of select=\"price\"/>` không khớp tên thẻ `<standard price>` ở Slide 38–39."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "EXTENSIBLE MARKUP LANGUAGE (XML)",
+          "bullets": [
+            {
+              "text": "A text-based markup language (like HTML)",
+              "subBullets": [
+                "Uses elements, tags, attributes",
+                "Includes document type declarations (DTDs), XML schemas, comments, and entity references"
+              ]
+            },
+            "Revolutionizes the way data are exchanged over the Internet",
+            "Document Structure Declarations (DSD), XML Schema (XSD) and Relax NG replacing DTDs for validating XML document structure",
+            "XSD – language for defining XML databases, recommended by the W3C."
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 31"
+          },
+          "explanation": [
+            "Khác với HTML vốn chỉ mô tả *cách hiển thị* bằng tập thẻ cố định (`<h1>`, `<table>`), **XML** cho phép tự tạo thẻ mô tả *ngữ nghĩa dữ liệu* (ví dụ `<product>`, `<description>`, `<finish>`) ở dạng văn bản thuần nên trao đổi độc lập nền tảng qua Internet.",
+            "Về cơ chế kiểm tra tính hợp lệ (validation): ngày nay **XSD** (cùng DSD, Relax NG) thay thế cho **DTD** cũ vì bản thân XSD cũng viết bằng cú pháp XML và hỗ trợ đầy đủ kiểu dữ liệu (`integer`, `string`, regex) nên được W3C khuyến nghị."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "SIMPLE XML EXAMPLE",
+          "diagramText": [
+            "<?xml version = \"1.0\"/>",
+            "<furniturecompany>",
+            "    <product ID=\"1\">",
+            "        <description>End Table</description>",
+            "        <finish>Cherry</finish>",
+            "        <standard price>175.00</standard price>",
+            "        <line>1</line>",
+            "    </product>",
+            "</furniturecompany>"
+          ],
+          "diagramNote": "Ví dụ cấu trúc cây XML của Pine Valley Furniture Company gồm thẻ gốc <furniturecompany>, phần tử con <product> mang thuộc tính ID=\"1\", bên trong lồng 4 phần tử dữ liệu.",
+          "ocrNote": "Slide gốc viết phần mở đầu là '<?xml version = \"1.0\"/>' (chuẩn XML dùng '?>') và thẻ '<standard price>' có dấu cách giữa hai từ.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 32"
+          },
+          "explanation": [
+            "Quan sát cấu trúc phân cấp chuẩn của một tài liệu XML: luôn có duy nhất một thẻ gốc (root element `<furniturecompany>`), bên trong gồm các **elements** (`<product>`, `<description>`...) và **attributes** (`ID=\"1\"`).",
+            "⚠️ Mẹo kiểm tra lỗi XML chuẩn well-formed: (1) Thẻ khai báo XML phải đóng bằng `?>` thay vì `/>`; (2) Tên thẻ XML không được chứa khoảng trắng nên `<standard price>` trong slide minh họa nếu đưa vào parser XML thật sẽ bị báo lỗi (cần viết liền `<standardprice>` hoặc `<standard_price>`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "SAMPLE XML SCHEMA (XSD)",
+          "paragraphs": [
+            "Schema is a record definition, analogous to the Create SQL statement, and therefore provides metadata."
+          ],
+          "diagramText": [
+            "<?xml version=\"1.0\" encoding=\"utf-8\" ?>",
+            "<xsd:schema id=\"salespersonSchema\"",
+            "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">",
+            "  <xsd:element name=\"Salesperson\" type=\"SalespersonType\" />",
+            "  <xsd:complexType name=\"SalespersonType\">",
+            "    <xsd:sequence>",
+            "      <xsd:elementname=\"SalespersonID\"",
+            "              type=\"xsd:integer\"/>",
+            "      <xsd:element name=\"SalespersonName\"",
+            "              type=\"xsd:string\" />",
+            "      <xsd:element name=\"SalespersonTelephone\"",
+            "              type=\"PhoneNumberType\">",
+            "      <xsd:element name=\"SalespersonFax\"",
+            "              type=\"PhoneNumber\" minOccurs=\"0\" />",
+            "      </xsd:element>",
+            "    </xsd:sequence>",
+            "  </xsd:complexType>",
+            "  <xsd:simpleType name=\"PhoneNumberType\">",
+            "    <xsd:restriction base=\"xsd:string\">",
+            "      <xsd:length value=\"12\" />",
+            "      <xsd:pattern value=\"\\d{3}-\\d{3}-\\d{4}\" />",
+            "    </xsd:restriction>",
+            "  </xsd:simpleType>",
+            "</xsd:schema>"
+          ],
+          "ocrNote": "Slide gốc có vài lỗi chính tả kỹ thuật trong ví dụ XSD: '<xsd:elementname=\"SalespersonID\"' thiếu khoảng trắng, thẻ '<xsd:element name=\"SalespersonTelephone\" ...>' không tự đóng mà bọc nhầm thẻ '<xsd:element name=\"SalespersonFax\" ... />' và gọi 'type=\"PhoneNumber\"' thay vì 'PhoneNumberType'.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 33"
+          },
+          "explanation": [
+            "Đây là định nghĩa **metadata** cho đối tượng `Salesperson`: quy định `SalespersonID` kiểu số nguyên (`xsd:integer`), `SalespersonName` kiểu chuỗi, `SalespersonFax` là tùy chọn nhờ `minOccurs=\"0\"`, và tự định nghĩa miền giá trị `PhoneNumberType` phải dài đúng 12 ký tự theo mẫu regex `\\d{3}-\\d{3}-\\d{4}` (như `813-444-5555`).",
+            "Câu chú thích bên phải là ý rất hay hỏi thi: **XSD Schema đóng vai trò tương tự câu lệnh `CREATE TABLE` trong SQL** (định nghĩa cấu trúc và ràng buộc dữ liệu), còn tệp XML cụ thể (Slide 34) tương đương một bản ghi (row/record)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "SAMPLE XML DOCUMENT DATA",
+          "paragraphs": [
+            "This XML data conforms to the XML schema of the previous slide, and involves elements and attributes defined in the schema.",
+            "This is analogous to a record in a database."
+          ],
+          "diagramText": [
+            "<?xml version=\"1.0\" encoding=\"utf-8\" ?>",
+            "<Salesperson xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance",
+            "xsi:noNamespaceSchemaLocation=\"salespersonSchema.xsd\">",
+            "    <SalespersonID>1</SalespersonID>",
+            "    <SalespersonName>Doug Henny</SalespersonName>",
+            "    <SalespersonTelephone>813-444-5555</SalespersonTelephone>",
+            "</Salesperson>"
+          ],
+          "ocrNote": "Thuộc tính xmlns:xsi trên slide thiếu dấu ngoặc kép quanh URL http://www.w3.org/2001/XMLSchema-instance.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 34"
+          },
+          "explanation": [
+            "Đối chiếu với XSD ở Slide 33: bản ghi của nhân viên bán hàng số 1 (`Doug Henny`, điện thoại `813-444-5555` khớp đúng định dạng `3-3-4` chữ số = 12 ký tự) và không ghi thẻ `<SalespersonFax>` vẫn hợp lệ vì XSD đã khai báo `minOccurs=\"0\"`.",
+            "Thuộc tính `xsi:noNamespaceSchemaLocation=\"salespersonSchema.xsd\"` trỏ tới tệp XSD dùng để xác thực (validate) dữ liệu trước khi xử lý hay nhập vào CSDL."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "STORING XML DOCUMENTS",
+          "bullets": [
+            "Storing as files introduces the same file processing problems stated in Ch 1",
+            {
+              "text": "Four common options:",
+              "subBullets": [
+                "Store XML data in a relational database by shredding the XML document",
+                "Store entire XML document in a large field (BLOB or CLOB)",
+                "Store the XML document using special XML columns",
+                "Store the XML document using a native XML database (non-relational)"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 35"
+          },
+          "explanation": [
+            "Cần thuộc đủ **4 cách lưu tài liệu XML** hay ra đề trắc nghiệm: (1) **Shredding** — tách từng thẻ XML rã thành cột/hàng lưu vào bảng quan hệ truyền thống; (2) Lưu nguyên tệp XML vào trường lớn **BLOB/CLOB**; (3) Dùng **cột kiểu XML chuyên biệt** (`XML data type` tích hợp trong SQL Server/Oracle/PostgreSQL hỗ trợ XQuery/index nội bộ); (4) Dùng **Native XML Database** (CSDL phi quan hệ chuyên lưu cấu trúc cây XML).",
+            "Tại sao không lưu XML dưới dạng file rời trên ổ cứng? Vì sẽ tái diễn mọi hạn chế của xử lý file truyền thống ở Chương 1 (trùng lặp, thiếu nhất quán, khó kiểm soát truy cập đồng thời và bảo mật)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "RETRIEVING XML DOCUMENTS",
+          "bullets": [
+            "XPath – One of a set of XML technologies supporting XQuery development, locating data in XML documents",
+            "XQuery – An XML transformation language that allows applications to query both relational databases and XML data",
+            "Sample XQuery expression:"
+          ],
+          "diagramText": [
+            "for $p in doc(“PVFC.xml”)/furniture company/product",
+            "where $p/standardprice>300.00",
+            "order by $p/description",
+            "return $p/description"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 36"
+          },
+          "explanation": [
+            "Phân biệt vai trò: **XPath** dùng cú pháp đường dẫn dạng cây (`/furniturecompany/product`) để định vị các node trong XML, làm nền cho **XQuery**; còn **XQuery** là ngôn ngữ truy vấn mạnh cho phép truy vấn hợp nhất cả CSDL quan hệ lẫn tài liệu XML.",
+            "Cấu trúc biểu thức **FLWOR** kinh điển trong ví dụ XQuery: `for` (lặp từng node `$p` theo XPath, tương ứng `FROM` trong SQL) → `where` (lọc điều kiện giá > 300.00) → `order by` (sắp xếp) → `return` (trả về kết quả, tương ứng `SELECT`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "DISPLAYING XML DATA",
+          "bullets": [
+            "Extensible Stylesheet Language Transformation (XSLT) – A language used to transform complex XML documents and also used to create HTML pages from XML documents",
+            "XSLT can translate a single XML document into both standard HTML and WAP/WML for cell phones without the necessity for two different pages"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 37"
+          },
+          "explanation": [
+            "Vì tệp XML thuần túy chỉ chứa dữ liệu có cấu trúc chứ không quy định màu sắc, bảng biểu hay font chữ, nên ta cần **XSLT** (một phần của XSL) làm bộ quy tắc biến đổi dữ liệu XML thành giao diện HTML (hoặc WAP/WML cho điện thoại cũ, hoặc một định dạng XML khác).",
+            "Giá trị thực tiễn lớn nhất của XSLT được nêu ở ý 2: tách biệt **dữ liệu (XML)** khỏi **trình bày (XSLT stylesheet)** — chỉ cần lưu một tệp XML duy nhất, gắn các XSLT khác nhau là tự xuất ra được trang web cho desktop lẫn trang gọn nhẹ cho di động hoặc bảng PDF."
+          ]
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "FIGURE 8-15B – XSLT CODE",
+          "diagramText": [
+            "<?xml version = \"1.0\"?>",
+            "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">",
+            "<xsl:template match=\"/\">",
+            "    <html>",
+            "        <body>",
+            "        <h2>Product Listing</h2>",
+            "        <table border=\"1\">",
+            "        <tr bgcolor=\"orange\">",
+            "                <th>Description</th>",
+            "                <th>Finish</th>",
+            "                <th>Price</th>",
+            "        </tr>",
+            "            <xsl:for-each select=\"furniturecompany/product\">",
+            "            <tr>",
+            "                <td> <xsl:value-of select=\"description\"/> </td>",
+            "                <td> <xsl:value-of select=\"finish\"/> </td>",
+            "                <td> <xsl:value-of select=\"price\"/> </td>",
+            "            </tr>",
+            "            </xsl:for-each>",
+            "        </table>",
+            "        </body>",
+            "    </html>",
+            "</xsl:template>",
+            "</xsl:stylesheet>"
+          ],
+          "diagramNote": "Hình 8-15b trình bày mã XSLT biến đổi danh sách sản phẩm XML thành bảng HTML Product Listing có hàng tiêu đề nền cam (Description, Finish, Price).",
+          "ocrNote": "Đoạn select=\"furniturecompany/product\" và select=\"price\" trong slide này khác nhẹ với tên thẻ '<furniture company>' và '<standard price>' ở Slide 39.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 38"
+          },
+          "explanation": [
+            "Cách đọc mã XSLT: `<xsl:template match=\"/\">` bắt đầu từ nút gốc tài liệu XML; `<xsl:for-each select=\"furniturecompany/product\">` duyệt qua từng sản phẩm như một vòng lặp, và `<xsl:value-of select=\"...\"/>` nhúng giá trị thẻ con tương ứng vào từng ô `<td>` của bảng HTML.",
+            "Liên hệ thực hành: khi làm việc với XSLT thật, biểu thức XPath trong `select` của `<xsl:for-each>` và `<xsl:value-of>` phải khớp chính xác 100% tên thẻ trong tài liệu XML đầu vào (không có khoảng trắng)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "Extracted from Figures 8-15a and 8-15c",
+          "paragraphs": [
+            "Extracted from Figures 8-15a and 8-15c",
+            "When applied to the above XML data, the XSLT code from Figure 8-15b produces the display on the right."
+          ],
+          "diagramText": [
+            "Đầu vào XML (Figure 8-15a):",
+            "<furniture company>",
+            "    <product ID=\"1\">",
+            "        <description>End Table</description>",
+            "        <finish>Cherry</finish>",
+            "        <standard price>175.00</standard price>",
+            "        <line>1</line>",
+            "    </product>",
+            "    <product ID=\"2\">",
+            "        <description>Coffee Table</description>",
+            "        <finish>Natural Ash</finish>",
+            "        <standard price>200.00</standard price>",
+            "        <line>2</line>",
+            "    </product>",
+            "</furniture company>"
+          ],
+          "table": {
+            "caption": "Product Listing (Figure 8-15c)",
+            "headers": [
+              "Description",
+              "Finish",
+              "Price"
+            ],
+            "rows": [
+              [
+                "End Table",
+                "Cherry",
+                "175.00"
+              ],
+              [
+                "Coffee Table",
+                "Natural Ash",
+                "200.00"
+              ]
+            ]
+          },
+          "diagramNote": "Mũi tên chuyển đổi thể hiện quá trình XSLT Processor nhận dữ liệu XML đầu vào (2 sản phẩm End Table và Coffee Table) áp dụng mẫu XSLT ở Slide 38 để xuất ra bảng HTML \"Product Listing\".",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 39"
+          },
+          "explanation": [
+            "Hình dung trọn bộ bộ ba Figure 8-15: **(a) Dữ liệu XML** cung cấp thông tin thô + **(b) Mẫu XSLT** đóng vai trò khuôn hiển thị → **(c) Kết quả HTML** hiện bảng `Product Listing` đẹp mắt trên trình duyệt.",
+            "Chú ý thẻ `<line>1</line>` và thuộc tính `ID=\"1\"` có mặt trong XML gốc nhưng **không xuất hiện** trong bảng kết quả vì mã XSLT không gọi `<xsl:value-of>` đối với chúng — XSLT đồng thời thực hiện cả lọc chiếu (projection) cột cần hiển thị."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "XML & Web Services, Giao thức SOAP/WSDL/UDDI & Kiến trúc SOA",
+      "text": "Định nghĩa Web Services, ngăn xếp giao thức Web Services (Internet → XML → SOAP → WSDL → UDDI, Figure 8-17), ví dụ thông điệp SOAP Request/Response, kiến trúc triển khai Web Services qua Firewall (Figure 8-18), Service Oriented Architecture (SOA) và trang bản quyền.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 40–45"
+      },
+      "digest": {
+        "keyPoints": [
+          "Web Services là tập chuẩn dựa trên JSON/XML định nghĩa giao thức giao tiếp tự động giữa các chương trình phần mềm qua Web.",
+          "Ba chuẩn cốt lõi trên nền XML + Internet (Figure 8-17): UDDI (đăng ký phân tán để publish/find/use dịch vụ), WSDL (ngữ pháp XML mô tả giao diện công khai của dịch vụ) và SOAP (giao thức XML gửi nhận thông điệp giữa các ứng dụng).",
+          "Triển khai Web Services (Figure 8-18): Trình duyệt giao tiếp bằng HTML với Web Presentation trên Application Server; còn ứng dụng ngoài giao tiếp tự động với SOAP Processor bằng XML xuyên qua Firewall.",
+          "SOA (Service Oriented Architecture) là mô hình phát triển ứng dụng dựa trên tập hợp các dịch vụ liên kết lỏng (loosely coupled), tương tác cao (highly interoperable), giúp linh hoạt và rút ngắn thời gian phát triển."
+        ],
+        "terms": [
+          {
+            "term": "UDDI (Universal Description, Discovery, and Integration)",
+            "meaning": "Chuẩn tạo danh bạ/đăng ký phân tán (distributed registry) để công bố, tìm kiếm và sử dụng các Web services."
+          },
+          {
+            "term": "WSDL (Web Services Description Language)",
+            "meaning": "Ngữ pháp dựa trên XML dùng để mô tả một Web service và chỉ rõ giao diện công khai (public interface) của nó."
+          },
+          {
+            "term": "SOAP (Simple Object Access Protocol)",
+            "meaning": "Giao thức truyền thông dựa trên XML để gửi các thông điệp (request/response) giữa các ứng dụng qua Internet."
+          },
+          {
+            "term": "SOA (Service Oriented Architecture)",
+            "meaning": "Kiến trúc hướng dịch vụ gồm tập hợp các dịch vụ liên kết lỏng, khả năng tương tác cao giao tiếp bằng cách truyền dữ liệu hoặc điều phối nghiệp vụ."
+          }
+        ],
+        "pitfalls": [
+          "Đừng đảo lộn vai trò của UDDI, WSDL và SOAP: UDDI dùng để **tìm/đăng ký** service (giống trang vàng danh bạ), WSDL dùng để **mô tả** hàm/tham số công khai, còn SOAP dùng để **đóng gói & truyền** thông điệp XML khi gọi dịch vụ.",
+          "Nhớ hướng luồng giao tiếp trên Figure 8-18: Browsers ↔ **HTML** ↔ Firewall, còn External Applications ↔ SOAP Processor ↔ **XML** ↔ Firewall ↔ SOAP Processor bên trong Application Server."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "XML AND WEB SERVICES",
+          "bullets": [
+            "Web Services – a set of emerging JSON/XML-based standards that define protocols for automatic communication between software programs over the Web",
+            "Universal Description, Discovery, and Integration (UDDI) – standard for creating a distributed registry of Web services",
+            "Web Services Description Language (WSDL) – XML-based grammar for describing a Web Service and specifying its public interface",
+            "Simple Object Access Protocol (SOAP) – XML-based communication protocol for sending messages between applications over the Internet"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 40"
+          },
+          "explanation": [
+            "Chú ý sự khác biệt giữa trang Web truyền thống (cho *con người* đọc HTML trên trình duyệt) và **Web Services** (cho *phần mềm với phần mềm* tự động trao đổi dữ liệu qua Web bằng chuẩn **JSON/XML**).",
+            "Nắm đúng từ khóa nhận diện 3 chữ viết tắt hay hỏi thi nhất cuối Chương 8: **UDDI** = *distributed registry* (đăng ký/tìm dịch vụ); **WSDL** = *describing / specifying public interface* (mô tả giao diện hàm gọi); **SOAP** = *communication protocol for sending messages* (giao thức trao đổi thông điệp)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 41",
+          "pageNumber": 41,
+          "title": "Figure 8-17 Web Services protocol stack",
+          "table": {
+            "caption": "Figure 8-17 Web Services protocol stack (từ trên xuống dưới)",
+            "headers": [
+              "Function / Role",
+              "Standard",
+              "Full Name"
+            ],
+            "rows": [
+              [
+                "Publish, Find, Use Services",
+                "UDDI",
+                "Universal Description, Discovery, Integration"
+              ],
+              [
+                "Describe Services",
+                "WSDL",
+                "Web Services Description Language"
+              ],
+              [
+                "Service Interactions",
+                "SOAP",
+                "Simple Object Access Protocol"
+              ],
+              [
+                "Data Format",
+                "XML",
+                "eXtensible Markup Language"
+              ],
+              [
+                "Open Communications",
+                "Internet",
+                ""
+              ]
+            ]
+          },
+          "diagramNote": "Ngăn xếp 5 tầng từ dưới lên trên: Internet (Open Communications) → XML (Data Format) → SOAP (Service Interactions) → WSDL (Describe Services) → UDDI (Publish, Find, Use Services).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 41"
+          },
+          "explanation": [
+            "Bảng Figure 8-17 tóm tắt trực quan toàn bộ kiến trúc nền tảng của Web Services cổ điển: hạ tầng truyền tải là **Internet**, định dạng dữ liệu chuẩn là **XML**, ở trên có 3 lớp chuẩn tương ứng *tương tác* (**SOAP**), *mô tả* (**WSDL**) và *đăng ký/tra cứu* (**UDDI**).",
+            "Lưu ý xu hướng hiện đại: ngoài SOAP/XML, nhiều Web Services / RESTful API ngày nay dùng trực tiếp HTTP + **JSON** (đã được giáo trình nhắc thoáng qua ở định nghĩa Slide 40) vì nhẹ và dễ đọc hơn SOAP."
+          ]
+        },
+        {
+          "slideNumber": "Slide 42",
+          "pageNumber": 42,
+          "title": "SOAP request sent from customer to supplier & SOAP response sent from supplier to customer",
+          "paragraphs": [
+            "SOAP request sent from customer to supplier",
+            "SOAP response sent from supplier to customer"
+          ],
+          "diagramText": [
+            "-- SOAP request sent from customer to supplier --",
+            "<soap:Envelope xmlns:soap=http://schemas.xmlsoap.org/soap/envelope/>",
+            "  <soap:Body>",
+            "    <getProductDetails xmlns=http://supplier.example.com/ws",
+            "      <productID>32879</productID>",
+            "    </getProductDetails>",
+            "  </soap:Body>",
+            "</soap:Envelope>",
+            "",
+            "-- SOAP response sent from supplier to customer --",
+            "<soap:Envelope xmlns:soap=http://schemas.xmlsoap.org/soap/envelope/>",
+            "  <soap:Body>",
+            "    <getProductDetailsResponse xmlns=\"suppliers.example.com/ws\">",
+            "      <getProductDetailsResult>",
+            "        <productName>Dining Table</productName>",
+            "        <Finish>Natural Ash</Finish>",
+            "        <Price>800</Price>",
+            "        <inStock>True</inStock>",
+            "      </getProductDetailsResult>",
+            "    </getProductDetailsResponse>",
+            "  </soap:Body>",
+            "</soap:Envelope>"
+          ],
+          "ocrNote": "Code minh họa trên slide gốc có vài lỗi cú pháp XML nhỏ (dùng dấu '/>' tự đóng ở thẻ mở <soap:Envelope .../>, thiếu dấu ngoặc kép và dấu '>' ở thẻ mở <getProductDetails xmlns=...); nội dung được chép nguyên văn theo hình.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 42"
+          },
+          "explanation": [
+            "Cấu trúc chuẩn của một thông điệp SOAP gồm phong bì ngoài `<soap:Envelope>` bọc phần thân `<soap:Body>` chứa tên tác vụ gọi từ xa (`getProductDetails` với tham số `<productID>32879</productID>`) và kết quả trả về (`getProductDetailsResponse` chứa `Dining Table`, `Natural Ash`, `800`, `inStock: True`).",
+            "Vì toàn bộ lời gọi hàm và kết quả đều là văn bản XML truyền qua HTTP (thường qua cổng 80/443), các doanh nghiệp khác ngôn ngữ lập trình (Java gọi .NET hoặc ngược lại) đều hiểu được nhau và đi qua Firewall dễ dàng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 43",
+          "pageNumber": 43,
+          "title": "Figure 8-18 Web services deployment",
+          "diagramText": [
+            "Luồng 1 (Trình duyệt người dùng): Browsers ↔ HTML ↔ Firewall ↔ Web Presentation (trong Application Server)",
+            "Luồng 2 (Tích hợp giữa các phần mềm): External Applications ↔ SOAP Processor ↔ XML ↔ Firewall ↔ SOAP Processor (trong Application Server)",
+            "Thành phần bên trong Application Server: Web Presentation | DBMS | Business Logic | SOAP Processor ↔ DB",
+            "Source: Based on Newcomer (2002)."
+          ],
+          "diagramNote": "Hình 8-18 cho thấy Application Server phục vụ đồng thời hai kênh qua Firewall: kênh giao diện người dùng (Browsers trao đổi HTML với Web Presentation) và kênh Web Service máy-với-máy (External Applications trao đổi XML thông qua cặp SOAP Processor).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 43"
+          },
+          "explanation": [
+            "Nhìn kỹ Hình 8-18 để thấy giá trị tái sử dụng: cùng một tầng **Business Logic**, **DBMS** và **DB**, tổ chức vừa xuất HTML cho người dùng trình duyệt, vừa mở cổng **SOAP Processor** dùng XML cho hệ thống đối tác (`External Applications`) tích hợp tự động.",
+            "**SOAP Processor** đóng vai trò bộ phiên dịch hai đầu: chuyển đổi lời gọi hàm nội bộ của ứng dụng thành phong bì XML SOAP ở phía gửi, và giải mã XML thành tham số/dữ liệu cho Business Logic ở phía nhận."
+          ]
+        },
+        {
+          "slideNumber": "Slide 44",
+          "pageNumber": 44,
+          "title": "SERVICE ORIENTED ARCHITECTURE (SOA)",
+          "bullets": [
+            "A collection of services that communicate with each other, usually by passing data or coordinating a business activity",
+            "A new paradigm for IT application development, based mostly on Web services",
+            "Loosely coupled, highly interoperable components",
+            "Leads to flexibility and shorter development time"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 44"
+          },
+          "explanation": [
+            "**SOA** là bước tiến kiến trúc ở tầm doanh nghiệp xây trên nền tảng Web Services: thay vì viết một khối ứng dụng đơn khối (monolith) khổng lồ, hệ thống được cấu thành từ các dịch vụ độc lập giao tiếp qua chuẩn chung.",
+            "Hai tính chất vàng của thành phần SOA cần thuộc cho câu hỏi trắc nghiệm: **Loosely coupled** (liên kết lỏng — thay đổi bên trong một dịch vụ không làm sập dịch vụ khác miễn giữ nguyên giao diện hợp đồng) và **Highly interoperable** (khả năng tương tác cao giữa các ngôn ngữ/nền tảng khác nhau), từ đó tăng tính linh hoạt và rút ngắn thời gian phát triển."
+          ]
+        },
+        {
+          "slideNumber": "Slide 45",
+          "pageNumber": 45,
+          "title": "Copyright Notice Slide (Trang 45/45)",
+          "paragraphs": [
+            "Trang cảnh báo bản quyền của nhà xuất bản Pearson Education (giới hạn mục đích giảng dạy cho giảng viên và sinh viên sử dụng giáo trình đi kèm).",
+            "Chapter 8 — Copyright © 2016 Pearson Education, Inc. — 8-45"
+          ],
+          "ocrNote": "Trang 45/45 của tệp hoffer_mdm12e_pp_ch08.pdf chỉ chứa hộp cảnh báo bản quyền chuẩn của Pearson Education, không chứa nội dung lý thuyết hay mã nguồn Chương 8.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch08.pdf",
+            "loc": "Slide 45"
+          },
+          "explanation": [
+            "Trang cuối cùng (45/45) là thông báo bản quyền của giáo trình *Modern Database Management (12th Edition)* — kết thúc bộ slide lý thuyết Chương 8.",
+            "Toàn bộ kiến thức Chương 8 trên slide đã hoàn tất ở Slide 44; mục tiếp theo bên dưới bổ sung phần phiên âm & phân tích ảnh thực hành `8.4.jpg` (bài Lab 8.4 trên MySQL Workbench)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Thực hành SQL nâng cao từ ảnh chụp Lab 8.4 (8.4.jpg — MySQL Workbench)",
+      "text": "Phiên âm và phân tích truy vấn SQL trên MySQL Workbench trong ảnh chụp 8.4.jpg (liên kết bài Task 8.4 trong Lab 7 - 8.pdf): kết hợp Derived Table (bảng dẫn xuất h) và Correlated Subquery theo h1.attract_no trên bảng hours.",
+      "source": {
+        "file": "8.4.jpg",
+        "loc": "Ảnh chụp thực hành MySQL Workbench (dòng 35–45)"
+      },
+      "digest": {
+        "keyPoints": [
+          "Ảnh `8.4.jpg` chụp cửa sổ trình soạn thảo SQL của MySQL Workbench (`schema: themepark`, tab `Query 1`) thực hành bài `# 8.4` trên bảng `hours`.",
+          "Truy vấn trong ảnh kết hợp **Derived Table** `(select emp_num, attract_no, sum(hours_per_attract) as total_hours from hours group by emp_num, attract_no) h` với **Correlated Subquery** (`where attract_no = h1.attract_no`) để tính hiệu `Different` giữa số giờ làm của nhân viên tại một trò chơi và số giờ trung bình trên trò chơi đó.",
+          "Hai vị trí ở mép phải khung soạn thảo bị khuất khỏi màn hình (dòng 37 sau `as total` và dòng 40 sau `sum(hours_per_attra`) được đánh dấu `[?cần kiểm tra]`."
+        ],
+        "terms": [
+          {
+            "term": "Derived Table (h)",
+            "meaning": "Truy vấn con đặt trong mệnh đề FROM tạo bảng tạm h tính tổng giờ làm theo từng cặp (emp_num, attract_no) để tính tiếp AVG(total_hours)."
+          },
+          {
+            "term": "Correlated Subquery (where attract_no = h1.attract_no)",
+            "meaning": "Truy vấn con lồng trong danh sách SELECT tham chiếu bí danh h1 của truy vấn ngoài nhằm tính trung bình riêng cho đúng attraction hiện tại."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi thường gặp khi chụp/chép lại từ màn hình bị cắt mép: dòng 37 bị khuất dấu phẩy ngăn cách cột trước `sum(hours_per_attract) - (...)` và phần tên alias sau `as total`; dòng 40 bị khuất phần đóng hàm `ct)`.",
+          "Nếu chạy trên MySQL bật `ONLY_FULL_GROUP_BY`, việc đặt correlated subquery tham chiếu cột `h1.attract_no` bên trong `SELECT` khi ngoài đang `GROUP BY emp_num, attract_no` vẫn hợp lệ vì `h1.attract_no` nằm trong `GROUP BY`, nhưng đối chiếu đề Lab 8.4 đầy đủ cần `JOIN EMPLOYEE` để lấy `EMP_FNAME`, `EMP_LNAME` và hiển thị `DATE_WORKED` cùng cột `AVERAGE`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Ảnh 8.4",
+          "title": "Lab 8.4: MySQL Workbench — Derived Table & Correlated Subquery (8.4.jpg)",
+          "diagramText": [
+            "Công cụ: MySQL Workbench | Tab đang mở: Query 1 (Schema đang chọn bên trái: themepark)",
+            "Dòng 35: select * from hours;",
+            "Dòng 36: # 8.4",
+            "Dòng 37: select emp_num, attract_no, sum(hours_per_Attract) as total[?cần kiểm tra: có thể là total_hours, bị cắt mép phải]",
+            "Dòng 38: sum(hours_per_attract) - (",
+            "Dòng 39:     select avg(total_hours) from (",
+            "Dòng 40:         select emp_num, attract_no, sum(hours_per_attra[?cần kiểm tra: có thể là sum(hours_per_attract)]",
+            "Dòng 41:         as total_hours",
+            "Dòng 42:         from hours group by emp_num, attract_no",
+            "Dòng 43:     ) h where attract_no = h1.attract_no",
+            "Dòng 44: ) as Different",
+            "Dòng 45: from hours h1 group by emp_num, attract_no;"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "select * from hours;\n# 8.4\nselect emp_num, attract_no, sum(hours_per_Attract) as total -- [?cần kiểm tra: thiếu phần cuối tên alias và dấu ',' do cắt mép phải]\nsum(hours_per_attract) - (\n    select avg(total_hours) from (\n        select emp_num, attract_no, sum(hours_per_attra -- [?cần kiểm tra: cắt mép phải, nhiều khả năng là sum(hours_per_attract)]\n        as total_hours\n        from hours group by emp_num, attract_no\n    ) h where attract_no = h1.attract_no\n) as Different\nfrom hours h1 group by emp_num, attract_no;"
+          },
+          "diagramNote": "Ảnh chụp màn hình thực hành tại phòng máy (10/11/2026) hiển thị truy vấn giải bài # 8.4 trên cơ sở dữ liệu themepark trong MySQL Workbench. Do thanh cuộn ngang chưa kéo sang phải nên cuối dòng 37 và dòng 40 bị khuất khỏi vùng hiển thị.",
+          "ocrNote": "Hai đoạn cuối dòng 37 ('as total...') và dòng 40 ('sum(hours_per_attra...') bị mép phải cửa sổ MySQL Workbench che khuất; đã giữ nguyên phần nhìn thấy và gắn nhãn [?cần kiểm tra]. Ngoài ra trong ảnh còn thấy đồng hồ treo tường và nhãn dán trên bệ màn hình lớp học.",
+          "source": {
+            "file": "8.4.jpg",
+            "loc": "Ảnh chụp thực hành MySQL Workbench (dòng 35–45, # 8.4)"
+          },
+          "explanation": [
+            "**Giải mã logic SQL trong ảnh `8.4.jpg`**: Truy vấn ngoài nhóm dữ liệu bảng `hours h1` theo `(emp_num, attract_no)` để tính tổng số giờ mỗi nhân viên làm tại mỗi trò chơi (`sum(hours_per_attract)`). Để lấy trung bình giờ làm **của đúng trò chơi đó**, tác giả dùng một **Correlated Subquery** (`where attract_no = h1.attract_no`) bọc bên ngoài một **Derived Table `h`** (vì SQL không cho lồng trực tiếp `AVG(SUM(...))` mà phải tính `SUM(...) as total_hours` ở tầng trong trước rồi mới `AVG(total_hours)` ở tầng giữa).",
+            "**Lỗi cú pháp khi chép nguyên văn từ ảnh bị khuất mép**: (1) Cuối dòng 37 sau `as total` chắc chắn còn phần tên bí danh và **dấu phẩy `,`** ngăn cách với biểu thức `sum(hours_per_attract) - (...)` ở dòng 38 (nếu thiếu dấu phẩy sẽ báo lỗi `1064 SQL syntax`); (2) Cuối dòng 40 cần hoàn chỉnh thành `sum(hours_per_attract)`. Chữ `hours_per_Attract` và `hours_per_attract` trên Linux MySQL tên cột phân biệt/không phân biệt tùy cấu hình nhưng nên viết đồng nhất.",
+            "**Đối chiếu yêu cầu đầy đủ của Task 8.4 (Lab 7 - 8.pdf trang 30)**: Đề bài Task 8.4 yêu cầu hiển thị `EMP_FNAME`, `EMP_LNAME`, `DATE_WORKED`, cột `AVERAGE` và cột `DIFFERENCE`. Đoạn code trên màn hình mới dừng ở bước tính nháp trên bảng `hours` (`emp_num, attract_no`), muốn nộp bài hoàn chỉnh cần `JOIN EMPLOYEE USING (EMP_NUM)` để lấy họ tên nhân viên, chọn thêm `DATE_WORKED` và hiển thị riêng cột trung bình `AVERAGE`."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch08-c01", "front": "Fat client khác thin client?", "back": "Fat client xử lý cả presentation và processing logic; thin client chỉ presentation (như trình duyệt), phần còn lại ở server.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 6" } },
-    { "id": "dbs-ch08-c02", "front": "Ba tầng của kiến trúc three-tier?", "back": "Client (thin, presentation) – Business/Application layer (web + application server) – Database layer (database server).", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 17–24" } },
-    { "id": "dbs-ch08-c03", "front": "6 bước dùng database qua middleware API?", "back": "Đăng ký driver; mở kết nối; thực thi truy vấn; xử lý kết quả; lặp lại 3–4 nếu cần; đóng kết nối.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 12" } },
-    { "id": "dbs-ch08-c04", "front": "UDDI, WSDL, SOAP lần lượt làm gì?", "back": "UDDI: đăng ký để publish/find/use service. WSDL: mô tả service và giao diện công khai. SOAP: giao thức XML để trao đổi thông điệp.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 40–41" } },
-    { "id": "dbs-ch08-c05", "front": "Bốn cách lưu tài liệu XML?", "back": "Shredding vào bảng quan hệ; lưu trong BLOB/CLOB; cột XML đặc biệt; native XML database.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 35" } },
-    { "id": "dbs-ch08-c06", "front": "Ba loại cloud computing?", "back": "IaaS, PaaS, SaaS.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 30" } }
+    {
+      "id": "dbs-ch08-c01",
+      "front": "Ba thành phần logic của ứng dụng Client/Server là gì?",
+      "back": "1) Presentation Logic (giao diện GUI, nhập phím/chuột, xuất màn hình/in); 2) Processing Logic (xử lý I/O, business rules, quản lý dữ liệu qua procedures/programs); 3) Storage Logic (lưu trữ và truy xuất do DBMS đảm nhiệm).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-ch08-c02",
+      "front": "Fat client, Thin client và Distributed trong Two-tier khác nhau thế nào?",
+      "back": "Storage Logic luôn ở Server và Presentation luôn ở Client. Fat client đặt Processing Logic ở Client; Thin client đặt Processing Logic ở Server; Distributed đặt Processing Logic ở cả Client và Server.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 6"
+      }
+    },
+    {
+      "id": "dbs-ch08-c03",
+      "front": "Application Partitioning là gì và có 3 lợi ích nào?",
+      "back": "Là việc đặt các phần mã ứng dụng ở vị trí khác nhau (client vs server) sau khi đã viết xong. Lợi ích: cải thiện hiệu năng (improved performance), tăng khả năng tương tác (interoperability) và cân bằng tải (balanced workloads).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 5"
+      }
+    },
+    {
+      "id": "dbs-ch08-c04",
+      "front": "Đặc điểm và phạm vi phù hợp của kiến trúc Two-tier Client/Server?",
+      "back": "Client lo presentation, data processing, business rules; Server lo storage/DBMS ('DBMS is only on server'). Phù hợp quy mô phòng ban (ít người dùng), không mang tính sống còn (not mission-critical), lượng giao dịch thấp.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 8–10"
+      }
+    },
+    {
+      "id": "dbs-ch08-c05",
+      "front": "6 bước sử dụng CSDL thông qua Middleware APIs (ODBC, ADO.NET, JDBC)?",
+      "back": "1) Xác định & đăng ký database driver; 2) Mở kết nối tới CSDL; 3) Thực thi truy vấn; 4) Xử lý kết quả truy vấn; 5) Lặp lại bước 3–4 khi cần; 6) Đóng kết nối CSDL.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 11–12"
+      }
+    },
+    {
+      "id": "dbs-ch08-c06",
+      "front": "Java JDBC API gồm những gói nào và lớp DriverManager làm gì?",
+      "back": "JDBC API gồm 2 gói: java.sql và javax.sql. Lớp DriverManager làm giao diện giữa người dùng và driver, theo dõi các driver khả dụng và thiết lập kết nối giữa CSDL với driver phù hợp.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 13–15"
+      }
+    },
+    {
+      "id": "dbs-ch08-c07",
+      "front": "Ba tầng của kiến trúc Three-tier và sự khác biệt xử lý trang tĩnh vs động?",
+      "back": "Ba tầng: Client (Thin client, GUI/browser) – Application/Web server (Business rules) – Database server (DBMS/Data storage). Yêu cầu trang tĩnh (.htm/.html) do Web server trả thẳng; trang động (.jsp/.aspx/.php) đi qua Application server và Driver gọi Database server.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 17–24"
+      }
+    },
+    {
+      "id": "dbs-ch08-c08",
+      "front": "Ưu điểm và nhược điểm của Stored Procedures trong ứng dụng 3 tầng?",
+      "back": "Ưu: hiệu năng cao hơn (SQL biên dịch sẵn), giảm lưu lượng mạng, bảo mật tốt hơn, toàn vẹn dữ liệu tốt hơn, client mỏng hơn. Nhược: lập trình tốn nhiều thời gian hơn và cú pháp độc quyền (proprietary) nên không port sang DBMS khác được.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 27–28"
+      }
+    },
+    {
+      "id": "dbs-ch08-c09",
+      "front": "Connection Pooling là gì và 7 lợi ích của kiến trúc Three-tier?",
+      "back": "Connection pooling dùng chung và tái sử dụng các kết nối CSDL đã mở vì giữ mở kết nối tốn tài nguyên. 7 lợi ích 3-tier: Scalability, Technological flexibility, Long-term cost reduction, Better match to business needs, Improved customer service, Competitive advantage, Reduced risk.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 27, 29"
+      }
+    },
+    {
+      "id": "dbs-ch08-c10",
+      "front": "5 đặc tính và 3 loại dịch vụ của Cloud Computing (Slide 30)?",
+      "back": "5 đặc tính: on-demand, broad network access, resource pooling, rapid elasticity, measured service. 3 loại dịch vụ: IaaS (Infrastructure-as-a-service), PaaS (Platform-as-a-service), SaaS (Software-as-a-service).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 30"
+      }
+    },
+    {
+      "id": "dbs-ch08-c11",
+      "front": "XML Schema (XSD) khác gì tài liệu dữ liệu XML khi so với SQL?",
+      "back": "XSD (được W3C khuyến nghị thay DTD) định nghĩa cấu trúc và ràng buộc bản ghi — tương đương lệnh CREATE SQL (metadata). Tài liệu XML tuân theo XSD chứa giá trị dữ liệu cụ thể — tương đương một record trong CSDL.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 31, 33–34"
+      }
+    },
+    {
+      "id": "dbs-ch08-c12",
+      "front": "Bốn cách lưu trữ tài liệu XML thay vì lưu thành file rời?",
+      "back": "1) Shredding dữ liệu XML vào bảng quan hệ; 2) Lưu nguyên tài liệu XML trong trường lớn (BLOB hoặc CLOB); 3) Lưu bằng cột XML chuyên biệt; 4) Dùng Native XML Database (phi quan hệ).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 35"
+      }
+    },
+    {
+      "id": "dbs-ch08-c13",
+      "front": "Phân biệt XPath, XQuery và XSLT?",
+      "back": "XPath định vị dữ liệu trong tài liệu XML (hỗ trợ XQuery). XQuery truy vấn/biến đổi cả CSDL quan hệ và dữ liệu XML (cú pháp for/where/order by/return). XSLT chuyển đổi tài liệu XML thành HTML hoặc WAP/WML cho di động.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 36–39"
+      }
+    },
+    {
+      "id": "dbs-ch08-c14",
+      "front": "Vai trò của UDDI, WSDL, SOAP trong Web Services stack và SOA?",
+      "back": "Nền dưới là Internet + XML. SOAP trao đổi thông điệp XML qua mạng; WSDL dùng XML mô tả Web service và giao diện công khai; UDDI tạo danh bạ đăng ký phân tán để publish/find/use. SOA là tập dịch vụ liên kết lỏng, tương tác cao.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 40–44"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch08-q01", "stem": "Trong three-tier, business rules và processing logic thường nằm ở đâu?", "options": ["Client", "Application/web server", "Database server chỉ", "Máy in"], "answer": 1, "explanation": "Tầng giữa (application server) xử lý business rules và processing logic.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 17–24" } },
-    { "id": "dbs-ch08-q02", "stem": "Chuẩn nào dùng XML để mô tả public interface của web service?", "options": ["UDDI", "WSDL", "SOAP", "XPath"], "answer": 1, "explanation": "WSDL là ngữ pháp XML mô tả service.", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slides 40–41" } },
-    { "id": "dbs-ch08-q03", "stem": "Một lợi ích của stored procedure là gì?", "options": ["Cú pháp giống nhau mọi DBMS", "Giảm lưu lượng mạng và tăng hiệu năng", "Không cần DBMS", "Dễ viết hơn mọi mã khác"], "answer": 1, "explanation": "Slide nêu stored procedure giảm network traffic và cải thiện hiệu năng (SQL biên dịch sẵn).", "source": { "file": "hoffer_mdm12e_pp_ch08.pdf", "loc": "Slide 28" } }
+    {
+      "id": "dbs-ch08-q01",
+      "stem": "Trong kiến trúc Three-tier (Slides 17–18), thành phần nào chịu trách nhiệm xử lý các quy tắc nghiệp vụ (business rules) và processing logic?",
+      "options": [
+        "Thin Client",
+        "Application server / Web server",
+        "Chỉ Database server",
+        "Máy in đầu ra"
+      ],
+      "answer": 1,
+      "explanation": "Slides 7, 17–18: Tầng giữa (Application server / Web server) chịu trách nhiệm Business rules và Processing logic, còn Client chỉ xử lý Presentation và DB server lo Storage.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 7, 17–18"
+      }
+    },
+    {
+      "id": "dbs-ch08-q02",
+      "stem": "Chuẩn nào trong ngăn xếp Web Services dùng ngữ pháp dựa trên XML để mô tả một dịch vụ và chỉ rõ giao diện công khai (public interface) của nó?",
+      "options": [
+        "UDDI",
+        "WSDL",
+        "SOAP",
+        "XPath"
+      ],
+      "answer": 1,
+      "explanation": "Slides 40–41: WSDL (Web Services Description Language) là ngữ pháp XML mô tả Web service và public interface; UDDI là registry, còn SOAP gửi thông điệp.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 40–41"
+      }
+    },
+    {
+      "id": "dbs-ch08-q03",
+      "stem": "Đâu là MỘT ưu điểm và MỘT nhược điểm của Stored Procedures được nêu trên Slide 28?",
+      "options": [
+        "Ưu: cú pháp giống hệt mọi DBMS; Nhược: tăng lưu lượng mạng",
+        "Ưu: giảm lưu lượng mạng và cải thiện hiệu năng (SQL biên dịch sẵn); Nhược: cú pháp độc quyền (proprietary) nên thuật toán không portable",
+        "Ưu: không cần kết nối DB; Nhược: không bảo mật",
+        "Ưu: viết nhanh hơn mọi ngôn ngữ khác; Nhược: khiến client nặng hơn"
+      ],
+      "answer": 1,
+      "explanation": "Slide 28: Stored procedures giúp cải thiện hiệu năng, giảm network traffic, tăng bảo mật/toàn vẹn, client mỏng hơn; nhưng tốn thời gian lập trình và mang tính độc quyền theo hãng nên không portable.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 28"
+      }
+    },
+    {
+      "id": "dbs-ch08-q04",
+      "stem": "Trong mô hình phân bố logic Two-tier (Figure 8-2a, Slide 6), kiểu kiến trúc nào đặt cả Processing Logic và Presentation Logic trên máy Client?",
+      "options": [
+        "Thin Client",
+        "Fat Client",
+        "Three-tier Web",
+        "Native XML"
+      ],
+      "answer": 1,
+      "explanation": "Slide 6: Ở Fat Client, Client gánh cả Presentation Logic và Processing Logic, còn Server chỉ giữ Storage Logic.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 6"
+      }
+    },
+    {
+      "id": "dbs-ch08-q05",
+      "stem": "Theo Slide 12, bước ĐẦU TIÊN và bước CUỐI CÙNG trong quy trình 6 bước dùng CSDL qua middleware APIs là gì?",
+      "options": [
+        "Đầu tiên: Thực thi query; Cuối cùng: Xử lý kết quả",
+        "Đầu tiên: Xác định & đăng ký database driver; Cuối cùng: Đóng kết nối tới database",
+        "Đầu tiên: Mở kết nối; Cuối cùng: Đăng ký driver",
+        "Đầu tiên: Tạo Stored Procedure; Cuối cùng: Commit"
+      ],
+      "answer": 1,
+      "explanation": "Slide 12: 1. Identify and register a database driver → 2. Open connection → 3. Execute query → 4. Process results → 5. Repeat 3–4 → 6. Close the connection to the database.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "dbs-ch08-q06",
+      "stem": "Trong Java JDBC (Slide 16, Figure 8-5), câu lệnh `ResultSet rec = st.executeQuery(\"SELECT * FROM Student\");` tương ứng với bước nào?",
+      "options": [
+        "Đăng ký driver với DriverManager",
+        "Mở kết nối TCP tới Oracle",
+        "Gửi câu truy vấn SQL và nhận tập kết quả để duyệt từng dòng",
+        "Đóng kết nối CSDL"
+      ],
+      "answer": 2,
+      "explanation": "Slide 16: `st.executeQuery(...)` gửi truy vấn và trả đối tượng `ResultSet`, sau đó vòng `while(rec.next())` xử lý từng hàng một.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "dbs-ch08-q07",
+      "stem": "Trong Figure 8-9 (Slide 23–24), khi trình duyệt gửi yêu cầu trang `.html` so với trang `.jsp` / `.aspx` / `.php`, điểm khác biệt về luồng xử lý là gì?",
+      "options": [
+        "Yêu cầu `.html` do Web Server trả trực tiếp không qua Application Server và Database Server; yêu cầu `.jsp`/`.aspx`/`.php` đi qua Application Server và Driver để gọi Database Server khi cần",
+        "Cả `.html` và `.jsp` đều gửi trực tiếp tới Database Server bỏ qua Web Server",
+        "Trình duyệt tự mở kết nối JDBC thẳng vào Database Server",
+        "Web Server chỉ trả được file `.php`, còn file `.html` do Database Server trả"
+      ],
+      "answer": 0,
+      "explanation": "Slides 23–24: Yêu cầu tĩnh (`.htm`, `.html`) chỉ qua Web Server rồi trả HTML; yêu cầu động (`.jsp`, `.aspx`, `.php`) được định tuyến tới Application Server xử lý server-side và gọi Database qua Driver.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 23–24"
+      }
+    },
+    {
+      "id": "dbs-ch08-q08",
+      "stem": "Trong phần XML (Slides 33–34), XML Schema (XSD) tương đương với thành phần nào trong hệ quản trị CSDL quan hệ?",
+      "options": [
+        "Một bản ghi (record) dữ liệu đơn lẻ",
+        "Câu lệnh CREATE SQL (định nghĩa cấu trúc bản ghi và metadata)",
+        "Bảng thống kê Connection Pool",
+        "Bức tường lửa Firewall"
+      ],
+      "answer": 1,
+      "explanation": "Slide 33 ghi rõ: \"Schema is a record definition, analogous to the Create SQL statement, and therefore provides metadata.\"",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slides 33–34"
+      }
+    },
+    {
+      "id": "dbs-ch08-q09",
+      "stem": "Công nghệ XML nào cho phép chuyển đổi MỘT tài liệu XML duy nhất thành cả trang HTML chuẩn và trang WAP/WML cho điện thoại di động (Slide 37)?",
+      "options": [
+        "DTD",
+        "UDDI",
+        "XSLT (Extensible Stylesheet Language Transformation)",
+        "Connection Pooling"
+      ],
+      "answer": 2,
+      "explanation": "Slide 37: XSLT biến đổi tài liệu XML thành HTML hoặc WAP/WML mà không cần tạo hai trang dữ liệu riêng biệt.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch08.pdf",
+        "loc": "Slide 37"
+      }
+    },
+    {
+      "id": "dbs-ch08-q10",
+      "stem": "Trong truy vấn thực hành MySQL ở ảnh `8.4.jpg`, vì sao tác giả lồng thêm một bảng dẫn xuất `(select emp_num, attract_no, sum(...) as total_hours from hours group by emp_num, attract_no) h` bên trong `select avg(total_hours) from (...) h where attract_no = h1.attract_no`?",
+      "options": [
+        "Vì MySQL không cho phép tính AVG(SUM(...)) trực tiếp trên một truy vấn; cần Derived Table h tính tổng giờ theo từng (nhân viên, trò chơi) trước rồi mới lấy trung bình cho đúng trò chơi h1.attract_no",
+        "Vì MySQL không hỗ trợ hàm AVG() trên kiểu số nguyên",
+        "Để xóa toàn bộ dữ liệu cũ trong bảng hours",
+        "Để chuyển truy vấn từ SELECT sang XML"
+      ],
+      "answer": 0,
+      "explanation": "Ảnh `8.4.jpg` minh họa kết hợp Derived Table `h` (tính `sum(...) as total_hours` theo từng `(emp_num, attract_no)`) và Correlated Subquery (`where attract_no = h1.attract_no`) để tính hiệu `Different` giữa giờ làm của nhân viên và mức trung bình của chính attraction đó.",
+      "source": {
+        "file": "8.4.jpg",
+        "loc": "Ảnh chụp thực hành MySQL Workbench (dòng 35–45, # 8.4)"
+      }
+    }
   ]
 }

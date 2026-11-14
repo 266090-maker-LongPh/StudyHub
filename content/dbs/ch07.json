@@ -1,26 +1,2143 @@
 {
-  "id": "dbs-ch07", "order": 7,
+  "id": "dbs-ch07",
+  "order": 7,
   "title": "Chương 7: Advanced SQL",
-  "summary": [
-    { "h": "Các loại join", "text": "Equi-join dựa trên so sánh bằng, cột chung xuất hiện hai lần. Natural join là equi-join loại bỏ cột trùng. Inner join chỉ giữ hàng khớp ở cả hai bảng. Outer join (LEFT/RIGHT/FULL) giữ cả hàng không khớp (điền NULL). Union join chứa mọi dữ liệu từ mỗi bảng. Self-join nối bảng với chính nó (quan hệ unary), cần alias. Nối N bảng cần N−1 điều kiện join." },
-    { "h": "Subquery", "text": "Subquery là SELECT lồng trong WHERE, FROM (derived table) hoặc HAVING. Noncorrelated subquery không phụ thuộc truy vấn ngoài, chạy một lần. Correlated subquery tham chiếu bảng của truy vấn ngoài, chạy một lần cho mỗi hàng ngoài, thường dùng EXISTS. Derived table trong FROM giúp dùng kết quả tổng hợp trong WHERE." },
-    { "h": "UNION và CASE", "text": "UNION gộp kết quả nhiều SELECT; số lượng và kiểu dữ liệu cột phải giống nhau (union-compatible). CASE WHEN ... THEN ... ELSE ... END là biểu thức điều kiện; còn có NULLIF, COALESCE." },
-    { "h": "Transaction", "text": "Transaction là đơn vị công việc phải hoàn tất toàn bộ hoặc không gì cả. COMMIT làm cập nhật vĩnh viễn; ROLLBACK hủy mọi cập nhật kể từ COMMIT gần nhất." },
-    { "h": "Routine và trigger", "text": "Function trả về giá trị và nhận tham số vào. Stored procedure không trả giá trị như biểu thức, nhận IN/OUT/IN OUT, gọi tường minh. Trigger là routine hướng sự kiện, chạy ngầm khi INSERT/UPDATE/DELETE (BEFORE/AFTER/INSTEAD OF)." },
-    { "h": "Hiệu quả truy vấn", "text": "Tránh SELECT *, hạn chế subquery và self-join, lưu truy vấn phức tạp thành view hoặc bảng tạm, giữ thống kê optimizer cập nhật, dùng kiểu dữ liệu tương thích. Embedded SQL nằm cố định trong ngôn ngữ chủ; dynamic SQL được sinh và chạy lúc runtime." }
+  "audit": {
+    "sourceFile": "Chapter 07.pdf",
+    "totalPages": 45,
+    "extractedPages": 45,
+    "ocrNotes": [
+      "PDF Chapter 07.pdf thực tế gồm 45 trang (Slides 1–45), đã trích xuất đầy đủ 45/45 slides kèm pageNumber 1–45.",
+      "Slide 25 chứa ảnh bảng OrderLine_T cỡ chữ nhỏ ở góc trên bên phải; một số giá trị cột OrderedQuantity hơi mờ (ví dụ dòng đầu OrderID 1001, ProductID 1 có giá trị OrderedQuantity [?cần kiểm tra: 1 hoặc 2]), đã đánh dấu và ghi chú.",
+      "Slide 45 là trang cảnh báo bản quyền của Pearson Education (tương tự trang cuối của Chương 8), không chứa kiến thức SQL bổ sung."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Chapter 07.pdf",
+      "loc": "Slides 1–45 (đầy đủ 45/45 slides)"
+    }
   ],
-  "sources": [{ "file": "Chapter 07.pdf", "loc": "Slides 1–45" }],
+  "summary": [
+    {
+      "h": "Giới thiệu chương, Mục tiêu, Định nghĩa các loại Join & Dữ liệu mẫu",
+      "text": "Giới thiệu Chương 7 (Advanced SQL), 6 mục tiêu học tập, định nghĩa các phép nối (Join, Equi-join, Natural join, Outer join, Inner join, Union join), sơ đồ Venn (Figure 7-2) và lược đồ/dữ liệu mẫu Pine Valley Furniture (Figure 1-3, Figure 7-1).",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 1–7"
+      },
+      "digest": {
+        "keyPoints": [
+          "Equi-join kết nối dựa trên điều kiện bằng (=) trên cột chung và giữ cả hai cột trùng lặp trong bảng kết quả; Natural join là equi-join nhưng loại bỏ bớt một cột trùng.",
+          "Inner join chỉ giữ các hàng có giá trị khớp ở cả hai bảng; Outer join (LEFT/RIGHT/FULL) giữ cả các hàng không có bản ghi khớp ở bảng kia (điền NULL).",
+          "Union join bao gồm toàn bộ dữ liệu từ mỗi bảng tham gia phép nối.",
+          "Cột chung để nối trong quan hệ 1:M thường là Primary Key (PK) của bảng trội (dominant table) và Foreign Key (FK) của bảng phụ thuộc (dependent table)."
+        ],
+        "terms": [
+          {
+            "term": "Join",
+            "meaning": "Phép toán quan hệ kết hợp hai hay nhiều bảng có miền giá trị chung (common domain) thành một bảng hoặc view duy nhất."
+          },
+          {
+            "term": "Equi-join",
+            "meaning": "Phép nối dùng điều kiện bằng (=) trên cột chung; cột chung xuất hiện lặp lại trong kết quả."
+          },
+          {
+            "term": "Natural join",
+            "meaning": "Equi-join trong đó một trong các cột trùng lặp được loại bỏ khỏi bảng kết quả."
+          },
+          {
+            "term": "Outer join",
+            "meaning": "Phép nối giữ lại cả những hàng không có giá trị khớp ở cột chung (trái ngược với inner join)."
+          },
+          {
+            "term": "Union join",
+            "meaning": "Phép nối bao gồm toàn bộ dữ liệu từ từng bảng được kết nối."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm UNION (gộp hàng dọc giữa hai câu SELECT có cùng cấu trúc cột) với Union join (kết nối ngang toàn bộ cột và hàng từ hai bảng).",
+          "Trong dữ liệu mẫu Figure 7-1: có 15 khách hàng trong Customer_T nhưng chỉ 9 khách hàng phát sinh tổng cộng 10 đơn hàng trong Order_T (khách hàng ID = 1 đặt 2 đơn 1001 và 1010; 6 khách hàng ID 6, 7, 9, 10, 13, 14 chưa có đơn hàng nào)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "CHAPTER 7: ADVANCED SQL",
+          "paragraphs": [
+            "CHAPTER 7: ADVANCED SQL",
+            "Modern Database Management (12th Edition) — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi",
+            "Copyright © 2016 Pearson Education, Inc."
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide mở đầu Chương 7: \"Advanced SQL\" thuộc giáo trình Modern Database Management (12th Edition).",
+            "Tiếp nối Chương 6 (DDL và truy vấn đơn bảng), Chương 7 mở rộng sang các kỹ thuật SQL nâng cao: truy vấn nhiều bảng bằng Join và Subquery, toán tử `UNION`, biểu thức điều kiện `CASE`, tối ưu hóa truy vấn, quản lý Transaction, Data Dictionary, Stored Procedures/Functions, Triggers và Embedded/Dynamic SQL."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "Write single and multiple table SQL queries",
+            "Define and use three types of joins",
+            "Write noncorrelated and correlated subqueries",
+            "Understand and use SQL in procedural languages (e.g. PHP, PL/SQL)",
+            "Understand triggers and stored procedures"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Slide nêu 6 mục tiêu trọng tâm của Chương 7, trong đó trọng số đề thi lý thuyết và thực hành thường rơi nhiều nhất vào phân biệt các loại Join (Natural/Inner, Outer, Self-join) và viết Noncorrelated vs Correlated Subqueries.",
+            "Phần cuối chương nối SQL thuần túy với lập trình thủ tục (PL/SQL, T-SQL, PHP) thông qua Routines (Stored Procedures, Functions) và Triggers."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "PROCESSING MULTIPLE TABLES",
+          "bullets": [
+            "Join–a relational operation that causes two or more tables with a common domain to be combined into a single table or view",
+            "Equi-join–a join in which the joining condition is based on equality between values in the common columns; common columns appear redundantly in the result table",
+            "Natural join–an equi-join in which one of the duplicate columns is eliminated in the result table"
+          ],
+          "paragraphs": [
+            "The common columns in joined tables are usually the primary key of the dominant table and the foreign key of the dependent table in 1:M relationships."
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Nắm chắc sự khác biệt giữa **Equi-join** và **Natural join**: cả hai đều ghép bản ghi dựa trên dấu bằng (`=`) giữa cột chung, nhưng Equi-join giữ lại cả 2 cột chung trong kết quả (`Customer_T.CustomerID` và `Order_T.CustomerID`), còn Natural join loại bớt một cột trùng để tránh dư thừa.",
+            "Yêu cầu điều kiện tiên quyết để hai bảng join hợp lệ: các cột ghép nối không bắt buộc phải trùng tên hệt nhau (khi dùng `ON` hoặc `WHERE`), nhưng bắt buộc phải có **common domain** (cùng miền giá trị/kiểu dữ liệu tương thích), thường là cặp PK ở bảng cha (1) và FK ở bảng con (M)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "PROCESSING MULTIPLE TABLES (Outer Join & Union Join)",
+          "bullets": [
+            "Outer join–a join in which rows that do not have matching values in common columns are nonetheless included in the result table (as opposed to inner join, in which rows must have matching values in order to appear in the result table)",
+            "Union join–includes all data from each table that was joined"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "**Inner join** (gồm equi-join và natural join) chỉ trả về những cặp hàng tìm được giá trị khớp nhau ở cả hai phía — do đó những khách hàng chưa từng đặt đơn sẽ bị rơi mất khỏi kết quả.",
+            "**Outer join** (`LEFT OUTER JOIN`, `RIGHT OUTER JOIN`, `FULL OUTER JOIN`) khắc phục điều đó bằng cách giữ lại toàn bộ hàng ở một (hoặc cả hai) bảng dù không có hàng khớp bên bảng kia, với các cột khuyết được điền giá trị `NULL`. **Union join** mở rộng giữ toàn bộ dữ liệu từ cả hai bảng được nối (tương đương giữ tất cả dòng của hai phía; lưu ý chuẩn SQL hiện đại thường dùng `FULL OUTER JOIN`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "Figure 7-2 Visualization of different join types with results returned in shaded area",
+          "diagramText": [
+            "Natural Join — Darker area is result returned.",
+            "Left Outer Join — All records returned from outer table. | Matching records returned from joined table.",
+            "Union Join — All records are returned."
+          ],
+          "diagramNote": "Hình 7-2 minh họa 3 biểu đồ Venn tương ứng với vùng tô đậm là tập kết quả trả về: (1) Natural Join chỉ tô đậm vùng giao ở giữa hai hình tròn; (2) Left Outer Join tô toàn bộ hình tròn bên trái (outer table) kèm phần giao với hình tròn bên phải (joined table); (3) Union Join tô toàn bộ cả hai hình tròn.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Biểu đồ Venn giúp hình dung trực quan câu hỏi chọn loại Join khi làm bài tập SQL: nếu đề bài hỏi \"những khách hàng ĐÃ đặt hàng\", chọn vùng giao (**Natural/Inner Join**); nếu đề bài hỏi \"TẤT CẢ khách hàng, kèm thông tin đơn hàng nếu có\", chọn **Left Outer Join** với `Customer_T` nằm bên trái.",
+            "Lưu ý bản chất kết nối: nếu hình tròn trái không giao ở hàng nào với hình tròn phải trong Left Outer Join, hàng bên trái vẫn hiện lên nhưng các thuộc tính lấy từ bảng bên phải sẽ mang giá trị `NULL`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "THE FOLLOWING SLIDES INVOLVE QUERIES OPERATING ON TABLES FROM THIS ENTERPRISE DATA MODEL",
+          "paragraphs": [
+            "(from Chapter 1, Figure 1-3)"
+          ],
+          "diagramText": [
+            "CUSTOMER (Customer ID PK, Customer Name) — Places / Is Placed By (1 : 0..N) → ORDER (Order ID PK, Customer ID, Order Date)",
+            "ORDER (Order ID PK, Customer ID, Order Date) — Contains / Is Contained In (1 : 1..N) → ORDER LINE (Quantity)",
+            "PRODUCT (Product ID PK, Standard Price) — Has / Is For (1 : 0..N) → ORDER LINE (Quantity)"
+          ],
+          "diagramNote": "Lược đồ dữ liệu doanh nghiệp Pine Valley Furniture (Figure 1-3): ORDER nối CUSTOMER (Customer ID), ORDER nối ORDER LINE (Order ID), và PRODUCT nối ORDER LINE (Product ID). Đây là 4 bảng chính được truy vấn xuyên suốt các ví dụ Chương 7.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Trước khi viết bất kỳ truy vấn nhiều bảng nào, bước đầu tiên là đọc sơ đồ ERD để xác định **đường đi nối bảng** và cặp **PK–FK**: muốn từ `CUSTOMER` biết khách mua `PRODUCT` nào, bắt buộc phải đi qua cầu `ORDER` và bảng kết hợp `ORDER LINE`.",
+            "Đếm nhanh số bảng trên đường đi: nối `CUSTOMER` ↔ `ORDER` ↔ `ORDER LINE` ↔ `PRODUCT` gồm 4 bảng, suy ra cần tối thiểu `4 − 1 = 3` điều kiện nối PK=FK."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Figure 7-1 Pine Valley Furniture Company Customer_T and Order_T tables with pointers from customers to their orders",
+          "paragraphs": [
+            "These tables are used in queries that follow"
+          ],
+          "diagramText": [
+            "Order_T (Record 1 of 10): OrderID | OrderDate | CustomerID → [1001 | 10/21/2015 | 1], [1002 | 10/21/2015 | 8], [1003 | 10/22/2015 | 15], [1004 | 10/22/2015 | 5], [1005 | 10/24/2015 | 3], [1006 | 10/24/2015 | 2], [1007 | 10/27/2015 | 11], [1008 | 10/30/2015 | 12], [1009 | 11/5/2015 | 4], [1010 | 11/5/2015 | 1]",
+            "Pointers from Order_T.CustomerID to Customer_T.CustomerID: 1001→1, 1002→8, 1003→15, 1004→5, 1005→3, 1006→2, 1007→11, 1008→12, 1009→4, 1010→1"
+          ],
+          "diagramNote": "Ảnh chụp hai bảng Access Customer_T (15 bản ghi) và Order_T (10 bản ghi) với các mũi tên liên kết từ CustomerID trong Order_T trỏ sang CustomerID tương ứng trong Customer_T. Khách hàng CustomerID = 1 có 2 mũi tên (đơn 1001 và 1010); các khách hàng 6, 7, 9, 10, 13, 14 không có mũi tên nào.",
+          "table": {
+            "caption": "Customer_T (15 rows)",
+            "headers": [
+              "CustomerID",
+              "CustomerName",
+              "CustomerAddress",
+              "CustomerCity",
+              "CustomerState",
+              "CustomerPostalCode"
+            ],
+            "rows": [
+              [
+                "1",
+                "Contemporary Casuals",
+                "1355 S Hines Blvd",
+                "Gainesville",
+                "FL",
+                "32601-2871"
+              ],
+              [
+                "2",
+                "Value Furniture",
+                "15145 S.W. 17th St.",
+                "Plano",
+                "TX",
+                "75094-7743"
+              ],
+              [
+                "3",
+                "Home Furnishings",
+                "1900 Allard Ave.",
+                "Albany",
+                "NY",
+                "12209-1125"
+              ],
+              [
+                "4",
+                "Eastern Furniture",
+                "1925 Beltline Rd.",
+                "Carteret",
+                "NJ",
+                "07008-3188"
+              ],
+              [
+                "5",
+                "Impressions",
+                "5585 Westcott Ct.",
+                "Sacramento",
+                "CA",
+                "94206-4056"
+              ],
+              [
+                "6",
+                "Furniture Gallery",
+                "325 Flatiron Dr.",
+                "Boulder",
+                "CO",
+                "80514-4432"
+              ],
+              [
+                "7",
+                "Period Furniture",
+                "394 Rainbow Dr.",
+                "Seattle",
+                "WA",
+                "97954-5589"
+              ],
+              [
+                "8",
+                "California Classics",
+                "816 Peach Rd.",
+                "Santa Clara",
+                "CA",
+                "96915-7754"
+              ],
+              [
+                "9",
+                "M and H Casual Furniture",
+                "3709 First Street",
+                "Clearwater",
+                "FL",
+                "34620-2314"
+              ],
+              [
+                "10",
+                "Seminole Interiors",
+                "2400 Rocky Point Dr.",
+                "Seminole",
+                "FL",
+                "34646-4423"
+              ],
+              [
+                "11",
+                "American Euro Lifestyles",
+                "2424 Missouri Ave N.",
+                "Prospect Park",
+                "NJ",
+                "07508-5621"
+              ],
+              [
+                "12",
+                "Battle Creek Furniture",
+                "345 Capitol Ave. SW",
+                "Battle Creek",
+                "MI",
+                "49015-3401"
+              ],
+              [
+                "13",
+                "Heritage Furnishings",
+                "66789 College Ave.",
+                "Carlisle",
+                "PA",
+                "17013-8834"
+              ],
+              [
+                "14",
+                "Kaneohe Homes",
+                "112 Kiowai St.",
+                "Kaneohe",
+                "HI",
+                "96744-2537"
+              ],
+              [
+                "15",
+                "Mountain Scenes",
+                "4132 Main Street",
+                "Ogden",
+                "UT",
+                "84403-4432"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "Bảng dữ liệu gốc để tự tay kiểm chứng số dòng đầu ra của mọi câu lệnh Join/Subquery từ Slide 8 đến Slide 28: `Order_T` có 10 đơn hàng và `Customer_T` có 15 khách hàng.",
+            "Chú ý chi tiết đếm dòng: có 10 liên kết đơn hàng trỏ sang 9 khách hàng khác nhau (`1` xuất hiện 2 lần), và 6 khách hàng (`6, 7, 9, 10, 13, 14`) chưa có đơn hàng nào. Vì vậy: `INNER JOIN` trả về **10 dòng**, `LEFT OUTER JOIN` (`Customer_T` bên trái) trả về `10 + 6 = 16` dòng, còn `Subquery` với `SELECT DISTINCT CustomerID FROM Order_T` trả về **9 khách hàng**."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Các ví dụ Join: Equi-join, Natural Join, Outer Join, Multiple Table Join & Self-Join",
+      "text": "Các truy vấn minh họa cú pháp truyền thống (WHERE) và cú pháp chuẩn ANSI (INNER JOIN, NATURAL JOIN, LEFT OUTER JOIN), kết nối 4 bảng tạo hóa đơn và Self-join cho quan hệ unary.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 8–16"
+      },
+      "digest": {
+        "keyPoints": [
+          "Equi-join (kiểu cũ `FROM A, B WHERE A.id = B.id` hoặc `A INNER JOIN B ON A.id = B.id`) có thể chọn cả hai cột `CustomerID` nên cột này xuất hiện hai lần trong bảng kết quả.",
+          "Outer join (`LEFT OUTER JOIN`) giữ tất cả hàng của bảng bên trái (`Customer_T`) ngay cả khi không có hàng khớp ở bảng bên phải (`Order_T`), trả về 16 dòng thay vì 10 dòng.",
+          "Khi join N bảng cần tối thiểu N − 1 điều kiện ghép khóa chính – khóa ngoại (ví dụ join 4 bảng `Customer_T`, `Order_T`, `OrderLine_T`, `Product_T` cần 3 điều kiện nối bằng).",
+          "Self-join dùng để nối một bảng với chính nó (phổ biến cho quan hệ unary như `Employee` tự tham chiếu `EmployeeSupervisor`), bắt buộc phải dùng bí danh bảng (table aliases) như `E` và `M`."
+        ],
+        "terms": [
+          {
+            "term": "INNER JOIN ... ON",
+            "meaning": "Cú pháp ANSI thay thế mệnh đề WHERE để ghép hai bảng dựa trên khóa chính và khóa ngoại, chỉ trả về các hàng khớp ở cả hai bảng."
+          },
+          {
+            "term": "LEFT OUTER JOIN",
+            "meaning": "Giữ toàn bộ hàng ở bảng đứng bên trái phép nối dù không có hàng khớp ở bảng bên phải."
+          },
+          {
+            "term": "Self-join",
+            "meaning": "Nối một bảng với chính nó bằng hai table aliases khác nhau, dùng cho quan hệ một ngôi (unary relationship)."
+          }
+        ],
+        "pitfalls": [
+          "Cảnh giác lỗi đánh máy trong Slide 10 & 11 của giáo trình gốc: `NATURAL JOIN` trong SQL chuẩn KHÔNG đi kèm `ON` và không đặt tên bảng trước cột chung; còn `LEFT OUTER JOIN` trong SQL chuẩn bắt buộc dùng từ khóa `ON` cho điều kiện nối thay vì `WHERE` (nếu dùng `WHERE A.id = B.id` sau outer join, các dòng `NULL` sẽ bị lọc mất!).",
+          "Trong mọi câu `SELECT` nhiều bảng, nếu cột cùng tên tồn tại ở nhiều bảng (ví dụ `CustomerID`, `OrderID`), bắt buộc phải viết rõ `TenBang.TenCot` (qualified column name), nếu không DBMS sẽ báo lỗi mơ hồ (ambiguous column)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "EQUI-JOIN EXAMPLE",
+          "bullets": [
+            "For each customer who placed an order, what is the customer’s name and order number?"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT Customer_T.CustomerID, Order_T.CustomerID,\n    CustomerName, OrderID\n    FROM Customer_T, Order_T\n    WHERE Customer_T.CustomerID = Order_T. CustomerID\n    ORDER BY OrderID"
+          },
+          "table": {
+            "caption": "Result: (10 rows selected.)",
+            "headers": [
+              "CUSTOMERID",
+              "CUSTOMERID",
+              "CUSTOMERNAME",
+              "ORDERID"
+            ],
+            "rows": [
+              [
+                "1",
+                "1",
+                "Contemporary Casuals",
+                "1001"
+              ],
+              [
+                "8",
+                "8",
+                "California Classics",
+                "1002"
+              ],
+              [
+                "15",
+                "15",
+                "Mountain Scenes",
+                "1003"
+              ],
+              [
+                "5",
+                "5",
+                "Impressions",
+                "1004"
+              ],
+              [
+                "3",
+                "3",
+                "Home Furnishings",
+                "1005"
+              ],
+              [
+                "2",
+                "2",
+                "Value Furniture",
+                "1006"
+              ],
+              [
+                "11",
+                "11",
+                "American Euro Lifestyles",
+                "1007"
+              ],
+              [
+                "12",
+                "12",
+                "Battle Creek Furniture",
+                "1008"
+              ],
+              [
+                "4",
+                "4",
+                "Eastern Furniture",
+                "1009"
+              ],
+              [
+                "1",
+                "1",
+                "Contemporary Casuals",
+                "1010"
+              ]
+            ]
+          },
+          "paragraphs": [
+            "Customer ID appears twice in the result"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "Đây là cú pháp **Equi-join truyền thống** (còn gọi là implicit join / Theta-join kiểu dấu phẩy): liệt kê nhiều bảng sau `FROM` cách nhau bởi dấu phẩy và đặt điều kiện ghép khóa `Customer_T.CustomerID = Order_T.CustomerID` trong mệnh đề `WHERE`.",
+            "Chú ý hai điểm: (1) Vì liệt kê cả `Customer_T.CustomerID` lẫn `Order_T.CustomerID` trong `SELECT`, kết quả có 2 cột `CUSTOMERID` giống hệt nhau (Customer ID appears twice); (2) Bắt buộc phải chỉ định rõ tên bảng trước `CustomerID` vì cả hai bảng đều có cột này, còn `CustomerName` và `OrderID` chỉ thuộc một bảng nên viết tắt được."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "EQUI-JOIN EXAMPLE – ALTERNATIVE SYNTAX",
+          "code": {
+            "lang": "sql",
+            "text": "SELECT Customer_T.CustomerID, Order_T.CustomerID,\n    CustomerName, OrderID\nFROM Customer_T INNER JOIN Order_T ON\n    Customer_T.CustomerID = Order_T.CustomerID\nORDER BY OrderID;"
+          },
+          "paragraphs": [
+            "INNER JOIN clause is an alternative to WHERE clause, and is used to match primary and foreign keys.",
+            "An INNER join will only return rows from each table that have matching rows in the other.",
+            "This query produces same results as previous equi-join example."
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Cú pháp chuẩn ANSI hiện đại hơn: tách phần ghép bảng `FROM Customer_T INNER JOIN Order_T ON ...` ra khỏi phần lọc dữ liệu ở mệnh đề `WHERE`.",
+            "Ưu điểm lớn của `INNER JOIN ... ON` là mã nguồn dễ đọc và **tránh quên điều kiện nối** (nếu lỡ quên viết `WHERE A.id = B.id` ở kiểu cũ, DBMS sẽ tạo tích Đề-các Cartesian product gồm `15 × 10 = 150` dòng mà không báo lỗi cú pháp!)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "NATURAL JOIN EXAMPLE",
+          "bullets": [
+            "For each customer who placed an order, what is the customer’s name and order number?"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT Customer_T.CustomerID, CustomerName, OrderID\nFROM Customer_T NATURAL JOIN Order_T ON\nCustomer_T.CustomerID = Order_T.CustomerID;"
+          },
+          "diagramText": [
+            "Join involves multiple tables in FROM clause → Customer_T NATURAL JOIN Order_T",
+            "ON clause performs the equality check for common columns of the two tables → Customer_T.CustomerID = Order_T.CustomerID;",
+            "Note: From Fig. 7-1, you see that only 10 Customers have links with orders. ➔ Only 10 rows will be returned from this INNER join"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "Ý tưởng của Natural Join trên Slide 10: chỉ giữ lại một cột `CustomerID` trong `SELECT` thay vì in ra 2 lần như Slide 8–9, và nhấn mạnh chỉ trả về 10 dòng có liên kết khớp (khách hàng chưa có đơn hàng bị loại bỏ).",
+            "⚠️ **Lưu ý bẫy cú pháp chuẩn SQL thực tế**: Slide in `NATURAL JOIN ... ON Customer_T.CustomerID = Order_T.CustomerID`, nhưng trong SQL chuẩn (Oracle/MySQL/PostgreSQL), `NATURAL JOIN` tự động ghép mọi cặp cột trùng tên nên **không được phép** viết thêm `ON` và **không được phép** gắn tiền tố tên bảng `Customer_T.` lên cột chung khi dùng `NATURAL JOIN` (viết `SELECT Customer_T.CustomerID ... NATURAL JOIN` trong Oracle sẽ báo lỗi `ORA-25155`). Nếu viết có `ON`, hãy dùng `INNER JOIN` như Slide 9!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "OUTER JOIN EXAMPLE",
+          "bullets": [
+            "List the customer name, ID number, and order number for all customers. Include customer information even for customers that do have an order."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT Customer_T.CustomerID, CustomerName, OrderID\n  FROM Customer_T LEFT OUTER JOIN Order_T\n  WHERE Customer_T.CustomerID = Order_T. CustomerID;"
+          },
+          "paragraphs": [
+            "LEFT OUTER JOIN clause causes customer data to appear even if there is no corresponding order data",
+            "Unlike INNER join, this will include customer rows with no matching order rows"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Chú ý đề bài yêu cầu liệt kê \"for **all** customers\" — kể cả những khách hàng *không* có đơn hàng (slide gốc gõ thiếu chữ `not` trong câu \"that do [not] have an order\"). Khi thấy từ khóa \"tất cả A kể cả A chưa có B\", luôn dùng Outer Join.",
+            "⚠️ **Lỗi kinh điển cần sửa khi chạy thực tế**: trong câu code minh họa trên slide, tác giả dùng `WHERE` thay vì `ON` sau `LEFT OUTER JOIN`. Trong chuẩn ANSI SQL, phép nối `LEFT OUTER JOIN` bắt buộc đi với **`ON`** (`FROM Customer_T LEFT OUTER JOIN Order_T ON Customer_T.CustomerID = Order_T.CustomerID;`). Nếu viết `WHERE` không có `ON` sẽ báo lỗi cú pháp ngay, hoặc nếu có `ON` rồi lại lọc cột bảng phải trong `WHERE` sẽ làm mất các dòng `NULL` và biến Outer Join ngược lại thành Inner Join!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Outer Join Results",
+          "paragraphs": [
+            "Unlike INNER join, this will include customer rows with no matching order rows"
+          ],
+          "table": {
+            "caption": "Outer Join Results (16 rows selected.)",
+            "headers": [
+              "CUSTOMERID",
+              "CUSTOMERNAME",
+              "ORDERID"
+            ],
+            "rows": [
+              [
+                "1",
+                "Contemporary Casuals",
+                "1001"
+              ],
+              [
+                "1",
+                "Contemporary Casuals",
+                "1010"
+              ],
+              [
+                "2",
+                "Value Furniture",
+                "1006"
+              ],
+              [
+                "3",
+                "Home Furnishings",
+                "1005"
+              ],
+              [
+                "4",
+                "Eastern Furniture",
+                "1009"
+              ],
+              [
+                "5",
+                "Impressions",
+                "1004"
+              ],
+              [
+                "6",
+                "Furniture Gallery",
+                ""
+              ],
+              [
+                "7",
+                "Period Furniture",
+                ""
+              ],
+              [
+                "8",
+                "California Classics",
+                "1002"
+              ],
+              [
+                "9",
+                "M & H Casual Furniture",
+                ""
+              ],
+              [
+                "10",
+                "Seminole Interiors",
+                ""
+              ],
+              [
+                "11",
+                "American Euro Lifestyles",
+                "1007"
+              ],
+              [
+                "12",
+                "Battle Creek Furniture",
+                "1008"
+              ],
+              [
+                "13",
+                "Heritage Furnishings",
+                ""
+              ],
+              [
+                "14",
+                "Kaneohe Homes",
+                ""
+              ],
+              [
+                "15",
+                "Mountain Scenes",
+                "1003"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "Bảng kết quả cho thấy rõ `16 rows selected`: 10 dòng ứng với 10 đơn hàng đã đặt (trong đó khách hàng `1` hiện 2 dòng cho 2 đơn `1001` và `1010`) cộng thêm **6 dòng** của các khách hàng `6, 7, 9, 10, 13, 14` với cột `ORDERID` để trống (`NULL`).",
+            "Mẹo thi: nếu muốn tìm \"khách hàng CHƯA BAO GIỜ đặt hàng\" bằng Outer Join, chỉ cần chạy `LEFT OUTER JOIN` như trên rồi thêm `WHERE Order_T.OrderID IS NULL` (lấy đúng 6 dòng có `ORDERID` rỗng)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "MULTIPLE TABLE JOIN EXAMPLE",
+          "bullets": [
+            "Assemble all information necessary to create an invoice for order number 1006"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT Customer_T.CustomerID, CustomerName, CustomerAddress,\n    CustomerCity, CustomerState, CustomerPostalCode, Order_T.OrderID,\n    OrderDate, OrderedQuantity, ProductDescription, StandardPrice,\n    (OrderedQuantity * ProductStandardPrice)\nFROM Customer_T, Order_T, OrderLine_T, Product_T\n  WHERE Order_T.CustomerID = Customer_T.CustomerID\n    AND Order_T.OrderID = OrderLine_T.OrderID\n    AND OrderLine_T.ProductID = Product_T.ProductID\n    AND Order_T.OrderID = 1006;"
+          },
+          "paragraphs": [
+            "Four tables involved in this join",
+            "Each pair of tables requires an equality-check condition in the WHERE clause, matching primary keys against foreign keys."
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Ví dụ nối **4 bảng** liền nhau theo chuỗi quan hệ trên ERD (`Customer_T` — `Order_T` — `OrderLine_T` — `Product_T`), do đó bắt buộc phải có đúng `4 − 1 = 3` điều kiện nối PK = FK trong `WHERE` cộng thêm 1 điều kiện lọc đơn hàng cụ thể (`AND Order_T.OrderID = 1006`).",
+            "Chú ý biểu thức tính thành tiền `(OrderedQuantity * ProductStandardPrice)` ở mệnh đề `SELECT` — trong thực tế có thể đặt alias `AS TotalPrice` để tiêu đề cột đẹp hơn (xem Slide 14)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Figure 7-4 Results from a four-table join (edited for readability)",
+          "diagramText": [
+            "From CUSTOMER_T table: CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMER CITY, CUSTOMER STATE, CUSTOMER POSTALCODE",
+            "From ORDER_T table: ORDERID, ORDERDATE",
+            "From ORDERLINE_T table: ORDERED QUANTITY",
+            "From PRODUCT_T table: PRODUCTNAME, PRODUCT STANDARDPRICE, (QUANTITY*STANDARDPRICE)"
+          ],
+          "diagramNote": "Hình 7-4 chia kết quả nối 4 bảng cho đơn hàng 1006 thành 2 phần xếp chồng để dễ đọc: hàng cột phía trên trích từ CUSTOMER_T; hàng cột phía dưới trích từ ORDER_T, ORDERLINE_T và PRODUCT_T (cùng cột tính toán QUANTITY * STANDARDPRICE).",
+          "table": {
+            "caption": "Figure 7-4 Results from a four-table join (edited for readability)",
+            "headers": [
+              "CUSTOMERID",
+              "CUSTOMERNAME",
+              "CUSTOMERADDRESS",
+              "CUSTOMERCITY",
+              "CUSTOMERSTATE",
+              "CUSTOMERPOSTALCODE",
+              "ORDERID",
+              "ORDERDATE",
+              "ORDEREDQUANTITY",
+              "PRODUCTNAME",
+              "PRODUCTSTANDARDPRICE",
+              "(QUANTITY*STANDARDPRICE)"
+            ],
+            "rows": [
+              [
+                "2",
+                "Value Furniture",
+                "15145 S. W. 17th St.",
+                "Plano",
+                "TX",
+                "75094 7743",
+                "1006",
+                "24-OCT-15",
+                "1",
+                "Entertainment Center",
+                "650",
+                "650"
+              ],
+              [
+                "2",
+                "Value Furniture",
+                "15145 S. W. 17th St.",
+                "Plano",
+                "TX",
+                "75094 7743",
+                "1006",
+                "24-OCT-15",
+                "2",
+                "Writer's Desk",
+                "325",
+                "650"
+              ],
+              [
+                "2",
+                "Value Furniture",
+                "15145 S. W. 17th St.",
+                "Plano",
+                "TX",
+                "75094 7743",
+                "1006",
+                "24-OCT-15",
+                "2",
+                "Dining Table",
+                "800",
+                "1600"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "Quan sát cách dữ liệu bị lặp lại khi join 1:M: đơn `1006` có 3 dòng chi tiết sản phẩm trong `OrderLine_T`, nên thông tin từ bảng `1` (`Customer_T`: Value Furniture và `Order_T`: 1006, 24-OCT-15) được nhân bản trên cả 3 hàng kết quả để ghép từng dòng sản phẩm.",
+            "Tính tổng giá trị hóa đơn `1006` trực tiếp từ bảng kết quả: `650 + 650 + 1600 = 2900`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "SELF-JOIN EXAMPLE",
+          "paragraphs": [
+            "Query: What are the employee ID and name of each employee and the name of his or her supervisor (label the supervisor’s name Manager)?",
+            "The same table is used on both sides of the join; distinguished using table aliases",
+            "Self-joins are usually used on tables with unary relationships."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT E.EmployeeID, E.EmployeeName, M.EmployeeName AS Manager\n  FROM Employee_T E, Employee_T M\n  WHERE E.EmployeeSupervisor = M.EmployeeID;"
+          },
+          "table": {
+            "caption": "Result:",
+            "headers": [
+              "EMPLOYEEID",
+              "EMPLOYEENAME",
+              "MANAGER"
+            ],
+            "rows": [
+              [
+                "123-44-347",
+                "Jim Jason",
+                "Robert Lewis"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "**Self-join** bắt buộc phải khai báo 2 **table aliases** khác nhau (`E` cho nhân viên và `M` cho người quản lý/supervisor) trên cùng một bảng `Employee_T` để DBMS phân biệt được hai vai trò của cùng một bảng.",
+            "Đừng đảo ngược điều kiện nối! Cột khóa ngoại `EmployeeSupervisor` nằm ở phía nhân viên cấp dưới (`E`), còn cột khóa chính `EmployeeID` tương ứng thuộc về người quản lý (`M`), nên điều kiện đúng phải là `E.EmployeeSupervisor = M.EmployeeID`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Figure 7-5 Example of a self-join",
+          "diagramText": [
+            "Employees (E) ∩ Managers (M) → Employees who have supervisors; i.e., WHERE E.EmployeeSupervisor = M.EmployeeID",
+            "From Chapter 2: EMPLOYEE — Manages [One-to-many] (Unary 1:N)",
+            "Liên kết trong bảng: dòng (123-44-347, Jim Jason, EmployeeSupervisor = 678-44-546) trong Employees (E) trỏ tới dòng (678-44-546, Robert Lewis) trong Managers (M)."
+          ],
+          "diagramNote": "Hình 7-5 đối chiếu mô hình quan hệ 1 ngôi (Unary 1:N \"Manages\") từ Chương 2 với hai bản sao logic của bảng Employee_T: Employees (E) và Managers (M). Vì là Inner Join nên chỉ nhân viên nào có giá trị EmployeeSupervisor khác NULL mới khớp sang M.",
+          "table": {
+            "caption": "Employee_T (Employees E / Managers M)",
+            "headers": [
+              "EmployeeID",
+              "EmployeeName",
+              "EmployeeSupervisor"
+            ],
+            "rows": [
+              [
+                "098-23-456",
+                "Sue Miller",
+                ""
+              ],
+              [
+                "107-55-789",
+                "Stan Getz",
+                ""
+              ],
+              [
+                "123-44-347",
+                "Jim Jason",
+                "678-44-546"
+              ],
+              [
+                "547-33-243",
+                "Bill Blass",
+                ""
+              ],
+              [
+                "678-44-546",
+                "Robert Lewis",
+                ""
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "Tại sao bảng `Employee_T` có tới 5 nhân viên nhưng kết quả Slide 15 chỉ ra đúng 1 dòng (`Jim Jason | Robert Lewis`)? Bởi vì 4 nhân viên còn lại có `EmployeeSupervisor` là `NULL`, nên khi dùng inner self-join (`=`), giá trị `NULL` không khớp với bất kỳ `EmployeeID` nào.",
+            "Mẹo mở rộng: nếu muốn liệt kê cả 5 nhân viên (người nào không có quản lý thì cột `Manager` hiện `NULL`), chỉ cần đổi từ `FROM Employee_T E, Employee_T M WHERE ...` sang `FROM Employee_T E LEFT OUTER JOIN Employee_T M ON E.EmployeeSupervisor = M.EmployeeID`."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Subqueries: Noncorrelated, Correlated (EXISTS), Join vs. Subquery & Derived Table",
+      "text": "Định nghĩa và vị trí đặt Subquery (WHERE, FROM, HAVING), so sánh Join với Subquery, phân biệt Noncorrelated với Correlated Subquery (EXISTS) và kỹ thuật Derived Table trong FROM.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 17–26"
+      },
+      "digest": {
+        "keyPoints": [
+          "Subquery (truy vấn lồng) có thể đặt trong điều kiện của mệnh đề `WHERE`, làm bảng dẫn xuất trong `FROM`, hoặc trong mệnh đề `HAVING`.",
+          "Noncorrelated subquery độc lập với truy vấn ngoài, chạy 1 lần hoàn chỉnh để tạo danh sách/giá trị trung gian trước khi truy vấn ngoài chạy.",
+          "Correlated subquery tham chiếu cột của bảng ở truy vấn ngoài nên phải chạy lại 1 lần cho mỗi hàng của truy vấn ngoài; thường kết hợp với `EXISTS` (trả về TRUE nếu tập con không rỗng).",
+          "Derived table là subquery đặt trong `FROM`, giúp dùng giá trị hàm tổng hợp (như `AvgPrice`) làm điều kiện so sánh ngay trong `WHERE` của truy vấn ngoài."
+        ],
+        "terms": [
+          {
+            "term": "Subquery",
+            "meaning": "Việc đặt một câu lệnh SELECT bên trong (inner query) vào bên trong một câu truy vấn khác (outer query)."
+          },
+          {
+            "term": "Noncorrelated subquery",
+            "meaning": "Subquery không phụ thuộc dữ liệu từ truy vấn ngoài; chỉ thực thi một lần cho toàn bộ truy vấn ngoài."
+          },
+          {
+            "term": "Correlated subquery",
+            "meaning": "Subquery sử dụng dữ liệu từ truy vấn ngoài; thực thi một lần cho mỗi hàng do truy vấn ngoài duyệt qua, có thể dùng toán tử EXISTS."
+          },
+          {
+            "term": "Derived table",
+            "meaning": "Subquery đặt trong mệnh đề FROM đóng vai trò một bảng tạm dẫn xuất với các cột tổng hợp có alias để truy vấn ngoài tham chiếu."
+          }
+        ],
+        "pitfalls": [
+          "Đừng dùng dấu `=` với subquery trả về nhiều hơn 1 dòng — phải dùng `IN` (hoặc `ANY`/`ALL`). Chỉ dùng `=` khi chắc chắn subquery trả về tối đa 1 giá trị (scalar subquery, ví dụ `WHERE OrderID = 1008` theo khóa chính).",
+          "Không thể viết trực tiếp `WHERE ProductStandardPrice > AVG(ProductStandardPrice)` vì `WHERE` lọc từng hàng trước khi tổng hợp; phải dùng scalar subquery trong `WHERE` hoặc derived table trong `FROM` (Slide 26)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "PROCESSING MULTIPLE TABLES USING SUBQUERIES",
+          "bullets": [
+            "Subquery–placing an inner query (SELECT statement) inside an outer query",
+            {
+              "text": "Options:",
+              "subBullets": [
+                "In a condition of the WHERE clause",
+                "As a “table” of the FROM clause",
+                "Within the HAVING clause"
+              ]
+            },
+            {
+              "text": "Subqueries can be:",
+              "subBullets": [
+                "Noncorrelated–executed once for the entire outer query",
+                "Correlated–executed once for each row returned by the outer query"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "Subquery cho phép phân rã bài toán phức tạp thành bước trong (inner query) tính tập điều kiện/tổng hợp, rồi bước ngoài (outer query) lọc hoặc hiển thị dựa trên kết quả đó.",
+            "Cần nhớ 3 vị trí phổ biến của Subquery (`WHERE`, `FROM`, `HAVING`) và 2 cơ chế thực thi hoàn toàn khác nhau về chi phí: **Noncorrelated** (chạy 1 lần duy nhất) vs **Correlated** (chạy lặp lại N lần theo số hàng ở truy vấn ngoài)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "SUBQUERY EXAMPLE",
+          "bullets": [
+            "Show all customers who have placed an order"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CustomerName\n  FROM Customer_T\n    WHERE CustomerID IN\n      (SELECT DISTINCT CustomerID\n       FROM Order_T);"
+          },
+          "table": {
+            "caption": "Result: (9 rows selected.)",
+            "headers": [
+              "CUSTOMERNAME"
+            ],
+            "rows": [
+              [
+                "Contemporary Casuals"
+              ],
+              [
+                "Value Furniture"
+              ],
+              [
+                "Home Furnishings"
+              ],
+              [
+                "Eastern Furniture"
+              ],
+              [
+                "Impressions"
+              ],
+              [
+                "California Classics"
+              ],
+              [
+                "American Euro Lifestyles"
+              ],
+              [
+                "Battle Creek Furniture"
+              ],
+              [
+                "Mountain Scenes"
+              ]
+            ]
+          },
+          "paragraphs": [
+            "The IN operator will test to see if the CUSTOMER_ID value of a row is included in the list returned from the subquery",
+            "Subquery is embedded in parentheses. In this case it returns a list that will be used in the WHERE clause of the outer query"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "Khác biệt tinh tế so với `INNER JOIN` ở Slide 8: Slide 8 trả về **10 dòng** (vì `Contemporary Casuals` đặt 2 đơn hàng 1001 và 1010 nên hiện 2 lần khi join với `Order_T`), còn Subquery với `WHERE CustomerID IN (...)` trên bảng `Customer_T` chỉ kiểm tra từng dòng khách hàng nên trả về **9 dòng** (mỗi khách hàng hiện tối đa 1 lần).",
+            "Quy tắc bắt buộc: Subquery luôn đặt trong cặp dấu ngoặc đơn `( ... )`, và khi inner query trả về một danh sách nhiều giá trị thì ngoài phải dùng `IN` (hoặc `NOT IN` để tìm khách hàng chưa từng đặt đơn)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "JOIN VS. SUBQUERY",
+          "bullets": [
+            "Some queries could be accomplished by either a join or a subquery"
+          ],
+          "paragraphs": [
+            "Query: What are the name and address of the customer who placed order number 1008?"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Join version\nSELECT CustomerName, CustomerAddress, CustomerCity,\n  CustomerState, CustomerPostalCode\nFROM Customer_T, Order_T\nWHERE Customer_T.CustomerID = Order_T. CustomerID\n  AND OrderID = 1008;\n\n-- Subquery version\nSELECT CustomerName, CustomerAddress, CustomerCity,\nCustomerState, CustomerPostalCode\nFROM Customer_T\n  WHERE Customer_T.CustomerID =\n    (SELECT Order_T.CustomerID\n     FROM Order_T\n       WHERE OrderID = 1008);"
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Khi chỉ cần hiển thị các cột của **một bảng duy nhất** (`Customer_T`) còn bảng kia (`Order_T`) chỉ dùng để lọc điều kiện (`OrderID = 1008`), bạn có thể chọn viết bằng **Join** hoặc **Subquery** và cả hai cho kết quả hệt nhau.",
+            "Khi nào BẮT BUỘC dùng Join mà Subquery không thay thế được? Khi danh sách `SELECT` cần lấy cột từ **cả hai bảng** (ví dụ vừa in `CustomerName` của `Customer_T` vừa in `OrderDate` của `Order_T`)!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Figure 7-6 Graphical depiction of two ways to answer a query with different types of joins — (a) Join query approach",
+          "diagramText": [
+            "(a) Join query approach",
+            "ORDER_T (CustomerID | OrderID | ....): tìm dòng [Cx | 1008 | ....] qua điều kiện WHERE OrderID = 1008",
+            "Ghép nối qua điều kiện WHERE Order_T.CustomerID = Customer_T.CustomerID từ Cx của ORDER_T sang dòng CustomerID = Cx trong bảng CUSTOMER_T",
+            "SELECT CustomerID, CustomerName, CustomerAddress, CustomerCity, CustomerState, CustomerPostalCode của dòng Cx tìm được."
+          ],
+          "diagramNote": "Hình 7-6a minh họa cơ chế Join approach: xác định OrderID = 1008 trong ORDER_T lấy CustomerID = Cx, liên kết ngang sang hàng Cx tương ứng của CUSTOMER_T rồi chiếu (SELECT) thông tin địa chỉ khách hàng.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 20"
+          },
+          "explanation": [
+            "Minh họa luồng thực thi logic của **Join query approach**: ghép hai bảng qua cột chung (`Order_T.CustomerID = Customer_T.CustomerID`) cùng bộ lọc `OrderID = 1008` để định vị duy nhất hàng `Cx` (`CustomerID = 12`, Battle Creek Furniture).",
+            "Các trình tối ưu truy vấn (Query Optimizer) hiện đại có thể biến đổi tương đương giữa Join và một số dạng Noncorrelated Subquery đơn giản, nhưng nắm luồng dữ liệu giúp bạn viết câu lệnh dễ đọc và dễ kiểm soát độ phức tạp."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Figure 7-6 Graphical depiction of two ways to answer a query with different types of joins — (b) Subquery approach",
+          "diagramText": [
+            "(b) Subquery approach",
+            "Tập hợp ngoài: All CustomerIDs",
+            "Vòng tròn con bên trong: Order_T.CustomerIDs WHERE OrderID = 1008",
+            "Show customer data for customers with these CustomerIDs; i.e., WHERE Customer_T.CustomerID = result of inner query"
+          ],
+          "diagramNote": "Hình 7-6b minh họa cơ chế Subquery approach dưới dạng hai vòng tròn lồng nhau: truy vấn trong lọc ra tập con CustomerID từ ORDER_T có OrderID = 1008, sau đó truy vấn ngoài lấy dữ liệu khách hàng có CustomerID trùng với kết quả vừa tìm.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 21"
+          },
+          "explanation": [
+            "Sơ đồ tập hợp lồng nhau thể hiện tư duy **top-down / tập con** của Subquery: thay vì nối toàn bộ cột hai bảng, ta tìm trước tập `CustomerID` mục tiêu (`12`) rồi đem đi so sánh ở bảng `Customer_T`.",
+            "Chú ý vì `OrderID` là Primary Key của `Order_T`, truy vấn trong chỉ trả về đúng 1 giá trị (`12`), nhờ đó truy vấn ngoài mới dùng được toán tử `=` thay vì `IN`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "CORRELATED VS. NONCORRELATED SUBQUERIES",
+          "bullets": [
+            {
+              "text": "Noncorrelated subqueries:",
+              "subBullets": [
+                "Do not depend on data from the outer query",
+                "Execute once for the entire outer query"
+              ]
+            },
+            {
+              "text": "Correlated subqueries:",
+              "subBullets": [
+                "Make use of data from the outer query",
+                "Execute once for each row of the outer query",
+                "Can use the EXISTS operator"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 22"
+          },
+          "explanation": [
+            "Câu hỏi lý thuyết kinh điển hay xuất hiện trong đề thi: phân biệt **Noncorrelated** vs **Correlated Subquery** dựa trên 2 tiêu chí: (1) Subquery có tham chiếu cột của bảng ngoài hay không, và (2) Subquery chạy **1 lần duy nhất** hay chạy **1 lần cho mỗi hàng** của truy vấn ngoài.",
+            "Cách nhận biết nhanh trên code: thử tách riêng đoạn code bên trong ngoặc đơn `(SELECT ...)` ra chạy độc lập — nếu chạy được một mình mà không báo lỗi thiếu bảng/cột thì đó là **Noncorrelated**; nếu bên trong có nhắc tới tên/bí danh bảng của truy vấn ngoài (ví dụ `WHERE ProductID = OrderLine_T.ProductID`) khiến chạy lẻ bị lỗi thì đó là **Correlated**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Figure 7-8a Processing a noncorrelated subquery",
+          "paragraphs": [
+            "What are the names of customers who have placed orders?",
+            "1. The subquery (shown in the box) is processed first and an intermediate results table created:",
+            "2. The outer query returns the requested customer information for each customer included in the intermediate results table:",
+            "A noncorrelated subquery processes completely before the outer query begins."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT CustomerName\n    FROM Customer_T\n        WHERE CustomerID IN\n            (SELECT DISTINCT CustomerID\n             FROM Order_T);"
+          },
+          "diagramText": [
+            "1. Intermediate results table (CUSTOMERID): 1, 8, 15, 5, 3, 2, 11, 12, 4 (9 rows selected.)",
+            "2. All Customers → CustomerIDs from orders → Show names (9 rows selected.)",
+            "CUSTOMERNAME: Contemporary Casuals, Value Furniture, Home Furnishings, Eastern Furniture, Impressions, California Classics, American Euro Lifestyles, Battle Creek Furniture, Mountain Scenes"
+          ],
+          "diagramNote": "Hình 7-8a chia quy trình noncorrelated subquery thành 2 bước tuần tự: Bước 1 chạy xong hoàn toàn subquery tạo bảng kết quả trung gian gồm 9 CustomerID phân biệt; Bước 2 truy vấn ngoài quét Customer_T và đối chiếu danh sách 9 ID đó để xuất tên khách hàng.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 23"
+          },
+          "explanation": [
+            "Vì **noncorrelated subquery** chạy hoàn tất trước khi truy vấn ngoài bắt đầu (`1` lần thực thi duy nhất cho phần trong), hiệu năng của nó thường tốt hơn correlated subquery trên bảng lớn.",
+            "Lưu ý nhỏ trên hình minh họa: cột `CUSTOMERID` ở bước 1 xuất hiện theo thứ tự `Order_T` (`1, 8, 15, 5, 3, 2, 11, 12, 4`), còn danh sách `CUSTOMERNAME` ở bước 2 trên slide được xếp theo `CustomerID` tăng dần (`1, 2, 3, 4, 5, 8, 11, 12, 15`) nên bạn đừng nhầm ID `8` ứng với `Value Furniture` (ID `8` thực chất là `California Classics`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "CORRELATED SUBQUERY EXAMPLE",
+          "bullets": [
+            "Show all orders that include furniture finished in natural ash."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT DISTINCT OrderID FROM OrderLine_T\nWHERE EXISTS\n    (SELECT *\n     FROM Product _T\n         WHERE ProductID = OrderLine_T.ProductID\n         AND Productfinish = 'Natural Ash');"
+          },
+          "paragraphs": [
+            "The EXISTS operator will return a TRUE value if the subquery resulted in a non-empty set, otherwise it returns a FALSE",
+            "The subquery is testing for a value that comes from the outer query",
+            "➔ A correlated subquery always refers to an attribute from a table referenced in the outer query"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 24"
+          },
+          "explanation": [
+            "Đặc điểm nhận dạng **Correlated Subquery**: bên trong truy vấn con `Product_T` có điều kiện `WHERE ProductID = OrderLine_T.ProductID` — đây chính là cột `OrderLine_T.ProductID` lấy từ bảng của truy vấn ngoài!",
+            "Toán tử `EXISTS` không quan tâm truy vấn con trả về giá trị cột gì (nên hay viết `SELECT *` hoặc `SELECT 1`), mà chỉ kiểm tra xem tập kết quả có **ít nhất 1 dòng** hay không (khác rỗng → `TRUE`, rỗng → `FALSE`). Lưu ý trong code slide có dấu cách nhỏ ở `Product _T`, khi gõ thực tế phải viết liền `Product_T`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Figure 7-8b Processing a correlated subquery",
+          "paragraphs": [
+            "What are the order IDs for all orders that have included furniture finished in natural ash?",
+            "Subquery refers to outer-query data, so executes once for each row of outer query",
+            "Note: Only the orders that involve products with Natural Ash will be included in the final results.",
+            "1. The first order ID is selected from OrderLine_T: OrderID =1001.",
+            "2. The subquery is evaluated to see if any product in that order has a natural ash finish. Product 2 does, and is part of the order. EXISTS is valued as true and the order ID is added to the result table.",
+            "3. The next order ID is selected from OrderLine_T: OrderID =1002.",
+            "4. The subquery is evaluated to see if the product ordered has a natural ash finish. It does. EXISTS is valued as true and the order ID is added to the result table.",
+            "5. Processing continues through each order ID. Orders 1004, 1005, and 1010 are not included in the result table because they do not include any furniture with a natural ash finish. The final result table is shown in the text on page 302."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT DISTINCT OrderID FROM OrderLine_T\nWHERE EXISTS\n    (SELECT *\n     FROM Product _T\n         WHERE ProductID = OrderLine_T.ProductID\n         AND Productfinish = 'Natural Ash');"
+          },
+          "diagramText": [
+            "OrderLine_T (ảnh thu nhỏ góc trên phải): (1001, 1, [?cần kiểm tra: 2 hoặc 1]), (1001, 2, 2), (1001, 4, 1), (1002, 3, 5), (1003, 3, 3), (1004, 6, 2), (1004, 8, 2), (1005, 4, 4), (1006, 4, 1), (1006, 5, 2), (1006, 7, 2), (1007, 1, 3), (1007, 2, 2), (1008, 3, 3), (1008, 8, 3), (1009, 4, 2), (1009, 7, 3), (1010, 8, 10)",
+            "Dấu vết kiểm tra từng bước: 1) OrderID=1001 có ProductID=2 → tra sang Product_T thấy Coffee Table (Natural Ash) → EXISTS=TRUE; 3–4) OrderID=1002 có ProductID=3 → Computer Desk (Natural Ash) → EXISTS=TRUE."
+          ],
+          "table": {
+            "caption": "Product_T (Figure 7-8b)",
+            "headers": [
+              "ProductID",
+              "ProductDescription",
+              "ProductFinish",
+              "ProductStandardPrice",
+              "ProductLineID"
+            ],
+            "rows": [
+              [
+                "1",
+                "End Table",
+                "Cherry",
+                "$175.00",
+                "10001"
+              ],
+              [
+                "2",
+                "Coffee Table",
+                "Natural Ash",
+                "$200.00",
+                "20001"
+              ],
+              [
+                "3",
+                "Computer Desk",
+                "Natural Ash",
+                "$375.00",
+                "20001"
+              ],
+              [
+                "4",
+                "Entertainment Center",
+                "Natural Maple",
+                "$650.00",
+                "30001"
+              ],
+              [
+                "5",
+                "Writer's Desk",
+                "Cherry",
+                "$325.00",
+                "10001"
+              ],
+              [
+                "6",
+                "8-Drawer Dresser",
+                "White Ash",
+                "$750.00",
+                "20001"
+              ],
+              [
+                "7",
+                "Dining Table",
+                "Natural Ash",
+                "$800.00",
+                "20001"
+              ],
+              [
+                "8",
+                "Computer Desk",
+                "Walnut",
+                "$250.00",
+                "30001"
+              ]
+            ]
+          },
+          "ocrNote": "Bảng OrderLine_T ở góc trên phải có kích thước rất nhỏ nên vài chữ số cột OrderedQuantity hơi mờ (như dòng đầu 1001, ProductID=1 [?cần kiểm tra]); các sản phẩm Natural Ash trong Product_T gồm ID 2, 3 và 7.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 25"
+          },
+          "explanation": [
+            "Luồng chạy ngược hoàn toàn so với Slide 23: thay vì chạy trong trước – ngoài sau, Correlated Subquery **bắt đầu từ bảng ngoài (`OrderLine_T`)**, lấy từng dòng và truyền `ProductID` vào cho truy vấn trong tra trên `Product_T` xem có phải `'Natural Ash'` (gồm ID 2, 3, 7) hay không.",
+            "Chú ý vì `OrderLine_T` có 18 dòng chi tiết đơn hàng nên nếu không có `SELECT DISTINCT OrderID`, cùng một `OrderID` có thể xuất hiện lặp lại; từ khóa `DISTINCT` bảo đảm mỗi `OrderID` thỏa điều kiện chỉ in ra đúng 1 lần (`1001, 1002, 1003, 1006, 1007, 1008, 1009`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "ANOTHER SUBQUERY EXAMPLE /(DERIVED TABLE)",
+          "bullets": [
+            "Show all products whose standard price is higher than the average price"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT ProductDescription, ProductStandardPrice, AvgPrice\n  FROM\n    (SELECT AVG(ProductStandardPrice) AvgPrice FROM Product_T),\n    Product_T\n  WHERE ProductStandardPrice > AvgPrice;"
+          },
+          "paragraphs": [
+            "Subquery forms the derived table used in the FROM clause of the outer query",
+            "One column of the subquery is an aggregate function that has an alias name. That alias can then be referred to in the outer query.",
+            "The WHERE clause normally cannot include aggregate functions, but because the aggregate is performed in the subquery its result can be used in the outer query’s WHERE clause."
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 26"
+          },
+          "explanation": [
+            "Giải pháp khéo léo để vượt qua hạn chế \"không được gọi hàm tổng hợp trực tiếp trong `WHERE`\": đặt `(SELECT AVG(ProductStandardPrice) AvgPrice FROM Product_T)` làm một **derived table** (bảng dẫn xuất gồm đúng 1 dòng × 1 cột `AvgPrice`) trong mệnh đề `FROM`, rồi nối với `Product_T`.",
+            "Lợi thế vượt trội của cách viết derived table này so với đặt subquery trong `WHERE`: cột `AvgPrice` có thể được **hiển thị luôn ở mệnh đề `SELECT`** bên cạnh giá từng sản phẩm (`ProductStandardPrice`), đồng thời tính `AVG(...)` chỉ 1 lần duy nhất! (Lưu ý trên MySQL/PostgreSQL, derived table trong `FROM` bắt buộc phải đặt thêm bí danh bảng phía sau ngoặc đóng, ví dụ `) AS AvgTable, Product_T`)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "UNION, Biểu thức điều kiện (CASE/NULLIF/COALESCE), View phức tạp & Tối ưu truy vấn",
+      "text": "Kết hợp tập kết quả bằng UNION, cú pháp biểu thức điều kiện CASE/NULLIF/COALESCE (Figure 7-10), truy vấn nhiều bước qua View và 14 nguyên tắc thiết kế/tối ưu truy vấn.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 27–35"
+      },
+      "digest": {
+        "keyPoints": [
+          "`UNION` gộp kết quả của nhiều câu `SELECT` thành một bảng kết quả duy nhất; yêu cầu bắt buộc là số lượng cột và kiểu dữ liệu tương ứng ở mọi câu `SELECT` phải giống nhau (union-compatible).",
+          "Biểu thức điều kiện `CASE WHEN ... THEN ... ELSE ... END` cùng `NULLIF` và `COALESCE` cho phép rẽ nhánh giá trị ngay trong truy vấn SQL.",
+          "Với các bài toán nhiều tầng tổng hợp (ví dụ tìm sản phẩm bán chạy nhất của từng nhân viên), tách bước đầu thành `CREATE VIEW` giúp câu truy vấn tiếp theo đơn giản như truy vấn bảng thường.",
+          "Nguyên tắc tối ưu truy vấn: không dùng `SELECT *`, hạn chế subquery lồng sâu và self-join khi không cần thiết, giữ thống kê optimizer mới nhất, dùng kiểu dữ liệu khớp nhau và tránh bắt DBMS sắp xếp trên cột không có index."
+        ],
+        "terms": [
+          {
+            "term": "UNION",
+            "meaning": "Toán tử kết hợp kết quả của hai hay nhiều câu SELECT có cùng số cột và kiểu dữ liệu tương thích thành một bảng kết quả."
+          },
+          {
+            "term": "CASE expression",
+            "meaning": "Biểu thức điều kiện trong SQL trả về giá trị tương ứng với nhánh WHEN thỏa điều kiện đầu tiên (hoặc nhánh ELSE)."
+          },
+          {
+            "term": "NULLIF / COALESCE",
+            "meaning": "NULLIF(a, b) trả về NULL nếu a = b (ngược lại trả về a); COALESCE(a, b, ...) trả về giá trị khác NULL đầu tiên trong danh sách."
+          }
+        ],
+        "pitfalls": [
+          "Trong truy vấn `UNION` (Slide 27–28), mệnh đề `ORDER BY 3` đặt ở **cuối cùng** (áp dụng sắp xếp chung cho toàn bộ tập hợp sau khi đã hợp nhất theo cột thứ 3 là `OrderedQuantity`), không đặt riêng lẻ trong từng nhánh trừ khi bọc ngoặc.",
+          "`UNION` mặc định loại bỏ dòng trùng lặp; nếu muốn giữ cả dòng trùng và chạy nhanh hơn vì không phải sort/dedup, dùng `UNION ALL`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "UNION QUERIES",
+          "bullets": [
+            "Combine the output (union of multiple queries) together into a single result table"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT C1.CustomerID, CustomerName, OrderedQuantity,\n'Largest Quantity' AS Quantity\nFROM Customer_T C1,Order_T O1, OrderLine_T Q1\n    WHERE C1.CustomerID = O1.CustomerID\n    AND O1.OrderID = Q1.OrderID\n    AND OrderedQuantity =\n    (SELECT MAX(OrderedQuantity)\n    FROM OrderLine_T)\nUNION\nSELECT C1.CustomerID, CustomerName, OrderedQuantity,\n'Smallest Quantity'\nFROM Customer_T C1, Order_T O1, OrderLine_T Q1\n    WHERE C1.CustomerID = O1.CustomerID\n    AND O1.OrderID = Q1.OrderID\n    AND OrderedQuantity =\n        (SELECT MIN(OrderedQuantity)\n        FROM OrderLine_T)\nORDER BY 3;"
+          },
+          "diagramText": [
+            "First query → Combine — UNION → Second query"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 27"
+          },
+          "explanation": [
+            "Truy vấn trên nối cùng lúc 2 kỹ thuật: dùng `MAX(OrderedQuantity)` và `MIN(OrderedQuantity)` trong subquery của hai nhánh `SELECT` riêng rẽ để tìm khách mua số lượng lớn nhất và nhỏ nhất, rồi dùng `UNION` hợp thành 1 bảng kết quả.",
+            "Chú ý hai chi tiết cú pháp rất hay ra đề thi: (1) Alias tiêu đề cột cho kết quả chung được đặt ở **câu SELECT đầu tiên** (`'Largest Quantity' AS Quantity`, còn nhánh 2 chỉ cần chuỗi `'Smallest Quantity'`); (2) `ORDER BY 3` sắp xếp kết quả hợp nhất theo **cột thứ 3** (`OrderedQuantity`) tăng dần mặc định."
+          ]
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "Figure 7-9 Combining queries using UNION",
+          "paragraphs": [
+            "1. In the above query, the subquery is processed first and an intermediate results table created. It contains the maximum quantity ordered from OrderLine_T and has a value of 10.",
+            "2. Next the main query selects customer information for the customer or customers who ordered 10 of any item. Contemporary Casuals has ordered 10 of some unspecified item.",
+            "1. In the second main query, the same process is followed but the result returned is for the minimum order quantity.",
+            "2. The results of the two queries are joined together using the UNION command.",
+            "3. The results are then ordered according to the value in OrderedQuantity. The default is ascending value, so the orders with the smallest quantity, 1, are listed first.",
+            "Note: With UNION queries, the quantity and data types of the attributes in the SELECT clauses of both queries must be identical."
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "SELECT C1.CustomerID, CustomerName, OrderedQuantity, 'Largest Quantity' AS Quantity\nFROM Customer_T C1,Order_T O1, OrderLine_T Q1\n    WHERE C1.CustomerID = O1.CustomerID\n    AND O1.OrderID = Q1.OrderID\n    AND OrderedQuantity =\n        (SELECT MAX(OrderedQuantity)\n        FROM OrderLine_T)\n\nSELECT C1.CustomerID, CustomerName, OrderedQuantity, 'Smallest Quantity'\nFROM Customer_T C1, Order_T O1, OrderLine_T Q1\n    WHERE C1.CustomerID = O1.CustomerID\n    AND O1.OrderID = Q1.OrderID\n    AND OrderedQuantity =\n        (SELECT MIN(OrderedQuantity)\n        FROM OrderLine_T)\nORDER BY 3;"
+          },
+          "table": {
+            "caption": "Result:",
+            "headers": [
+              "CUSTOMERID",
+              "CUSTOMERNAME",
+              "ORDEREDQUANTITY",
+              "QUANTITY"
+            ],
+            "rows": [
+              [
+                "1",
+                "Contemporary Casuals",
+                "1",
+                "Smallest Quantity"
+              ],
+              [
+                "2",
+                "Value Furniture",
+                "1",
+                "Smallest Quantity"
+              ],
+              [
+                "1",
+                "Contemporary Casuals",
+                "10",
+                "Largest Quantity"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 28"
+          },
+          "explanation": [
+            "Ghi nhớ quy tắc vàng của `UNION` trong khung Note bên phải: **số lượng cột và kiểu dữ liệu tương ứng của các cột trong mọi câu `SELECT` phải giống hệt nhau** (ví dụ cả hai đều có 4 cột: số – chuỗi – số – chuỗi).",
+            "Do `ORDER BY 3` sắp xếp tăng dần mặc định theo cột `ORDEREDQUANTITY`, các dòng có giá trị `1` (`Smallest Quantity`) nhảy lên đầu còn dòng `10` (`Largest Quantity`) xuống cuối — dù truy vấn `Largest` được viết ở nhánh trên!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "CONDITIONAL EXPRESSIONS USING CASE KEYWORD",
+          "paragraphs": [
+            "This is available with newer versions of SQL, previously not part of the standard",
+            "Figure 7-10"
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "-- Figure 7-10 Syntax\n{CASE expression\n {WHEN expression\n THEN {expression | NULL}} . . .\n | {WHEN predicate\n THEN {expression | NULL}} . . .\n [ELSE {expression NULL}]\n END }\n | ( NULLIF (expression, expression) }\n | ( COALESCE (expression . . .) }\n\n-- Example\nSELECT CASE\n    WHEN ProductLine = 1 THEN ProductDescription\n    ELSE '####'\nEND AS ProductDescription\nFROM Product_T;"
+          },
+          "table": {
+            "caption": "Result:",
+            "headers": [
+              "PRODUCTDESCRIPTION"
+            ],
+            "rows": [
+              [
+                "End Table"
+              ],
+              [
+                "####"
+              ],
+              [
+                "####"
+              ],
+              [
+                "####"
+              ],
+              [
+                "Writers Desk"
+              ],
+              [
+                "####"
+              ],
+              [
+                "####"
+              ],
+              [
+                "####"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 29"
+          },
+          "explanation": [
+            "Biểu thức `CASE` đóng vai trò như lệnh `IF-THEN-ELSE` ngay trong câu lệnh SQL (có 2 dạng: Simple `CASE col WHEN val THEN ...` và Searched `CASE WHEN condition THEN ...`). Nếu không viết `ELSE`, mọi trường hợp không khớp sẽ trả về `NULL`.",
+            "Figure 7-10 còn giới thiệu hai hàm điều kiện chuẩn ANSI rất hữu ích: `NULLIF(e1, e2)` (trả về `NULL` nếu `e1 = e2`, tránh chia cho 0 bằng `NULLIF(x, 0)`) và `COALESCE(e1, e2, ...)` (trả về giá trị đầu tiên khác `NULL`, thường dùng thay `NULL` bằng 0 hoặc `'N/A'`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "MORE COMPLICATED SQL QUERIES",
+          "bullets": [
+            "Production databases contain hundreds or even thousands of tables, and tables could include hundreds of columns.",
+            "So, sometimes query requirements can be very complex.",
+            "Sometimes it’s useful to combine queries, through the use of Views.",
+            "If you use a view (which is a query), you could have another query that uses the view as if it were a table."
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 30"
+          },
+          "explanation": [
+            "Đặt vấn đề thực tế: trong CSDL doanh nghiệp có hàng trăm/nghìn bảng, việc nhồi toàn bộ logic join + `GROUP BY` + lồng nhiều cấp subquery vào một câu `SELECT` khổng lồ rất dễ sai và khó bảo trì.",
+            "Giải pháp phân tầng (modularization) bằng **View**: đóng gói phần join và tổng hợp trung gian thành một `VIEW` có tên rõ ràng, rồi truy vấn lớp ngoài đọc từ View đó hệt như đọc một bảng bình thường."
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "EXAMPLE OF QUERY USING A VIEW",
+          "code": {
+            "lang": "sql",
+            "text": "CREATE VIEW TSales AS\nSELECT SalespersonName,\n       ProductDescription,\n       SUM(OrderedQuantity) AS Totorders\nFROM Salesperson_T, OrderLine_T, Product_T, Order_T\n     WHERE Salesperson_T.SalespersonID=Order_T.SalespersonID\n     AND Order_T.OrderID=OrderLine_T.OrderID\n     AND OrderLine_T.ProductID=Product_T.ProductID\n     GROUP BY SalespersonName, ProductDescription;\n\nSELECT SalespersonName, ProductDescription\n       FROM TSales AS A\n            WHERE Totorders = (SELECT MAX(Totorders) FROM TSales B\n            WHERE B.SalesperssonName = A.SalespersonName);"
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 31"
+          },
+          "explanation": [
+            "Đây là mẫu bài toán cực hay gặp (**Top-1 per group**: tìm sản phẩm có tổng số lượng đặt cao nhất *cho từng* nhân viên bán hàng): Bước 1 tạo View `TSales` tính sẵn `SUM(OrderedQuantity) AS Totorders` theo cặp `(SalespersonName, ProductDescription)`; Bước 2 dùng **Correlated Subquery** trên chính View `TSales` (`A` đối chiếu với `B`) để tìm `MAX(Totorders)` riêng cho từng `SalespersonName`.",
+            "⚠️ Chú ý lỗi chính tả trên slide gốc: ở dòng cuối `B.SalesperssonName` bị dư 1 chữ `s` (tên cột đúng trong `TSales` là `SalespersonName`) — nhớ sửa chính xác khi chạy code!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "TIPS FOR DEVELOPING QUERIES",
+          "bullets": [
+            "Be familiar with the data model (entities and relationships)",
+            "Understand the desired results",
+            "Know the attributes desired in results",
+            "Identify the entities that contain desired attributes",
+            "Review ERD",
+            "Construct a WHERE equality for each link",
+            "Fine tune with GROUP BY and HAVING clauses if needed",
+            "Consider the effect on unusual data"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 32"
+          },
+          "explanation": [
+            "Quy trình 8 bước có hệ thống để không viết sót khi gặp đề thi truy vấn phức tạp: đọc hiểu ERD trước → xác định bảng chứa các cột output → lần theo các đường nối PK–FK giữa những bảng đó (kể cả bảng trung gian không in cột nào ra kết quả!) → cuối cùng mới tinh chỉnh `GROUP BY` / `HAVING`.",
+            "Chú ý mẹo số 8 (\"Consider the effect on unusual data\"): luôn tự hỏi dữ liệu có `NULL`, có khách hàng chưa đặt đơn, hoặc có hai dòng đồng hạng nhất (`MAX`) không để chọn đúng `LEFT JOIN`, `COALESCE`, hoặc `IN` thay vì `=`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "QUERY EFFICIENCY CONSIDERATIONS",
+          "bullets": [
+            "Instead of SELECT *, identify the specific attributes in the SELECT clause; this helps reduce network traffic of result set",
+            "Limit the number of subqueries; try to make everything done in a single query if possible",
+            "If data is to be used many times, make a separate query and store it as a view"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 33"
+          },
+          "explanation": [
+            "Ba quy tắc hiệu năng cốt lõi khi viết SQL trong ứng dụng thực tế: (1) Tránh `SELECT *` để không kéo dư cột BLOB/chuỗi dài qua mạng gây nghẽn băng thông và bỏ lỡ cơ hội dùng covering index; (2) Giảm lồng ghép nhiều subquery khi một phép Join phẳng làm tốt hơn; (3) Tái sử dụng logic truy vấn lặp lại qua `VIEW`.",
+            "Liên hệ với Chương 8: giảm lượng dữ liệu trả về từ DB server sang application/client chính là chìa khóa giảm độ trễ mạng trong kiến trúc client/server."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "GUIDELINES FOR BETTER QUERY DESIGN",
+          "bullets": [
+            "Understand how indexes are used in query processing",
+            "Keep optimizer statistics up-to-date",
+            "Use compatible data types for fields and literals",
+            "Write simple queries",
+            "Break complex queries into multiple simple parts",
+            "Don’t nest one query inside another query",
+            "Don’t combine a query with itself (if possible avoid self-joins)"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 34"
+          },
+          "explanation": [
+            "Tại sao phải **\"Use compatible data types for fields and literals\"**? Nếu cột `CustomerID` là `INT` mà bạn viết `WHERE CustomerID = '10'` (chuỗi), hoặc ngược lại, DBMS có thể phải ép kiểu ngầm (implicit type conversion) trên từng dòng và **vô hiệu hóa Index** khiến truy vấn quét toàn bảng (Full Table Scan).",
+            "Các nguyên tắc \"Keep optimizer statistics up-to-date\" và \"Understand how indexes are used\" liên kết trực tiếp với Chương 5 (Physical Database Design): Query Optimizer dựa vào thống kê phân bố dữ liệu (statistics/cardinality) để chọn kế hoạch thực thi dùng index hay scan."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "GUIDELINES FOR BETTER QUERY DESIGN (CONT.)",
+          "bullets": [
+            "Create temporary tables for groups of queries",
+            "Combine update operations",
+            "Retrieve only the data you need",
+            "Don’t have the DBMS sort without an index",
+            "Learn!",
+            "Consider the total query processing time for ad hoc queries"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 35"
+          },
+          "explanation": [
+            "Tiếp tục 6 gợi ý thiết kế truy vấn tối ưu: gom nhiều thao tác cập nhật liên tiếp hoặc dùng bảng tạm (temporary tables) cho chuỗi nhiều báo cáo đọc cùng một tập dữ liệu trung gian, và tránh bắt DBMS `ORDER BY` / `DISTINCT` trên tập dữ liệu lớn mà không có index hỗ trợ.",
+            "Lưu ý ý cuối về **ad hoc queries** (truy vấn đột xuất viết một lần): đôi khi thời gian bạn bỏ ra ngồi tối ưu cực sâu một câu SQL chỉ chạy đúng 1 lần còn lớn hơn tổng thời gian chạy bình thường của nó — cần cân nhắc tổng chi phí (thời gian viết + thời gian máy chạy)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Transaction Integrity, Data Dictionary, Routines, Triggers, Embedded & Dynamic SQL",
+      "text": "Đảm bảo toàn vẹn giao dịch (BEGIN TRANSACTION, COMMIT, ROLLBACK), hệ thống Data Dictionary (Oracle 12c & SQL Server 2014), phân biệt Functions/Procedures/Triggers (SQL:2008 & SQL:2011), so sánh cú pháp các hãng (Table 7-2) và Embedded vs Dynamic SQL.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 36–45"
+      },
+      "digest": {
+        "keyPoints": [
+          "Transaction là đơn vị công việc rời rạc phải hoàn thành trọn vẹn toàn bộ hoặc hủy bỏ hoàn toàn (`BEGIN`/`END TRANSACTION`, `COMMIT` ghi vĩnh viễn, `ROLLBACK` hủy mọi thay đổi từ lần `COMMIT` gần nhất).",
+          "Data Dictionary lưu metadata hệ thống (ví dụ Oracle 12c có `DBA_TABLES`, `DBA_CONSTRAINTS`, `DBA_USERS`; SQL Server 2014 có `sys.columns`, `sys.indexes`, `sys.foreign_key_columns`); user thường chỉ xem được chứ không tự `UPDATE` trực tiếp.",
+          "Phân biệt Routines (Functions trả giá trị & nhận tham số vào; Procedures không trả giá trị theo kiểu biểu thức, nhận IN/OUT và gọi tường minh bằng `EXEC`/`CALL`) với Triggers (chạy ngầm/tự động theo sự kiện `INSERT`/`UPDATE`/`DELETE` hoặc DDL như `DROP_TABLE`/`ALTER_TABLE`).",
+          "Embedded SQL nhúng mã SQL cố định lúc biên dịch vào ngôn ngữ chủ (C, Java), còn Dynamic SQL sinh và thực thi câu SQL linh hoạt lúc ứng dụng đang chạy."
+        ],
+        "terms": [
+          {
+            "term": "Transaction",
+            "meaning": "Đơn vị công việc rời rạc phải được xử lý trọn vẹn toàn bộ hoặc không xử lý gì cả (COMMIT làm vĩnh viễn; ROLLBACK hủy bỏ)."
+          },
+          {
+            "term": "Data Dictionary",
+            "meaning": "Các bảng hệ thống lưu trữ metadata mô tả bảng, cột, chỉ mục, ràng buộc và người dùng."
+          },
+          {
+            "term": "Stored Procedure vs Function",
+            "meaning": "Function là routine trả về giá trị và nhận input parameters; Procedure không trả về giá trị như hàm biểu thức, nhận IN/OUT parameters và gọi tường minh."
+          },
+          {
+            "term": "Trigger",
+            "meaning": "Routine hướng sự kiện (event-driven), tự động thực thi ngầm khi xảy ra sự kiện DML (INSERT, UPDATE, DELETE) hoặc DDL."
+          },
+          {
+            "term": "Embedded SQL vs Dynamic SQL",
+            "meaning": "Embedded SQL nhúng cố định câu lệnh SQL trong mã nguồn ngôn ngữ chủ (C, Java); Dynamic SQL sinh câu lệnh SQL ngay lúc runtime."
+          }
+        ],
+        "pitfalls": [
+          "Cú pháp Stored Procedure khác nhau rất rõ giữa các DBMS (Table 7-2): SQL Server/Sybase dùng `@param` và gán `SELECT @param = 1`; Oracle dùng `IN OUT`, dấu gán `:=`, kết thúc khối có `END IF;`; IBM/SQL:1999 dùng `SET param = 1;` và `MODIFIES SQL DATA`.",
+          "Đừng nhầm thời điểm kích hoạt Trigger: ngoài `BEFORE` / `AFTER` trên bảng (cho DML), còn có `INSTEAD OF` (hay dùng trên View) và Database-level DDL triggers (`FOR DROP_TABLE, ALTER_TABLE`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "ENSURING TRANSACTION INTEGRITY",
+          "bullets": [
+            {
+              "text": "Transaction = A discrete unit of work that must be completely processed or not processed at all",
+              "subBullets": [
+                "May involve multiple updates",
+                "If any update fails, then all other updates must be cancelled"
+              ]
+            },
+            {
+              "text": "SQL commands for transactions",
+              "subBullets": [
+                "BEGIN TRANSACTION/END TRANSACTION — Marks boundaries of a transaction",
+                "COMMIT — Makes all updates permanent",
+                "ROLLBACK — Cancels updates since the last COMMIT"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 36"
+          },
+          "explanation": [
+            "Khái niệm nền tảng của tính chất **Atomicity (Nguyên tử)** trong giao dịch (ACID): ví dụ chuyển tiền hoặc tạo đơn hàng gồm 1 lệnh `INSERT` vào `Order_T` và 3 lệnh `INSERT` vào `OrderLine_T` phải cùng thành công hoặc cùng hủy bỏ để tránh hóa đơn mồ côi không có mặt hàng.",
+            "Cần thuộc chính xác công dụng của 3 nhóm lệnh: `BEGIN`/`END TRANSACTION` đánh dấu ranh giới giao dịch, `COMMIT` chốt lưu vĩnh viễn vào đĩa, còn `ROLLBACK` hoàn tác toàn bộ thay đổi kể từ lần `COMMIT` gần nhất."
+          ]
+        },
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "Figure 7-12 An SQL Transaction sequence (in pseudocode)",
+          "code": {
+            "lang": "sql",
+            "text": "BEGIN transaction\n\n  INSERT OrderID, Orderdate, CustomerID into Order_T;\n\n  INSERT OrderID, ProductID, OrderedQuantity into OrderLine_T;\n  INSERT OrderID, ProductID, OrderedQuantity into OrderLine_T;\n  INSERT OrderID, ProductID, OrderedQuantity into OrderLine_T;\n\nEND transaction"
+          },
+          "diagramText": [
+            "Nhánh thành công: Valid information inserted. → COMMIT work. → All changes to data are made permanent.",
+            "Nhánh lỗi: Invalid ProductID entered. → Transaction will be ABORTED. ROLLBACK all changes made to Order_T. → All changes made to Order_T and OrderLine_T are removed. Database state is just as it was before the transaction began."
+          ],
+          "diagramNote": "Hình 7-12 vẽ sơ đồ hai kịch bản của cùng một Transaction thêm 1 đơn hàng mới vào Order_T và 3 dòng sản phẩm vào OrderLine_T: nếu cả 4 lệnh INSERT hợp lệ thì COMMIT giữ dữ liệu vĩnh viễn; nếu một dòng trong OrderLine_T nhập sai ProductID (vi phạm khóa ngoại), toàn bộ giao dịch bị ABORT và ROLLBACK xóa sạch cả bản ghi đã chèn trước đó ở Order_T.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 37"
+          },
+          "explanation": [
+            "Điểm quan trọng của kịch bản lỗi trên Hình 7-12: lệnh đầu tiên chèn vào `Order_T` đã chạy qua thành công rồi mới gặp lỗi `Invalid ProductID` ở một lệnh chèn `OrderLine_T` phía sau.",
+            "Nếu không bọc trong một `Transaction`, bản ghi ở `Order_T` và các dòng `OrderLine_T` trước đó sẽ kẹt lại thành **dữ liệu rác không nhất quán**; nhờ `ROLLBACK`, CSDL quay về trạng thái nguyên vẹn hệt như trước khi `BEGIN transaction`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "DATA DICTIONARY FACILITIES",
+          "bullets": [
+            "System tables that store metadata",
+            "Users usually can view some of these tables",
+            "Users are restricted from updating them",
+            {
+              "text": "Some examples in Oracle 12c",
+              "subBullets": [
+                "DBA_TABLES – descriptions of tables",
+                "DBA_CONSTRAINTS – description of constraints",
+                "DBA_USERS – information about the users of the system"
+              ]
+            },
+            {
+              "text": "Examples in Microsoft SQL Server 2014",
+              "subBullets": [
+                "sys.columns – table and column definitions",
+                "sys.indexes – table index information",
+                "sys.foreign_key_columns – details about columns in foreign key constraints"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 38"
+          },
+          "explanation": [
+            "**Data Dictionary** (hoặc System Catalog) là nơi DBMS tự quản lý toàn bộ **metadata** (cấu trúc bảng, cột, khóa, index, tài khoản). Người dùng chỉ được phép đọc (theo quyền) bằng lệnh `SELECT`, tuyệt đối bị cấm `UPDATE`/`DELETE` trực tiếp để không làm hỏng cấu trúc CSDL.",
+            "Cần nhớ cặp ví dụ phân biệt hai hệ lớn cho đề trắc nghiệm: **Oracle 12c** dùng tiền tố `DBA_*` (`DBA_TABLES`, `DBA_CONSTRAINTS`, `DBA_USERS`), còn **SQL Server 2014** dùng schema `sys.*` (`sys.columns`, `sys.indexes`, `sys.foreign_key_columns`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "ROUTINES AND TRIGGERS",
+          "bullets": [
+            {
+              "text": "Routines",
+              "subBullets": [
+                "Program modules that execute on demand"
+              ]
+            },
+            "Functions–routines that return values and take input parameters",
+            "Procedures–routines that do not return values and can take input or output parameters",
+            "Triggers–routines that execute in response to a database event (INSERT, UPDATE, or DELETE)"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 39"
+          },
+          "explanation": [
+            "So sánh bộ ba khái niệm lập trình phía CSDL: **Function**, **Procedure** và **Trigger**.",
+            "Điểm phân biệt trọng tâm hay thi: (1) **Function** trả về một giá trị (có thể nhúng trực tiếp trong `SELECT`, `WHERE`) và chỉ nhận tham số đầu vào; (2) **Procedure** không trả về giá trị kiểu biểu thức, nhận được cả tham số `IN`, `OUT`, `IN OUT` và thực hiện loạt thao tác phức tạp; (3) **Trigger** không do người dùng gọi tay mà tự động kích hoạt khi có sự kiện dữ liệu (`INSERT`, `UPDATE`, `DELETE`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "Figure7-13 Triggers contrasted with stored procedures (based on Mullins 1995)",
+          "diagramText": [
+            "ROUTINE (Procedures are called explicitly): Call Procedure_name (parameter_value:) [Explicit execution] → Stored Procedure [code] ↔ Database (returns value or performs routine)",
+            "TRIGGER (Triggers are event-driven): Insert / Update / Delete [Implicit execution] → Trigger [code] ↔ Database (performs trigger action)",
+            "Source: adapted from Mullins, 1995."
+          ],
+          "diagramNote": "Hình 7-13 đối chiếu trực diện cơ chế thực thi: phía trên, Stored Procedure chạy tường minh (Explicit execution) khi có lệnh Call Procedure_name(...); phía dưới, Trigger chạy ngầm theo sự kiện (Implicit execution / event-driven) mỗi khi có thao tác Insert, Update hoặc Delete tác động lên Database.",
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 40"
+          },
+          "explanation": [
+            "Hai cặp từ khóa đối lập cần nhớ chắc trên Hình 7-13: Stored Procedure là **Explicit execution** (chủ động gọi tường minh bằng `EXEC` / `CALL`), còn Trigger là **Implicit execution / event-driven** (kích hoạt ngầm tự động theo sự kiện).",
+            "Ứng dụng thực tế: Stored Procedure dùng cho các tác vụ nghiệp vụ định kỳ/theo yêu cầu (ví dụ tính giảm giá toàn danh mục sản phẩm), còn Trigger dùng để ghi nhật ký kiểm toán (audit log) hoặc ép các ràng buộc nghiệp vụ phức tạp mà `CHECK` không làm nổi mỗi khi dữ liệu thay đổi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 41",
+          "pageNumber": 41,
+          "title": "Figure 7-14 Simplified trigger syntax, SQL:2008",
+          "code": {
+            "lang": "sql",
+            "text": "-- Simplified trigger syntax, SQL:2008\nCREATE TRIGGER trigger_name\n    {BEFORE | AFTER | INSTEAD OF} {INSERT | DELETE | UPDATE} ON\n    table_name\n    [FOR EACH {ROW | STATEMENT}] [WHEN (search condition)]\n    <triggered SQL statement here>;\n\n-- Example DML Trigger\nCREATE TRIGGER StandardPriceUpdate\nAFTER UPDATE OF ProductStandardPrice ON Product_T\nFOR EACH ROW\nINSERT INTO PriceUpdates_T VALUES (ProductDescription, SYSDATE,\nProductStandardPrice);\n\n-- Example DDL Trigger\nCREATE TRIGGER safety\nON DATABASE\nFOR DROP_TABLE, ALTER_TABLE\nAS\n    PRINT 'You must disable Trigger \"safety\" to drop or alter tables!'\n    ROLLBACK;"
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 41"
+          },
+          "explanation": [
+            "Giải mã các thành phần của cú pháp Trigger chuẩn SQL:2008: thời điểm (`BEFORE`, `AFTER`, hoặc `INSTEAD OF` — thường dùng cho View), sự kiện (`INSERT`, `DELETE`, `UPDATE`), phạm vi (`FOR EACH ROW` chạy cho từng dòng bị tác động vs `FOR EACH STATEMENT` chạy 1 lần cho cả câu lệnh).",
+            "Slide minh họa hai loại Trigger rất thực tế: **DML Trigger** (`StandardPriceUpdate`) tự động ghi lịch sử giá vào `PriceUpdates_T` mỗi khi đơn giá sản phẩm bị cập nhật (lưu ý tùy hệ DBMS thực tế như Oracle/MySQL cần dùng `:NEW.ProductStandardPrice` / `NEW.ProductStandardPrice`), và **DDL Trigger** (`safety` trong SQL Server) chặn thao tác `DROP_TABLE`/`ALTER_TABLE` nhầm trên toàn CSDL bằng lệnh `ROLLBACK;`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 42",
+          "pageNumber": 42,
+          "title": "Figure 7-15 Syntax for creating a routine, SQL:2011",
+          "code": {
+            "lang": "sql",
+            "text": "-- Syntax for creating a routine, SQL:2011\n{CREATE PROCEDURE | CREATE FUNCTION} routine_name\n([parameter [{,parameter} . . .]])\n[RETURNS data_type result_cast]  /* for functions only */\n[LANGUAGE {ADA|C|COBOL|FORTRAN|MUMPS|PASCAL|PLI|SQL}]\n[PARAMETER STYLE {SQL|GENERAL}]\n[SPECIFIC specific_name]\n[DETERMINISTIC|NOT DETERMINISTIC]\n[NO SQL|CONTAINS SQL|READS SQL DATA|MODIFIES SQL DATA]\n[RETURNS NULL ON NULL INPUT |CALLED ON NULL INPUT]\n[DYNAMIC RESULT SETS unsigned_integer] /* for procedures only */\n[STATIC DISPATCH]                     /* for functions only */\n[NEW SAVEPOINT LEVEL | OLD SAVEPOINT LEVEL]\nroutine_body\n\n-- Example stored procedure\nCREATE OR REPLACE PROCEDURE ProductLineSale\n  AS BEGIN\n    UPDATE Product_T\n      SET SalePrice =.90 * ProductStandardPrice\n      WHERE ProductStandardPrice > = 400;\n    UPDATE Product_T\n      SET SalePrice =.85 * ProductStandardPrice\n      WHERE ProductStandardPrice < 400;\nEND;\n\n-- Calling the procedure\nSQL > EXEC ProductLineSale"
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 42"
+          },
+          "explanation": [
+            "Xem chú thích trong cú pháp chuẩn SQL:2011 để nhớ ranh giới Procedure vs Function: mệnh đề `RETURNS data_type` và `STATIC DISPATCH` chỉ dành riêng cho **Function** (`/* for functions only */`), còn `DYNAMIC RESULT SETS` chỉ dành riêng cho **Procedure** (`/* for procedures only */`).",
+            "Trong ví dụ `ProductLineSale` (theo cú pháp Oracle PL/SQL), 2 câu lệnh `UPDATE` đặt cùng trong một khối `BEGIN ... END;` và được gọi thực thi tường minh bằng lệnh `EXEC ProductLineSale`. Chú ý trên ảnh slide có dấu cách giữa `>` và `=` (`> = 400`); khi gõ code thật bắt buộc phải viết liền `>=`!"
+          ]
+        },
+        {
+          "slideNumber": "Slide 43",
+          "pageNumber": 43,
+          "title": "TABLE 7-2 Comparison of Vendor Syntax Differences in Stored Procedures",
+          "paragraphs": [
+            "The vendors’ syntaxes differ in stored procedures more than in ordinary SQL. For an illustration, here is a chart that shows what CREATE PROCEDURE looks like in three dialects. We use one line for each significant part, so you can compare dialects by reading across the line.",
+            "Source: Data from SQL Performance Tuning (Gulutzan and Pelzer, Addison-Wesley, 2002). Viewed at www.tdan.com/i023fe03.htm, June 6, 2007 (no longer available from this site)."
+          ],
+          "table": {
+            "caption": "TABLE 7-2 Comparison of Vendor Syntax Differences in Stored Procedures",
+            "headers": [
+              "SQL:1999/IBM",
+              "MICROSOFT/SYBASE",
+              "ORACLE"
+            ],
+            "rows": [
+              [
+                "CREATE PROCEDURE",
+                "CREATE PROCEDURE",
+                "CREATE PROCEDURE"
+              ],
+              [
+                "Sp_proc1",
+                "Sp_proc1",
+                "Sp_proc1"
+              ],
+              [
+                "(param1 INT)",
+                "@param1 INT",
+                "(param1 IN OUT INT)"
+              ],
+              [
+                "MODIFIES SQL DATA BEGIN DECLARE num1 INT;",
+                "AS DECLARE @num1 INT",
+                "AS num1 INT; BEGIN"
+              ],
+              [
+                "IF param1 <> 0",
+                "IF @param1 <> 0",
+                "IF param1 <> 0"
+              ],
+              [
+                "THEN SET param1 = 1;",
+                "SELECT @param1 = 1;",
+                "THEN param1 :=1;"
+              ],
+              [
+                "END IF",
+                "",
+                "END IF;"
+              ],
+              [
+                "UPDATE Table1 SET column1 = param1;",
+                "UPDATE Table1 SET column1 = @param1",
+                "UPDATE Table1 SET column1 = param1;"
+              ],
+              [
+                "END",
+                "",
+                "END"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 43"
+          },
+          "explanation": [
+            "Bảng 7-2 giải thích trực tiếp nhược điểm lớn nhất của Stored Procedure (được nhắc lại ở Chương 8): **\"Proprietary, so algorithms are not portable\"** (cú pháp đặc thù theo từng hãng, không mang nguyên sang DBMS khác chạy được).",
+            "Mẹo nhận diện 3 phương ngữ (dialects) khi đọc đề: **Microsoft/Sybase (T-SQL)** luôn có ký tự `@` trước tên biến/tham số (`@param1`, `@num1`) và không cần `THEN`/`END IF` cho câu lệnh đơn; **Oracle (PL/SQL)** dùng cặp dấu gán `:=`, khai báo `IN OUT` và `AS ... BEGIN ... END`; còn **SQL:1999/IBM** dùng `MODIFIES SQL DATA`, `DECLARE` bên trong `BEGIN` và gán bằng `SET`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 44",
+          "pageNumber": 44,
+          "title": "EMBEDDED AND DYNAMIC SQL",
+          "bullets": [
+            {
+              "text": "Embedded SQL",
+              "subBullets": [
+                "Including hard-coded SQL statements in a program written in another language such as C or Java"
+              ]
+            },
+            {
+              "text": "Dynamic SQL",
+              "subBullets": [
+                "Ability for an application program to generate SQL code on the fly, as the application is running"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 44"
+          },
+          "explanation": [
+            "**Embedded SQL** nhúng tĩnh (hard-code) các câu lệnh SQL trực tiếp vào mã nguồn của ngôn ngữ chủ (host language như C, Java, COBOL) trước khi biên dịch — ưu điểm là biết trước truy vấn nên tối ưu/kiểm tra cú pháp sớm, nhưng kém linh hoạt khi điều kiện tìm kiếm thay đổi tùy biến theo người dùng.",
+            "**Dynamic SQL** tạo chuỗi câu lệnh SQL ngay trong lúc chương trình đang chạy (on the fly, runtime) — cực kỳ linh hoạt cho form tìm kiếm nâng cao/báo cáo tùy biến, nhưng phải cảnh giác lỗi bảo mật **SQL Injection** nếu ghép thẳng chuỗi nhập từ người dùng mà không dùng parameterized query / prepared statement."
+          ]
+        },
+        {
+          "slideNumber": "Slide 45",
+          "pageNumber": 45,
+          "title": "Copyright Notice Slide (Trang 45/45)",
+          "paragraphs": [
+            "This work is protected by United States copyright laws and is provided solely for the use of instructors in teaching their courses and assessing student learning. Dissemination or sale of any part of this work (including on the World Wide Web) will destroy the integrity of the work and is not permitted. The work and materials from it should never be made available to students except by instructors using the accompanying text in their classes. All recipients of this work are expected to abide by these restrictions and to honor the intended pedagogical purposes and the needs of other instructors who rely on these materials.",
+            "Chapter 7 — Copyright © 2016 Pearson Education, Inc. — 7-45"
+          ],
+          "source": {
+            "file": "Chapter 07.pdf",
+            "loc": "Slide 45"
+          },
+          "explanation": [
+            "Trang cuối cùng (45/45) của tệp `Chapter 07.pdf` là thông báo bản quyền tiêu chuẩn từ nhà xuất bản Pearson Education.",
+            "Toàn bộ nội dung kiến thức Chương 7 (Advanced SQL) đã khép lại trọn vẹn ở Slide 44."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch07-c01", "front": "Equi-join, natural join, outer join khác nhau thế nào?", "back": "Equi-join giữ cột trùng hai lần; natural join bỏ một cột trùng; outer join giữ thêm hàng không khớp (NULL).", "source": { "file": "Chapter 07.pdf", "loc": "Slides 3–16" } },
-    { "id": "dbs-ch07-c02", "front": "Correlated subquery khác noncorrelated?", "back": "Correlated tham chiếu bảng của truy vấn ngoài và chạy một lần cho mỗi hàng ngoài (thường EXISTS); noncorrelated chạy một lần trước truy vấn ngoài.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 22–25" } },
-    { "id": "dbs-ch07-c03", "front": "Điều kiện để dùng UNION?", "back": "Các SELECT phải có cùng số cột và kiểu dữ liệu tương thích.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 27–28" } },
-    { "id": "dbs-ch07-c04", "front": "Trigger khác stored procedure?", "back": "Trigger chạy tự động theo sự kiện DML/DDL; stored procedure được gọi tường minh (EXEC/CALL).", "source": { "file": "Chapter 07.pdf", "loc": "Slides 39–43" } },
-    { "id": "dbs-ch07-c05", "front": "COMMIT và ROLLBACK?", "back": "COMMIT làm mọi cập nhật trong transaction thành vĩnh viễn; ROLLBACK hủy cập nhật kể từ COMMIT cuối.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 36–37" } },
-    { "id": "dbs-ch07-c06", "front": "Vì sao dùng derived table trong FROM?", "back": "Vì WHERE không chứa trực tiếp hàm tổng hợp; derived table cho phép dùng kết quả tổng hợp (ví dụ AVG) trong WHERE của truy vấn ngoài.", "source": { "file": "Chapter 07.pdf", "loc": "Slide 26" } }
+    {
+      "id": "dbs-ch07-c01",
+      "front": "Equi-join, natural join, outer join khác nhau thế nào?",
+      "back": "Equi-join giữ cột trùng hai lần trong kết quả; Natural join là equi-join loại bỏ một cột trùng; Outer join (LEFT/RIGHT/FULL) giữ thêm cả các hàng không có giá trị khớp ở bảng kia (điền NULL).",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 3–12"
+      }
+    },
+    {
+      "id": "dbs-ch07-c02",
+      "front": "Correlated subquery khác noncorrelated subquery thế nào?",
+      "back": "Noncorrelated không phụ thuộc truy vấn ngoài và chỉ chạy 1 lần hoàn tất trước truy vấn ngoài. Correlated tham chiếu cột của bảng ở truy vấn ngoài nên thực thi 1 lần cho mỗi hàng của truy vấn ngoài (thường dùng EXISTS).",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 22–25"
+      }
+    },
+    {
+      "id": "dbs-ch07-c03",
+      "front": "Điều kiện để dùng toán tử UNION trong SQL?",
+      "back": "Các câu SELECT kết hợp phải có cùng số lượng cột và kiểu dữ liệu tương ứng giống nhau (union-compatible). Tên cột lấy theo SELECT đầu tiên; ORDER BY đặt ở cuối cùng.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 27–28"
+      }
+    },
+    {
+      "id": "dbs-ch07-c04",
+      "front": "Trigger khác Stored Procedure như thế nào?",
+      "back": "Stored procedure được gọi tường minh (explicit execution bằng EXEC/CALL) và có thể nhận tham số IN/OUT. Trigger là routine hướng sự kiện, chạy ngầm tự động (implicit execution) khi xảy ra INSERT/UPDATE/DELETE hoặc DDL.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 39–42"
+      }
+    },
+    {
+      "id": "dbs-ch07-c05",
+      "front": "COMMIT và ROLLBACK trong Transaction làm gì?",
+      "back": "Transaction là đơn vị công việc phải hoàn tất toàn bộ hoặc hủy bỏ hoàn toàn (BEGIN/END TRANSACTION). COMMIT ghi vĩnh viễn mọi cập nhật; ROLLBACK hủy mọi thay đổi kể từ lần COMMIT gần nhất.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 36–37"
+      }
+    },
+    {
+      "id": "dbs-ch07-c06",
+      "front": "Vì sao dùng Derived Table trong mệnh đề FROM?",
+      "back": "Vì WHERE không thể chứa trực tiếp hàm tổng hợp (như AVG); đặt subquery tính AVG(...) AS AvgPrice trong FROM tạo derived table giúp dùng và hiển thị giá trị tổng hợp đó ở WHERE và SELECT của truy vấn ngoài.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 26"
+      }
+    },
+    {
+      "id": "dbs-ch07-c07",
+      "front": "Nối N bảng cần bao nhiêu điều kiện ghép khóa? Self-join dùng cho quan hệ nào?",
+      "back": "Nối N bảng yêu cầu N − 1 điều kiện nối bằng ghép PK với FK. Self-join nối một bảng với chính nó bằng 2 table aliases (như E và M), dùng cho quan hệ một ngôi (unary relationship).",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 13–16"
+      }
+    },
+    {
+      "id": "dbs-ch07-c08",
+      "front": "Toán tử EXISTS hoạt động ra sao trong Correlated Subquery?",
+      "back": "EXISTS trả về TRUE nếu subquery trả về tập kết quả khác rỗng (có ít nhất 1 dòng), ngược lại trả về FALSE — thường dùng với SELECT * để kiểm tra sự tồn tại bản ghi khớp ở truy vấn con.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 22, 24–25"
+      }
+    },
+    {
+      "id": "dbs-ch07-c09",
+      "front": "Cú pháp CASE, NULLIF và COALESCE (Figure 7-10)?",
+      "back": "CASE WHEN điều_kiện THEN kq ELSE mặc_định END thực hiện rẽ nhánh điều kiện; NULLIF(a, b) trả về NULL nếu a = b; COALESCE(a, b, ...) trả về biểu thức đầu tiên khác NULL.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "dbs-ch07-c10",
+      "front": "Stored Function khác Stored Procedure ở những điểm nào (Slide 39 & 42)?",
+      "back": "Function trả về giá trị (mệnh đề RETURNS data_type) và chỉ nhận input parameters; Procedure không trả giá trị theo kiểu biểu thức, nhận được input và output parameters, hỗ trợ DYNAMIC RESULT SETS.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 39, 42"
+      }
+    },
+    {
+      "id": "dbs-ch07-c11",
+      "front": "Data Dictionary là gì? Ví dụ bảng hệ thống trong Oracle 12c vs SQL Server 2014?",
+      "back": "Data Dictionary là các bảng hệ thống lưu metadata (người dùng xem được nhưng bị hạn chế cập nhật). Oracle 12c: DBA_TABLES, DBA_CONSTRAINTS, DBA_USERS. SQL Server 2014: sys.columns, sys.indexes, sys.foreign_key_columns.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 38"
+      }
+    },
+    {
+      "id": "dbs-ch07-c12",
+      "front": "Cách nhận biết cú pháp Stored Procedure của SQL:1999/IBM, Microsoft/Sybase và Oracle?",
+      "back": "Microsoft/Sybase: biến/tham số có dấu @ (`@param1`) và gán `SELECT @param1 = 1`. Oracle: dùng `IN OUT`, dấu gán `:=`, `END IF;`. SQL:1999/IBM: `MODIFIES SQL DATA`, `DECLARE` trong `BEGIN`, gán `SET param1 = 1`.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 43"
+      }
+    },
+    {
+      "id": "dbs-ch07-c13",
+      "front": "Embedded SQL và Dynamic SQL khác nhau thế nào?",
+      "back": "Embedded SQL nhúng cố định (hard-coded) câu lệnh SQL vào mã nguồn ngôn ngữ khác (như C, Java). Dynamic SQL cho phép ứng dụng tự sinh mã SQL linh hoạt ngay lúc chạy (on the fly / runtime).",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 44"
+      }
+    },
+    {
+      "id": "dbs-ch07-c14",
+      "front": "Các nguyên tắc chính để thiết kế truy vấn SQL hiệu quả (Slides 33–35)?",
+      "back": "Chỉ định rõ cột thay vì SELECT *, hạn chế lồng subquery và tránh self-join nếu có thể, lưu truy vấn lặp lại thành View/bảng tạm, cập nhật optimizer statistics, dùng kiểu dữ liệu tương thích và không sort khi thiếu index.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 33–35"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch07-q01", "stem": "Nối 4 bảng bằng điều kiện bằng cần tối thiểu bao nhiêu điều kiện join?", "options": ["2", "3", "4", "5"], "answer": 1, "explanation": "N bảng cần N−1 điều kiện join.", "source": { "file": "Chapter 07.pdf", "loc": "Slide 13" } },
-    { "id": "dbs-ch07-q02", "stem": "Loại subquery nào thực thi một lần cho mỗi hàng của truy vấn ngoài?", "options": ["Noncorrelated", "Correlated", "Derived table", "Scalar luôn luôn"], "answer": 1, "explanation": "Correlated subquery tham chiếu truy vấn ngoài nên chạy lặp theo từng hàng.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 22, 24–25" } },
-    { "id": "dbs-ch07-q03", "stem": "Routine chạy ngầm khi có INSERT/UPDATE/DELETE gọi là gì?", "options": ["Function", "Stored procedure", "Trigger", "View"], "answer": 2, "explanation": "Trigger là routine hướng sự kiện, thực thi implicitly.", "source": { "file": "Chapter 07.pdf", "loc": "Slides 39–43" } }
+    {
+      "id": "dbs-ch07-q01",
+      "stem": "Nối 4 bảng (`Customer_T`, `Order_T`, `OrderLine_T`, `Product_T`) bằng điều kiện bằng cần tối thiểu bao nhiêu điều kiện join khóa chính – khóa ngoại?",
+      "options": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "answer": 1,
+      "explanation": "Slide 13: Nối N bảng cần N − 1 điều kiện bằng trong WHERE (hoặc ON) khớp PK với FK, nên 4 bảng cần 3 điều kiện nối.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "dbs-ch07-q02",
+      "stem": "Loại subquery nào tham chiếu thuộc tính của truy vấn ngoài và thực thi lặp lại một lần cho mỗi hàng của truy vấn ngoài?",
+      "options": [
+        "Noncorrelated subquery",
+        "Correlated subquery",
+        "Derived table không tham chiếu ngoài",
+        "UNION subquery"
+      ],
+      "answer": 1,
+      "explanation": "Slides 22, 24–25: Correlated subquery sử dụng dữ liệu từ truy vấn ngoài và thực thi một lần cho mỗi hàng của truy vấn ngoài.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 22, 24–25"
+      }
+    },
+    {
+      "id": "dbs-ch07-q03",
+      "stem": "Routine chạy ngầm tự động (implicit execution) khi xảy ra sự kiện INSERT, UPDATE hoặc DELETE gọi là gì?",
+      "options": [
+        "Function",
+        "Stored procedure",
+        "Trigger",
+        "View"
+      ],
+      "answer": 2,
+      "explanation": "Slides 39–40 (Figure 7-13): Trigger là routine hướng sự kiện (event-driven), thực thi ngầm (implicit) khi có INSERT/UPDATE/DELETE.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 39–40"
+      }
+    },
+    {
+      "id": "dbs-ch07-q04",
+      "stem": "Sự khác biệt chính giữa Equi-join (Slide 8) và Natural join (Slide 3) là gì?",
+      "options": [
+        "Equi-join không dùng điều kiện bằng, còn Natural join dùng > hoặc <",
+        "Equi-join giữ cột chung xuất hiện lặp lại hai lần trong kết quả, còn Natural join loại bỏ bớt một cột trùng",
+        "Equi-join giữ cả hàng không khớp, còn Natural join loại bỏ hàng không khớp",
+        "Natural join luôn trả về nhiều hàng hơn Equi-join"
+      ],
+      "answer": 1,
+      "explanation": "Slide 3: Cả hai đều nối theo điều kiện bằng trên cột chung, nhưng trong Natural join một trong các cột trùng lặp được loại bỏ khỏi bảng kết quả.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-ch07-q05",
+      "stem": "Dựa trên dữ liệu mẫu Figure 7-1 (15 khách hàng trong Customer_T, 10 đơn hàng trong Order_T thuộc về 9 khách hàng), truy vấn `Customer_T LEFT OUTER JOIN Order_T` trên Slide 11–12 trả về bao nhiêu hàng?",
+      "options": [
+        "9 hàng",
+        "10 hàng",
+        "15 hàng",
+        "16 hàng"
+      ],
+      "answer": 3,
+      "explanation": "Slide 12: Trả về 16 hàng gồm 10 dòng khớp đơn hàng (khách ID 1 có 2 đơn) cộng 6 khách hàng chưa có đơn hàng nào (ORDERID để trống).",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 7, 11–12"
+      }
+    },
+    {
+      "id": "dbs-ch07-q06",
+      "stem": "Tại sao Self-join (Slide 15–16) bắt buộc phải sử dụng bí danh bảng (table aliases như `Employee_T E, Employee_T M`)?",
+      "options": [
+        "Vì tự nối bảng đòi hỏi ít nhất 2 cột khóa chính",
+        "Vì cùng một bảng được dùng ở cả hai vế phép nối nên cần alias để phân biệt vai trò cột (nhân viên vs quản lý)",
+        "Vì SQL cấm dùng mệnh đề WHERE khi không có alias",
+        "Vì table alias làm phép nối tự động thành OUTER JOIN"
+      ],
+      "answer": 1,
+      "explanation": "Slide 15: \"The same table is used on both sides of the join; distinguished using table aliases\" — thường dùng trên bảng có quan hệ unary.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 15–16"
+      }
+    },
+    {
+      "id": "dbs-ch07-q07",
+      "stem": "Nếu một transaction (Figure 7-12) chèn thành công 1 dòng vào `Order_T` nhưng lệnh thứ 3 chèn vào `OrderLine_T` gặp `ProductID` không hợp lệ, hành động đúng để đảm bảo toàn vẹn giao dịch là gì?",
+      "options": [
+        "Chỉ hủy lệnh thứ 3 và giữ nguyên dòng đã thêm vào Order_T",
+        "Thực hiện ABORT và ROLLBACK để hủy bỏ toàn bộ thay đổi ở cả Order_T và OrderLine_T",
+        "Chạy COMMIT trước rồi sửa lại ProductID sau",
+        "Xóa toàn bộ bảng Order_T bằng DROP TABLE"
+      ],
+      "answer": 1,
+      "explanation": "Slides 36–37 (Figure 7-12): Giao dịch là một khối trọn vẹn; nếu bất kỳ cập nhật nào lỗi thì ROLLBACK sẽ xóa bỏ toàn bộ thay đổi trên cả Order_T và OrderLine_T.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 36–37"
+      }
+    },
+    {
+      "id": "dbs-ch07-q08",
+      "stem": "Điều kiện bắt buộc để kết hợp hai truy vấn bằng toán tử `UNION` (Slide 28) là gì?",
+      "options": [
+        "Hai truy vấn phải đọc từ cùng một bảng gốc duy nhất",
+        "Số lượng cột và kiểu dữ liệu của các thuộc tính trong mệnh đề SELECT ở cả hai truy vấn phải giống nhau",
+        "Cả hai truy vấn đều phải chứa hàm MAX hoặc MIN",
+        "Không được sử dụng mệnh đề ORDER BY"
+      ],
+      "answer": 1,
+      "explanation": "Slide 28 (Figure 7-9): \"With UNION queries, the quantity and data types of the attributes in the SELECT clauses of both queries must be identical.\"",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slides 27–28"
+      }
+    },
+    {
+      "id": "dbs-ch07-q09",
+      "stem": "Trong Table 7-2 so sánh cú pháp Stored Procedure của các hãng, phương ngữ nào sử dụng tiền tố `@` cho biến/tham số (`@param1`, `@num1`) và gán giá trị bằng `SELECT @param1 = 1;`?",
+      "options": [
+        "SQL:1999 / IBM",
+        "Oracle",
+        "Microsoft / Sybase",
+        "ANSI SQL:2011 bắt buộc cho mọi hãng"
+      ],
+      "answer": 2,
+      "explanation": "Slide 43 (Table 7-2): Cột MICROSOFT/SYBASE dùng `@param1 INT`, `AS DECLARE @num1 INT`, `SELECT @param1 = 1;`.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 43"
+      }
+    },
+    {
+      "id": "dbs-ch07-q10",
+      "stem": "Sự khác biệt giữa Embedded SQL và Dynamic SQL (Slide 44) là gì?",
+      "options": [
+        "Embedded SQL chỉ chạy trên Oracle, Dynamic SQL chỉ chạy trên MySQL",
+        "Embedded SQL nhúng cố định (hard-coded) trong mã nguồn ngôn ngữ chủ, còn Dynamic SQL được ứng dụng tự sinh ra lúc đang chạy (on the fly)",
+        "Embedded SQL không cần DBMS, Dynamic SQL cần DBMS",
+        "Dynamic SQL chỉ chạy được ở bên trong Trigger"
+      ],
+      "answer": 1,
+      "explanation": "Slide 44: Embedded SQL nhúng cứng câu SQL trong chương trình viết bằng ngôn ngữ khác (C, Java); Dynamic SQL sinh câu SQL ngay trong lúc ứng dụng đang chạy.",
+      "source": {
+        "file": "Chapter 07.pdf",
+        "loc": "Slide 44"
+      }
+    }
   ]
 }

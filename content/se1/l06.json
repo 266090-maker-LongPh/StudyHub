@@ -1,24 +1,1353 @@
 {
-  "id": "se1-l06", "order": 5,
+  "id": "se1-l06",
+  "order": 5,
   "title": "Lecture 6: Software Development Life Cycle",
-  "summary": [
-    { "h": "Program, software, software engineering", "text": "Software gồm chương trình và mọi tài liệu, dữ liệu cấu hình liên quan. Software engineering là ngành kỹ thuật liên quan mọi khía cạnh sản xuất phần mềm từ ý tưởng tới vận hành và bảo trì (gồm quản lý dự án: rủi ro, chất lượng, tiến độ, ngân sách)." },
-    { "h": "4 hoạt động của software process", "text": "1) Specification (requirements engineering): xác định dịch vụ yêu cầu và ràng buộc; có user requirements và system requirements; 3 hoạt động: elicitation & analysis, specification, validation. 2) Development: design (architectural, database, interface, component selection and design) và programming/debugging. 3) Validation (V&V): Verification = 'Are we building the product right?'; Validation = 'Are we building the right product?'; 3 giai đoạn test: component, system (gồm integration), customer (gồm beta test). 4) Evolution: sửa đổi sau bàn giao." },
-    { "h": "Mô hình quy trình", "text": "Waterfall (5 pha) chỉ phù hợp hệ nhúng, hệ critical, hệ lớn nhiều công ty. Incremental dùng khi yêu cầu ban đầu khá rõ. Evolutionary (prototyping, spiral) dùng khi lõi sản phẩm rõ nhưng chi tiết chưa định. Prototyping có nhược điểm hy sinh chất lượng tổng thể/khả năng bảo trì. Spiral kết hợp tính lặp của prototyping với tính hệ thống của waterfall; ưu: giảm rủi ro; nhược: khó ước lượng thời gian, cần đánh giá rủi ro ở mọi giai đoạn." },
-    { "h": "Agile", "text": "4 giá trị Agile Manifesto: con người và tương tác hơn quy trình và công cụ; phần mềm chạy được hơn tài liệu đầy đủ; hợp tác với khách hàng hơn đàm phán hợp đồng; đáp ứng thay đổi hơn bám kế hoạch. 5 nguyên tắc: customer involvement, embrace change, incremental delivery, maintain simplicity, people not process. Cách tiếp cận: Scrum, Lean, Kanban, XP. Project management triangle: Scope–Time–Cost, Quality ở giữa." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 6.pdf",
+    "totalPages": 34,
+    "extractedPages": 34,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 6.pdf có đúng 34 trang (Slides 1–34, nhiều hơn ước tính ban đầu 30 trang), đầy đủ text layer và sơ đồ quy trình.",
+      "Slide 12: Slide gốc viết tách từ 'relation ships' (giữ nguyên văn).",
+      "Slide 21: Slide gốc viết '...partner companies. where several companies...' với chữ w viết thường sau dấu chấm (giữ nguyên văn).",
+      "Slides 24–25: Slide gốc viết 'does not have detailed of requirements' (Slide 24) và 'haven\\'t', 'Developer don’t have time to analysis' (Slide 25), giữ nguyên văn."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 6.pdf",
+      "loc": "Slides 1–34 (đầy đủ 34/34 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 6.pdf", "loc": "Slides 1–34" }],
+  "summary": [
+    {
+      "h": "Giới thiệu, Program vs Software & Kỹ nghệ phần mềm",
+      "text": "Giới thiệu bài giảng Lecture 6, dàn ý, tài liệu tham khảo (Sommerville, Pressman & Maxim), phân biệt Program vs Software, và định nghĩa Software Engineering như một ngành kỹ thuật bao trùm cả quy trình kỹ thuật lẫn quản lý dự án.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 1–5"
+      },
+      "digest": {
+        "keyPoints": [
+          "Program chỉ là chương trình chạy được trên máy tính/điện thoại/thiết bị; Software gồm cả chương trình lẫn tài liệu và dữ liệu cấu hình đi kèm.",
+          "Software development là hoạt động chuyên nghiệp phát triển phần mềm cho mục đích kinh doanh (cho một khách hàng cụ thể hoặc thị trường chung).",
+          "Software engineering hỗ trợ phát triển phần mềm chuyên nghiệp, quan tâm tới mọi khía cạnh sản xuất phần mềm từ khái niệm ban đầu đến vận hành và bảo trì — bao gồm cả quản lý dự án (rủi ro, chất lượng, tiến độ, ngân sách)."
+        ],
+        "terms": [
+          {
+            "term": "Software",
+            "meaning": "Chương trình máy tính cùng toàn bộ tài liệu (documentation) và dữ liệu cấu hình (configuration data) liên quan."
+          },
+          {
+            "term": "Software Engineering",
+            "meaning": "Ngành kỹ thuật (engineering discipline) quan tâm đến mọi khía cạnh sản xuất phần mềm từ ý tưởng ban đầu đến vận hành và bảo trì."
+          },
+          {
+            "term": "Software Process",
+            "meaning": "Cách tiếp cận có hệ thống được dùng trong kỹ nghệ phần mềm — chuỗi hoạt động dẫn tới sản phẩm phần mềm."
+          }
+        ],
+        "pitfalls": [
+          "Đừng đồng nhất Software Engineering với mỗi việc viết code: slide nhấn mạnh nó bao gồm cả software project management (risks, quality, schedule, budget).",
+          "Phân biệt Program (chỉ bản thân mã chạy trên máy) với Software (program + documentation + configuration data)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 6: Software development life cycle",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 6",
+            "Software development life cycle"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide mở đầu môn 61FIT3SE1 - Software Engineering 1, giới thiệu chủ đề Lecture 6 là Vòng đời phát triển phần mềm (Software development life cycle — SDLC).",
+            "Nội dung bài này chuyển trọng tâm từ kỹ thuật lập trình OOP/JUnit ở các bài đầu sang bức tranh quy trình kỹ nghệ phần mềm và các mô hình vòng đời phát triển."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Outline",
+          "bullets": [
+            "Software development",
+            "Software process models"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Bài giảng chia thành 2 phần chính: (1) Khái niệm phát triển phần mềm và các hoạt động cốt lõi trong quy trình phần mềm; (2) Các mô hình quy trình phần mềm (SDLC models).",
+            "Hiểu phần 1 giúp nắm 'làm gì' (4 hoạt động nền tảng), còn phần 2 trả lời 'sắp xếp thứ tự và lặp các hoạt động đó như thế nào' cho từng loại dự án."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "References",
+          "bullets": [
+            "Sommerville, Software Engineering, part 1",
+            "Roger S. Pressman, Bruce R. Maxim, Software engineering: a practitioners approach, part 1"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Hai giáo trình gốc của bài giảng đều nằm ở Part 1 của Ian Sommerville và Roger S. Pressman / Bruce R. Maxim.",
+            "Cấu trúc 4 hoạt động quy trình và Waterfall/Incremental đi theo Sommerville, trong khi các sơ đồ Prototyping/Spiral và định nghĩa Agile lấy thêm từ Pressman."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "A program vs A software",
+          "bullets": [
+            "A program: A program can run in computer, phone or machine.",
+            "A software: Computer programs and all associated documentation and configuration data. Software products may be developed for a particular customer or may be developed for a general market.",
+            "Software development: A professional activity in which software is developed for business purposes"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "Slide phân biệt rõ 3 khái niệm: A program chỉ là chương trình thực thi được trên máy tính, điện thoại hay thiết bị; còn A software rộng hơn vì bao gồm cả mã chương trình, tài liệu đi kèm và dữ liệu cấu hình.",
+            "Sản phẩm phần mềm có 2 thị trường đích: làm riêng cho một khách hàng cụ thể (customized/bespoke) hoặc làm sản phẩm đóng gói bán ra thị trường chung (generic market).",
+            "Software development được định nghĩa là hoạt động nghề nghiệp chuyên nghiệp phục vụ mục đích kinh doanh (khác với viết code bài tập nhỏ lẻ)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "Software Engineering",
+          "bullets": [
+            {
+              "text": "Software engineering:",
+              "subBullets": [
+                "is intended to support professional software development",
+                "is an engineering discipline that is concerned with all aspects of software production from initial conception to operation and maintenance."
+              ]
+            },
+            {
+              "text": "All aspects of software production:",
+              "subBullets": [
+                "Not just the technical processes of software development. It also includes software project management: risks, quality, schedule and budget."
+              ]
+            },
+            "The systematic approach that is used in software engineering is called a software process."
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Software engineering không chỉ là lập trình mà là một ngành kỹ thuật bao phủ toàn bộ vòng đời sản xuất phần mềm: từ lúc hình thành ý tưởng ban đầu cho đến khi vận hành và bảo trì.",
+            "Cụm từ 'All aspects of software production' nhấn mạnh hai mảng song hành: quy trình kỹ thuật (làm ra phần mềm) và quản lý dự án phần mềm (quản lý rủi ro, chất lượng, tiến độ và ngân sách).",
+            "Cách tiếp cận có hệ thống mà Software Engineering sử dụng để tổ chức công việc được gọi là Software Process (quy trình phần mềm)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Quy trình phần mềm & Quá trình đặc tả (Software Specification)",
+      "text": "Trình bày 4 hoạt động nền tảng của mọi quy trình phần mềm và đi sâu vào hoạt động đầu tiên: Software Specification (Requirements Engineering) với 3 bước elicitation & analysis, specification, validation.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 6–9"
+      },
+      "digest": {
+        "keyPoints": [
+          "Mọi software process đều gồm 4 hoạt động cơ bản: Software specification, Software development, Software validation và Software evolution.",
+          "Software specification (requirements engineering) xác định dịch vụ hệ thống cần cung cấp và ràng buộc vận hành/phát triển, tạo tài liệu yêu cầu ở 2 mức: mức cao cho người dùng/khách hàng và mức chi tiết cho lập trình viên.",
+          "Quy trình requirements engineering có 3 hoạt động chính tương tác lặp qua lại: Requirements elicitation and analysis → Requirements specification → Requirements validation."
+        ],
+        "terms": [
+          {
+            "term": "Software Specification (Requirements Engineering)",
+            "meaning": "Quá trình hiểu và định nghĩa các dịch vụ cần có từ hệ thống cùng các ràng buộc khi vận hành và phát triển."
+          },
+          {
+            "term": "Requirements Elicitation and Analysis",
+            "meaning": "Khảo sát hệ thống hiện có, trao đổi với người dùng/bên đặt hàng, phân tích tác vụ để rút ra yêu cầu hệ thống."
+          },
+          {
+            "term": "Requirements Validation",
+            "meaning": "Kiểm tra các yêu cầu về tính thực tế (realism), nhất quán (consistency) và đầy đủ (completeness)."
+          }
+        ],
+        "pitfalls": [
+          "Nhớ đúng 2 mức độ chi tiết của Requirements Document: End-users/customers cần mô tả mức cao (high-level), còn system developers cần đặc tả hệ thống chi tiết hơn.",
+          "Trong sơ đồ Slide 9, luồng Requirements Engineering không đi thẳng một chiều mà có mũi tên phản hồi ngược từ Specification về Elicitation và từ Validation về Specification."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Software Process",
+          "bullets": [
+            "A software process is a sequence of activities that leads to the production of a software product.",
+            {
+              "text": "All software processes commonly consists of 4 fundamental activities:",
+              "subBullets": [
+                "Software specification: where customers and engineers define the software that is to be produced and the constraints on its operation",
+                "Software development: where the software is designed and programmed",
+                "Software validation: where the software is checked to ensure that it is what the customer requires",
+                "Software evolution: where the software is modified to reflect changing customer and market requirements."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Slide chốt 4 hoạt động nền tảng (fundamental activities) có mặt trong mọi quy trình phát triển phần mềm dù dùng mô hình Waterfall hay Agile: Specification, Development, Validation, Evolution.",
+            "Specification định nghĩa hệ thống cần làm gì và ràng buộc ra sao; Development biến đặc tả đó thành thiết kế và mã nguồn; Validation kiểm chứng sản phẩm đúng yêu cầu khách hàng; Evolution sửa đổi hệ thống khi nhu cầu thị trường/khách hàng thay đổi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Software Specification Process",
+          "bullets": [
+            "Software specification (or requirements engineering): the process of understanding and defining what services are required from the system and identifying the constraints on the system’s operation and development.",
+            {
+              "text": "Products:",
+              "subBullets": [
+                "an agreed requirements document that specifies a system satisfying stakeholder requirements.",
+                "Two levels of detail: End-users and customers need a high-level statement of the requirements; system developers need a more detailed system specification."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "Software specification (còn gọi là requirements engineering) giải quyết bài toán hiểu đúng nhu cầu dịch vụ và ràng buộc vận hành/phát triển trước khi thiết kế.",
+            "Sản phẩm đầu ra là một tài liệu yêu cầu đã được thống nhất (agreed requirements document) đáp ứng các bên liên quan (stakeholders).",
+            "Tài liệu này cần phục vụ 2 đối tượng với 2 độ chi tiết khác nhau: người dùng cuối và khách hàng đọc bản tóm tắt mức cao, còn đội ngũ phát triển cần bản đặc tả hệ thống chi tiết để xây dựng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Software Specification Process",
+          "paragraphs": [
+            "There are 3 main activities in the requirements engineering process:"
+          ],
+          "bullets": [
+            {
+              "text": "Requirements elicitation and analysis:",
+              "subBullets": [
+                "The process of deriving the system requirements through observation of existing systems, discussions with potential users and procurers, task analysis, and so on."
+              ]
+            },
+            {
+              "text": "Requirements specification:",
+              "subBullets": [
+                "The activity of translating the information gathered during requirements analysis into a document that defines a set of requirements (user requirements and system requirements)."
+              ]
+            },
+            {
+              "text": "Requirements validation:",
+              "subBullets": [
+                "This activity checks the requirements for realism, consistency, and completeness"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "Slide tách quy trình kỹ nghệ yêu cầu thành 3 hoạt động chính: (1) Elicitation & analysis — khơi gợi và phân tích qua quan sát hệ thống cũ, thảo luận người dùng/bên mua (procurers) và phân tích tác vụ.",
+            "(2) Requirements specification — chuyển hóa thông tin thu thập được thành văn bản gồm user requirements và system requirements.",
+            "(3) Requirements validation — rà soát tài liệu yêu cầu theo 3 tiêu chí được nêu trực tiếp trên slide: tính thực tế (realism), tính nhất quán (consistency) và tính đầy đủ (completeness)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Software Specification Process — The requirements engineering process",
+          "paragraphs": [
+            "The requirements engineering process"
+          ],
+          "diagramText": [
+            "Chuỗi hoạt động (hình bầu dục): Requirements elicitation and analysis → Requirements specification → Requirements validation",
+            "Vòng phản hồi (mũi tên ngược): Requirements specification → Requirements elicitation and analysis; Requirements validation → Requirements specification",
+            "Sản phẩm trung gian & đầu ra (hình chữ nhật):",
+            "  • Requirements elicitation and analysis → System descriptions → Requirements document",
+            "  • Requirements specification → User and system requirements → Requirements document",
+            "  • Requirements validation → Requirements document"
+          ],
+          "diagramNote": "Sơ đồ quy trình kỹ nghệ yêu cầu (Sommerville) thể hiện luồng lặp giữa 3 hoạt động chính cùng các tài liệu đầu ra hợp nhất vào Requirements document.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Sơ đồ trực quan hóa mối liên hệ giữa 3 hoạt động ở Slide 8 và sản phẩm tương ứng: Elicitation & analysis tạo System descriptions; Specification tạo User and system requirements; cả 3 cùng đổ vào tài liệu cuối là Requirements document.",
+            "Hai mũi tên phản hồi ngược (từ Specification về Elicitation và từ Validation về Specification) cho thấy nếu phát hiện thiếu sót hay mâu thuẫn khi viết hoặc kiểm tra yêu cầu, nhóm phải quay lại thu thập/chỉnh sửa ngay."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Phát triển (Design & Programming), Kiểm chứng & Tiến hóa phần mềm",
+      "text": "Chi tiết ba hoạt động tiếp theo của Software Process: Software Development (4 hoạt động thiết kế + lập trình/debug/version control), Software Validation (Verification vs Validation & 3 giai đoạn test) và Software Evolution.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 10–17"
+      },
+      "digest": {
+        "keyPoints": [
+          "Software development tạo hệ thống thực thi được cho khách hàng, gồm Software design (tài liệu thiết kế chi tiết) và Programming (viết code, debug lỗi, quản lý phiên bản).",
+          "Bốn hoạt động thiết kế tương tác chặt với nhau: Architectural design, Database design, Interface design, và Component selection and design.",
+          "Software validation (V&V) gồm Verification (kiểm tra khớp đặc tả functional & non-functional) và Validation (đảm bảo đáp ứng kỳ vọng khách hàng), kiểm thử qua 3 giai đoạn: Component testing → System testing (gồm integration testing) → Customer testing (gồm beta testing).",
+          "Software evolution (maintenance) là quá trình sửa đổi, cập nhật hệ thống sau khi bàn giao để thích ứng thay đổi yêu cầu và nhu cầu khách hàng."
+        ],
+        "terms": [
+          {
+            "term": "Debugging",
+            "meaning": "Quá trình tìm kiếm và sửa chữa lỗi (defects) trong chương trình do lập trình viên thực hiện."
+          },
+          {
+            "term": "Verification vs Validation",
+            "meaning": "Verification kiểm tra phần mềm khớp đặc tả yêu cầu đã nêu; Validation đảm bảo phần mềm đáp ứng kỳ vọng của khách hàng."
+          },
+          {
+            "term": "Beta testing",
+            "meaning": "Hình thức customer testing cho sản phẩm thương mại: phát hành hệ thống cho một nhóm khách hàng tiềm năng dùng thử và báo lỗi về nhà phát triển."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm Component selection and design chỉ là viết code component mới: bước đầu tiên của nó là tìm thành phần tái sử dụng (reusable components), không có mới thiết kế thành phần mới.",
+          "Thứ tự 3 giai đoạn kiểm thử trong Validation phải đúng: Component testing → System testing (tích hợp subsystem ở hệ lớn gọi là integration testing) → Customer testing."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "Software Development Process",
+          "bullets": [
+            "Software development is the process of developing an executable system for delivery to the customer.",
+            {
+              "text": "Software development involves activities of:",
+              "subBullets": [
+                "Software design",
+                "Programming"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "Nếu Specification tạo ra tài liệu yêu cầu thì Software Development có nhiệm vụ xây dựng một hệ thống thực thi được (executable system) để bàn giao cho khách hàng.",
+            "Hoạt động này gồm hai nhánh lớn nối tiếp và bổ trợ nhau: Software design (lên bản thiết kế) và Programming (hiện thực hóa bằng mã nguồn)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Software Design",
+          "bullets": [
+            "Software design is the process to create the description of the structure of the software to be implemented, the data models and structures used by the system, the interfaces between system components and the algorithms used",
+            "Products: detail design documents. It includes description of the system and design diagrams of interface, architecture, database, and so on."
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Software design tạo ra bản mô tả chi tiết cho 4 khía cạnh kỹ thuật trước/song song khi code: cấu trúc phần mềm, mô hình & cấu trúc dữ liệu, giao diện giữa các thành phần và các thuật toán sử dụng.",
+            "Đầu ra của giai đoạn này là bộ tài liệu thiết kế chi tiết (detail design documents) bao gồm cả phần mô tả văn bản lẫn các sơ đồ giao diện, kiến trúc, cơ sở dữ liệu..."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Software Design",
+          "paragraphs": [
+            "Four activities that may be part of the design process:"
+          ],
+          "bullets": [
+            {
+              "text": "Architectural design:",
+              "subBullets": [
+                "Identify the overall structure of the system, the sub systems, their relation ships, and how they are distributed"
+              ]
+            },
+            {
+              "text": "Database design:",
+              "subBullets": [
+                "Design the system data structures and how these are to be represented in a database"
+              ]
+            },
+            {
+              "text": "Interface design:",
+              "subBullets": [
+                "Define the interfaces between system components. This interface specification must be unambiguous"
+              ]
+            },
+            {
+              "text": "Component selection and design:",
+              "subBullets": [
+                "Search for reusable components and, if no suitable components are available, design new software components"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "Slide liệt kê 4 hoạt động thiết kế cốt lõi: Architectural design định hình cấu trúc tổng thể, các hệ thống con (subsystems) và cách phân bố chúng; Database design chuyển cấu trúc dữ liệu vào mô hình CSDL.",
+            "Interface design đặc tả giao diện giữa các thành phần sao cho không mơ hồ (unambiguous) để nhiều nhóm có thể code độc lập mà vẫn khớp nhau; Component selection and design ưu tiên tìm component tái sử dụng trước khi thiết kế mới."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Software Design — Design Inputs, Activities & Outputs",
+          "diagramText": [
+            "Design inputs: [Platform information] | [Software requirements] | [Data descriptions]",
+            "  ↓",
+            "Design activities (4 hình bầu dục liên kết hai chiều đầy đủ với nhau):",
+            "  Architectural design ↔ Interface design ↔ Component selection and design ↔ Database design (kèm liên kết chéo Architectural ↔ Component và Interface ↔ Database)",
+            "  ↓",
+            "Design outputs: [System architecture] | [Database design] | [Interface specification] | [Component descriptions]"
+          ],
+          "diagramNote": "Sơ đồ mô hình tổng quát quá trình thiết kế (Sommerville): 3 đầu vào đi qua 4 hoạt động thiết kế liên thông hai chiều để sinh 4 tài liệu thiết kế đầu ra.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Sơ đồ cho thấy quá trình thiết kế nhận 3 nguồn đầu vào: Platform information (nền tảng chạy), Software requirements (yêu cầu phần mềm) và Data descriptions (mô tả dữ liệu).",
+            "Điểm quan trọng của sơ đồ là các mũi tên hai chiều nối tất cả 4 hoạt động thiết kế với nhau (kể cả đường chéo): thay đổi kiến trúc có thể kéo theo sửa giao diện, chọn component hoặc cấu trúc CSDL."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Programming Activity",
+          "bullets": [
+            "Programming is an individual activity, and there is no general process that is usually followed",
+            "Normally, programmers carry out some testing of the code they have developed. Finding and fixing program defects is called debugging",
+            "When coding, you often work with version control system to keep track and manage changes to software code."
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "Khác với các pha trên mức hệ thống, lập trình (programming) mang tính cá nhân cao và không có một quy trình chuẩn cứng nhắc duy nhất cho mọi lập trình viên.",
+            "Trong lúc viết code, lập trình viên tự kiểm tra đoạn mã của mình (finding and fixing defects = debugging) và sử dụng hệ thống quản lý phiên bản (version control system như Git) để theo dõi thay đổi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Software Validation Process",
+          "bullets": [
+            "Software validation (verification and validation or V & V) is intended to show that a system both conforms to its specification and meets the expectations of the system customer.",
+            "Verification: Check that the software meets its stated functional and non-functional requirements (that is, the specification).",
+            "Validation: Ensure that the software meets consumer's expectations"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "Quy trình V&V (Verification and Validation) nhắm tới hai mục tiêu khác nhau: Verification kiểm tra phần mềm có làm đúng như bản đặc tả yêu cầu chức năng và phi chức năng hay không ('Are we building the product right?').",
+            "Validation đi xa hơn đặc tả giấy tờ, đảm bảo sản phẩm thực sự giải quyết đúng nhu cầu và kỳ vọng của khách hàng/người dùng ('Are we building the right product?')."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Software Validation Process",
+          "paragraphs": [
+            "The stages in the testing process:"
+          ],
+          "bullets": [
+            {
+              "text": "Component testing:",
+              "subBullets": [
+                "The components are tested by the people developing the system. Each component is tested independently, without other system components."
+              ]
+            },
+            {
+              "text": "System testing:",
+              "subBullets": [
+                "System components are integrated to create a complete system. Interactions between components and component interface will be tested.",
+                "For large systems, this may be an integration testing where components are integrated to form subsystems that are individually tested."
+              ]
+            },
+            {
+              "text": "Customer testing:",
+              "subBullets": [
+                "The system is tested by the system customer rather than with simulated test data.",
+                "When a system is to be marketed as a software product, a testing process called beta testing is often used. Beta testing involves delivering a system to a number of potential customers who agree to use that system. They report problems to the system developers."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "Quá trình kiểm thử đi từ nhỏ đến lớn qua 3 giai đoạn: (1) Component testing — chính đội phát triển test độc lập từng thành phần tách rời các thành phần khác.",
+            "(2) System testing — ghép các thành phần lại để test tương tác và giao diện giữa chúng; ở hệ thống lớn bước ghép từng phần thành subsystem được gọi là integration testing.",
+            "(3) Customer testing — khách hàng tự kiểm thử bằng dữ liệu thật thay vì dữ liệu mô phỏng; đối với phần mềm đóng gói bán ra thị trường thì hình thức phổ biến là beta testing."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Software Evolution process",
+          "bullets": [
+            "Software evolution (or software maintenance): the process of modifying and updating a software system after it has been delivered to the customer.",
+            "We can think of software engineering as an evolutionary process where software is continually changed over its lifetime in response to changing requirements and customer needs"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "Software evolution (hay software maintenance) bắt đầu sau khi phần mềm đã bàn giao cho khách hàng, bao gồm việc sửa đổi và cập nhật hệ thống đang chạy.",
+            "Do môi trường kinh doanh và yêu cầu luôn biến động, phần mềm hiện đại không kết thúc khi bàn giao mà tiến hóa liên tục suốt vòng đời của nó."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Mô hình SDLC, Waterfall Model & Incremental Process Model",
+      "text": "Giới thiệu khái niệm Software Development Life Cycle (SDLC / software process model), mô hình thác nước Waterfall Model (5 pha, điều kiện áp dụng) và mô hình tăng trưởng Incremental Process Model.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 18–22"
+      },
+      "digest": {
+        "keyPoints": [
+          "SDLC (software process model) là biểu diễn đơn giản hóa của quy trình phần mềm, sắp xếp 4 hoạt động cơ bản theo những cách khác nhau tùy loại hệ thống.",
+          "Waterfall Model gồm 5 pha tuần tự: Requirements analysis and definition → System and software design → Implementation and unit testing → Integration and system testing → Operation and maintenance; pha sau không nên bắt đầu khi pha trước chưa kết thúc và phê duyệt tài liệu.",
+          "Waterfall chỉ phù hợp cho: Embedded systems (phần cứng khó thay đổi), Critical systems (cần phân tích an toàn/bảo mật trên đặc tả đầy đủ) và Large software systems (nhiều công ty đối tác phát triển các subsystem độc lập).",
+          "Incremental Process Model dùng khi yêu cầu ban đầu đã khá rõ (reasonably well defined) nhưng cần sớm giao một tập chức năng giới hạn cho người dùng rồi mở rộng dần qua các bản phát hành (increment 1..n)."
+        ],
+        "terms": [
+          {
+            "term": "Software Development Life Cycle (SDLC)",
+            "meaning": "Biểu diễn đơn giản hóa của một quy trình phần mềm, định nghĩa luồng các hoạt động, hành động và tác vụ."
+          },
+          {
+            "term": "The Waterfall Model",
+            "meaning": "Mô hình quy trình được công bố đầu tiên, chia thành các pha tuần tự dựa trên tài liệu phê duyệt đầu ra mỗi pha."
+          },
+          {
+            "term": "Incremental Process Model",
+            "meaning": "Mô hình phát hành từng phần tăng dần: mỗi increment chạy đủ analysis → design → code → test → deployment để đưa sớm giá trị tới người dùng."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhớ nhầm Waterfall phù hợp cho mọi dự án lớn: thực tế Slide 21 chỉ rõ Waterfall chỉ thích hợp cho Embedded systems, Critical systems và Large software systems có nhiều công ty đối tác cần đặc tả hoàn chỉnh để chia việc.",
+          "Phân biệt điều kiện dùng Incremental (yêu cầu ban đầu 'reasonably well defined', chỉ cần giao sớm một phần rồi mở rộng dần) với Evolutionary (chi tiết và phần mở rộng 'have yet to be defined')."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Software Development Lifecycle",
+          "bullets": [
+            "A Software Development Life Cycle (sometimes called a software process model or SDLC model) is a simplified representation of a software process. It defines the flow of all activities, actions and tasks.",
+            "The four basic process activities of specification, development, validation, and evolution are organized differently in different software process models.",
+            {
+              "text": "General process models :",
+              "subBullets": [
+                "The Waterfall Model",
+                "Incremental Process Models",
+                "Evolutionary Process Models"
+              ]
+            },
+            "Different types of systems need different development processes"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "SDLC (hay software process model) không thêm hoạt động mới ngoài 4 hoạt động nền tảng ở Slide 6, mà là cách sắp xếp thứ tự, ranh giới và vòng lặp giữa chúng.",
+            "Bài giảng giới thiệu 3 nhóm mô hình quy trình tổng quát (Waterfall, Incremental, Evolutionary) cùng tiếp cận Agile ở các slide sau, nhấn mạnh nguyên tắc không có một mô hình tốt nhất cho mọi loại hệ thống."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "The Waterfall Model",
+          "paragraphs": [
+            "The first published model of the software development process.",
+            "Consist fundamental software development activities:",
+            "In principle, the result of each phase in the waterfall model is one or more documents that are approved. The following phase should not start until the previous phase has finished."
+          ],
+          "bullets": [
+            "Requirements analysis and definition",
+            "System and software design",
+            "Implementation and unit testing",
+            "Integration and system testing",
+            "Operation and maintenance"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Waterfall (Thác nước) là mô hình quy trình phần mềm đầu tiên được công bố, tổ chức theo 5 pha kế tiếp nhau từ phân tích yêu cầu đến vận hành và bảo trì.",
+            "Đặc trưng cứng của Waterfall là định hướng tài liệu (document-driven): cuối mỗi pha phải nghiệm thu và phê duyệt một hoặc nhiều tài liệu rồi mới được chuyển sang pha tiếp theo."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "The Waterfall Model — Diagram",
+          "diagramText": [
+            "Thứ tự thác đổ từ trên xuống: [Requirements definition] → [System and software design] → [Implementation and unit testing] → [Integration and system testing] → [Operation and maintenance]",
+            "Phản hồi ngược: Các mũi tên nối từ đường đáy quay ngược lên từng pha phía trên (Integration/Operation có thể đẩy ngược lại các pha thiết kế, cài đặt hoặc yêu cầu)"
+          ],
+          "diagramNote": "Sơ đồ thác nước 5 pha kinh điển của Sommerville kèm các đường phản hồi ngược lên các pha trước khi phát hiện sai sót ở giai đoạn sau.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 20"
+          },
+          "explanation": [
+            "Sơ đồ minh họa hình dáng 'thác đổ' khiến mô hình mang tên Waterfall: sản phẩm chảy từ pha trên xuống pha dưới qua 5 mốc.",
+            "Tuy nhiên các mũi tên quay ngược từ dưới lên nhắc rằng trên thực tế các pha vẫn chồng lấn và có thể phải quay lại sửa tài liệu pha trước khi gặp vấn đề ở bước tích hợp hay vận hành — điều này rất tốn kém."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "The Waterfall Model",
+          "paragraphs": [
+            "The waterfall model is only appropriate for some types of system:"
+          ],
+          "bullets": [
+            {
+              "text": "Embedded systems:",
+              "subBullets": [
+                "where the software has to interface with hardware systems. Because of the inflexibility of hardware, it takes time to change"
+              ]
+            },
+            {
+              "text": "Critical systems:",
+              "subBullets": [
+                "where there is a need for extensive safety and security analysis of the software specification and design. In these systems, the specification and design documents must be complete so that this analysis is possible."
+              ]
+            },
+            {
+              "text": "Large software systems:",
+              "subBullets": [
+                "Part of broader engineering systems developed by several partner companies. where several companies are involved, complete specifications may be needed to allow for the independent development of different subsystems"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 21"
+          },
+          "explanation": [
+            "Waterfall không phải mô hình lỗi thời hoàn toàn mà phù hợp nhất với 3 bối cảnh cần đặc tả chắc chắn từ đầu: hệ thống nhúng (giao tiếp phần cứng khó thay đổi nhanh), hệ thống trọng yếu an toàn/bảo mật (cần phân tích kỹ trên hồ sơ đặc tả-thiết kế hoàn chỉnh).",
+            "Bối cảnh thứ ba là hệ thống phần mềm lớn thuộc dự án kỹ thuật do nhiều công ty đối tác cùng làm: cần bộ đặc tả đầy đủ làm hợp đồng giao diện để các bên phát triển song song các hệ thống con độc lập."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "Incremental Process Model",
+          "paragraphs": [
+            "When initial software requirements are reasonably well defined and there is a need to provide a limited set of software functionality to users quickly and then refine and expand on that functionality in later software releases. In such cases, you can choose incremental process model."
+          ],
+          "diagramText": [
+            "Trục tung: Software Functionality and Features | Trục hoành: Project Calendar Time",
+            "Chú giải các hộp quy trình: analysis → design → code → test → Deployment (delivery, feedback)",
+            "increment # 1: analysis → design → code → test → Deployment (delivery, feedback) ⇒ delivery of 1st increment",
+            "increment # 2 (bắt đầu nối tiếp theo thời gian): analysis → design → code → test → Deployment ⇒ delivery of 2nd increment",
+            "... → increment # n: analysis → design → code → test → Deployment ⇒ delivery of nth increment"
+          ],
+          "diagramNote": "Biểu đồ mô hình tăng trưởng (Incremental Process Model, Pressman): mỗi increment đi qua đủ 5 bước (analysis, design, code, test, deployment) để giao dần từng gói tính năng theo trục thời gian.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 22"
+          },
+          "explanation": [
+            "Mô hình Incremental thích hợp khi yêu cầu ban đầu đã được xác định tương đối rõ ràng, nhưng khách hàng cần sớm có một phần chức năng thiết yếu dùng trước rồi mới tinh chỉnh và mở rộng ở các đợt phát hành sau.",
+            "Sơ đồ cho thấy mỗi increment như một vòng phát triển nhỏ hoàn chỉnh (analysis → design → code → test → deployment & feedback) và các increment giao hàng nối tiếp nhau dọc theo thời gian dự án."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Mô hình tiến hóa: Prototyping & The Spiral Model",
+      "text": "Phân tích nhóm Evolutionary Process Models khi lõi sản phẩm đã rõ nhưng chi tiết/mở rộng chưa xác định: hai đại diện là Prototyping (ưu/nhược điểm và vòng lặp nhanh) và The Spiral Model (kết hợp prototyping với tính hệ thống và quản trị rủi ro).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 23–27"
+      },
+      "digest": {
+        "keyPoints": [
+          "Evolutionary process models dùng khi cần tung sớm phiên bản giới hạn do áp lực kinh doanh; tập lõi sản phẩm đã rõ nhưng chi tiết sản phẩm hoặc phần mở rộng chưa xác định ('have yet to be defined').",
+          "Prototyping lặp nhanh: Communication → Quick plan → Modeling Quick design → Construction of prototype → Deployment Delivery & Feedback; giúp user thấy hệ thống thật và dev code ngay, nhưng dễ hy sinh chất lượng tổng thể/bảo trì và chọn nhầm OS/ngôn ngữ/thuật toán kém.",
+          "Spiral Model kết hợp tính lặp của prototyping với tính có kiểm soát, hệ thống của waterfall qua 5 vùng: Communication, Planning (estimation, scheduling, risk analysis), Modeling (analysis, design), Construction (code, test), Deployment (delivery, feedback).",
+          "Spiral Model mạnh về giảm rủi ro ở mọi giai đoạn và phù hợp dự án lớn, nhưng khó ước lượng thời gian (chưa biết số vòng lặp), bắt buộc phải đánh giá rủi ro kỹ thuật tốt nếu không sẽ thất bại, và tốn thời gian cho nhiều đợt review."
+        ],
+        "terms": [
+          {
+            "term": "Prototyping Model",
+            "meaning": "Mô hình dựng nhanh bản mẫu để người dùng trải nghiệm khi chưa có yêu cầu chi tiết hoặc đội phát triển chưa chắc về hiệu năng thuật toán/OS/framework."
+          },
+          {
+            "term": "The Spiral Model",
+            "meaning": "Mô hình tiến hóa kết hợp tính lặp của prototyping với tính kiểm soát có hệ thống của waterfall, lấy phân tích rủi ro làm trọng tâm mỗi vòng xoắn."
+          }
+        ],
+        "pitfalls": [
+          "Nhược điểm rất hay bị hỏi của Prototyping: người dùng không nhận ra vì chạy đua dựng prototype mà lập trình viên bỏ qua chất lượng tổng thể/khả năng bảo trì dài hạn, hoặc chọn vội OS/ngôn ngữ/thuật toán không tối ưu.",
+          "Nhược điểm then chốt của Spiral Model: không biết trước số vòng/pha nên rất khó ước lượng và quản lý thời gian; hơn nữa nếu đội dự án không đánh giá đúng rủi ro kỹ thuật ở mọi giai đoạn thì mô hình sẽ thất bại."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Evolutionary Process Models",
+          "paragraphs": [
+            "When a limited version must be introduced to meet business pressure; a set of core product is well understood, but the details of product or system extensions have yet to be defined. In these situations, you need evolutionary process model."
+          ],
+          "bullets": [
+            {
+              "text": "2 common evolutionary process models:",
+              "subBullets": [
+                "Prototyping",
+                "The Spiral Model"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 23"
+          },
+          "explanation": [
+            "Khác với Incremental (yêu cầu đã tương đối rõ), Evolutionary Process Models được chọn khi lõi sản phẩm đã hiểu rõ nhưng các chi tiết hoặc phần mở rộng chưa được định nghĩa ('have yet to be defined') mà áp lực kinh doanh lại đòi hỏi ra mắt sớm một bản giới hạn.",
+            "Hai mô hình tiến hóa phổ biến nhất được giới thiệu trong bài là Prototyping và The Spiral Model."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Prototyping",
+          "paragraphs": [
+            "When customer defines a software but does not have detailed of requirements. The developers are unsure of the efficiency of an algorithm, OS, framework."
+          ],
+          "diagramText": [
+            "Vòng lặp theo chiều kim đồng hồ:",
+            "Communication → Quick plan → Modeling Quick design → Construction of prototype → Deployment Delivery & Feedback → Communication"
+          ],
+          "diagramNote": "Sơ đồ vòng đời mô hình Prototyping (Pressman): 5 bước chạy vòng tròn liên tục dựa trên thiết kế nhanh và phản hồi trực tiếp từ bản mẫu.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 24"
+          },
+          "explanation": [
+            "Prototyping phù hợp trong hai tình huống nêu ở slide: khách hàng đã hình dung phần mềm nhưng chưa có yêu cầu chi tiết, hoặc lập trình viên chưa chắc về độ hiệu quả của thuật toán, hệ điều hành hay framework.",
+            "Sơ đồ nhấn mạnh tốc độ: từ Communication chuyển sang Quick plan, Modeling Quick design rồi dựng ngay prototype để giao và nhận feedback làm đầu vào cho vòng tinh chỉnh kế tiếp."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Prototyping",
+          "bullets": [
+            {
+              "text": "Pros:",
+              "subBullets": [
+                "Users get a feel for the actual system",
+                "Developers get to build something immediately"
+              ]
+            },
+            {
+              "text": "Cons:",
+              "subBullets": [
+                "User unaware that in the rush to get prototype working developer haven't considered overall software quality or long-term maintainability",
+                "Developer don’t have time to analysis and design (quick plan and quick design), therefore an inappropriate operating system or programming language may be used, an inefficient algorithm may be implemented."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 25"
+          },
+          "explanation": [
+            "Ưu điểm lớn của Prototyping là tính trực quan tức thì: người dùng sớm được chạm và cảm nhận hệ thống thật, còn lập trình viên được bắt tay vào dựng sản phẩm ngay lập tức.",
+            "Nhược điểm nghiêm trọng lại đến từ chính chữ 'quick': khách hàng dễ hiểu nhầm bản chạy thử là sản phẩm hoàn chỉnh dù chất lượng tổng thể và khả năng bảo trì dài hạn chưa được tính đến, còn kỹ sư có nguy cơ chọn nhầm OS, ngôn ngữ hoặc thuật toán kém hiệu quả."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "The Spiral Model",
+          "paragraphs": [
+            "The spiral model is an evolutionary software process model that couples the iterative nature of prototyping with the controlled and systematic aspects of the waterfall model."
+          ],
+          "diagramText": [
+            "Đường xoắn ốc đi từ tâm 'Start' lan dần ra ngoài theo chiều kim đồng hồ qua 5 cung hoạt động:",
+            "1. Communication",
+            "2. Planning (estimation, scheduling, risk analysis)",
+            "3. Modeling (analysis, design)",
+            "4. Construction (code, test)",
+            "5. Deployment (delivery, feedback)"
+          ],
+          "diagramNote": "Sơ đồ mô hình xoắn ốc (Spiral Model theo Pressman): mỗi vòng xoắn đi qua 5 vùng hoạt động từ trong ra ngoài, thể hiện mức độ hoàn thiện và quy mô sản phẩm tăng dần qua từng vòng.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 26"
+          },
+          "explanation": [
+            "Spiral Model dung hòa hai thế giới đối lập: giữ được tính lặp linh hoạt của Prototyping nhưng vẫn duy trì kỷ luật có kiểm soát và có hệ thống của Waterfall.",
+            "Mỗi vòng xoắn mở rộng bán kính đều bắt buộc đi qua vùng Planning chứa ước lượng (estimation), lập lịch (scheduling) và đặc biệt là phân tích rủi ro (risk analysis) trước khi sang Modeling, Construction và Deployment."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "The Spiral Model",
+          "bullets": [
+            {
+              "text": "Pros:",
+              "subBullets": [
+                "Can apply the prototyping approach at any stage in the evolution of the product to reduce risk",
+                "Can change requirements in later phase",
+                "Suitable for large projects"
+              ]
+            },
+            {
+              "text": "Cons:",
+              "subBullets": [
+                "Difficulty in time management. As the number of phases is unknown at the start of the project, so time estimation is very difficult.",
+                "The spiral model demands a direct consideration of technical risks at all stages of the project or it will be a failure",
+                "The Spiral Model can be time-consuming, as it requires multiple evaluations and reviews."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 27"
+          },
+          "explanation": [
+            "Spiral Model cho phép dùng prototyping tại bất kỳ giai đoạn nào để giảm thiểu rủi ro, linh hoạt thay đổi yêu cầu ở pha sau và rất thích hợp cho các dự án quy mô lớn.",
+            "Đổi lại là 3 thách thức quản trị: không biết trước tổng số vòng nên khó ước lượng thời gian, đòi hỏi năng lực đánh giá rủi ro kỹ thuật xuyên suốt (nếu làm qua loa dự án sẽ thất bại), và tốn nhiều thời gian cho các cuộc rà soát, đánh giá lặp đi lặp lại."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Agile Manifesto, Nguyên lý Agile & Cách chọn mô hình SDLC",
+      "text": "Lý do cần Agile trong hệ thống kinh doanh, 4 giá trị của Agile Manifesto, 5 nguyên lý cốt lõi, đặc điểm chung của các phương pháp Agile (Scrum, Lean, Kanban, XP), ưu/nhược điểm và tiêu chí chọn mô hình SDLC dựa trên tam giác quản lý dự án.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 28–34"
+      },
+      "digest": {
+        "keyPoints": [
+          "Agile là triết lý quản trị dự án dùng tập nguyên lý và giá trị giúp đội phần mềm phát triển, bàn giao nhanh và phản ứng tốt với thay đổi.",
+          "4 giá trị cốt lõi của Agile Manifesto: Individuals and interactions over processes and tools; Working software over comprehensive documentation; Customer collaboration over contract negotiation; Responding to change over following a plan.",
+          "5 nguyên lý tiêu biểu trên slide: Customer involvement, Embrace change, Incremental delivery, Maintain simplicity, People, not process.",
+          "Đặc điểm chung của Agile (Scrum, Lean, Kanban, Extreme Programming): đặc tả-thiết kế-cài đặt xen kẽ nhau, giảm thiểu tài liệu thiết kế, bản yêu cầu chỉ ở mức phác thảo, phát triển qua các increment có người dùng cuối đánh giá, và dùng nhiều công cụ tự động hóa (test, configuration management).",
+          "Chọn mô hình SDLC dựa vào tam giác quản lý dự án (Scope – Time – Cost với Quality ở trung tâm) và 5 yếu tố cân nhắc."
+        ],
+        "terms": [
+          {
+            "term": "Agile Manifesto",
+            "meaning": "Tuyên ngôn xác lập 4 cặp giá trị cốt lõi của phát triển Agile (ưu tiên vế trái hơn vế phải nhưng vẫn coi trọng giá trị ở vế phải)."
+          },
+          {
+            "term": "Project Management Triangle",
+            "meaning": "Tam giác ràng buộc 3 cạnh Scope – Time – Cost với Quality ở tâm, làm căn cứ cân đối khi lựa chọn mô hình SDLC."
+          }
+        ],
+        "pitfalls": [
+          "Agile Manifesto KHÔNG nói các mục vế phải (processes/tools, documentation, contract, plan) vô giá trị — câu kết Slide 29 ghi rõ: 'while there is value in the items on the right, we value the items on the left more'.",
+          "Agile không dễ áp dụng cho mọi đội: Slide 32 chỉ ra các nhược điểm là đòi hỏi quản lý giàu kinh nghiệm và dev tay nghề cao, đòi hỏi nhiều thời gian tham gia của khách hàng, dễ thiếu tài liệu cần thiết và khó dự đoán tiến độ."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "Why Agile?",
+          "paragraphs": [
+            "Rapid software development and delivery is the most critical requirement for most business systems. Therefore, for business systems in particular, development processes that focus on rapid software development and delivery are essential.",
+            "Agile methods are designed to produce useful software quickly.",
+            "Agile is a project management philosophy that employs a set of principles and values to help software teams respond to change."
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 28"
+          },
+          "explanation": [
+            "Đối với đa số hệ thống nghiệp vụ kinh doanh (business systems), tốc độ phát triển và đưa phần mềm ra thị trường nhanh là yêu cầu sống còn.",
+            "Slide định nghĩa Agile ở mức bản chất là một triết lý quản lý dự án (project management philosophy) trang bị tập giá trị và nguyên lý giúp đội ngũ tạo phần mềm hữu ích nhanh chóng và thích ứng thay đổi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Agile Manifesto",
+          "paragraphs": [
+            "We are uncovering better ways of developing software by doing it and helping others do it. Through this work we have come to value:",
+            "That is, while there is value in the items on the right, we value the items on the left more"
+          ],
+          "bullets": [
+            "Individuals and interactions over processes and tools",
+            "Working software over comprehensive documentation",
+            "Customer collaboration over contract negotiation",
+            "Responding to change over following a plan"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 29"
+          },
+          "explanation": [
+            "Slide trích nguyên văn 4 giá trị trong Tuyên ngôn Agile: đề cao con người & tương tác, phần mềm chạy được, sự hợp tác với khách hàng và khả năng ứng biến trước thay đổi.",
+            "Câu kết bài tuyên ngôn nhấn mạnh tinh thần cân bằng: vế bên phải (quy trình/công cụ, tài liệu đầy đủ, đàm phán hợp đồng, bám kế hoạch) vẫn có giá trị, chỉ là vế bên trái được ưu tiên cao hơn khi có xung đột."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "Principles of Agile Methods",
+          "paragraphs": [
+            "Based on Agile manifesto, we have listed of principles:"
+          ],
+          "table": {
+            "headers": [
+              "Principle",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Customer involvement",
+                "Customers should be closely involved throughout the development process. They provide and prioritize new system requirements, and, evaluate the iterations of the system."
+              ],
+              [
+                "Embrace change",
+                "Expect the system requirements to change, and so design the system to accommodate these changes."
+              ],
+              [
+                "Incremental delivery",
+                "The software is developed in increments, with the customer specifying the requirements to be included in each increment."
+              ],
+              [
+                "Maintain simplicity",
+                "Focus on simplicity in both the software being developed and in the development process."
+              ],
+              [
+                "People, not process",
+                "The skills of the development team should be recognized and exploited. Team members should be left to develop their own ways of working without prescriptive processes."
+              ]
+            ]
+          },
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 30"
+          },
+          "explanation": [
+            "Bảng tổng hợp 5 nguyên lý Agile (theo Sommerville): khách hàng tham gia sát sao suốt quy trình để cung cấp, sắp thứ tự ưu tiên yêu cầu và đánh giá từng vòng lặp.",
+            "Hệ thống phải được thiết kế sẵn sàng đón nhận thay đổi (Embrace change), giao hàng tăng dần theo từng increment do khách hàng chọn lọc tính năng, giữ sự đơn giản ở cả code lẫn quy trình, và tin tưởng vào năng lực tự chủ của con người thay vì trói buộc bằng quy trình cứng nhắc."
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "Agile",
+          "paragraphs": [
+            "Agile methods share common characteristics:",
+            "Approaches to Agile methods are Scrum, Lean, Kanban and Extreme Programming."
+          ],
+          "bullets": [
+            "The processes of specification, design and implementation are interleaved. There is no detailed system specification, and design documentation is minimized",
+            "The user requirements document is an outline definition of the most important characteristics of the system",
+            "The system is developed in a series of increments. End-users are involved in specifying and evaluating each increment.",
+            "Extensive tool support is used to support the development process: automated testing tools, configuration management, and so on."
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 31"
+          },
+          "explanation": [
+            "Các phương pháp Agile cụ thể như Scrum, Lean, Kanban hay Extreme Programming (XP) đều chia sẻ 4 đặc điểm chung trong vận hành: đặc tả, thiết kế và lập trình diễn ra đan xen thay vì tách pha cứng như Waterfall.",
+            "Tài liệu thiết kế được tối giản và đặc tả người dùng chỉ ở mức phác thảo đặc trưng cốt lõi, bù lại đội ngũ sử dụng mạnh các công cụ hỗ trợ tự động hóa (automated testing, configuration management) qua chuỗi increment."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "Agile",
+          "bullets": [
+            {
+              "text": "Pros:",
+              "subBullets": [
+                "Customer satisfaction and quality deliverables are the focus",
+                "Can change requirements, even late in development",
+                "Deliver working software frequently",
+                "Eliminate as many opportunities for miscommunication."
+              ]
+            },
+            {
+              "text": "Cons:",
+              "subBullets": [
+                "Requires experienced management and highly skilled developers",
+                "Greater demands on clients.",
+                "Lack of necessary documentation.",
+                "Less predictable and projects easily fall off track."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 32"
+          },
+          "explanation": [
+            "Ưu điểm của Agile là đặt sự hài lòng khách hàng và sản phẩm chất lượng làm tâm điểm, cho phép đổi yêu cầu ngay cả ở giai đoạn muộn, bàn giao phần mềm chạy được thường xuyên và giảm tối đa hiểu nhầm trong giao tiếp.",
+            "Tuy nhiên Agile không hề dễ làm: nó đòi hỏi quản lý dày dạn kinh nghiệm và dev giỏi, khách hàng phải dành nhiều thời gian tham gia, dễ thiếu hụt tài liệu cần thiết cho bảo trì/chuyển giao, và tiến độ kém dự đoán hơn nên dự án dễ chệch hướng nếu kỷ luật yếu."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "What Model you should choose?",
+          "paragraphs": [
+            "Project management triangle:",
+            "Consider:"
+          ],
+          "bullets": [
+            "The project and task at hand",
+            "Well-definedness of requirements",
+            "Risk management and quality/cost control",
+            "Customer involvement and feedback",
+            "Experience of management and team members"
+          ],
+          "diagramText": [
+            "Tam giác quản lý dự án (Project management triangle):",
+            "  Đỉnh trên: [Scope]",
+            "  Góc trái: [Time]  ——  Góc phải: [Cost]",
+            "  Bên trong tâm tam giác: Quality"
+          ],
+          "diagramNote": "Tam giác quản lý dự án liên kết 3 ràng buộc Scope, Time, Cost bao quanh Quality làm cơ sở chọn mô hình SDLC phù hợp.",
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 33"
+          },
+          "explanation": [
+            "Việc lựa chọn Waterfall, Incremental, Prototyping, Spiral hay Agile phụ thuộc vào sự cân bằng giữa 3 yếu tố trên tam giác quản lý dự án (Scope — Phạm vi, Time — Thời gian, Cost — Chi phí) xoay quanh Chất lượng (Quality).",
+            "Năm câu hỏi gợi ý ở mục Consider giúp ra quyết định thực tế: đặc thù dự án, mức độ rõ ràng của yêu cầu từ đầu, nhu cầu quản trị rủi ro và kiểm soát chất lượng/chi phí, mức độ sẵn sàng tham gia phản hồi của khách hàng, và kinh nghiệm của quản lý lẫn thành viên."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "Summary",
+          "bullets": [
+            "Software development",
+            "Software process models"
+          ],
+          "source": {
+            "file": "Resources/Lecture 6.pdf",
+            "loc": "Slide 34"
+          },
+          "explanation": [
+            "Slide tổng kết bài giảng Lecture 6, khép lại hai mảng lớn đã trình bày: bản chất phát triển phần mềm cùng 4 hoạt động quy trình cốt lõi, và các mô hình SDLC tiêu biểu.",
+            "Các bài kế tiếp (Lecture 7–9) sẽ phóng to từng hoạt động cốt lõi trong quy trình này: Requirements Engineering, Architectural Design và UML Class Diagrams."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l06-c01", "front": "Verification và validation khác nhau thế nào?", "back": "Verification: 'Are we building the product right?' (đúng đặc tả). Validation: 'Are we building the right product?' (đáp ứng kỳ vọng khách hàng).", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 15–16" } },
-    { "id": "se1-l06-c02", "front": "Bốn hoạt động cơ bản của software process?", "back": "Specification, Development, Validation, Evolution.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 6–17" } },
-    { "id": "se1-l06-c03", "front": "Waterfall chỉ phù hợp với loại hệ thống nào?", "back": "Hệ nhúng, hệ critical (an toàn/an ninh), hệ phần mềm lớn do nhiều công ty phát triển.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 19–21" } },
-    { "id": "se1-l06-c04", "front": "4 giá trị của Agile Manifesto?", "back": "Individuals & interactions; working software; customer collaboration; responding to change (hơn các vế còn lại).", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slide 29" } },
-    { "id": "se1-l06-c05", "front": "Nhược điểm của Spiral model?", "back": "Khó ước lượng thời gian (không biết số pha), cần đánh giá rủi ro ở mọi giai đoạn, review tốn thời gian.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 26–27" } },
-    { "id": "se1-l06-c06", "front": "4 hoạt động của software design?", "back": "Architectural design, database design, interface design, component selection and design.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 12–13" } }
+    {
+      "id": "se1-l06-c01",
+      "front": "Bốn hoạt động cơ bản của mọi software process?",
+      "back": "Software specification (requirements engineering), software development (design & programming), software validation (V&V), software evolution (maintenance).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 6"
+      }
+    },
+    {
+      "id": "se1-l06-c02",
+      "front": "Phân biệt A program và A software?",
+      "back": "Program: chương trình chạy trên máy tính/điện thoại/thiết bị. Software: chương trình máy tính cùng toàn bộ tài liệu (documentation) và dữ liệu cấu hình (configuration data) liên quan.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "se1-l06-c03",
+      "front": "Ba hoạt động chính trong Software Specification (Requirements Engineering)?",
+      "back": "1) Requirements elicitation and analysis; 2) Requirements specification; 3) Requirements validation (kiểm tra realism, consistency, completeness).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 8–9"
+      }
+    },
+    {
+      "id": "se1-l06-c04",
+      "front": "Bốn hoạt động của software design là gì?",
+      "back": "Architectural design, database design, interface design (phải unambiguous), component selection and design (tìm reusable component trước, không có mới thiết kế mới).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 12–13"
+      }
+    },
+    {
+      "id": "se1-l06-c05",
+      "front": "Verification khác Validation thế nào?",
+      "back": "Verification: kiểm tra phần mềm đáp ứng các yêu cầu functional và non-functional đã nêu trong đặc tả. Validation: đảm bảo phần mềm đáp ứng kỳ vọng của khách hàng.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "se1-l06-c06",
+      "front": "Ba giai đoạn kiểm thử trong Software Validation Process?",
+      "back": "1) Component testing (từng thành phần độc lập); 2) System testing (tích hợp hệ thống/subsystems — integration testing); 3) Customer testing (khách hàng test thật, gồm beta testing).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "se1-l06-c07",
+      "front": "Năm pha của Waterfall Model và nguyên tắc chuyển pha?",
+      "back": "1) Requirements analysis and definition; 2) System and software design; 3) Implementation and unit testing; 4) Integration and system testing; 5) Operation and maintenance. Pha sau không nên bắt đầu trước khi pha trước hoàn tất và tài liệu được phê duyệt.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 19–20"
+      }
+    },
+    {
+      "id": "se1-l06-c08",
+      "front": "Waterfall Model chỉ phù hợp với 3 loại hệ thống nào?",
+      "back": "Embedded systems (giao tiếp phần cứng khó thay đổi), Critical systems (cần đặc tả-thiết kế hoàn chỉnh để phân tích safety/security), và Large software systems (nhiều công ty đối tác làm độc lập các subsystem).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 21"
+      }
+    },
+    {
+      "id": "se1-l06-c09",
+      "front": "Khi nào chọn Incremental vs Evolutionary Process Model?",
+      "back": "Incremental: yêu cầu ban đầu đã khá rõ (reasonably well defined), cần sớm giao một phần chức năng rồi mở rộng qua các release. Evolutionary: lõi đã hiểu rõ nhưng chi tiết và phần mở rộng chưa xác định ('have yet to be defined').",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 22–23"
+      }
+    },
+    {
+      "id": "se1-l06-c10",
+      "front": "Ưu và nhược điểm chính của Prototyping?",
+      "back": "Ưu: user cảm nhận hệ thống thật, dev build được ngay. Nhược: user không biết do làm vội nên thiếu xem xét chất lượng tổng thể/bảo trì dài hạn; dev thiếu thời gian phân tích-thiết kế nên có thể chọn sai OS, ngôn ngữ hoặc thuật toán kém hiệu quả.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 24–25"
+      }
+    },
+    {
+      "id": "se1-l06-c11",
+      "front": "Nhược điểm của Spiral Model?",
+      "back": "Khó ước lượng và quản lý thời gian (không biết trước số pha/vòng lặp); đòi hỏi đánh giá rủi ro kỹ thuật trực tiếp ở mọi giai đoạn nếu không sẽ thất bại; tốn thời gian vì nhiều lần đánh giá và review.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 26–27"
+      }
+    },
+    {
+      "id": "se1-l06-c12",
+      "front": "Bốn giá trị của Agile Manifesto?",
+      "back": "Individuals and interactions over processes and tools; Working software over comprehensive documentation; Customer collaboration over contract negotiation; Responding to change over following a plan (vế phải vẫn có giá trị, vế trái được coi trọng hơn).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "se1-l06-c13",
+      "front": "Năm nguyên lý của Agile Methods trên Slide 30?",
+      "back": "Customer involvement; Embrace change; Incremental delivery; Maintain simplicity; People, not process.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 30"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l06-q01", "stem": "Câu 'Are we building the right product?' mô tả hoạt động nào?", "options": ["Verification", "Validation", "Debugging", "Maintenance"], "answer": 1, "explanation": "Validation bảo đảm phần mềm đáp ứng kỳ vọng người dùng.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slide 15" } },
-    { "id": "se1-l06-q02", "stem": "Mô hình nào dùng khi lõi sản phẩm đã rõ nhưng chi tiết và phần mở rộng chưa xác định?", "options": ["Waterfall", "Evolutionary", "Incremental", "Không mô hình nào"], "answer": 1, "explanation": "Evolutionary process models dùng khi chi tiết/mở rộng chưa được định nghĩa.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slides 23–27" } },
-    { "id": "se1-l06-q03", "stem": "Ba giai đoạn testing trong validation theo thứ tự?", "options": ["Customer → System → Component", "Component → System → Customer", "System → Component → Customer", "Unit → Beta → Alpha"], "answer": 1, "explanation": "Component testing → System testing (gồm integration) → Customer testing.", "source": { "file": "Resources/Lecture 6.pdf", "loc": "Slide 16" } }
+    {
+      "id": "se1-l06-q01",
+      "stem": "Hoạt động nào trong V&V tập trung vào việc kiểm tra phần mềm đáp ứng kỳ vọng của khách hàng/người tiêu dùng?",
+      "options": [
+        "Verification",
+        "Validation",
+        "Debugging",
+        "Requirements specification"
+      ],
+      "answer": 1,
+      "explanation": "Slide 15: Verification kiểm tra phần mềm khớp đặc tả (stated functional & non-functional requirements), còn Validation đảm bảo phần mềm đáp ứng kỳ vọng của khách hàng (meets consumer's expectations).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "se1-l06-q02",
+      "stem": "Mô hình nào dùng khi lõi sản phẩm đã rõ nhưng chi tiết sản phẩm hoặc phần mở rộng chưa xác định ('have yet to be defined')?",
+      "options": [
+        "The Waterfall Model",
+        "Evolutionary Process Models",
+        "Incremental Process Model",
+        "Chỉ dùng được cho Embedded systems"
+      ],
+      "answer": 1,
+      "explanation": "Slide 23: Evolutionary process models (như Prototyping và The Spiral Model) dùng khi tập lõi sản phẩm đã hiểu rõ nhưng chi tiết sản phẩm hoặc phần mở rộng vẫn chưa được định nghĩa.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 23–27"
+      }
+    },
+    {
+      "id": "se1-l06-q03",
+      "stem": "Ba giai đoạn kiểm thử trong Software Validation Process theo đúng thứ tự là gì?",
+      "options": [
+        "Customer testing → System testing → Component testing",
+        "Component testing → System testing → Customer testing",
+        "System testing → Component testing → Customer testing",
+        "Beta testing → Component testing → Integration testing"
+      ],
+      "answer": 1,
+      "explanation": "Slide 16 trình bày 3 giai đoạn theo trình tự: Component testing (test từng thành phần độc lập) → System testing (gồm integration testing các subsystem) → Customer testing (gồm beta testing).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "se1-l06-q04",
+      "stem": "Trong 4 hoạt động thiết kế phần mềm (Slides 12–13), hoạt động nào bắt đầu bằng việc tìm kiếm thành phần có thể tái sử dụng?",
+      "options": [
+        "Architectural design",
+        "Database design",
+        "Interface design",
+        "Component selection and design"
+      ],
+      "answer": 3,
+      "explanation": "Slide 12: Component selection and design tìm kiếm các reusable components trước; nếu không có thành phần phù hợp mới thiết kế thành phần phần mềm mới.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 12–13"
+      }
+    },
+    {
+      "id": "se1-l06-q05",
+      "stem": "Theo Slide 21, loại hệ thống nào KHÔNG nằm trong nhóm phù hợp với mô hình Waterfall?",
+      "options": [
+        "Embedded systems giao tiếp phần cứng khó thay đổi",
+        "Critical systems cần phân tích safety và security trên đặc tả hoàn chỉnh",
+        "Large software systems do nhiều công ty đối tác cùng phát triển các subsystem độc lập",
+        "Hệ thống kinh doanh có yêu cầu chi tiết chưa xác định và cần thay đổi liên tục"
+      ],
+      "answer": 3,
+      "explanation": "Slide 21 chỉ rõ Waterfall chỉ phù hợp cho Embedded systems, Critical systems và Large software systems nhiều công ty đối tác; các hệ thống kinh doanh cần giao nhanh và hay đổi yêu cầu phù hợp với Agile hơn (Slide 28).",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 21, 28"
+      }
+    },
+    {
+      "id": "se1-l06-q06",
+      "stem": "Trong Prototyping (Slide 25), rủi ro nào dễ xảy ra do không có thời gian phân tích và thiết kế đầy đủ (quick plan and quick design)?",
+      "options": [
+        "Không biết số pha của dự án nên không ước lượng được thời gian",
+        "Có thể dùng nhầm hệ điều hành/ngôn ngữ lập trình không phù hợp hoặc cài đặt thuật toán kém hiệu quả",
+        "Khách hàng phải trả tiền kiểm thử beta cho người dùng cuối",
+        "Phải phê duyệt đầy đủ tài liệu đặc tả trước khi bắt đầu thiết kế"
+      ],
+      "answer": 1,
+      "explanation": "Slide 25 nêu rõ nhược điểm của Prototyping: lập trình viên thiếu thời gian analysis/design nên có thể chọn OS hoặc ngôn ngữ lập trình không phù hợp và cài đặt thuật toán kém hiệu quả, đồng thời bỏ qua chất lượng tổng thể/bảo trì dài hạn.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 25"
+      }
+    },
+    {
+      "id": "se1-l06-q07",
+      "stem": "Điểm khác biệt cốt lõi làm nên mô hình xoắn ốc (The Spiral Model) theo Slide 26–27 là gì?",
+      "options": [
+        "Loại bỏ hoàn toàn tài liệu đặc tả và kế hoạch",
+        "Kết hợp tính lặp của prototyping với tính có kiểm soát, hệ thống của waterfall, đòi hỏi xem xét trực tiếp rủi ro kỹ thuật ở mọi giai đoạn",
+        "Chỉ giao hàng một lần duy nhất vào cuối năm",
+        "Cấm thay đổi yêu cầu sau vòng lặp đầu tiên"
+      ],
+      "answer": 1,
+      "explanation": "Slides 26–27: Spiral model kết hợp tính lặp của prototyping với tính kiểm soát hệ thống của waterfall (qua Planning có risk analysis ở mọi vòng); nếu không cân nhắc trực tiếp technical risks ở mọi giai đoạn thì dự án sẽ thất bại.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slides 26–27"
+      }
+    },
+    {
+      "id": "se1-l06-q08",
+      "stem": "Theo Agile Manifesto (Slide 29), phát biểu nào phản ánh ĐÚNG mối quan hệ giữa hai vế trong 4 cặp giá trị?",
+      "options": [
+        "Quy trình, tài liệu, hợp đồng và kế hoạch hoàn toàn không có giá trị",
+        "Trong khi vẫn có giá trị ở các mục bên phải, Agile coi trọng các mục bên trái hơn",
+        "Chỉ áp dụng các mục bên trái cho các dự án Critical systems",
+        "Tài liệu thiết kế chi tiết luôn quan trọng hơn phần mềm chạy được"
+      ],
+      "answer": 1,
+      "explanation": "Slide 29 viết nguyên văn: 'That is, while there is value in the items on the right, we value the items on the left more'.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "se1-l06-q09",
+      "stem": "Nhược điểm nào sau đây của Agile được nêu trực tiếp trên Slide 32?",
+      "options": [
+        "Không thể thay đổi yêu cầu ở giai đoạn muộn",
+        "Không có công cụ kiểm thử tự động hỗ trợ",
+        "Đòi hỏi quản lý giàu kinh nghiệm, dev tay nghề cao, đòi hỏi nhiều ở khách hàng, thiếu tài liệu cần thiết và khó dự đoán hơn",
+        "Không thể dùng cho các hệ thống kinh doanh cần ra mắt nhanh"
+      ],
+      "answer": 2,
+      "explanation": "Slide 32 liệt kê 4 nhược điểm (Cons) của Agile: Requires experienced management and highly skilled developers; Greater demands on clients; Lack of necessary documentation; Less predictable and projects easily fall off track.",
+      "source": {
+        "file": "Resources/Lecture 6.pdf",
+        "loc": "Slide 32"
+      }
+    }
   ]
 }

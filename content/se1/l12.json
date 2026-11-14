@@ -1,27 +1,1439 @@
 {
-  "id": "se1-l12", "order": 10,
+  "id": "se1-l12",
+  "order": 10,
   "title": "Lecture 12: Testing",
-  "summary": [
-    { "h": "Định nghĩa", "text": "Software testing là đánh giá động (dynamic) hành vi chương trình trên một tập hữu hạn (finite) test case được chọn phù hợp (selected) từ miền thực thi thường vô hạn, so với hành vi mong đợi (expected). Phân loại 3 trục: mức (unit, integration, system, acceptance), phương pháp (black-box, white-box, non-functional), loại (manual, automated)." },
-    { "h": "Mức kiểm thử", "text": "Unit: kiểm tra mã nguồn (setup, exercise, verify, teardown). Integration: kiểm tra giao diện giữa các module. Top-down: bắt đầu từ main program, dùng stub thay module cấp dưới, thay dần bằng module thật (depth-first hoặc breadth-first), có regression testing. Bottom-up: bắt đầu từ module thấp nhất, gom thành cluster, dùng driver điều phối test, sau đó bỏ driver và đi lên. System testing: tích hợp tất cả thành phần. Acceptance: dùng dữ liệu thật của khách, đội phát triển không chịu trách nhiệm, thường là black-box." },
-    { "h": "Black-box", "text": "Equivalence partitioning: khoảng giá trị → 1 lớp hợp lệ và 2 không hợp lệ; một giá trị cụ thể → 1 hợp lệ và 2 không hợp lệ; thành viên của tập → 1 và 1; Boolean → 1 và 1; mảng/chuỗi → 1 hợp lệ và 2 không hợp lệ. Boundary value analysis: chọn test ở biên, ví dụ khoảng [a, b]: a, b và ngay trên/dưới a, b (cả đầu vào và đầu ra)." },
-    { "h": "White-box", "text": "Coverage: statement, decision, condition, paths, function, entry/exit. Basis path testing (McCabe): vẽ flow graph, tính cyclomatic complexity, tìm tập đường độc lập tuyến tính, soạn test cho mỗi đường. Compound condition (IF a OR b) cần predicate node riêng cho từng điều kiện. Công thức: V(G) = số region (gồm vùng ngoài) = E − N + 2 = P + 1 (P là số predicate node)." },
-    { "h": "Loop testing", "text": "Simple loop (tối đa n lần): bỏ qua vòng, 1 lần, 2 lần, m lần (m < n), n−1, n, n+1 lần. Nested: bắt đầu vòng trong cùng với vòng ngoài ở giá trị nhỏ nhất, rồi làm ngược ra ngoài. Concatenated: độc lập → test như simple; phụ thuộc → test như nested. Unstructured: nên thiết kế lại." },
-    { "h": "Non-functional", "text": "Performance, load, volume (tập trung khối lượng dữ liệu), stress (vượt công suất bình thường tới khi hỏng), security (6 khái niệm: confidentiality, integrity, authentication, authorization, availability, non-repudiation), usability, accessibility." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 12.pdf",
+    "totalPages": 35,
+    "extractedPages": 35,
+    "ocrNotes": [
+      "Resources/Lecture 12.pdf là PDF ảnh 1 trang dài (960×25200 px) gồm 35 slide (960×720 px/slide); mỗi slide được gán pageNumber: 1 và loc tương ứng Slide 1..Slide 35.",
+      "Toàn bộ 35/35 slide đều rõ nét, không có chữ mờ/không đọc được; các lỗi chính tả hoặc khoảng trắng nguyên văn trên slide (ví dụ: 'practitioners approach' ở Slide 3, 'Testing levels contains 4 phases' ở Slide 7, 'source code are tested' ở Slide 8, 'and the testing the integrated system' và 'topically across its user interfaces' ở Slide 16, 'When the loops are not in dependent' ở Slide 32, 'integrity ,' ở Slide 33) được giữ nguyên khi trích verbatim."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 12.pdf",
+      "loc": "Slides 1–35 (đầy đủ 35/35 slides, PDF ảnh 1 trang dài)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 12.pdf", "loc": "Slides 1–35 (PDF ảnh 1 trang)" }],
+  "summary": [
+    {
+      "h": "Giới thiệu, Tài liệu tham khảo & Định nghĩa Software Testing",
+      "text": "Định nghĩa Software Testing qua 4 khái niệm then chốt (Dynamic, Finite, Selected, Expected) và khung phân loại kiểm thử theo 3 trục: Level, Method và Type.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 1–5"
+      },
+      "digest": {
+        "keyPoints": [
+          "Software testing là sự đánh giá động (dynamic) hành vi của chương trình trên một tập hữu hạn (finite) các test case được lựa chọn phù hợp (selected) từ miền thực thi thường vô hạn, đối chiếu với hành vi mong đợi (expected).",
+          "Bốn từ khóa cốt lõi của định nghĩa: Dynamic (phải chạy thật SUT với input cụ thể để tìm lỗi), Finite (không thể kiểm thử vét cạn mọi trường hợp), Selected (thách thức lớn nhất là chọn các test case dễ làm lộ lỗi nhất), Expected (sau mỗi lần chạy phải có oracle quyết định đạt hay lỗi).",
+          "Ba trục phân loại kiểm thử trong bài: Testing level (unit, integration, system, acceptance), Testing methods (black-box, white-box, non-functional), và Testing types (manual, automated)."
+        ],
+        "terms": [
+          {
+            "term": "SUT (System Under Test)",
+            "meaning": "Hệ thống hoặc thành phần phần mềm đang được mang ra kiểm thử."
+          },
+          {
+            "term": "Dynamic evaluation",
+            "meaning": "Đánh giá bằng cách thực thi chương trình với dữ liệu đầu vào cụ thể (khác với static review/inspection chỉ đọc tài liệu hoặc mã nguồn)."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm lẫn giữa 3 trục phân loại: Unit/Integration/System/Acceptance là mức (Level); Black-box/White-box/Non-functional là phương pháp thiết kế test (Method); Manual/Automated là cách thức thực hiện (Type)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 12 — Testing",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 12",
+            "Testing"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide mở đầu giới thiệu chủ đề Lecture 12: **Testing** (Kiểm thử phần mềm) trong học phần 61FIT3SE1 - Software Engineering 1.",
+            "Đây là giai đoạn tiếp nối sau Design và Implementation nhằm xác minh (verification) xem mã nguồn có cài đặt đúng thiết kế không và thẩm định (validation) xem hệ thống có đáp ứng nhu cầu người dùng cuối không."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 1,
+          "title": "Outline",
+          "bullets": [
+            "Software testing",
+            "Testing level",
+            "Testing methods",
+            "Testing types"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Slide tóm tắt bố cục 4 phần lớn của bài giảng: (1) Khái niệm Software testing, (2) Các mức kiểm thử (Testing level), (3) Các phương pháp thiết kế test case (Testing methods), và (4) Các loại hình thực thi kiểm thử (Testing types).",
+            "Hãy chú ý cấu trúc phân cấp này vì toàn bộ 35 slide phía sau đi tuần tự đúng theo 4 mục này."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 1,
+          "title": "References",
+          "bullets": [
+            "Roger S. Pressman, Bruce R. Maxim, Software engineering: a practitioners approach, part 3",
+            "Boni García, Mastering Software Testing with JUnit 5"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Slide trích dẫn 2 tài liệu tham khảo chính cho nội dung bài giảng: sách giáo khoa kinh điển của Roger S. Pressman & Bruce R. Maxim (Part 3 — phần Quality Management / Testing) và cuốn *Mastering Software Testing with JUnit 5* của Boni García.",
+            "Cụ thể, phần định nghĩa Dynamic/Finite/Selected/Expected và sơ đồ cấu trúc Unit Test lấy từ Boni García, còn các kỹ thuật Black-box, White-box, Basis Path và Loop Testing lấy từ Pressman & Maxim."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 1,
+          "title": "Software testing",
+          "paragraphs": [
+            "Software testing: consists of the dynamic evaluation of the behavior of a program on a finite set of test cases, suitably selected from the usually infinite executions domain, against the expected behavior.",
+            "Key concepts:"
+          ],
+          "bullets": [
+            "Dynamic: The System Under Test (SUT) is executed with specific input values to find failures in its behavior.",
+            "Finite: Exhaustive testing is not possible or practical for most real programs. Testers must choose a number of tests so that we can run the tests in the available time",
+            "Selected: The key challenge of testing is how to select the tests that are most likely to expose failures in the system.",
+            "Expected: After each test execution, it must be decided whether the observed behavior of the system was a failure or not."
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "Slide đưa ra định nghĩa chuẩn của Software Testing (theo IEEE/SWEBOK được trích dẫn trong Boni García) xoay quanh **4 từ khóa**: **Dynamic**, **Finite**, **Selected**, và **Expected**.",
+            "**Dynamic** nhấn mạnh kiểm thử là *chạy* phần mềm với input cụ thể (phân biệt với phân tích tĩnh như đọc code). **Finite** nhấn mạnh không thể kiểm thử vét cạn (exhaustive testing) mọi tổ hợp đầu vào nên phải chọn tập test hữu hạn chạy vừa quỹ thời gian.",
+            "**Selected** chỉ ra thách thức cốt lõi của nghề kiểm thử: chọn bộ test có xác suất phát hiện lỗi cao nhất (đó là lý do ta học Equivalence Partitioning, BVA, Basis Path ở các slide sau). **Expected** nhắc rằng mỗi test case luôn cần có đầu ra mong đợi (expected behavior/oracle) để kết luận pass hay fail."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 1,
+          "title": "Software testing",
+          "paragraphs": [
+            "In this lecture, we classify test using three axis:"
+          ],
+          "bullets": [
+            "Testing level: unit test, integration test, system test and acceptance test",
+            "Testing methods: black-box, white-box and non-functional testing",
+            "Testing types: manual and automated"
+          ],
+          "diagramText": [
+            "Test ──> Level ──> { Unit | Integration | System | Acceptance }",
+            "Test ──> Method ──> { Black-box | White-box | Non-functional }",
+            "Test ──> Type ──> { Manual | Automated }"
+          ],
+          "diagramNote": "Sơ đồ cây bên phải chia nút gốc Test thành 3 nhánh chính: Level (4 nhánh con), Method (3 nhánh con) và Type (2 nhánh con).",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Slide hệ thống hóa phân loại kiểm thử theo **3 trục (three axis)** trực giao với nhau: **Level** (kiểm thử ở phạm vi nào), **Method** (thiết kế test case dựa trên gì), và **Type** (ai/cái gì thực thi test).",
+            "Ba trục này có thể kết hợp với nhau: ví dụ một Unit test (Level) thường là White-box hoặc Black-box (Method) và được viết bằng JUnit để chạy Automated (Type), trong khi Acceptance test (Level) thường là Black-box (Method) và do khách hàng chạy Manual (Type)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Các mức kiểm thử (Testing Levels): Unit, Integration, System, Acceptance",
+      "text": "Bốn pha kiểm thử từ thấp lên cao (Unit, Integration, System, Acceptance), phân biệt Verification và Validation, cấu trúc 4 bước của Unit test (Setup–Exercise–Verify–Teardown), cùng hai chiến lược Integration Testing: Top-down (stub, depth-first/breadth-first) và Bottom-up (cluster, driver).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 6–17"
+      },
+      "digest": {
+        "keyPoints": [
+          "4 mức kiểm thử theo kim tự tháp từ đáy lên đỉnh: Unit → Integration → System → Acceptance. Ba mức dưới là Development testing (Verification), mức đỉnh là User testing (Validation).",
+          "Unit testing kiểm tra mã nguồn từng đơn vị để xác minh thiết kế đã được cài đặt đúng, theo cấu trúc 4 pha: Setup (khởi tạo SUT) → Exercise (thực thi SUT, có thể tương tác DOC) → Verify (assert ra verdict) → Teardown (dọn dẹp).",
+          "Integration testing kiểm tra giao diện và tương tác giữa các module khi ghép lại, gồm 2 chiến lược chính: Top-down (dùng stub thay module cấp dưới, tích hợp depth-first hoặc breadth-first, kèm regression testing) và Bottom-up (gom module thấp thành cluster, viết driver điều phối test, rồi gỡ driver đi lên).",
+          "System testing tích hợp toàn bộ các thành phần của hệ thống (thường qua UI) để kiểm tra tương thích, tương tác và truyền dữ liệu đúng lúc.",
+          "Acceptance testing chạy trên toàn hệ thống với dữ liệu thật/khách hàng, thường là black-box, và đội phát triển KHÔNG nên là bên chịu trách nhiệm."
+        ],
+        "terms": [
+          {
+            "term": "DOC (Depended-On Component)",
+            "meaning": "Thành phần phụ thuộc bên ngoài mà SUT tương tác trong quá trình thực thi unit test."
+          },
+          {
+            "term": "Stub",
+            "meaning": "Module giả lập tạm thời thay thế cho các module cấp dưới chưa sẵn sàng trong chiến lược Top-down integration."
+          },
+          {
+            "term": "Driver",
+            "meaning": "Chương trình điều khiển tạm thời đóng vai trò gọi và cấp dữ liệu đầu vào/kiểm tra đầu ra cho một cluster module cấp thấp trong chiến lược Bottom-up integration."
+          },
+          {
+            "term": "Cluster",
+            "meaning": "Nhóm các thành phần cấp thấp được kết hợp lại để thực hiện một chức năng con cụ thể khi kiểm thử Bottom-up."
+          },
+          {
+            "term": "Regression testing",
+            "meaning": "Kiểm thử hồi quy nhằm bảo đảm các thay đổi hoặc module mới tích hợp không làm phát sinh lỗi cho phần đã hoạt động trước đó."
+          }
+        ],
+        "pitfalls": [
+          "Đảo lộn Stub và Driver: Top-down dùng module chính làm driver và thay các module cấp dưới bằng **stub**; còn Bottom-up không cần stub ở dưới mà phải viết **driver** cho từng cluster ở trên.",
+          "Câu hỏi hay gặp: ai KHÔNG nên chịu trách nhiệm Acceptance testing? Chính là **đội phát triển hệ thống** (development team)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 1,
+          "title": "Testing Level",
+          "paragraphs": [
+            "Testing Level"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Slide ngăn mục báo hiệu bắt đầu phần trình bày chi tiết trục phân loại thứ nhất: **Testing Level** (các mức độ kiểm thử theo phạm vi thành phần hệ thống).",
+            "Các slide kế tiếp (Slides 7–17) sẽ lần lượt đi qua cả 4 mức từ vi mô tới vĩ mô: **Unit testing**, **Integration testing** (Top-down và Bottom-up), **System testing**, và **Acceptance testing**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 1,
+          "title": "Testing level",
+          "paragraphs": [
+            "Testing levels contains 4 phases:"
+          ],
+          "bullets": [
+            "Unit testing",
+            "Integration testing",
+            "System testing",
+            "Acceptance testing"
+          ],
+          "diagramText": [
+            "[Kim tự tháp 'Testing levels' từ đáy lên đỉnh]: Unit → Integration → System → Acceptance",
+            "Nhóm 3 tầng dưới (Unit, Integration, System) ──> Development testing (verification)",
+            "Nhóm tầng đỉnh (Acceptance) ──> User testing (validation)"
+          ],
+          "diagramNote": "Sơ đồ kim tự tháp 'Testing levels' chia 4 tầng từ đáy (Unit, nhiều test nhỏ nhất) lên đỉnh (Acceptance); hai mũi tên hai chiều bên phải ghép Unit–Integration–System vào Development testing (verification) và Acceptance vào User testing (validation).",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "Slide minh họa **4 pha kiểm thử** theo trình tự tăng dần về quy mô: **Unit → Integration → System → Acceptance**.",
+            "Điểm quan trọng trên hình vẽ kim tự tháp: 3 mức đầu (Unit, Integration, System) thuộc **Development testing (Verification)** — tức kiểm tra xem đội dev có làm sản phẩm *đúng theo đặc tả/thiết kế* không; còn mức cuối (Acceptance) thuộc **User testing (Validation)** — khách hàng xác nhận sản phẩm có *đúng cái họ cần* không."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 1,
+          "title": "Testing Level",
+          "paragraphs": [
+            "Unit testing: source code are tested to verify the design has been correctly implemented.",
+            "Unit test case has 4 phases:"
+          ],
+          "bullets": [
+            "Setup",
+            "Exercise",
+            "Verify",
+            "Teardown"
+          ],
+          "diagramText": [
+            "Test: [ Setup | Exercise | Verify | Teardown ]",
+            "Setup ──initialize──> System Under Test (SUT)",
+            "Exercise ──exercise──> System Under Test (SUT) ──> Exercise",
+            "Verify <──assert── Verify ──> Test verdict (✓ / ✗)",
+            "System Under Test (SUT) <──interact──> Depended-On Component (DOC)",
+            "Caption: Unit test generic structure"
+          ],
+          "diagramNote": "Sơ đồ cấu trúc tổng quát của một unit test: khối Test gồm 4 bước xếp dọc (Setup, Exercise, Verify, Teardown) tương tác với khối System Under Test (SUT), và SUT giao tiếp với khối Depended-On Component (DOC).",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "**Unit testing** kiểm thử trực tiếp từng đơn vị mã nguồn (phương thức/lớp) nhằm xác minh mã cài đặt đúng với bản thiết kế chi tiết.",
+            "Một unit test chuẩn gồm **4 pha tuần tự**: (1) **Setup** chuẩn bị dữ liệu và khởi tạo SUT, (2) **Exercise** gọi phương thức trên SUT (lúc này SUT có thể tương tác với **DOC** hoặc bản giả lập mock/stub), (3) **Verify** dùng assertion so sánh kết quả thực tế với kỳ vọng để đưa ra phán quyết đạt/lỗi (Test verdict ✓/✗), và (4) **Teardown** giải phóng tài nguyên về trạng thái sạch."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 1,
+          "title": "Testing Level",
+          "paragraphs": [
+            "Integration testing: Test the interfaces, and the interaction between integrated components or modules.",
+            "Strategies for performing integration testing:"
+          ],
+          "bullets": [
+            "Top-down integration",
+            "Bottom-up integration"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Ngay cả khi từng unit hoạt động tốt riêng lẻ, lỗi vẫn có thể xảy ra ở giao diện truyền tham số hoặc giả định sai giữa các module khi ghép lại; **Integration testing** ra đời để kiểm tra chính các interface và tương tác liên module đó.",
+            "Thay vì ghép tất cả cùng lúc (dễ khó khoanh vùng lỗi), slide nêu 2 chiến lược tích hợp tăng dần kinh điển: **Top-down integration** (từ trên xuống) và **Bottom-up integration** (từ dưới lên)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 1,
+          "title": "Testing Level - Top Down",
+          "paragraphs": [
+            "Top-down integration:"
+          ],
+          "bullets": [
+            "Modules are integrated by moving downward through the control hierarchy, beginning with the main program.",
+            "Modules subordinate to the main control module are incorporated into the structure in either a depth first or breadth-first manner."
+          ],
+          "diagramText": [
+            "M₁ ──> M₂, M₃, (nét đứt) M₄",
+            "M₂ ──> M₅, M₆",
+            "M₃ ──(nét đứt)──> M₇",
+            "M₅ ──> M₈"
+          ],
+          "diagramNote": "Sơ đồ cây phân cấp điều khiển 8 module từ M₁ (gốc/chương trình chính) xuống M₂..M₈; các nút M₄, M₇ và cạnh nối tương ứng được vẽ bằng nét đứt để chỉ các module cấp dưới/stub trong minh họa.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "**Top-down integration** bắt đầu từ module điều khiển cao nhất (chương trình chính `M₁`) rồi mở rộng dần xuống các module cấp dưới theo cây phân cấp điều khiển.",
+            "Việc chọn thứ tự ghép các module cấp dưới ở mỗi bước có thể đi theo 2 cách quen thuộc của duyệt cây: **depth-first** (đi sâu hết một nhánh) hoặc **breadth-first** (đi ngang từng tầng)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 1,
+          "title": "Testing Level - Top Down",
+          "paragraphs": [
+            "Depth-first integration: integrates all components on a major control path of the program structure.",
+            "For example: Selecting the left-hand path, components M1, M2 , M5 would be integrated first. Next, M8 or M6 would be integrated. Then, the central and right-hand control paths are built"
+          ],
+          "diagramText": [
+            "[Khoanh tròn nhấn mạnh]: (M₁) ──> (M₂) ──> (M₅) ──> M₈",
+            "Các nhánh khác trên cây: M₂ ──> M₆; M₁ ──> M₃ ──(nét đứt)──> M₇; M₁ ──(nét đứt)──> M₄"
+          ],
+          "diagramNote": "Cây phân cấp tương tự Slide 10 nhưng vẽ thêm 3 vòng tròn bao quanh M₁, M₂, M₅ để minh họa nhánh điều khiển chính bên trái được tích hợp ưu tiên trước theo chiều sâu.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Trong **Depth-first integration** (tích hợp theo chiều sâu), ta đi trọn vẹn một đường điều khiển chính từ gốc xuống tới lá trước khi chuyển sang nhánh khác.",
+            "Theo ví dụ trên sơ đồ, nhánh trái `M₁ → M₂ → M₅` được tích hợp đầu tiên, tiếp đến là `M₈` hoặc `M₆` để hoàn thiện nhánh trái, sau đó mới sang nhánh giữa (`M₃, M₇`) và nhánh phải (`M₄`). Ưu điểm là sớm có một luồng tính năng chạy hoàn chỉnh đầu-cuối."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 1,
+          "title": "Testing Level - Top Down",
+          "paragraphs": [
+            "Breadth-first integration incorporates all components directly subordinate at each level, moving across the structure horizontally.",
+            "For example: Components M2, M3, and M4 would be integrated first. The next control level, M5, M6, and so on, follows."
+          ],
+          "diagramText": [
+            "Tầng 1: M₁",
+            "Tầng 2 (theo chiều ngang): M₂, M₃, (nét đứt) M₄",
+            "Tầng 3 (theo chiều ngang): M₅, M₆, (nét đứt) M₇",
+            "Tầng 4: M₈"
+          ],
+          "diagramNote": "Sơ đồ cây phân cấp M₁..M₈ minh họa quá trình ghép ngang từng tầng: hoàn thành M₂, M₃, M₄ ở tầng 2 trước rồi mới xuống M₅, M₆, M₇ ở tầng 3.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "**Breadth-first integration** (tích hợp theo chiều rộng) ghép tất cả các module trực thuộc cùng một tầng theo chiều ngang trước khi xuống tầng kế tiếp.",
+            "Trên hình, sau `M₁` sẽ tích hợp toàn bộ tầng 2 (`M₂, M₃, M₄`), rồi mới xuống tầng 3 (`M₅, M₆, M₇`) và cuối cùng là `M₈`. Cách này giúp kiểm soát kiến trúc tổng thể ở tầng trên sớm, nhưng có thể trì hoãn việc kiểm chứng luồng nghiệp vụ đầu-cuối."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 1,
+          "title": "Testing Level - Top Down",
+          "paragraphs": [
+            "The integration process is performed in a series of five steps:",
+            "1. The main control module is used as a test driver and stubs are substituted for all components directly subordinate to the main control module.",
+            "2. Depending on the integration approach selected (i.e., depth or breadth first), subordinate stubs are replaced one at a time with actual components.",
+            "3. Tests are conducted as each component is integrated.",
+            "4. On completion of each set of tests, another stub is replaced with the real component.",
+            "5. Regression testing may be conducted to ensure that new errors have not been introduced.",
+            "The process continues from step 2 until the entire program structure is built."
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Slide liệt kê chính xác **5 bước quy trình tích hợp Top-down**: dùng module chính làm driver và thay toàn bộ module con bằng **stub**; lần lượt thay từng stub bằng component thật (theo depth-first hoặc breadth-first); chạy test sau mỗi lần thay; thay tiếp stub khác; và thực hiện **regression testing** để bảo đảm thay đổi mới không phá hỏng phần đã chạy đúng.",
+            "Chi tiết cần nhớ: trong Top-down integration, **stub** đóng vai trò giả lập module cấp dưới trả về dữ liệu cứng hoặc đơn giản để module cấp trên có thể chạy thử được ngay."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 1,
+          "title": "Testing Level – Bottom-Up",
+          "paragraphs": [
+            "Bottom-Up integration:"
+          ],
+          "bullets": [
+            "Begins construction and testing with components at the lowest levels in the program structure",
+            {
+              "text": "A bottom-up integration strategy is implemented with the following steps:",
+              "subBullets": [
+                "1. Low-level components are combined into clusters that perform a specific software subfunction.",
+                "2. A driver (a control program for testing) is written to coordinate test-case input and output.",
+                "3. The cluster is tested.",
+                "4. Drivers are removed and clusters are combined moving upward in the program structure."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "**Bottom-up integration** đi theo chiều ngược lại: bắt đầu dựng và kiểm thử từ các thành phần cấp thấp nhất ở đáy cây phân cấp rồi mới ghép dần lên trên.",
+            "Quy trình 4 bước rất mạch lạc: gom module thấp thành **cluster** thực hiện một chức năng con → viết **driver** điều phối cấp input và kiểm output → test cluster → tháo driver và nâng các cluster ghép với module cấp trên."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 1,
+          "title": "Testing Level – Bottom-Up",
+          "paragraphs": [
+            "Components are combined to form clusters 1, 2, and 3.",
+            "Each of the clusters is tested using a driver (shown as a dashed block).",
+            "Components in clusters 1 and 2 are subordinate to Ma .",
+            "Drivers D1 and D2 are removed and the clusters are interfaced directly to Ma . Similarly, driver D3 for cluster 3 is removed prior to integration with module Mb.",
+            "Both Ma and Mb will be integrated with component Mc , and so forth."
+          ],
+          "diagramText": [
+            "M_c ──(nét đứt)──> M_a, M_b",
+            "M_a ──(nét đứt)──> D₁ (driver, khối nét đứt), D₂ (driver, khối nét đứt)",
+            "M_b ──(nét đứt)──> D₃ (driver, khối nét đứt)",
+            "D₁ ──(nét đứt)──> Cluster 1 (4 module cấp thấp)",
+            "D₂ ──(nét đứt)──> Cluster 2 (5 module cấp thấp)",
+            "D₃ ──(nét đứt)──> Cluster 3 (2 module cấp thấp)"
+          ],
+          "diagramNote": "Sơ đồ minh họa ví dụ Bottom-Up: ba cụm cấp thấp (Cluster 1, Cluster 2, Cluster 3) được test thông qua 3 driver nét đứt D₁, D₂, D₃; sau đó bỏ D₁, D₂ để nối Cluster 1 & 2 vào M_a, bỏ D₃ để nối Cluster 3 vào M_b, rồi ghép M_a và M_b lên M_c.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "Slide minh họa trực quan cơ chế làm việc của **driver** trong Bottom-up integration: vì `M_a` và `M_b` chưa được tích hợp hoặc chưa test xong, ta tạm đặt các driver `D₁, D₂, D₃` (hình chữ nhật nét đứt) phía trên để gọi thử từng cụm Cluster 1, 2, 3.",
+            "Ưu điểm của Bottom-up là không cần viết stub phức tạp cho các hàm xử lý dữ liệu tầng thấp; nhược điểm là bản thân chương trình hoàn chỉnh (`M_c`) mãi tới bước cuối cùng mới xuất hiện."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 1,
+          "title": "Testing Level",
+          "paragraphs": [
+            "System testing:"
+          ],
+          "bullets": [
+            "Involves integrating components to create a version of the system and the testing the integrated system.",
+            "It verifies that the components are compatible, interacts correctly, and transfer the right data at the right time, topically across its user interfaces.",
+            "It overlaps with integration testing, but the difference here is that system testing should involve all the system components"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "**System testing** ghép tất cả các thành phần thành một phiên bản hoàn chỉnh của toàn hệ thống để kiểm thử tổng thể (thường đi qua giao diện người dùng thực tế).",
+            "So sánh dễ bị hỏi trong đề thi: System testing có phần giao thoa với Integration testing ở khâu kiểm tra tương tác, nhưng **điểm khác biệt then chốt** là System testing phải bao gồm **toàn bộ (all) thành phần hệ thống** hoạt động cùng nhau (cả về chức năng lẫn phi chức năng như hiệu năng, bảo mật)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 1,
+          "title": "Testing Level",
+          "paragraphs": [
+            "Acceptance testing:"
+          ],
+          "bullets": [
+            "Test all system with real data or customer data.",
+            "The system development team should not be responsible for acceptance testing.",
+            "Checking to ensure that a system meets its requirements and is good enough for use by system customers",
+            "is usually a black-box testing"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "**Acceptance testing** (kiểm thử chấp nhận) là chốt chặn cuối cùng trước khi bàn giao đưa hệ thống vào vận hành: dùng **dữ liệu thật của khách hàng** để kiểm chứng hệ thống đạt yêu cầu và đủ tốt cho người dùng.",
+            "Hai ý đặc trưng rất hay ra thi: (1) thường sử dụng phương pháp **black-box testing** (chỉ quan tâm đầu vào/đầu ra theo yêu cầu nghiệp vụ), và (2) **đội phát triển hệ thống không nên chịu trách nhiệm** thực hiện kiểm thử chấp nhận để bảo đảm tính khách quan."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Phương pháp kiểm thử & Black-Box Testing (Equivalence Partitioning, BVA)",
+      "text": "Giới thiệu 3 phương pháp thiết kế test case (Black-box, White-box, Non-functional) và đi sâu vào hai kỹ thuật cốt lõi của Black-box Testing là Equivalence Partitioning (phân vùng tương đương) và Boundary Value Analysis (phân tích giá trị biên).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 18–22"
+      },
+      "digest": {
+        "keyPoints": [
+          "Ba phương pháp thiết kế test case (Testing methods): Black-box (dựa trên đặc tả chức năng), White-box (dựa trên tài liệu thiết kế/cấu trúc nội bộ), Non-functional (dựa trên yêu cầu phi chức năng).",
+          "Black-box testing còn gọi là behavioral testing hoặc functional testing, gồm 2 kỹ thuật chính: Equivalence Partitioning và Boundary Value Analysis (BVA).",
+          "Equivalence Partitioning chia miền đầu vào thành các lớp tương đương hợp lệ (valid) và không hợp lệ (invalid): khoảng giá trị / giá trị cụ thể / mảng / chuỗi → 1 valid + 2 invalid; tập hợp / Boolean → 1 valid + 1 invalid.",
+          "Boundary Value Analysis chọn test case tại các 'mép' (edges) của lớp tương đương và áp dụng cho CẢ miền đầu vào (input) lẫn miền đầu ra (output): với khoảng [a, b] chọn a, b và giá trị ngay trên/dưới a, b."
+        ],
+        "terms": [
+          {
+            "term": "Black-box testing",
+            "meaning": "Kiểm thử hộp đen (behavioral/functional testing), thiết kế test dựa trên chức năng được đặc tả mà không nhìn cấu trúc mã nguồn bên trong."
+          },
+          {
+            "term": "Equivalence Partitioning (EP)",
+            "meaning": "Chia miền dữ liệu thành các lớp tương đương sao cho mọi phần tử trong cùng lớp được kỳ vọng xử lý tương tự nhau."
+          },
+          {
+            "term": "Boundary Value Analysis (BVA)",
+            "meaning": "Phân tích giá trị biên: bổ sung cho EP bằng cách tập trung vào ranh giới của lớp hợp lệ/không hợp lệ nơi lập trình viên dễ sai dấu < vs <=."
+          }
+        ],
+        "pitfalls": [
+          "Quên đếm đủ lớp không hợp lệ trong Equivalence Partitioning: một khoảng [a, b] hoặc một giá trị cụ thể hoặc mảng/chuỗi có **2 lớp không hợp lệ** (ví dụ nhỏ hơn biên dưới và lớn hơn biên trên), còn Boolean và thành viên của tập hợp chỉ có **1 lớp không hợp lệ**.",
+          "Nhầm rằng BVA chỉ xét input: Slide 22 nhấn mạnh BVA tạo test case cho **cả output domain** (chọn input sao cho kết quả đầu ra rơi đúng vào các giá trị biên [a, b] và ngay trên/dưới a, b)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 1,
+          "title": "Testing Methods",
+          "paragraphs": [
+            "Testing methods (or strategies) define the way for designing test cases:"
+          ],
+          "bullets": [
+            "black box: design test cases on the basis of the specified functionality of the item to be tested",
+            "white box: rely on design document to develop test cases",
+            "non-functional: design test case to test non-functional requirement"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "Slide chuyển sang trục phân loại thứ hai — **Testing methods** (phương pháp/chiến lược thiết kế test case), trả lời câu hỏi 'làm sao nghĩ ra các bộ dữ liệu test hợp lý?'.",
+            "**Black-box** xuất phát từ đặc tả chức năng bên ngoài; **White-box** dựa vào tài liệu thiết kế và logic cấu trúc bên trong; **Non-functional** nhắm vào các thuộc tính chất lượng phi chức năng như tốc độ, tải, bảo mật."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 1,
+          "title": "Testing Methods",
+          "paragraphs": [
+            "Testing Methods"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Slide ngăn mục chuyển tiếp sau phần khái quát 3 phương pháp (Slide 18) để bước vào phân tích chi tiết từng kỹ thuật thiết kế test case.",
+            "Ba khối kỹ thuật chính ngay phía sau gồm: **Black-Box Testing** (Equivalence Partitioning & Boundary Value Analysis, Slides 20–22), **White-Box Testing** (Code Coverage, Basis Path & Loop Testing, Slides 23–32), và **Non-functional Testing** (Slide 33)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 1,
+          "title": "Black-Box Testing",
+          "paragraphs": [
+            "Black-box testing , also called behavioral testing or functional testing, focuses on the functional requirements of the software.",
+            "Techniques to generate test cases:"
+          ],
+          "bullets": [
+            "Equivalence Partitioning",
+            "Boundary Value Analysis"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 20"
+          },
+          "explanation": [
+            "**Black-box testing** còn có hai tên gọi khác rất hay gặp trong câu hỏi trắc nghiệm là **behavioral testing** (kiểm thử hành vi) và **functional testing** (kiểm thử chức năng).",
+            "Mục tiêu là bám sát *functional requirements* (đầu vào nào cho ra đầu ra nào) mà không cần xem code. Bài học trình bày 2 kỹ thuật sinh test case bổ trợ chặt chẽ cho nhau: **Equivalence Partitioning** và **Boundary Value Analysis**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 1,
+          "title": "Black-Box Testing",
+          "paragraphs": [
+            "Equivalence Partitioning:"
+          ],
+          "bullets": [
+            "Divides the input domain of a program into classes of data from which test cases can be derived.",
+            "An equivalence class represents a set of valid or invalid states for input conditions",
+            "An input condition is either a specific numeric value, a range of values, a set of related values, or a Boolean condition"
+          ],
+          "table": {
+            "headers": [
+              "Input condition",
+              "Equivalence class"
+            ],
+            "rows": [
+              [
+                "a range",
+                "one valid and two invalid classes"
+              ],
+              [
+                "a specific value",
+                "one valid and two invalid classes"
+              ],
+              [
+                "a member of a set",
+                "one valid and one invalid class"
+              ],
+              [
+                "boolean",
+                "one valid and one invalid class"
+              ],
+              [
+                "an array",
+                "one valid and two invalid classes"
+              ],
+              [
+                "a string",
+                "similar to array of characters"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 21"
+          },
+          "explanation": [
+            "**Equivalence Partitioning (EP)** giải quyết bài toán miền đầu vào vô hạn bằng cách chia input thành các phân vùng/lớp tương đương (valid và invalid) rồi lấy đại diện mỗi lớp 1–2 giá trị để test.",
+            "Hãy học thuộc bảng ánh xạ **6 dạng Input condition → số lớp Equivalence class**:",
+            "• Dạng có hai phía ngoài biên (**range**, **specific value**, **array**, và **string** giống mảng ký tự) → **1 lớp hợp lệ + 2 lớp không hợp lệ** (dưới mức tối thiểu và vượt mức tối đa/độ dài cho phép). Dạng rời rạc hoặc nhị phân (**member of a set**, **boolean**) → **1 lớp hợp lệ + 1 lớp không hợp lệ**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 1,
+          "title": "Black-Box Testing",
+          "paragraphs": [
+            "Boundary Value Analysis:"
+          ],
+          "bullets": [
+            "a selection of test cases that exercise bounding values.",
+            "leads to the selection of test cases at the “edges” of the class.",
+            "Rather than focusing solely on input conditions, BVA derives test cases from the output domain as well"
+          ],
+          "table": {
+            "caption": "Guidelines for BVA:",
+            "headers": [
+              "Condition",
+              "Test cases"
+            ],
+            "rows": [
+              [
+                "input a range [a,b]",
+                "Values a and b and just above and just below a and b."
+              ],
+              [
+                "input a number of values",
+                "The minimum, maximum numbers, values just above and below minimum and maximum"
+              ],
+              [
+                "output a range [a,b]",
+                "Choose test cases to create output values: a and b and just above and just below a and b."
+              ],
+              [
+                "output a number of values",
+                "Choose test cases to create output values: the minimum, maximum numbers, values just above and below minimum and maximum"
+              ]
+            ]
+          },
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 22"
+          },
+          "explanation": [
+            "**Boundary Value Analysis (BVA)** bổ sung trực tiếp cho EP vì lỗi lập trình (như nhầm `<` thành `<=`, sai chỉ số mảng `n` với `n-1`) tập trung rất dày ở các **điểm biên (edges)** của lớp tương đương.",
+            "Ví dụ với miền số nguyên `[1, 100]`, BVA chọn 6 điểm biên xung quanh 1 và 100 là `0, 1, 2` và `99, 100, 101` (hoặc ít nhất là `a−1, a, b, b+1` và hai điểm ngay bên trong biên).",
+            "Lưu ý quan trọng từ bảng **Guidelines for BVA**: BVA áp dụng cho **cả đầu vào (input)** lẫn **đầu ra (output)** — tức phải chọn test case làm sao ép kết quả đầu ra chạm đúng biên dưới `a`, biên trên `b`, và ngay trên/dưới các ngưỡng đó."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "White-Box Testing: Code Coverage, Basis Path Testing & Cyclomatic Complexity",
+      "text": "Kiểm thử hộp trắng qua 6 tiêu chí Code Coverage, kỹ thuật Basis Path Testing của Tom McCabe, cách chuyển thiết kế thành Flow Graph (Node, Edge, Region, Predicate node, Independent path), và 3 công thức tính độ phức tạp cyclomatic V(G).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 23–28"
+      },
+      "digest": {
+        "keyPoints": [
+          "White-box testing (glass-box / structural testing) dựa vào cấu trúc thiết kế và logic bên trong mã nguồn.",
+          "Sáu mức độ bao phủ mã (Code coverage): Statement coverage, Decision coverage, Condition coverage, Paths coverage, Function coverage, Entry/exit coverage.",
+          "Basis path testing (Tom McCabe) gồm 4 bước: (1) Vẽ flow graph từ thiết kế, (2) Tính cyclomatic complexity V(G), (3) Tìm tập cơ sở các đường độc lập tuyến tính (linearly independent paths), (4) Thiết kế test case ép chương trình chạy từng đường đó — bảo đảm mọi câu lệnh được thực thi ít nhất 1 lần.",
+          "Quy tắc Flow Graph: điều kiện ghép như IF (a OR b) phải tách thành predicate node riêng cho từng điều kiện a và b; khi đếm region phải tính cả vùng bên ngoài đồ thị.",
+          "Ba cách tính Cyclomatic Complexity V(G): V(G) = số regions (kể cả vùng ngoài) = E − N + 2 = P + 1 (P là số predicate nodes)."
+        ],
+        "terms": [
+          {
+            "term": "Predicate node",
+            "meaning": "Nút trong flow graph chứa điều kiện rẽ nhánh (mỗi nhánh đơn trong compound condition phải tách thành một predicate node riêng)."
+          },
+          {
+            "term": "Independent path",
+            "meaning": "Đường đi từ đầu tới cuối chương trình đưa vào ít nhất một tập câu lệnh xử lý mới hoặc điều kiện mới (phải đi qua ít nhất một cạnh chưa từng duyệt trước đó)."
+          },
+          {
+            "term": "Cyclomatic complexity V(G)",
+            "meaning": "Độ đo định lượng độ phức tạp logic của chương trình, đồng thời cho biết số lượng đường độc lập trong tập cơ sở (basis set)."
+          }
+        ],
+        "pitfalls": [
+          "Quên tính **vùng bên ngoài (outer area)** khi đếm số regions của flow graph.",
+          "Gộp nhầm compound condition `IF (a OR b)` thành 1 predicate node duy nhất — đúng ra phải tách thành **2 predicate node riêng biệt** cho `a` và `b`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 1,
+          "title": "White-Box Testing",
+          "paragraphs": [
+            "White-box testing (or glass-box testing or structural testing) is based on knowledge of the design, internal logic of an application's code. It determines if the program-code structure and logic is faulty.",
+            "Technique:"
+          ],
+          "bullets": [
+            {
+              "text": "Code coverage: define the degree of source code, which has been tested. There are several criteria for the code coverage:",
+              "subBullets": [
+                "Statement coverage: The line of code coverage granularity",
+                "Decision coverage: Control structure (for example, if-else) coverage granularity",
+                "Condition coverage: Boolean expression (true-false) coverage granularity.",
+                "Paths coverage: Every possible route coverage granularity.",
+                "Function coverage: Program functions coverage granularity.",
+                "Entry/exit coverage: Call and return of the coverage granularity."
+              ]
+            },
+            {
+              "text": "Techniques to generate test cases:",
+              "subBullets": [
+                "Basis path testing",
+                "Loop testing"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 23"
+          },
+          "explanation": [
+            "**White-box testing** (còn gọi là **glass-box** hoặc **structural testing**) soi trực tiếp vào cấu trúc điều khiển và logic bên trong mã nguồn để phát hiện nhánh sai, điều kiện thiếu hoặc đoạn mã chết.",
+            "Slide phân biệt 6 mức độ **Code coverage** tăng dần về độ chi tiết từ cấp hàm (**Function**, **Entry/exit**), cấp dòng lệnh (**Statement**), cấp nhánh rẽ (**Decision**: mọi nhánh true/false của `if-else`), cấp biểu thức con (**Condition**: từng vế boolean đúng/sai), tới cấp cao nhất là **Paths coverage** (mọi lộ trình khả dĩ).",
+            "Hai kỹ thuật sinh test case trọng tâm của White-box được trình bày ngay sau đây là **Basis path testing** (Slides 24–28) và **Loop testing** (Slides 29–32)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 1,
+          "title": "White-Box Testing",
+          "bullets": [
+            {
+              "text": "Basis path testing:",
+              "subBullets": [
+                "is a white-box testing technique first proposed by Tom McCabe.",
+                "enables the test-case designer to derive a logical complexity measure of a procedural design and use this measure as a guide for defining a basis set of execution paths.",
+                "Test cases derived to exercise the basis set are guaranteed to execute every statement in the program at least one time during testing."
+              ]
+            },
+            {
+              "text": "Process to generate basis set:",
+              "subBullets": [
+                "Using the design as a foundation, draw a corresponding flow graph.",
+                "Determine the cyclomatic complexity of the resultant flow graph.",
+                "Determine a basis set of linearly independent paths.",
+                "Prepare test cases that will force execution of each path in the basis set."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 24"
+          },
+          "explanation": [
+            "**Basis path testing** do Tom McCabe đề xuất giúp tránh bùng nổ tổ hợp của path coverage bằng cách chỉ tìm ra một tập cơ sở nhỏ gọn các **đường đi độc lập tuyến tính**, nhưng vẫn bảo đảm **mọi câu lệnh trong chương trình được chạy ít nhất 1 lần**.",
+            "Quy trình 4 bước chuẩn thi cử: (1) Chuyển lưu đồ thiết kế thành Flow Graph → (2) Tính Cyclomatic Complexity `V(G)` để biết cần đúng bao nhiêu đường → (3) Liệt kê đủ `V(G)` independent paths → (4) Chọn dữ liệu đầu vào sao cho từng test case ép chương trình đi đúng từng đường đó."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 1,
+          "title": "Flow Graph",
+          "bullets": [
+            {
+              "text": "Flow graph:",
+              "subBullets": [
+                "Each circle, called a flow graph node, represents one or more procedural statements. A sequence of process boxes and a decision diamond can map into a single node.",
+                "The arrows on the flow graph, called edges or links, represent flow of control and are analogous to flowchart arrows.",
+                "Areas bounded by edges and nodes are called regions. When counting regions, we include the area outside the graph as a region."
+              ]
+            },
+            "Note: a separate node is created for each of the conditions a and b in the statement IF (a OR b). Each node that contains a condition is called a predicate node",
+            {
+              "text": "An independent path:",
+              "subBullets": [
+                "is any path through the program that introduces at least one new set of processing statements or a new condition.",
+                "in flow graph, an independent path must move along at least one edge that has not been traversed before the path is defined"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 25"
+          },
+          "explanation": [
+            "Slide giải thích quy ước vẽ **Flow Graph** và 3 khái niệm cơ bản: **Node** (vòng tròn gom chuỗi lệnh tuần tự + thậm chí cả hình thoi điều kiện ngay sau nó), **Edge/Link** (mũi tên luồng điều khiển), và **Region** (vùng kín giới hạn bởi node/edge **cộng thêm 1 vùng bên ngoài đồ thị**).",
+            "Quy tắc đặc biệt dễ mất điểm nếu quên: với điều kiện ghép như `IF (a OR b)` hoặc `IF (a AND b)`, **không được gộp vào 1 nút** mà phải tách thành **2 predicate node riêng** cho `a` và `b`.",
+            "Định nghĩa **Independent path** giúp chọn tập đường cơ sở không dư thừa: mỗi đường mới được thêm vào bắt buộc phải đi qua **ít nhất 1 cạnh chưa từng đi qua** ở các đường trước đó."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 1,
+          "title": "Example: Design To Flow Graph",
+          "diagramText": [
+            "Hình (a) Flowchart: Start → Diamond 1 --(nhánh trái)--> Exit 11; Diamond 1 → Box 2 → Diamond 3 → { (nhánh trái) Diamond 6 → (Box 7 | Box 8) → Merge 9 → Merge 10; (nhánh phải) Box 4 → Box 5 → Merge 10 } → vòng lặp quay lên trước Diamond 1.",
+            "Hình (b) Flow Graph (9 nodes, 11 edges, 4 regions):",
+            "• Nodes: 1, (2,3), 6, (4,5), 7, 8, 9, 10, 11 [chuỗi tuần tự Box 2 + Diamond 3 gộp thành node 2,3; Box 4 + Box 5 gộp thành node 4,5].",
+            "• Edges: 1 → 2,3; 1 → 11; 2,3 → 6; 2,3 → 4,5; 6 → 7; 6 → 8; 7 → 9; 8 → 9; 9 → 10; 4,5 → 10; 10 → 1.",
+            "• Regions: R₁ (vùng bên phải giữa 1→2,3→4,5→10 và cung ngược 10→1), R₂ (vùng giữa 2,3→6→8→9→10←4,5←2,3), R₃ (vùng giữa 6→7→9←8←6), R₄ (vùng ngoài đồ thị).",
+            "Chú thích mũi tên trên hình: Edge, Node, Region."
+          ],
+          "diagramNote": "Đối chiếu hai hình (a) Flowchart và (b) Flow Graph: các khối tuần tự trước điều kiện hoặc không rẽ nhánh (2 & 3, 4 & 5) được gộp lại thành một node để rút gọn đồ thị; đồng thời đánh nhãn rõ 4 vùng R₁, R₂, R₃, R₄.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 26"
+          },
+          "explanation": [
+            "Ví dụ mẫu chuyển lưu đồ (a) sang Flow Graph (b): để ý hai chỗ gộp nút điển hình đúng quy tắc ở Slide 25 là Box 2 + Diamond 3 gộp thành nút `2,3`, và Box 4 + Box 5 gộp thành nút `4,5`.",
+            "Kiểm tra nhanh trên hình (b): tổng cộng có **9 nút** (`N = 9`), **11 cạnh có hướng** (`E = 11`), **3 nút điều kiện/predicate** (`P = 3` gồm nút `1`, nút `2,3` và nút `6`), và **4 vùng** (`R₁, R₂, R₃` bên trong + `R₄` bên ngoài)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 1,
+          "title": "Cyclomatic Complexity",
+          "paragraphs": [
+            "Cyclomatic complexity:"
+          ],
+          "bullets": [
+            "a software metric that provides a quantitative measure of the logical complexity of a program.",
+            "defines the number of independent paths in the basis set of a program to ensure that all statements have been executed at least once",
+            {
+              "text": "is computed in one of three ways:",
+              "subBullets": [
+                "The number of regions of the flow graph corresponds to the cyclomatic complexity.",
+                "Cyclomatic complexity V ( G ) for a flow graph G is defined as V ( G ) = E - N + 2 where E is the number of flow graph edges and N is the number of flow graph nodes.",
+                "Cyclomatic complexity V ( G ) for a flow graph G is also defined as V ( G ) = P + 1 where P is the number of predicate nodes contained in the flow graph G ."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 27"
+          },
+          "explanation": [
+            "Ba công thức tính **Cyclomatic Complexity `V(G)`** bắt buộc phải thuộc lòng và biết kiểm chứng chéo với nhau:",
+            "1) `V(G) = số regions` (đếm cả vùng ngoài cùng); 2) `V(G) = E − N + 2` (với `E` là số cạnh, `N` là số nút); 3) `V(G) = P + 1` (với `P` là số predicate node).",
+            "Áp dụng lại ngay cho hình (b) ở Slide 26: số regions = `4`; `E − N + 2 = 11 − 9 + 2 = 4`; `P + 1 = 3 + 1 = 4`. Cả 3 cách đều khớp bằng `4`, suy ra tập cơ sở có đúng **4 independent paths**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 1,
+          "title": "Example: White-box",
+          "diagramText": [
+            "Flow graph gồm 13 nút (1..13) và 17 cạnh có hướng:",
+            "• 1 → 2",
+            "• 2 → 3 ; 2 → 10",
+            "• 3 → 4 ; 3 → 10",
+            "• 4 → 5",
+            "• 5 → 6 ; 5 → 8",
+            "• 6 → 7 ; 6 → 8",
+            "• 7 → 8",
+            "• 8 → 9",
+            "• 9 → 2 (cung vòng lặp từ nút 9 quay lại nút 2)",
+            "• 10 → 11 ; 10 → 12",
+            "• 11 → 13 ; 12 → 13"
+          ],
+          "diagramNote": "Đồ thị luồng bài tập thực hành có N = 13 nút, E = 17 cạnh và P = 5 nút rẽ nhánh (nút 2, 3, 5, 6, 10), tương ứng với một vòng lặp lớn quay từ 9 về 2 và nhánh rẽ ra khối 10–13.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 28"
+          },
+          "explanation": [
+            "Slide đưa ra bài tập thực hành phân tích hộp trắng từ một Flow Graph hoàn chỉnh gồm **13 nút (`1..13`)**.",
+            "Khi áp dụng 3 công thức Slide 27 vào đồ thị này: số nút `N = 13`, số cạnh `E = 17` → `V(G) = 17 − 13 + 2 = 6`; kiểm tra theo predicate node có **5 nút rẽ 2 nhánh** là `2, 3, 5, 6, 10` (`P = 5`) → `V(G) = 5 + 1 = 6`; đếm vùng có 5 vùng kín (`[2-3-10]`, `[10-11-13-12]`, `[5-6-8]`, `[6-7-8]`, `[2-3-4-5-8-9-2]`) + 1 vùng ngoài = **6**.",
+            "Do đó ta cần xác định một basis set gồm đúng **6 independent paths** từ điểm vào `1` đến điểm kết thúc `13` (hoặc cuối vòng lặp `9`) rồi viết 6 test case tương ứng."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Loop Testing: Simple, Nested, Concatenated & Unstructured Loops",
+      "text": "Kỹ thuật kiểm thử vòng lặp (Loop testing) trong White-box testing cho 4 loại cấu trúc vòng lặp: Simple loops (tối đa n lần), Nested loops (lồng nhau), Concatenated loops (nối tiếp độc lập hoặc phụ thuộc) và Unstructured loops.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 29–32"
+      },
+      "digest": {
+        "keyPoints": [
+          "Loop testing tập trung hoàn toàn vào tính hợp lệ của các cấu trúc vòng lặp với 4 lớp vòng lặp: simple, concatenated, nested, và unstructured loops.",
+          "Simple loops (tối đa n lần lặp): test 0 lần (bỏ qua vòng), 1 lần, 2 lần, m lần (với m < n), và quanh ngưỡng biên là n−1, n, n+1 lần.",
+          "Nested loops: bắt đầu từ vòng trong cùng (giữ mọi vòng ngoài ở giá trị nhỏ nhất) và thực hiện simple loop tests cho vòng trong cùng + các giá trị ngoài khoảng/loại trừ; sau đó dịch dần ra ngoài (giữ vòng ngoài ở mức nhỏ nhất và các vòng trong đã test ở giá trị 'typical') tới khi xong hết.",
+          "Concatenated loops: nếu các vòng độc lập nhau thì test như simple loops; nếu phụ thuộc nhau (không độc lập — biến kết thúc vòng trước làm giá trị đầu vòng sau) thì áp dụng cách của nested loops.",
+          "Unstructured loops: bất cứ khi nào có thể, nên thiết kế lại (redesign) thay vì cố test."
+        ],
+        "terms": [
+          {
+            "term": "Simple loop",
+            "meaning": "Vòng lặp đơn đứng độc lập (như while, for, do-while) với số lần lặp tối đa cho phép là n."
+          },
+          {
+            "term": "Nested loop",
+            "meaning": "Vòng lặp nằm lồng bên trong một vòng lặp khác."
+          },
+          {
+            "term": "Concatenated loop",
+            "meaning": "Hai vòng lặp đặt nối tiếp nhau trong cùng một đoạn mã."
+          },
+          {
+            "term": "Unstructured loop",
+            "meaning": "Vòng lặp rẽ/nhảy chéo phi cấu trúc (ví dụ nhảy thẳng vào giữa thân vòng lặp)."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi thường gặp khi test **Nested loops**: không được đặt tất cả vòng ở mức lớn nhất ngay từ đầu (dễ bùng nổ số test case); phải đi từ **trong ra ngoài** (innermost → outward), đặt vòng ngoài ở min và vòng con đã xong ở typical.",
+          "Nhầm xử lý **Concatenated loops**: quên kiểm tra xem vòng sau có phụ thuộc kết quả/biến đếm của vòng trước không — có phụ thuộc phải dùng chiến lược **nested loops**."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 1,
+          "title": "White-Box Testing",
+          "paragraphs": [
+            "Loop testing:"
+          ],
+          "bullets": [
+            "a white-box testing technique that focuses exclusively on the validity of loop constructs",
+            "Four different classes of loops: simple loops, concatenated loops, nested loops, and unstructured loops"
+          ],
+          "diagramText": [
+            "1) Simple loops: gồm 2 dạng lưu đồ (kiểm tra điều kiện trước / kiểm tra điều kiện sau)",
+            "2) Nested loops: 1 vòng lặp nằm lồng bên trong vòng lặp ngoài",
+            "3) Concatenated loops: 2 vòng lặp đặt nối tiếp nhau từ trên xuống dưới",
+            "4) Unstructured loops: nhiều nhánh nhảy chéo cắt ngang vào/ra giữa các vòng"
+          ],
+          "diagramNote": "Hình gồm 4 cột lưu đồ đặt cạnh nhau từ trái sang phải minh họa hình dáng của Simple loops, Nested loops, Concatenated loops và Unstructured loops.",
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 29"
+          },
+          "explanation": [
+            "**Loop testing** là một nhánh chuyên biệt của White-box testing nhằm phát hiện các lỗi đặc trưng ở vòng lặp (như điều kiện dừng lệch 1 nhịp, biến đếm không được khởi tạo lại, vòng lặp vô hạn).",
+            "Slide phân loại toàn bộ các cấu trúc vòng lặp gặp trong thực tế thành **4 nhóm**: Simple, Nested, Concatenated, và Unstructured — mỗi nhóm có chiến lược test riêng ở 3 slide kế tiếp."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 1,
+          "title": "Simple Loops",
+          "paragraphs": [
+            "The following set of tests can be applied to simple loops, where n is the maximum number of allowable passes through the loop."
+          ],
+          "bullets": [
+            "1. Skip the loop entirely.",
+            "2. Only one pass through the loop.",
+            "3. Two passes through the loop.",
+            "4. m passes through the loop where m < n.",
+            "5. n - 1, n, n + 1 passes through the loop."
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 30"
+          },
+          "explanation": [
+            "Với **Simple loop** có tối đa `n` lần lặp cho phép, bộ 7 mốc kiểm thử chuẩn cần nhớ là: **`0, 1, 2, m (với 2 < m < n−1), n−1, n, n+1`**.",
+            "Ý nghĩa từng mốc: `0` kiểm tra điều kiện vào vòng (do-while không bỏ qua được nếu không rào trước); `1` và `2` kiểm tra việc cập nhật biến lặp qua lần chuyển tiếp; `m` kiểm tra trường hợp trung bình; còn `n−1, n, n+1` áp dụng tư duy giá trị biên ngay tại giới hạn tối đa (đặc biệt `n+1` kiểm tra xử lý tràn/vượt ngưỡng)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 1,
+          "title": "Nested Loops",
+          "paragraphs": [
+            "The following set of tests can be applied to Nested loops"
+          ],
+          "bullets": [
+            "1. Start at the innermost loop. Set all other loops to minimum values.",
+            "2. Conduct simple loop tests for the innermost loop while holding the outer loops at their minimum iteration parameter (e.g., loop counter) values. Add other tests for out-of-range or excluded values.",
+            "3. Work outward, conducting tests for the next loop, but keeping all other outer loops at minimum values and other nested loops to “typical” values.",
+            "4. Continue until all loops have been tested."
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 31"
+          },
+          "explanation": [
+            "Nếu test tổ hợp mọi vòng lặp lồng nhau một cách ngây thơ, số test case sẽ tăng theo cấp số nhân (`7^k`). Kỹ thuật chuẩn giải quyết bằng cách **cố định các vòng khác và quét từ trong ra ngoài (innermost → outward)**.",
+            "Cách làm 4 bước: bắt đầu từ vòng **trong cùng** (giữ tất cả vòng ngoài ở giá trị tối thiểu *min*), chạy trọn bộ Simple Loop tests cho vòng này; rồi lùi dần ra vòng ngoài kế tiếp trong khi vẫn giữ các vòng ngoài hơn ở *min* và đặt các vòng con bên trong ở giá trị **điển hình (typical)**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 1,
+          "title": "Concatenated Loops & Unstructured Loops",
+          "bullets": [
+            {
+              "text": "Concatenated loops:",
+              "subBullets": [
+                "can be tested using the approach defined for simple loops, if each of the loops is independent of the other.",
+                "When the loops are not in dependent, the approach applied to nested loops is recommended"
+              ]
+            },
+            {
+              "text": "Unstructured Loops:",
+              "subBullets": [
+                "Whenever possible, this class of loops should be redesigned."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 32"
+          },
+          "explanation": [
+            "Với **Concatenated loops** (hai vòng nối tiếp nhau), mấu chốt nằm ở tính độc lập dữ liệu: nếu biến kiểm soát/dữ liệu hai vòng hoàn toàn độc lập → test từng vòng như **simple loops**; ngược lại nếu vòng đầu quyết định ngưỡng/biến đếm cho vòng sau (**phụ thuộc nhau**, slide gõ nhầm là *'not in dependent'*) → phải dùng chiến lược của **nested loops**.",
+            "Với **Unstructured loops** (vòng lặp nhảy cóc, nhiều lối vào/ra đan xen), chi phí test và rủi ro lỗi quá cao nên khuyến nghị chuẩn là **viết lại/thiết kế lại (redesign)** thành các vòng cấu trúc sạch."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Non-functional Testing, Testing Types (Manual vs Automated) & Summary",
+      "text": "Bảy loại kiểm thử phi chức năng (Performance, Load, Volume, Stress, Security với 6 khái niệm bảo mật, Usability, Accessibility), hai hình thức thực thi Manual vs Automated testing và tổng kết toàn bài.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 33–35"
+      },
+      "digest": {
+        "keyPoints": [
+          "Non-functional testing kiểm tra các khía cạnh chất lượng của hệ thống gồm 7 loại: Performance, Load, Volume, Stress, Security, Usability, Accessibility.",
+          "Phân biệt 4 loại kiểm thử hiệu năng/tải: Performance (đo thời gian phản hồi với 1 hoặc nhiều người dùng), Load (tăng tải tới ngưỡng tối đa đã nêu/ngầm định), Volume (cùng nhóm với load nhưng tập trung vào khối lượng dữ liệu), Stress (vượt quá công suất vận hành bình thường cho tới khi hệ thống sập để tìm giới hạn gãy thực sự).",
+          "Security testing bảo đảm 6 nguyên lý: confidentiality, integrity, authentication, authorization, availability, và non-repudiation.",
+          "Usability tập trung tìm lỗi giao diện gây khó dùng hoặc hiểu nhầm kết quả; Accessibility kiểm tra tuân thủ chuẩn tiếp cận (cho mọi đối tượng người dùng).",
+          "Hai loại Testing Types: Manual testing (do con người — kỹ sư phần mềm hoặc người dùng cuối — đánh giá SUT) và Automated testing (dùng phần mềm và hạ tầng chuyên dụng để tự động thực thi kiểm thử)."
+        ],
+        "terms": [
+          {
+            "term": "Volume vs Stress testing",
+            "meaning": "Volume testing tập trung vào lượng dữ liệu lớn; Stress testing đẩy tải vượt quá công suất thiết kế bình thường cho tới khi hệ thống hỏng để tìm ranh giới giới hạn thực."
+          },
+          {
+            "term": "6 nguyên lý Security testing",
+            "meaning": "Confidentiality (bảo mật), Integrity (toàn vẹn), Authentication (xác thực), Authorization (phân quyền), Availability (sẵn sàng), Non-repudiation (chống chối bỏ)."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm **Load testing** (kiểm tra trong phạm vi tải tối đa kỳ vọng) với **Stress testing** (cố tình vượt ngưỡng bình thường tới mức fail để xác định điểm gãy)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 1,
+          "title": "Non-functional Testing",
+          "bullets": [
+            "The Non-functional aspects of a system can require considerable effort to test.",
+            {
+              "text": "List of non-functional testing:",
+              "subBullets": [
+                "Performance testing: measure response time with a single user exercising the system or with multiple users exercising the system",
+                "Load testing: focused on increasing the load on the system to some stated or implied maximum load",
+                "Volume testing: often considered synonymous with load testing, yet volume testing focuses on data",
+                "Stress testing: exercises beyond normal operational capacity to the extent that the system fails, identifying actual boundaries at which the system breaks",
+                "Security testing: ensure the following concepts: confidentiality, integrity , authentication, authorization, availability, and non-repudiation",
+                "Usability testing: focuses on finding user interface problems, which may make the software difficult to use or may cause users to misinterpret the output",
+                "Accessibility testing: making sure that our product is accessibility compliant"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 33"
+          },
+          "explanation": [
+            "Slide tổng hợp **7 loại Non-functional testing** trọng tâm và ranh giới phân biệt từng loại:",
+            "• Bộ 4 về tải & dữ liệu: **Performance** đo thời gian phản hồi (1 hoặc nhiều người dùng); **Load** tăng tải tới ngưỡng tối đa dự kiến; **Volume** nhấn mạnh vào *khối lượng dữ liệu*; **Stress** đẩy *vượt quá* ngưỡng bình thường cho tới khi sập để tìm giới hạn gãy và khả năng phục hồi.",
+            "• **Security testing** cần nhớ đủ **6 khái niệm**: Confidentiality, Integrity, Authentication, Authorization, Availability, và Non-repudiation. Còn **Usability** tìm lỗi UI gây khó dùng/hiểu sai output; **Accessibility** bảo đảm tuân thủ khả năng tiếp cận (ví dụ hỗ trợ người khuyết tật)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 1,
+          "title": "Testing Types",
+          "paragraphs": [
+            "There are two main types:"
+          ],
+          "bullets": [
+            "Manual testing: This is the process of assessing the SUT is done by a human, typically a software engineer or the final consumer",
+            "Automated testing: This is the process of assessing the SUT in which the testing process is carried out with special software and infrastructure for testing"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 34"
+          },
+          "explanation": [
+            "Slide trình bày trục phân loại thứ ba — **Testing Types** (cách thức thực hiện kiểm thử), gồm 2 loại chính: **Manual testing** (con người thao tác trực tiếp, chẳng hạn kỹ sư QA hoặc khách hàng khi kiểm thử chấp nhận/khả dụng) và **Automated testing** (dùng công cụ, kịch bản mã nguồn và hạ tầng như JUnit 5, Selenium, CI/CD để chạy lặp lại tự động).",
+            "Trong thực tế, hai loại này bổ trợ lẫn nhau: Automated phù hợp cho unit test, regression test lặp đi lặp lại; Manual phù hợp cho exploratory testing, usability hoặc user acceptance."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 1,
+          "title": "Summary",
+          "bullets": [
+            "Software testing",
+            "Testing level",
+            "Testing methods",
+            "Testing types"
+          ],
+          "source": {
+            "file": "Resources/Lecture 12.pdf",
+            "loc": "Slide 35"
+          },
+          "explanation": [
+            "Slide khép lại Lecture 12 với 4 cột mốc kiến thức đúng như Outline ban đầu: định nghĩa & 4 từ khóa **Software testing**, 4 **Testing levels** (Unit → Integration → System → Acceptance), 3 **Testing methods** (Black-box, White-box, Non-functional), và 2 **Testing types** (Manual, Automated).",
+            "Khi ôn tập tổng hợp, hãy kết nối ngay phần lý thuyết này với bài thực hành JUnit 5 (Tutorial 12) để thấy cách áp dụng Setup–Exercise–Verify–Teardown, Equivalence Partitioning và BVA vào test case thật bằng Java."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l12-c01", "front": "Bốn khái niệm then chốt trong định nghĩa software testing?", "back": "Dynamic, Finite, Selected, Expected.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 4" } },
-    { "id": "se1-l12-c02", "front": "Top-down khác bottom-up integration ở công cụ giả lập?", "back": "Top-down dùng stub thay module cấp dưới; bottom-up dùng driver điều phối test cho cluster.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slides 13–14" } },
-    { "id": "se1-l12-c03", "front": "Equivalence classes cho input là một khoảng giá trị?", "back": "1 lớp hợp lệ và 2 lớp không hợp lệ.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 21" } },
-    { "id": "se1-l12-c04", "front": "Ba công thức cyclomatic complexity V(G)?", "back": "V(G) = số region (gồm vùng ngoài) = E − N + 2 = P + 1 (P: predicate nodes).", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 27" } },
-    { "id": "se1-l12-c05", "front": "Các test case cho simple loop tối đa n lần?", "back": "0, 1, 2, m (m < n), n−1, n, n+1 lần.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 30" } },
-    { "id": "se1-l12-c06", "front": "Stress testing là gì?", "back": "Thực thi vượt công suất vận hành bình thường tới khi hệ thống hỏng để xác định ranh giới thực.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 33" } },
-    { "id": "se1-l12-c07", "front": "Sáu khái niệm của security testing?", "back": "Confidentiality, integrity, authentication, authorization, availability, non-repudiation.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 33" } }
+    {
+      "id": "se1-l12-c01",
+      "front": "Bốn khái niệm then chốt trong định nghĩa software testing?",
+      "back": "Dynamic (chạy thật SUT với input cụ thể), Finite (tập test hữu hạn vì không thể vét cạn), Selected (chọn test dễ làm lộ lỗi nhất), Expected (có hành vi mong đợi để đối chiếu đạt/lỗi).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "se1-l12-c02",
+      "front": "Ba trục phân loại kiểm thử phần mềm trong Lecture 12?",
+      "back": "1) Testing level: unit, integration, system, acceptance; 2) Testing methods: black-box, white-box, non-functional; 3) Testing types: manual, automated.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 5"
+      }
+    },
+    {
+      "id": "se1-l12-c03",
+      "front": "Trong 4 mức kiểm thử, mức nào thuộc Verification và mức nào thuộc Validation?",
+      "back": "Unit, Integration, System thuộc Development testing (Verification); Acceptance thuộc User testing (Validation).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "se1-l12-c04",
+      "front": "Bốn pha trong cấu trúc tổng quát của một Unit test case?",
+      "back": "Setup (khởi tạo SUT) → Exercise (thực thi SUT, tương tác với DOC) → Verify (assert so sánh để ra Test verdict) → Teardown (dọn dẹp).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l12-c05",
+      "front": "Top-down khác Bottom-up integration ở công cụ giả lập nào?",
+      "back": "Top-down bắt đầu từ main control module (làm driver) và dùng stub thay module cấp dưới (tích hợp depth-first hoặc breadth-first, có regression testing); Bottom-up gom module cấp thấp thành cluster và viết driver điều phối test, rồi gỡ driver đi lên.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 10–15"
+      }
+    },
+    {
+      "id": "se1-l12-c06",
+      "front": "Điểm khác biệt giữa System testing và Integration testing, và đặc điểm của Acceptance testing?",
+      "back": "System testing phải bao gồm TẤT CẢ các thành phần của hệ thống. Acceptance testing chạy trên dữ liệu thật/khách hàng, thường là black-box, và đội phát triển KHÔNG nên chịu trách nhiệm.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 16–17"
+      }
+    },
+    {
+      "id": "se1-l12-c07",
+      "front": "Equivalence Partitioning chia lớp hợp lệ/không hợp lệ theo các dạng input nào?",
+      "back": "A range / a specific value / an array / a string: 1 lớp hợp lệ + 2 lớp không hợp lệ. A member of a set / boolean: 1 lớp hợp lệ + 1 lớp không hợp lệ.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 21"
+      }
+    },
+    {
+      "id": "se1-l12-c08",
+      "front": "Nguyên tắc chọn test case trong Boundary Value Analysis (BVA) cho khoảng [a, b]?",
+      "back": "Chọn tại a, b và ngay trên/dưới a, b (cả với số lượng giá trị min/max); đặc biệt BVA tạo test case cho CẢ miền đầu vào (input) và miền đầu ra (output).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l12-c09",
+      "front": "Sáu tiêu chí Code Coverage trong White-box testing?",
+      "back": "Statement coverage, Decision coverage, Condition coverage, Paths coverage, Function coverage, Entry/exit coverage.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "se1-l12-c10",
+      "front": "Quy tắc tách Predicate node cho compound condition và định nghĩa Independent path trong Flow Graph?",
+      "back": "Với IF (a OR b), phải tạo predicate node riêng cho TỪNG điều kiện a và b. Independent path là đường đi đưa vào ít nhất một tập câu lệnh xử lý hoặc điều kiện mới (phải đi qua ít nhất 1 cạnh chưa từng duyệt trước đó).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 25"
+      }
+    },
+    {
+      "id": "se1-l12-c11",
+      "front": "Ba công thức tính Cyclomatic Complexity V(G)?",
+      "back": "1) V(G) = số regions (kể cả vùng ngoài đồ thị); 2) V(G) = E − N + 2 (E: số cạnh, N: số nút); 3) V(G) = P + 1 (P: số predicate nodes).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 27"
+      }
+    },
+    {
+      "id": "se1-l12-c12",
+      "front": "Bộ test case cho Simple loop tối đa n lần và chiến lược Nested / Concatenated / Unstructured loops?",
+      "back": "Simple loop: 0, 1, 2, m (m < n), n−1, n, n+1 lần. Nested: từ trong ra ngoài (vòng ngoài để min, vòng con đã xong để typical). Concatenated: độc lập → simple; phụ thuộc → nested. Unstructured: nên redesign.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 29–32"
+      }
+    },
+    {
+      "id": "se1-l12-c13",
+      "front": "Phân biệt Load testing, Volume testing và Stress testing?",
+      "back": "Load testing: tăng tải tới mức tối đa dự kiến; Volume testing: tập trung vào khối lượng dữ liệu lớn; Stress testing: ép tải vượt công suất vận hành bình thường cho tới khi hệ thống sập để xác định ranh giới thực.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 33"
+      }
+    },
+    {
+      "id": "se1-l12-c14",
+      "front": "Sáu khái niệm trong Security testing và hai loại Testing Types?",
+      "back": "Security testing gồm 6 khái niệm: Confidentiality, Integrity, Authentication, Authorization, Availability, Non-repudiation. Testing types gồm 2 loại: Manual testing (con người thực hiện) và Automated testing (dùng phần mềm và hạ tầng chuyên dụng).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 33–34"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l12-q01", "stem": "Flow graph có E = 11 cạnh và N = 9 nút. V(G) bằng?", "options": ["2", "4", "6", "20"], "answer": 1, "explanation": "V(G) = E − N + 2 = 11 − 9 + 2 = 4.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 27" } },
-    { "id": "se1-l12-q02", "stem": "Với IF a OR b (compound condition) trong flow graph, cần bao nhiêu predicate node?", "options": ["1", "2", "3", "0"], "answer": 1, "explanation": "Mỗi điều kiện đơn (a và b) cần một predicate node riêng.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 26" } },
-    { "id": "se1-l12-q03", "stem": "Ai KHÔNG nên chịu trách nhiệm acceptance testing?", "options": ["Khách hàng", "Đội phát triển hệ thống", "Người dùng cuối", "Bên thứ ba độc lập"], "answer": 1, "explanation": "Slide 17: đội phát triển không nên chịu trách nhiệm acceptance testing.", "source": { "file": "Resources/Lecture 12.pdf", "loc": "Slide 17" } }
+    {
+      "id": "se1-l12-q01",
+      "stem": "Flow graph có E = 11 cạnh và N = 9 nút. Cyclomatic complexity V(G) bằng bao nhiêu?",
+      "options": [
+        "2",
+        "4",
+        "6",
+        "20"
+      ],
+      "answer": 1,
+      "explanation": "Slide 27 (và ví dụ Slide 26): V(G) = E − N + 2 = 11 − 9 + 2 = 4.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 27"
+      }
+    },
+    {
+      "id": "se1-l12-q02",
+      "stem": "Khi vẽ Flow Graph cho câu lệnh điều kiện ghép IF (a OR b), cần tạo bao nhiêu predicate node?",
+      "options": [
+        "1 predicate node cho cả biểu thức",
+        "2 predicate node riêng biệt cho a và b",
+        "3 predicate node",
+        "0 predicate node"
+      ],
+      "answer": 1,
+      "explanation": "Slide 25: 'a separate node is created for each of the conditions a and b in the statement IF (a OR b). Each node that contains a condition is called a predicate node'.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 25"
+      }
+    },
+    {
+      "id": "se1-l12-q03",
+      "stem": "Theo Slide 17, ai KHÔNG nên chịu trách nhiệm thực hiện Acceptance testing?",
+      "options": [
+        "Khách hàng",
+        "Đội phát triển hệ thống",
+        "Người dùng cuối",
+        "Đội đại diện phía khách hàng dùng dữ liệu thực"
+      ],
+      "answer": 1,
+      "explanation": "Slide 17 nêu rõ: 'The system development team should not be responsible for acceptance testing.'",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l12-q04",
+      "stem": "Theo kim tự tháp Testing levels (Slide 7), nhóm nào thuộc Development testing (verification)?",
+      "options": [
+        "Chỉ có Unit testing",
+        "Unit, Integration và System testing",
+        "System và Acceptance testing",
+        "Chỉ có Acceptance testing"
+      ],
+      "answer": 1,
+      "explanation": "Slide 7: 3 mức dưới (Unit, Integration, System) thuộc Development testing (verification); mức đỉnh (Acceptance) thuộc User testing (validation).",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "se1-l12-q05",
+      "stem": "Thứ tự 4 pha chuẩn trong cấu trúc tổng quát của một Unit test case là gì?",
+      "options": [
+        "Setup → Verify → Exercise → Teardown",
+        "Initialize → Assert → Teardown → Interact",
+        "Setup → Exercise → Verify → Teardown",
+        "Exercise → Setup → Verify → Teardown"
+      ],
+      "answer": 2,
+      "explanation": "Slide 8: Unit test case gồm 4 pha theo đúng thứ tự Setup → Exercise → Verify → Teardown.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l12-q06",
+      "stem": "Nhận định nào đúng về công cụ giả lập trong Top-down và Bottom-up integration testing?",
+      "options": [
+        "Top-down dùng driver ở phía dưới; Bottom-up dùng stub ở phía trên",
+        "Top-down dùng main control module làm driver và thay module cấp dưới bằng stub; Bottom-up gom module thấp thành cluster và viết driver điều phối test",
+        "Cả Top-down và Bottom-up đều chỉ dùng stub",
+        "Bottom-up bắt đầu từ main control module đi xuống theo chiều sâu"
+      ],
+      "answer": 1,
+      "explanation": "Slides 13–15: Top-down thay các module cấp dưới bằng stub; Bottom-up gom các module cấp thấp thành cluster và viết driver để điều phối input/output trước khi gỡ driver đi lên.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slides 13–15"
+      }
+    },
+    {
+      "id": "se1-l12-q07",
+      "stem": "Trong Equivalence Partitioning (Slide 21), nếu điều kiện đầu vào là một khoảng giá trị (a range) hoặc một mảng (an array), ta thu được bao nhiêu lớp tương đương?",
+      "options": [
+        "1 lớp hợp lệ và 1 lớp không hợp lệ",
+        "1 lớp hợp lệ và 2 lớp không hợp lệ",
+        "2 lớp hợp lệ và 1 lớp không hợp lệ",
+        "2 lớp hợp lệ và 2 lớp không hợp lệ"
+      ],
+      "answer": 1,
+      "explanation": "Bảng Slide 21: 'a range', 'a specific value', và 'an array' (cùng 'a string' tương tự mảng ký tự) đều có 'one valid and two invalid classes'; chỉ 'a member of a set' và 'boolean' là 'one valid and one invalid class'.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 21"
+      }
+    },
+    {
+      "id": "se1-l12-q08",
+      "stem": "Điểm đặc trưng nào của Boundary Value Analysis (BVA) được nhấn mạnh trong bảng Guidelines for BVA (Slide 22)?",
+      "options": [
+        "Chỉ áp dụng cho biến kiểu Boolean",
+        "Chỉ xét các giá trị nằm chính giữa khoảng hợp lệ",
+        "Không chỉ xét điều kiện đầu vào (input) mà còn dẫn xuất test case từ miền đầu ra (output)",
+        "Thay thế hoàn toàn nhu cầu viết regression testing"
+      ],
+      "answer": 2,
+      "explanation": "Slide 22: 'Rather than focusing solely on input conditions, BVA derives test cases from the output domain as well', áp dụng chọn a, b và ngay trên/dưới a, b cho cả input lẫn output.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l12-q09",
+      "stem": "Với hai vòng lặp nối tiếp (Concatenated loops) có phụ thuộc dữ liệu lẫn nhau (vòng sau phụ thuộc kết quả vòng trước), nên áp dụng cách tiếp cận kiểm thử nào?",
+      "options": [
+        "Kiểm thử như Simple loops",
+        "Kiểm thử theo cách của Nested loops",
+        "Bỏ qua vòng thứ hai",
+        "Chỉ kiểm thử 0 lần và n+1 lần"
+      ],
+      "answer": 1,
+      "explanation": "Slide 32: nếu hai vòng lặp nối tiếp độc lập → dùng cách của simple loops; nếu chúng phụ thuộc nhau ('not in dependent') → khuyến nghị dùng cách của nested loops.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 32"
+      }
+    },
+    {
+      "id": "se1-l12-q10",
+      "stem": "Loại kiểm thử phi chức năng nào cố tình thực thi vượt quá công suất vận hành bình thường cho tới khi hệ thống hỏng nhằm xác định giới hạn gãy thực tế?",
+      "options": [
+        "Load testing",
+        "Volume testing",
+        "Stress testing",
+        "Usability testing"
+      ],
+      "answer": 2,
+      "explanation": "Slide 33: 'Stress testing: exercises beyond normal operational capacity to the extent that the system fails, identifying actual boundaries at which the system breaks'.",
+      "source": {
+        "file": "Resources/Lecture 12.pdf",
+        "loc": "Slide 33"
+      }
+    }
   ]
 }

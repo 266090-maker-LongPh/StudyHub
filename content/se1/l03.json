@@ -1,23 +1,1112 @@
 {
-  "id": "se1-l03", "order": 3,
+  "id": "se1-l03",
+  "order": 3,
   "title": "Lecture 3: Iteration Abstraction",
-  "summary": [
-    { "h": "Vì sao cần iteration abstraction", "text": "Trả về mảng (int[] members()) kém hiệu quả với tập lớn vì phải sao chép. Thêm get(int index) không hơn vòng for, còn trả về vector nội bộ elements làm lộ rep (phá encapsulation). Iteration abstraction cho truy cập tăng dần kiểu hỏi–lấy (ask & get), không giới hạn kích thước và không giả định biểu diễn của collection." },
-    { "h": "Generator: pre-populated và auto-populated", "text": "Pre-populated collection (ví dụ LinkedList): generator sinh chỉ số trên các phần tử đã có. Auto-populated collection (ví dụ PrimeList): phần tử (có thể đến một giới hạn max) được sinh ngay khi truy cập qua generator." },
-    { "h": "Iterator và Iterable trong Java", "text": "Collection implement Iterable và có iterator()/elements() trả về generator implement java.util.Iterator; generator thường là private inner class của collection (ví dụ LinkedListGen).", "code": { "lang": "java", "text": "Iterator<Integer> g = list.iterator();\nwhile (g.hasNext()) {\n  Integer x = g.next();\n}\n// hoặc kiểm soát bằng exception\ntry {\n  while (true) { Integer x = g.next(); }\n} catch (NoSuchElementException e) { }" } },
-    { "h": "Ba method của Iterator", "text": "hasNext(): hỏi còn phần tử không. next() throws NoSuchElementException: trả phần tử kế và cập nhật trạng thái generator. remove() throws UnsupportedOperationException, IllegalStateException: xóa phần tử cuối do next() trả về; tùy chọn, chỉ cho collection sửa được." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 3.pdf",
+    "totalPages": 30,
+    "extractedPages": 30,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 3.pdf có đúng 30 trang (Slides 1–30), đầy đủ text layer và sơ đồ UML/Generator.",
+      "Slide 7: Slide gốc viết lặp chữ 'is is inefficient' (giữ nguyên văn).",
+      "Slide 9: Slide gốc viết 'knowlege' thiếu chữ d (giữ nguyên văn)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 3.pdf",
+      "loc": "Slides 1–30 (đầy đủ 30/30 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 3.pdf", "loc": "Slides 1–30" }],
+  "summary": [
+    {
+      "h": "Giới thiệu bài giảng & Động lực của Iteration Abstraction",
+      "text": "Giới thiệu Lecture 3 về Iteration Abstraction, yêu cầu duyệt collection tổng quát (tăng dần, kích thước không giới hạn, cả index-based lẫn non-index-based) và lý do 3 cách tiếp cận trực giác (trả mảng, get(index), trả vector nội bộ) đều không đạt.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 1–9"
+      },
+      "digest": {
+        "keyPoints": [
+          "Mục tiêu của Iteration abstraction: duyệt thuận tiện và hiệu quả mọi collection (cả mảng có chỉ số lẫn tập hợp Set không có chỉ số), hỗ trợ truy cập tăng dần (incremental/run-time access) và kích thước không giới hạn.",
+          "Cách 1 (trả về mảng `int[] members()`): kém hiệu quả khi tập lớn vì phải cấp phát và sao chép toàn bộ danh sách.",
+          "Cách 2 (thêm `get(int index)` như ArrayList): không cải thiện so với vòng lặp `for` truyền thống (và không tự nhiên cho tập không thứ tự/Set).",
+          "Cách 3 (observer trả về vector `elements` nội bộ): phá hủy tính đóng gói của Collection vì làm lộ biểu diễn bên trong (exposing the rep).",
+          "Giải pháp Iteration abstraction: cung cấp truy cập tăng dần theo cặp hỏi–lấy (ask & get), không ràng buộc kích thước, không giả định cấu trúc biểu diễn (rep) bên trong và đặc tả như một interface."
+        ],
+        "terms": [
+          {
+            "term": "Iteration abstraction",
+            "meaning": "Sự trừu tượng hóa việc duyệt tập hợp, cung cấp truy cập tăng dần (ask & get) tới các phần tử mà không lộ cấu trúc biểu diễn (rep) của collection."
+          },
+          {
+            "term": "Exposing the rep",
+            "meaning": "Làm lộ biểu diễn dữ liệu nội bộ (ví dụ trả về trực tiếp Vector/List bên trong) khiến code ngoài sửa hỏng bất biến của collection."
+          },
+          {
+            "term": "Abstraction Function (AF)",
+            "meaning": "Hàm ánh xạ biểu diễn nội bộ (c.els) sang khái niệm trừu tượng (ví dụ tập hợp IntSet {x1, ..., xn})."
+          }
+        ],
+        "pitfalls": [
+          "Trả về vector `elements` nội bộ dù chạy nhanh O(1) vẫn bị loại ngay vì lỗi thiết kế nghiêm trọng: 'exposing the rep'."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 3: Iteration Abstraction",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 3",
+            "Iteration Abstraction"
+          ],
+          "explanation": [
+            "Slide mở đầu Lecture 3 giới thiệu chủ đề Trừu tượng hóa phép lặp (Iteration Abstraction) trong học phần 61FIT3SE1.",
+            "Nếu Lecture 2 xử lý tình huống bất thường bằng Exception, thì Lecture 3 sử dụng cả thiết kế hướng đối tượng lẫn Exception (`NoSuchElementException`) để xây dựng cơ chế duyệt tổng quát cho mọi cấu trúc dữ liệu."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Outline",
+          "bullets": [
+            {
+              "text": "Iteration",
+              "subBullets": [
+                "Why iteration abstraction?",
+                "Generator",
+                "Iteration in Java",
+                "Implement an iteration",
+                "Using iteration"
+              ]
+            }
+          ],
+          "explanation": [
+            "Bố cục 5 phần của bài giảng: động lực (Why), khái niệm bộ sinh (Generator), chuẩn `Iterator`/`Iterable` trong Java, cách cài đặt một iterator cho collection riêng, và 2 cách dùng iterator ở phía client.",
+            "Cấu trúc này đi đúng theo 2 góc nhìn: người thiết kế thư viện (Implement) và người dùng thư viện (Using)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "References",
+          "bullets": [
+            "Guttag, Liskov, Program development in Java, chapter 6"
+          ],
+          "explanation": [
+            "Tài liệu gốc là Chương 6 sách 'Program Development in Java' của Guttag & Liskov.",
+            "Chú ý thuật ngữ trong sách dùng tên gọi 'Generator' và phương thức `elements()`, còn trong Java Collections Framework chuẩn tương ứng với `Iterator` và phương thức `iterator()`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "Why iteration abstraction?",
+          "bullets": [
+            "Problem: how to conveniently and efficiently iterate over a generic collection of objects?",
+            {
+              "text": "Requirements: to support",
+              "subBullets": [
+                "incremental (run-time) access",
+                "unlimited collection size",
+                {
+                  "text": "all types of collections",
+                  "subBullets": [
+                    "index-based (e.g. arrays)",
+                    "non-index-based collections (e.g. sets)"
+                  ]
+                }
+              ]
+            }
+          ],
+          "explanation": [
+            "Nêu bài toán trung tâm: làm sao duyệt một collection tổng quát một cách vừa tiện lợi vừa hiệu quả.",
+            "Ba yêu cầu thiết kế bắt buộc gồm: (1) truy cập tăng dần từng bước lúc chạy (không cần tải hết một lúc), (2) hỗ trợ kích thước tập hợp không giới hạn (thậm chí sinh vô hạn theo nhu cầu), và (3) hoạt động thống nhất cho cả cấu trúc có chỉ số (array, list) lẫn không có chỉ số (set, tree, graph)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "Example: Elements of a Set",
+          "bullets": [
+            "How to sum the elements of a set?",
+            "Basic algorithm:"
+          ],
+          "diagramText": [
+            "for each element i in l.elements",
+            "    add i to sum",
+            "return sum",
+            "  └── [Callout]: How to obtain l.elements?"
+          ],
+          "diagramNote": "Mã giả tính tổng các phần tử của một tập hợp l, với bong bóng câu hỏi chỉ vào biểu thức 'l.elements' để đặt vấn đề làm sao lấy các phần tử mà không phá vỡ tính đóng gói.",
+          "explanation": [
+            "Ví dụ dẫn nhập: muốn viết thuật toán cộng tổng các phần tử của một tập hợp `l`, ý tưởng tự nhiên nhất là 'với mỗi phần tử `i` trong `l.elements`, cộng `i` vào `sum`'.",
+            "Câu hỏi mấu chốt nằm ở `l.elements`: làm thế nào cung cấp dòng phần tử đó cho vòng lặp mà vẫn nhanh, tiết kiệm bộ nhớ và an toàn đóng gói?"
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Some intuitive solutions",
+          "paragraphs": [
+            "None is really suitable!",
+            "Figure: Abstract function of an IntSet"
+          ],
+          "bullets": [
+            "Add a method to return an array of elements",
+            "Add an index-based access method",
+            "Add an observer that returns vector elements"
+          ],
+          "code": {
+            "lang": "java",
+            "text": "// A typical IntSet is {x1, . . . , xn}\n// The abstraction function is\n//   AF(c) = { c.els[i].intValue | 0 <= i < c.els.size }"
+          },
+          "explanation": [
+            "Đề xuất 3 giải pháp trực giác đầu tiên mà lập trình viên hay nghĩ tới: (1) thêm method trả về mảng phần tử, (2) thêm method truy cập theo chỉ số `index`, (3) thêm observer trả về trực tiếp `Vector elements` bên trong.",
+            "Slide khẳng định ngay: 'None is really suitable!' (không cách nào thực sự đạt chuẩn), và đưa ra mô hình biểu diễn `IntSet` (lưu nội bộ bằng `c.els`) để phân tích từng cách ở Slides 7–8."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Return an array of elements",
+          "bullets": [
+            {
+              "text": "This method is is inefficient",
+              "subBullets": [
+                "...especially if the set is large",
+                "it needs to make a copy of the list"
+              ]
+            }
+          ],
+          "code": {
+            "lang": "java",
+            "text": "public int[ ] members ( )\n  // EFFECTS: Returns an array containing the elements of this,\n  //   each exactly once, in some arbitrary order.\n\npublic static int setSum (IntSet s) {\n  int[ ] a = s.members( );\n  int sum = 0;\n  for (int i = 0; i < a.length; i++) sum = sum + a[i];\n  return sum;\n}"
+          },
+          "ocrNote": "Slide gốc lặp chữ 'is is inefficient' (giữ nguyên văn).",
+          "explanation": [
+            "Phân tích Giải pháp trực giác 1 (`int[] members()`): để bảo vệ dữ liệu gốc, `members()` buộc phải tạo một mảng mới và sao chép toàn bộ phần tử sang rồi mới trả về.",
+            "Điều này rất kém hiệu quả cả về bộ nhớ lẫn thời gian khi tập hợp lớn (hoặc khi người dùng chỉ cần tìm vài phần tử đầu rồi dừng sớm), và hoàn toàn bất khả thi với tập hợp sinh vô hạn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Other two alternatives",
+          "bullets": [
+            {
+              "text": "Add an index-based access method",
+              "subBullets": [
+                "Similar to get(int index) method in java.util.ArrayList",
+                "No improvement over for loop iteration"
+              ]
+            },
+            {
+              "text": "Add an observer that returns vector elements",
+              "subBullets": [
+                "May destroy Collection by exposing the rep"
+              ]
+            }
+          ],
+          "explanation": [
+            "Phân tích Giải pháp 2 (`get(int index)`): nó chỉ mô phỏng lại vòng `for` chỉ số thông thường — kém tự nhiên với các kiểu dữ liệu không có khái niệm vị trí như `Set` hay `HashMap` (và với `LinkedList` thì gọi `get(i)` trong vòng lặp gây độ phức tạp $O(n^2)$!).",
+            "Phân tích Giải pháp 3 (trả thẳng tham chiếu tới `Vector elements` nội bộ): vi phạm nặng nguyên tắc đóng gói do làm lộ biểu diễn bên trong (**exposing the rep**), khiến bên ngoài có thể tự ý thêm/xóa phần tử làm hỏng bất biến (ví dụ chèn phần tử trùng vào `IntSet`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Iteration abstraction as a solution",
+          "bullets": [
+            "An abstraction that provides generic access to a collection's elements",
+            {
+              "text": "Incremental access:",
+              "subBullets": [
+                "ask & get",
+                "get: can also generate elements"
+              ]
+            },
+            {
+              "text": "Supports unlimited collection size:",
+              "subBullets": [
+                "no bounds on size"
+              ]
+            },
+            {
+              "text": "Supports all types of collections:",
+              "subBullets": [
+                "assumes no knowlege of the collection's rep",
+                "specified as an interface"
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết 'knowlege' thiếu chữ d (giữ nguyên văn).",
+          "explanation": [
+            "Giới thiệu giải pháp chuẩn: **Iteration abstraction** tách việc duyệt thành cơ chế truy cập tăng dần theo cặp **ask & get** (hỏi còn phần tử không → lấy phần tử kế tiếp).",
+            "Vì được đặc tả qua `interface` và không giả định bất kỳ cấu trúc lưu trữ (`rep`) nào, cùng một giao diện lặp dùng được cho mảng, danh sách liên kết, tập hợp và thậm chí bộ sinh phần tử tự động có kích thước không giới hạn trước."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 9"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Bộ sinh phần tử (Generator: Pre-populated vs Auto-populated) & Chuẩn Java",
+      "text": "Phân biệt Pre-populated generator (LinkedList) và Auto-populated generator (PrimeList có cận max), cùng kiến trúc java.util.Iterator và java.lang.Iterable trong Java.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 10–15"
+      },
+      "digest": {
+        "keyPoints": [
+          "Generator tạo/trả các phần tử tăng dần: cùng public API nhưng cơ chế nội bộ khác nhau tùy loại collection.",
+          "Pre-populated collection (vd LinkedList): các phần tử x1..xn đã có sẵn trong collection; generator chỉ tăng dần chỉ số/con trỏ qua chúng.",
+          "Auto-populated collection (vd PrimeList): phần tử (thường có bound condition <= max) chỉ được sinh (hoặc lấy từ nguồn khác) ngay tại thời điểm truy cập qua generator.",
+          "Trong Java: generator cài đặt `java.util.Iterator` (3 method: `hasNext`, `next`, `remove`), còn collection cài đặt `java.lang.Iterable` với method `iterator()` trả về một đối tượng `Iterator`."
+        ],
+        "terms": [
+          {
+            "term": "Generator",
+            "meaning": "Đối tượng lưu trạng thái duyệt và sinh/trả từng phần tử kế tiếp cho caller qua API chuẩn."
+          },
+          {
+            "term": "Pre-populated collection",
+            "meaning": "Tập hợp chứa sẵn toàn bộ phần tử trước khi duyệt; generator chỉ quản lý vị trí/chỉ số đang trỏ."
+          },
+          {
+            "term": "Auto-populated collection",
+            "meaning": "Tập hợp tự sinh phần tử mới (thường tới ngưỡng giới hạn max) vào lúc được truy cập qua generator."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm package: `Iterable` nằm trong `java.lang.Iterable`, còn `Iterator` nằm trong `java.util.Iterator`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "Generator",
+          "bullets": [
+            "Generates the “elements” incrementally",
+            "Same public API but different internal mechanism depending on the collection",
+            {
+              "text": "Pre-populated collections:",
+              "subBullets": [
+                "generate indices over the elements incrementally"
+              ]
+            },
+            {
+              "text": "Auto-populated collections:",
+              "subBullets": [
+                "generate elements (and indices) incrementally",
+                "often has a bound condition"
+              ]
+            }
+          ],
+          "explanation": [
+            "Định nghĩa **Generator** là đối tượng trung gian phát ra từng phần tử theo yêu cầu. Tuy phía caller luôn gọi cùng một bộ API công khai, bên trong lại chia làm 2 chiến lược tùy bản chất collection.",
+            "Với **Pre-populated collections**, dữ liệu đã nằm sẵn trong bộ nhớ nên generator chỉ sinh chỉ số duyệt; với **Auto-populated collections**, generator tự tính toán/sinh ra cả phần tử mới theo từng bước (thường kèm điều kiện dừng `bound condition`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Pre-populated generator",
+          "diagramText": [
+            "[P] ──▶ (Generator) ◀── LinkedList.elements [ x1 | x2 | ... | xn ]"
+          ],
+          "diagramNote": "Sơ đồ minh họa bộ sinh dữ liệu đã có sẵn: chương trình P giao tiếp với Generator bên trong LinkedList; các phần tử x1, x2, ..., xn đã tồn tại sẵn trong elements và được Generator lần lượt đọc ra.",
+          "explanation": [
+            "Sơ đồ trực quan hóa **Pre-populated generator** trên `LinkedList`: khi chương trình `P` yêu cầu phần tử tiếp theo, `Generator` lần lượt đọc `x1`, `x2`, ..., `xn` từ vùng nhớ `elements` đã được nạp sẵn trước đó.",
+            "Nếu có 2 bộ duyệt chạy đồng thời trên cùng `LinkedList`, mỗi generator giữ con trỏ chỉ số riêng mà không làm thay đổi mảng `elements`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Auto-populated generator",
+          "bullets": [
+            "Elements (possibly up to a max value) are generated (or obtained from another source) into the set when accessed via the generator"
+          ],
+          "diagramText": [
+            "[P] ──▶ (Generator) ──▶ PrimeList.elements [ p1 |   |   | ... max (nét đứt) ]",
+            "Caption: bound condition: elements are ≤ max"
+          ],
+          "diagramNote": "Sơ đồ minh họa bộ sinh tự động trên PrimeList: khi P truy cập qua Generator, các số nguyên tố p1, ... mới được sinh ra và đưa dần vào elements với điều kiện biên elements <= max.",
+          "explanation": [
+            "Sơ đồ **Auto-populated generator** trên `PrimeList`: ban đầu danh sách chưa cần tính trước toàn bộ số nguyên tố.",
+            "Chỉ khi `P` gọi `Generator` để duyệt, phần tử tiếp theo (như `p1`, `p2`...) mới được sinh ra theo công thức (lazy generation) miễn sao vẫn thỏa điều kiện biên `elements <= max`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Iteration abstraction in Java framework",
+          "bullets": [
+            "Generators implement interface java.util.Iterator",
+            {
+              "text": "Collections implement an iterator() method:",
+              "subBullets": [
+                "returns an Iterator object"
+              ]
+            },
+            {
+              "text": "Iterator defines 3 methods:",
+              "subBullets": [
+                "hasNext: ask",
+                "next: get",
+                "remove"
+              ]
+            }
+          ],
+          "explanation": [
+            "Ánh xạ khái niệm tổng quát vào thư viện chuẩn Java: Generator chính là lớp cài đặt `java.util.Iterator`, còn Collection cung cấp phương thức nhà máy `iterator()` trả về một thể hiện `Iterator`.",
+            "Giao diện `Iterator` gói gọn cơ chế ask-and-get qua `hasNext()` (ask) và `next()` (get), cộng thêm `remove()` để xóa an toàn phần tử vừa duyệt nếu collection hỗ trợ."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "iterator() method & Iterator",
+          "diagramText": [
+            "[P] ··▶ [iterator()] ··▶ [Generator] ──▷ [java.util.Iterator]",
+            "Inside LinkedList: Generator reads elements [ x1 | x2 | ... | xn ]"
+          ],
+          "diagramNote": "Sơ đồ tương tác trong Java: client P gọi iterator() trên LinkedList để khởi tạo Generator (một cài đặt của java.util.Iterator), sau đó Generator đọc tuần tự các phần tử x1..xn.",
+          "explanation": [
+            "Hình ghép nối luồng gọi thực tế trong Java: caller `P` gọi `list.iterator()`, phương thức này tạo và trả về một đối tượng `Generator` có kiểu giao diện `java.util.Iterator`.",
+            "Từ đây `P` chỉ làm việc qua kiểu `Iterator`, hoàn toàn tách rời khỏi cấu trúc nội bộ `elements` của `LinkedList`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Types with built-in iterators in Java framework",
+          "bullets": [
+            "Those that are subtype of : java.lang.Iterable",
+            {
+              "text": "Some common examples:",
+              "subBullets": [
+                "Collection",
+                "Lists: ArrayList, LinkedList",
+                "Set",
+                "Queue"
+              ]
+            }
+          ],
+          "explanation": [
+            "Mọi kiểu dữ liệu hỗ trợ sẵn iterator trong Java đều là subtype của giao diện `java.lang.Iterable` (giao diện gốc quy định phương thức `iterator()`, đồng thời cho phép dùng vòng lặp `for-each`).",
+            "Các ví dụ phổ biến gồm `Collection` và mọi nhánh con của nó như `ArrayList`, `LinkedList`, `Set` và `Queue`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 15"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Đặc tả và Cài đặt Iteration Abstraction trong Java",
+      "text": "Cách đặc tả iterator() và generator inner class, chi tiết hợp đồng Javadoc của hasNext(), next(), remove(), hỗ trợ nhiều iterator độc lập (iterator vs rIterator) và ví dụ LinkedListGen.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 16–26"
+      },
+      "digest": {
+        "keyPoints": [
+          "Để cài đặt iteration abstraction cho một collection: (1) khai báo method `iterator()` (hoặc `elements()`) trả về `new Generator()`, và (2) định nghĩa generator là một **private inner class** cài đặt `java.util.Iterator`, chứa thuộc tính theo dõi trạng thái duyệt.",
+          "`hasNext()` kiểm tra còn phần tử chưa; `next()` có `@modifies this` — trả phần tử kế và cập nhật trạng thái, hoặc ném `NoSuchElementException` nếu hết phần tử.",
+          "`remove()` (tùy chọn, chỉ cho modifiable collections) xóa phần tử cuối cùng do `next()` trả về; ném `UnsupportedOperationException` nếu không hỗ trợ, hoặc `IllegalStateException` nếu chưa gọi `next()` hoặc đã gọi `remove()` sau lần `next()` cuối.",
+          "Vì generator là inner class riêng biệt, một collection có thể cấp đồng thời nhiều generator độc lập (ví dụ `iterator()` trả `GenA` duyệt xuôi và `rIterator()` trả `GenB` duyệt ngược) hoặc như `LinkedListGen` giữ chỉ số `- ind: int`."
+        ],
+        "terms": [
+          {
+            "term": "Private inner class (Generator)",
+            "meaning": "Lớp lồng private bên trong lớp collection (vd LinkedListGen) giúp truy cập trực tiếp rep nội bộ mà vẫn giấu kín cài đặt khỏi bên ngoài."
+          },
+          {
+            "term": "NoSuchElementException",
+            "meaning": "Ngoại lệ được next() ném ra khi không còn phần tử nào để trả về."
+          },
+          {
+            "term": "UnsupportedOperationException / IllegalStateException",
+            "meaning": "Hai ngoại lệ đặc tả của Iterator.remove() khi thao tác xóa không được hỗ trợ hoặc gọi sai trình tự trạng thái."
+          }
+        ],
+        "pitfalls": [
+          "Cả `hasNext()` và `next()` đều phải kiểm tra xem còn phần tử để trả về hay không — không được giả định caller lúc nào cũng gọi `hasNext()` trước khi gọi `next()`.",
+          "Không được sửa collection bằng cách khác (ngoài `Iterator.remove()`) trong khi đang duyệt bằng iterator — hành vi lúc đó là unspecified (trong Java thường gây `ConcurrentModificationException`)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Implements Iteration abstraction",
+          "bullets": [
+            "Specify an iterator() method",
+            "Specify a generator as sub-type that implements Iterator"
+          ],
+          "explanation": [
+            "Để tự cài đặt iteration abstraction cho lớp collection của riêng mình, bạn chỉ cần làm đúng 2 việc: viết phương thức `iterator()` và định nghĩa lớp generator cài đặt `Iterator`.",
+            "Nếu lớp collection `implements Iterable<T>`, nó cũng tự động dùng được với cú pháp `for (T x : col)` trong Java."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Specify an iterator method",
+          "bullets": [
+            "Common names: elements(), iterator()",
+            "Effect: return an object of generator."
+          ],
+          "code": {
+            "lang": "java",
+            "text": "public Iterator iterator(){\n    return new Generator();\n}"
+          },
+          "explanation": [
+            "Phương thức tạo bộ duyệt thường đặt tên là `iterator()` (chuẩn Java `Iterable`) hoặc `elements()` (phong cách sách Liskov/Guttag).",
+            "Tác dụng của nó đơn giản là khởi tạo và trả về một đối tượng generator mới với trạng thái bắt đầu từ đầu tập hợp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Specify a generator",
+          "bullets": [
+            "A private inner class of the collection class",
+            "Implements java.util.Iterator",
+            {
+              "text": "Attribute",
+              "subBullets": [
+                "keep track of the iteration state"
+              ]
+            },
+            {
+              "text": "Operations:",
+              "subBullets": [
+                "hasNext() and next()",
+                "remove():optional"
+              ]
+            }
+          ],
+          "explanation": [
+            "Tại sao nên thiết kế Generator làm **private inner class** bên trong collection? Vì là inner class nên nó truy cập trực tiếp được các trường `private` (`rep`) của collection mà không cần mở getter làm lộ rep; đồng thời vì là `private` nên bên ngoài chỉ thấy kiểu giao diện `Iterator`.",
+            "Bên trong inner class cần ít nhất một thuộc tính lưu trạng thái duyệt hiện tại (như `ind`) và cài đặt `hasNext()`, `next()`, còn `remove()` là tùy chọn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "java.util.Iterator",
+          "diagramText": [
+            "<<interface>>",
+            "Iterator",
+            "------------------------",
+            "+ hasNext(): boolean",
+            "+ next(): Object",
+            "+ remove()"
+          ],
+          "diagramNote": "Biểu đồ lớp UML của giao diện java.util.Iterator gồm 3 phương thức public: hasNext(): boolean, next(): Object và remove().",
+          "explanation": [
+            "Sơ đồ UML chuẩn của giao diện `java.util.Iterator` với 3 phương thức công khai.",
+            "Lưu ý trên slide dùng dạng non-generic (`Object next()`), còn từ Java 5 trở đi thường dùng dạng generic `Iterator<E>` với `E next()`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Iterator.hasNext()",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @effects\n *   if there are more elements to yield\n *     return true\n *   else\n *     return false\n *\n */\npublic boolean hasNext();"
+          },
+          "explanation": [
+            "Đặc tả chuẩn của `hasNext()`: chỉ kiểm tra trạng thái xem còn phần tử nào chưa duyệt để trả về hay không (`true`/`false`).",
+            "Quan trọng: `hasNext()` KHÔNG có `@modifies this` — gọi `hasNext()` nhiều lần liên tiếp không được làm tiến chỉ số hoặc thay đổi trạng thái của generator."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Iterator.next()",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @modifies this\n * @effects\n *   if there are more results to yield\n *     returns the next result\n *     and modifies the state of\n *     this to record the yield.\n *   else\n *     throws NoSuchElementException\n */\npublic Object next() throws NoSuchElementException;"
+          },
+          "explanation": [
+            "Đặc tả chuẩn của `next()`: khác với `hasNext()`, `next()` có `@modifies this` vì ngoài việc trả về phần tử kế tiếp nó phải cập nhật trạng thái nội bộ (ví dụ tăng `ind++`) để ghi nhận phần tử đã được duyệt.",
+            "Nếu không còn phần tử nào, `next()` phải ném `NoSuchElementException` — chính đặc tả này cho phép cách viết vòng lặp kiểm soát bằng exception ở Slide 29."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "Iterator.remove()",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @effects\n *   remove from the underlying collection the last\n *   element returned by the call to next;\n *   throw\n *     UnsupportedOperationException if remove is not\n *       supported,\n *     IllegalStateException if next has not yet been\n *       called, or remove has already been called after\n *       the last to next.\n *\n *   The behavior is unspecified if the underlying\n *   collection is modified while the iteration is in\n *   progress in any way other than by calling this\n *   method.\n */\npublic void remove() throws UnsupportedOperationException,\n                              IllegalStateException;"
+          },
+          "explanation": [
+            "Đặc tả chi tiết của `remove()`: xóa phần tử cuối cùng mà `next()` vừa trả về khỏi collection gốc. Có 2 tình huống ngoại lệ rõ ràng: `UnsupportedOperationException` (collection chỉ đọc hoặc không hỗ trợ xóa qua iterator) và `IllegalStateException` (gọi `remove()` trước khi gọi `next()`, hoặc gọi `remove()` 2 lần liên tiếp cho cùng 1 lần `next()`).",
+            "Đoạn lưu ý cuối đặc tả nhấn mạnh: nếu bạn sửa collection bằng `list.add/remove` trực tiếp trong lúc iterator đang chạy (thay vì gọi `iterator.remove()`), hành vi là không xác định (unspecified)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Notes",
+          "bullets": [
+            {
+              "text": "Notes:",
+              "subBullets": [
+                "hasNext() and next() both check if there are more results to return",
+                "next(): modifies the state of generator if a new result is returned",
+                "remove(): only used for modifiable collections"
+              ]
+            }
+          ],
+          "explanation": [
+            "Ba ghi chú quan trọng dễ mất điểm khi cài đặt bài tập/thi: (1) cả `hasNext()` lẫn `next()` đều phải tự kiểm tra điều kiện còn phần tử (vì caller có thể gọi thẳng `next()` mà không gọi `hasNext()` như ở Slide 29).",
+            "(2) `next()` chỉ thay đổi trạng thái generator khi có kết quả mới trả về; (3) `remove()` chỉ áp dụng cho collection cho phép sửa đổi (nếu không thì ném `UnsupportedOperationException`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Multiple iterators",
+          "diagramText": [
+            "[P] ··▶ iterator() ··▶ [GenA] ──▶ đọc từ x1 → x2 → ...",
+            "[P] ··▶ rIterator() (An independent reverse iterator) ··▶ [GenB] ──▶ đọc từ xn → ... → x2 → x1",
+            "LinkedList.elements = [ x1 | x2 | ... | xn ]"
+          ],
+          "diagramNote": "Sơ đồ minh họa hai iterator độc lập cùng hoạt động trên một LinkedList: iterator() tạo GenA duyệt xuôi từ x1, còn rIterator() tạo GenB duyệt ngược độc lập từ xn.",
+          "explanation": [
+            "Một ưu điểm lớn của việc tách Generator thành các đối tượng riêng do phương thức tạo ra là bạn có thể mở nhiều iterator đồng thời trên cùng một collection — kể cả duyệt lồng nhau hoặc duyệt theo hai chiều khác nhau.",
+            "Trên hình, `P` vừa gọi `iterator()` lấy `GenA` duyệt xuôi từ `x1`, vừa gọi `rIterator()` lấy `GenB` duyệt ngược độc lập từ `xn` mà không hề đụng chạm trạng thái của nhau."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Example: LinkedList",
+          "diagramText": [
+            "[java.util.Iterator] ◁·· (implements) ·· [LinkedListGen (inner class inside LinkedList)]",
+            "LinkedList:",
+            "  ...",
+            "  + ...",
+            "  + iterator(): Iterator",
+            "  ┌─────────────────────────┐",
+            "  │      LinkedListGen      │",
+            "  ├─────────────────────────┤",
+            "  │ - ind: int              │",
+            "  ├─────────────────────────┤",
+            "  │ + LinkedListGen()       │",
+            "  │ + hasNext(): boolean    │",
+            "  │ + next(): Object        │",
+            "  │ + remove()              │",
+            "  └─────────────────────────┘"
+          ],
+          "diagramNote": "Biểu đồ lớp UML minh họa LinkedList chứa inner class LinkedListGen (biến private ind: int và các phương thức hasNext, next, remove) cài đặt giao diện java.util.Iterator.",
+          "explanation": [
+            "Sơ đồ thiết kế hoàn chỉnh cho `LinkedList` và lớp lồng `LinkedListGen`: `LinkedList` có hàm `+ iterator(): Iterator` khởi tạo `LinkedListGen`.",
+            "`LinkedListGen` giữ trường trạng thái `- ind: int` (vị trí phần tử kế tiếp sẽ trả về) và cài đặt đủ giao diện `java.util.Iterator`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "Example: LinkedList — Cơ chế hoạt động của LinkedListGen",
+          "paragraphs": [
+            "LinkedList"
+          ],
+          "bullets": [
+            "iterator() returns a new instance of LinkedListGen",
+            {
+              "text": "LinkedListGen",
+              "subBullets": [
+                "hasNext() checks ind against LinkedList.size()",
+                "next() if still have element, returns element at index ind and increments ind else throws an exception"
+              ]
+            }
+          ],
+          "explanation": [
+            "Mô tả logic cài đặt bên trong `LinkedListGen`: ban đầu `ind = 0`. Hàm `hasNext()` chỉ việc kiểm tra `ind < LinkedList.size()`.",
+            "Hàm `next()` kiểm tra nếu vẫn còn phần tử (`hasNext()` đúng) thì lấy phần tử tại `ind`, tăng `ind` lên 1 rồi trả về phần tử đó; ngược lại ném `NoSuchElementException`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 26"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Cách sử dụng Iterator (2 mẫu vòng lặp) & Tổng kết",
+      "text": "Hai mẫu vòng lặp while sử dụng iterator trong Java (kiểm soát bằng hasNext() và kiểm soát bằng NoSuchElementException) cùng tổng kết Lecture 3.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 27–30"
+      },
+      "digest": {
+        "keyPoints": [
+          "Cách 1 (phổ biến): gọi `iterator()` lấy `g`, dùng `while (g.hasNext()) { Integer x = g.next(); ... }`.",
+          "Cách 2 (kiểm soát bằng exception): dùng `try { while (true) { Integer x = g.next(); ... } } catch (NoSuchElementException e) { ... }`.",
+          "Tổng kết 5 ý: Iteration abstraction cung cấp cách duyệt tổng quát tiện lợi/hiệu quả; gồm `iterator` method + `generator`; `iterator()` tạo generator mới; Generator cài đặt `java.util.Iterator` và viết như inner class; các collection trong Java kế thừa `java.lang.Iterable`."
+        ],
+        "pitfalls": [
+          "Trong Slide 28–29 viết `LinkedList list = new LinkedList<>();` và `Iterator g = list.iterator();` dạng raw type để minh họa ngắn; khi code Java thật nên dùng generic `LinkedList<Integer>` và `Iterator<Integer>` để tránh phải ép kiểu."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "Using iteration",
+          "bullets": [
+            "Generator object is used via iterator() methods",
+            "Use while loop to iterate the elements",
+            {
+              "text": "Loop condition is controlled by:",
+              "subBullets": [
+                "hasNext() or",
+                "NoSuchElementException thrown by next()"
+              ]
+            }
+          ],
+          "explanation": [
+            "Khi phía người dùng (client) sử dụng một collection có iteration abstraction, bước đầu là gọi `iterator()` để lấy đối tượng generator, sau đó dùng vòng `while` để duyệt từng phần tử.",
+            "Có đúng 2 cách điều khiển điều kiện dừng vòng lặp: kiểm tra trước bằng `hasNext()`, hoặc chạy vòng lặp vô hạn rồi dừng khi `next()` ném `NoSuchElementException`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "Example using iteration — Cách 1: hasNext()",
+          "code": {
+            "lang": "java",
+            "text": "// Create an even number list\nLinkedList list = new LinkedList<>();\nfor (int i = 0; i < 100; i++)\n    // even numbers\n    if (i % 2 == 0) list.add(i);\nIterator<Integer> g = list.iterator();\n// loop controlled by hasNext\nwhile (g.hasNext()) {\n    Integer x = g.next(); // use x\n}"
+          },
+          "explanation": [
+            "Mẫu chuẩn và được khuyến nghị nhất trong thực tế: tạo danh sách số chẵn từ 0 đến 98, gọi `list.iterator()`, rồi lặp `while (g.hasNext())` và đọc phần tử bằng `g.next()`.",
+            "Cách này rõ ràng, dễ đọc và không phải dựa vào ngoại lệ để điều khiển luồng bình thường."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Example using iteration — Cách 2: NoSuchElementException",
+          "code": {
+            "lang": "java",
+            "text": "// ...create list (as before)\nIterator g = list.iterator();\ntry {\n    while (true) {\n        Integer x = g.next(); // use x\n    }\n} catch (NoSuchElementException e) {\n    // no more elements\n}"
+          },
+          "explanation": [
+            "Mẫu thứ hai (thường thấy trong phong cách lập trình của Liskov): bỏ qua `hasNext()` và gọi thẳng `g.next()` trong `while (true)` cho đến khi hết phần tử và `next()` ném `NoSuchElementException` để thoát ra khối `catch`.",
+            "Ví dụ này giải thích tại sao ở Slide 23 bắt buộc `next()` phải tự kiểm tra điều kiện còn phần tử và ném `NoSuchElementException` chứ không được ỷ lại vào việc caller đã gọi `hasNext()`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "Summary",
+          "bullets": [
+            "Iteration abstraction provides a convenient and efficient generic method to iterate the elements of a collection",
+            "Iteration abstraction is defined by a combination of an iterator method and a generator",
+            "iterator method creates a new generator",
+            "Generator implements java.util.Iterator and is specified as an inner class",
+            "Java’s collection classes inherit java.lang.Iterable"
+          ],
+          "explanation": [
+            "Slide tổng kết toàn bộ 5 ý trọng tâm của Lecture 3: mục tiêu của iteration abstraction, bộ đôi `iterator()` + `generator`, vai trò khởi tạo của `iterator()`, thiết kế `private inner class` cài đặt `java.util.Iterator`, và gốc `java.lang.Iterable` của các collection Java.",
+            "Khi làm bài thực hành Tutorial 3 (`IntegerLinkedList.evenIterator`, `PrimeLinkedList.primeIterator`, `PrimeList`), bạn sẽ áp dụng trực tiếp mô hình inner class `Iterator` và đặc tả `@modifies`/`@effects` của bài này."
+          ],
+          "source": {
+            "file": "Resources/Lecture 3.pdf",
+            "loc": "Slide 30"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l03-c01", "front": "Vì sao trả về vector nội bộ không phải cách tốt?", "back": "Làm lộ rep (exposing the rep) nên phá encapsulation.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 8" } },
-    { "id": "se1-l03-c02", "front": "Pre-populated và auto-populated collection?", "back": "Pre-populated: phần tử đã có (LinkedList). Auto-populated: phần tử được sinh khi truy cập qua generator (PrimeList).", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 10–12" } },
-    { "id": "se1-l03-c03", "front": "Ba method của Iterator?", "back": "hasNext(), next() (có thể ném NoSuchElementException), remove() (tùy chọn).", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 13, 19–23" } },
-    { "id": "se1-l03-c04", "front": "Generator thường được khai báo ở đâu?", "back": "Là private inner class của collection class.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 18" } },
-    { "id": "se1-l03-c05", "front": "Hai cách điều khiển vòng lặp với iterator?", "back": "while (g.hasNext()) { g.next() } hoặc while (true) { g.next() } bọc trong try...catch NoSuchElementException.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 27–29" } }
+    {
+      "id": "se1-l03-c01",
+      "front": "Vì sao thêm observer trả về vector elements nội bộ không phải cách tốt?",
+      "back": "Làm lộ biểu diễn nội bộ (exposing the rep), cho phép code bên ngoài sửa trực tiếp collection và phá vỡ encapsulation/bất biến của ADT.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l03-c02",
+      "front": "Phân biệt Pre-populated và Auto-populated collection?",
+      "back": "Pre-populated (vd LinkedList): các phần tử đã có sẵn, generator chỉ sinh chỉ số tăng dần qua chúng. Auto-populated (vd PrimeList): phần tử (thường có bound <= max) được sinh tăng dần ngay khi truy cập qua generator.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 10–12"
+      }
+    },
+    {
+      "id": "se1-l03-c03",
+      "front": "Ba method của giao diện java.util.Iterator và ngoại lệ của chúng?",
+      "back": "hasNext(): boolean; next() throws NoSuchElementException (có @modifies this); remove() throws UnsupportedOperationException, IllegalStateException (tùy chọn).",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 13, 19–22"
+      }
+    },
+    {
+      "id": "se1-l03-c04",
+      "front": "Generator thường được khai báo ở đâu và với mục đích gì?",
+      "back": "Khai báo là private inner class của collection class, implements java.util.Iterator, giữ thuộc tính theo dõi trạng thái duyệt (ví dụ ind).",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 18, 25"
+      }
+    },
+    {
+      "id": "se1-l03-c05",
+      "front": "Hai cách điều khiển điều kiện dừng vòng lặp với Iterator?",
+      "back": "1) while (g.hasNext()) { ... g.next(); } hoặc 2) try { while (true) { ... g.next(); } } catch (NoSuchElementException e) { ... }.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 27–29"
+      }
+    },
+    {
+      "id": "se1-l03-c06",
+      "front": "Ba yêu cầu mà Iteration abstraction cần đáp ứng (Slide 4)?",
+      "back": "1) Incremental (run-time) access; 2) Unlimited collection size (không giới hạn kích thước); 3) Hỗ trợ mọi loại collection (cả index-based như arrays lẫn non-index-based như sets).",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "se1-l03-c07",
+      "front": "Nhược điểm của `int[] members()` và `get(int index)` so với Iteration abstraction?",
+      "back": "`members()` kém hiệu quả với tập lớn vì phải sao chép toàn bộ danh sách sang mảng mới. `get(int index)` không cải thiện hơn vòng lặp for và không phù hợp tập không chỉ số.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 7–8"
+      }
+    },
+    {
+      "id": "se1-l03-c08",
+      "front": "Giao diện gốc của các collection có iterator tích hợp trong Java là gì?",
+      "back": "java.lang.Iterable (ví dụ Collection, ArrayList, LinkedList, Set, Queue đều là subtype của Iterable).",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "se1-l03-c09",
+      "front": "Khi nào Iterator.remove() ném IllegalStateException?",
+      "back": "Khi next() chưa từng được gọi, HOẶC remove() đã được gọi sau lần gọi next() gần nhất.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l03-c10",
+      "front": "Điều gì xảy ra nếu sửa underlying collection bằng cách khác trong khi đang duyệt?",
+      "back": "Theo đặc tả Slide 22: hành vi không xác định (The behavior is unspecified) nếu collection bị thay đổi bằng bất kỳ cách nào khác ngoài chính method remove() của iterator.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l03-c11",
+      "front": "Vì sao một collection có thể có nhiều iterator độc lập (vd iterator() và rIterator())?",
+      "back": "Mỗi lần gọi iterator() hay rIterator() tạo ra một đối tượng generator mới (GenA, GenB) tự giữ trạng thái duyệt riêng biệt trên cùng tập elements.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 24"
+      }
+    },
+    {
+      "id": "se1-l03-c12",
+      "front": "Hai lưu ý quan trọng về hasNext() và next() ở Slide 23?",
+      "back": "Cả hasNext() và next() đều phải tự kiểm tra xem còn kết quả để trả về không; và next() chỉ thay đổi trạng thái của generator nếu trả về được một kết quả mới.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 23"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l03-q01", "stem": "PrimeList thuộc loại collection nào?", "options": ["Pre-populated", "Auto-populated", "Immutable", "Sorted"], "answer": 1, "explanation": "Slide 12: PrimeList là ví dụ auto-populated, phần tử sinh khi truy cập.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 12" } },
-    { "id": "se1-l03-q02", "stem": "Method nào của Iterator ném NoSuchElementException khi hết phần tử?", "options": ["hasNext()", "next()", "remove()", "iterator()"], "answer": 1, "explanation": "next() ném NoSuchElementException khi không còn phần tử.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slides 19–23" } },
-    { "id": "se1-l03-q03", "stem": "Nhược điểm của việc dùng get(int index) thay iteration abstraction là gì?", "options": ["Không cải thiện so với vòng for và có nguy cơ lộ rep", "Quá nhanh", "Không dùng được với mảng", "Tốn ít bộ nhớ"], "answer": 0, "explanation": "Slide 8: không hơn vòng for; trả về elements nội bộ làm lộ rep.", "source": { "file": "Resources/Lecture 3.pdf", "loc": "Slide 8" } }
+    {
+      "id": "se1-l03-q01",
+      "stem": "PrimeList thuộc loại collection nào theo Slide 10–12?",
+      "options": [
+        "Pre-populated",
+        "Auto-populated",
+        "Immutable",
+        "Index-only"
+      ],
+      "answer": 1,
+      "explanation": "Slide 12: PrimeList là ví dụ auto-populated collection, phần tử (<= max) được sinh ra khi truy cập qua generator.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "se1-l03-q02",
+      "stem": "Method nào của Iterator ném NoSuchElementException khi không còn phần tử để trả về?",
+      "options": [
+        "hasNext()",
+        "next()",
+        "remove()",
+        "iterator()"
+      ],
+      "answer": 1,
+      "explanation": "Slide 21: public Object next() throws NoSuchElementException khi hết phần tử.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 21"
+      }
+    },
+    {
+      "id": "se1-l03-q03",
+      "stem": "Nhược điểm chính của việc thêm observer trả về trực tiếp Vector elements nội bộ là gì?",
+      "options": [
+        "Tốn nhiều bộ nhớ sao chép mảng",
+        "Làm phá hủy Collection do lộ biểu diễn nội bộ (exposing the rep)",
+        "Không chạy được trong vòng lặp while",
+        "Chỉ dùng được với kiểu int"
+      ],
+      "answer": 1,
+      "explanation": "Slide 8: Add an observer that returns vector elements -> May destroy Collection by exposing the rep.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l03-q04",
+      "stem": "Vì sao phương thức `int[] members()` (Slide 7) không phải giải pháp tốt cho collection lớn?",
+      "options": [
+        "Vì mảng trong Java không chứa được số nguyên",
+        "Vì nó phải tạo bản sao toàn bộ danh sách sang mảng mới nên kém hiệu quả",
+        "Vì members() luôn trả về null",
+        "Vì không tính tổng bằng vòng lặp for được"
+      ],
+      "answer": 1,
+      "explanation": "Slide 7: This method is inefficient ... especially if the set is large, it needs to make a copy of the list.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "se1-l03-q05",
+      "stem": "Trong Java framework, các lớp có sẵn iterator tích hợp là subtype của interface nào?",
+      "options": [
+        "java.util.Serializable",
+        "java.lang.Iterable",
+        "java.lang.Cloneable",
+        "java.util.Comparator"
+      ],
+      "answer": 1,
+      "explanation": "Slide 15: Those that are subtype of java.lang.Iterable (Collection, ArrayList, LinkedList, Set, Queue).",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "se1-l03-q06",
+      "stem": "Cách khai báo chuẩn nhất cho Generator của một lớp collection là gì?",
+      "options": [
+        "Một public static class tách rời nằm ngoài package",
+        "Một private inner class của collection class, implements java.util.Iterator",
+        "Một interface mới kế thừa Collection",
+        "Một biến static dùng chung cho mọi instance"
+      ],
+      "answer": 1,
+      "explanation": "Slides 18, 25, 30: Generator implements java.util.Iterator and is specified as a private inner class of the collection class.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 18, 25, 30"
+      }
+    },
+    {
+      "id": "se1-l03-q07",
+      "stem": "Theo đặc tả `Iterator.remove()` (Slide 22), ngoại lệ nào bị ném nếu gọi `remove()` khi chưa từng gọi `next()` hoặc đã gọi `remove()` sau lần `next()` gần nhất?",
+      "options": [
+        "NoSuchElementException",
+        "UnsupportedOperationException",
+        "IllegalStateException",
+        "NullPointerException"
+      ],
+      "answer": 2,
+      "explanation": "Slide 22: throw IllegalStateException if next has not yet been called, or remove has already been called after the last call to next.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l03-q08",
+      "stem": "Nếu collection không hỗ trợ thao tác xóa phần tử trong khi lặp, `Iterator.remove()` sẽ ném ngoại lệ nào?",
+      "options": [
+        "UnsupportedOperationException",
+        "IllegalArgumentException",
+        "NoSuchElementException",
+        "IndexOutOfBoundsException"
+      ],
+      "answer": 0,
+      "explanation": "Slide 22: throw UnsupportedOperationException if remove is not supported; Slide 23: remove(): only used for modifiable collections.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slides 22–23"
+      }
+    },
+    {
+      "id": "se1-l03-q09",
+      "stem": "Đặc tả của `Iterator.next()` (Slide 21) có chú thích `@modifies this`. Điều này có ý nghĩa gì?",
+      "options": [
+        "Sửa đổi các phần tử bên trong Collection gốc",
+        "Cập nhật trạng thái nội bộ của đối tượng generator (như tăng biến đếm ind) để ghi nhận đã trả về phần tử",
+        "Xóa toàn bộ bộ nhớ đệm của JVM",
+        "Thay đổi kiểu dữ liệu của biến collection"
+      ],
+      "answer": 1,
+      "explanation": "Slide 21: returns the next result and modifies the state of this (the generator) to record the yield.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 21"
+      }
+    },
+    {
+      "id": "se1-l03-q10",
+      "stem": "Trong Slide 24 (Multiple iterators), làm sao LinkedList hỗ trợ đồng thời cả duyệt xuôi `iterator()` và duyệt ngược `rIterator()`?",
+      "options": [
+        "Đảo ngược mảng elements gốc mỗi khi gọi rIterator()",
+        "Mỗi method tạo một đối tượng generator độc lập (GenA và GenB) giữ trạng thái duyệt riêng",
+        "Chỉ cho phép chạy một iterator tại một thời điểm",
+        "Bắt buộc người dùng sao chép LinkedList thành 2 bản"
+      ],
+      "answer": 1,
+      "explanation": "Slide 24: iterator() trả GenA bắt đầu từ x1, còn rIterator() trả GenB độc lập bắt đầu từ xn.",
+      "source": {
+        "file": "Resources/Lecture 3.pdf",
+        "loc": "Slide 24"
+      }
+    }
   ]
 }

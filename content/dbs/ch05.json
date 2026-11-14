@@ -1,27 +1,1775 @@
 {
-  "id": "dbs-ch05", "order": 5,
+  "id": "dbs-ch05",
+  "order": 5,
   "title": "Chương 5: Physical Database Design and Performance",
-  "summary": [
-    { "h": "Mục đích và quyết định", "text": "Chuyển logical schema thành đặc tả kỹ thuật để lưu/truy xuất dữ liệu với hiệu năng đủ tốt, đồng thời bảo đảm integrity, security, recoverability. Quyết định: kiểu dữ liệu attribute, physical record, file organization, index, tối ưu truy vấn." },
-    { "h": "Chọn data type", "text": "4 mục tiêu: biểu diễn mọi giá trị có thể, tăng data integrity, hỗ trợ mọi thao tác dữ liệu, tối thiểu dung lượng. Dùng coding/look-up table để tiết kiệm chỗ. Kiểm soát cấp field: default value, range control, null control, referential integrity." },
-    { "h": "Denormalization", "text": "Gộp bảng đã chuẩn hóa để giảm JOIN, tăng tốc truy vấn, nhưng tốn chỗ, đe dọa integrity (quay lại các anomaly) và phải sửa chương trình khi quy tắc đổi. 3 tình huống thường gặp: 1:1; M:N có thuộc tính non-key (sao chép thuộc tính vào bảng trung gian); reference data ở quan hệ 1:N." },
-    { "h": "Partitioning", "text": "Horizontal: chia hàng (key range, hash, composite). Vertical: chia cột; PK phải lặp ở mọi partition. Lợi ích: hiệu quả, tối ưu cục bộ, bảo mật, recovery/uptime, load balancing. Hạn chế: tốc độ truy cập không đồng đều, phức tạp, tốn thêm chỗ và thời gian update." },
-    { "h": "Phân cấp lưu trữ", "text": "Database → Tablespace → Segment → Extent → Data Block (đơn vị I/O nhỏ nhất của DBMS)." },
-    { "h": "File organization", "text": "Heap (không thứ tự, tìm trung bình n/2), Sequential (theo PK, tìm nhị phân log2 n), Indexed (index như B+ tree, hỗ trợ nhiều khóa), Hashed (hàm băm tính địa chỉ; nhanh với truy cập ngẫu nhiên theo PK, không hợp truy cập tuần tự/theo khoảng, có collision)." },
-    { "h": "9 quy tắc dùng index", "text": "Dùng cho bảng lớn; index PK; index search field; index trường trong ORDER BY và GROUP BY; dùng khi có hơn 100 giá trị khác nhau, tránh khi ít hơn 30; tránh index giá trị dài; khóa clustering nên dùng surrogate/sequence key; để ý giới hạn DBMS; cẩn thận với cột có NULL." }
+  "audit": {
+    "sourceFile": "Chapter 05.pdf",
+    "totalPages": 40,
+    "extractedPages": 40,
+    "ocrNotes": [
+      "Chapter 05.pdf có tổng cộng 40 trang (Slides 5-1 đến 5-40, gồm trang cuối là thông báo bản quyền Pearson); toàn bộ 40/40 trang đã được trích xuất đầy đủ với pageNumber 1–40.",
+      "Các bảng kiểu dữ liệu SQL Server ở Slides 6–9 được đánh số Table 6-1, 6-3, 6-2, 6-4 (không theo thứ tự tăng dần và khác tiền tố Table 5-x), kèm vòng tròn đỏ ghi chú 'These are frequently used' trên Slides 6–8 (Int/Float, Varchar/nvarchar, Date/Time); Slide 10 dùng nhãn TABLE 5-1 (Oracle 12c) và bộ slide không có Figure 5-1.",
+      "Slide 9 in nhầm chính tả 'uniqueidentifer' (thiếu chữ 'i' trước 'er'); Slide 13 có dòng chữ 'Physical design (Table)' đè nhẹ lên viền trên ô 'Column Name'.",
+      "Slide 31 có hộp sơ đồ màu xanh che nhẹ phần chân trang Copyright/5-31; Slide 34 '(c) Hashed' bị cắt mất tiêu đề chuẩn của Pearson và chớm cắt chân trang ở đáy ảnh."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Chapter 05.pdf",
+      "loc": "Slides 1–40 (đầy đủ 40/40 slides)"
+    }
   ],
-  "sources": [{ "file": "Chapter 05.pdf", "loc": "Slides 1–40" }],
+  "summary": [
+    {
+      "h": "Tổng quan Thiết kế Vật lý (Physical Database Design) & Quy trình",
+      "text": "Giới thiệu Chương 5, 8 mục tiêu học tập, mục đích và mục tiêu của thiết kế cơ sở dữ liệu mức vật lý cùng sơ đồ quy trình chuyển đổi từ Inputs (đầu vào) sang Decisions (quyết định vật lý).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 1–4"
+      },
+      "digest": {
+        "keyPoints": [
+          "Thiết kế vật lý (Physical Database Design) chuyển mô tả dữ liệu mức logic thành đặc tả kỹ thuật (technical specifications) để lưu trữ và truy xuất thực tế trên DBMS.",
+          "Mục tiêu kép: đạt hiệu năng đủ tốt (adequate performance) đồng thời bảo đảm toàn vẹn (integrity), bảo mật (security) và khả năng khôi phục (recoverability).",
+          "Đầu vào gồm: các quan hệ đã chuẩn hóa, ước lượng dung lượng (volume estimates), định nghĩa thuộc tính, kỳ vọng thời gian phản hồi, yêu cầu bảo mật/sao lưu/toàn vẹn và công nghệ DBMS cụ thể.",
+          "Quyết định vật lý bao gồm: kiểu dữ liệu thuộc tính, đặc tả bản ghi vật lý (không nhất thiết khớp 1-1 với thiết kế logic do có thể denormalize hoặc partition), tổ chức file, chỉ mục/kiến trúc CSDL và tối ưu truy vấn."
+        ],
+        "terms": [
+          {
+            "term": "Physical Database Design",
+            "meaning": "Giai đoạn chuyển các relation mức logic thành cấu trúc lưu trữ vật lý, kiểu dữ liệu, tổ chức file và chỉ mục cụ thể cho DBMS mục tiêu."
+          },
+          {
+            "term": "Physical Record Description",
+            "meaning": "Cấu trúc bản ghi lưu thực tế trên đĩa; không phải lúc nào cũng trùng khớp hoàn toàn với logical relation."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm lẫn thiết kế vật lý chỉ là việc gõ CREATE TABLE từ logical schema; thực tế có thể thay đổi cấu trúc bản ghi (denormalization, partitioning) để đáp ứng response time.",
+          "Chỉ chạy theo tốc độ truy vấn mà bỏ qua yêu cầu security, backup/recovery và data integrity."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "CHAPTER 5: PHYSICAL DATABASE DESIGN AND PERFORMANCE",
+          "paragraphs": [
+            "CHAPTER 5: PHYSICAL DATABASE DESIGN AND PERFORMANCE",
+            "Modern Database Management 12th Edition — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi",
+            "Copyright © 2016 Pearson Education, Inc."
+          ],
+          "explanation": [
+            "Slide mở đầu Chương 5: Thiết kế cơ sở dữ liệu mức vật lý và Hiệu năng (Physical Database Design and Performance) theo giáo trình Modern Database Management 12th Edition.",
+            "Sau khi đã chuẩn hóa mô hình quan hệ ở Chương 4, Chương 5 tập trung vào câu hỏi: lưu dữ liệu xuống đĩa bằng kiểu dữ liệu nào, gộp hay tách bảng thế nào (denormalization/partitioning), và tổ chức file cùng index ra sao để truy vấn nhanh mà vẫn an toàn."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "Describe the physical database design process",
+            "Choose storage formats for attributes",
+            "Select appropriate file organizations",
+            "Describe three types of file organization",
+            "Describe indexes and their appropriate use",
+            "Translate a database model into efficient structures",
+            "Know when and how to use denormalization"
+          ],
+          "explanation": [
+            "Slide nêu 8 mục tiêu trọng tâm của Chương 5: nắm thuật ngữ vật lý, hiểu quy trình thiết kế vật lý, chọn định dạng lưu trữ (kiểu dữ liệu) cho thuộc tính, chọn và mô tả 3 kiểu tổ chức file chính (Sequential, Indexed, Hashed — bên cạnh Heap), sử dụng index hợp lý và biết khi nào nên phi chuẩn hóa.",
+            "Ghi chú chi tiết dễ hỏi lý thuyết: mục tiêu 5 nhắc 'Describe three types of file organization' (tương ứng 3 kiểu chính được so sánh trong Table 5-3), dù Slide 30 liệt kê thêm Heap thành 4 loại."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "PHYSICAL DATABASE DESIGN",
+          "bullets": [
+            "Purpose–translate the logical description of data into the technical specifications for storing and retrieving data",
+            "Goal–create a design for storing data that will provide adequate performance and ensure database integrity, security, and recoverability"
+          ],
+          "explanation": [
+            "Phân biệt rạch ròi Purpose (mục đích) và Goal (mục tiêu) của thiết kế vật lý: Purpose là dịch mô tả logic thành đặc tả kỹ thuật để lưu và truy xuất; còn Goal là cân bằng giữa hiệu năng đủ dùng (adequate performance) với 3 trụ cột an toàn: integrity, security và recoverability.",
+            "Chú ý chữ 'adequate performance' chứ không phải 'maximum performance bằng mọi giá' — thiết kế tốt luôn đánh đổi chi phí dung lượng, tốc độ ghi và tính nhất quán dữ liệu."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "PHYSICAL DESIGN PROCESS",
+          "diagramText": [
+            "Inputs:",
+            "• Normalized relations",
+            "• Volume estimates",
+            "• Attribute definitions",
+            "• Response time expectations",
+            "• Data security needs",
+            "• Backup/recovery needs",
+            "• Integrity expectations",
+            "• DBMS technology used",
+            "[Arrow: Leads to]",
+            "Decisions:",
+            "• Attribute data types",
+            "• Physical record descriptions (doesn’t always match logical design)",
+            "• File organizations",
+            "• Indexes and database architectures",
+            "• Query optimization"
+          ],
+          "diagramNote": "Sơ đồ gồm hộp Inputs bên trái nối qua mũi tên đỏ 'Leads to' tới hộp Decisions bên phải.",
+          "explanation": [
+            "Muốn đưa ra các quyết định vật lý đúng, DBA phải dựa vào dữ liệu định lượng và yêu cầu vận hành (Inputs): số lượng bản ghi ước tính (volume estimates), thời gian phản hồi mong đợi (response time) và năng lực của chính DBMS sẽ triển khai.",
+            "Chú thích quan trọng trong hộp Decisions: 'doesn't always match logical design' — bảng vật lý có thể gộp (denormalization) hoặc tách (partitioning) khác với các bảng 3NF ở mức logic."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 4"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Thiết kế Trường (Fields), Kiểu Dữ liệu & Kiểm soát Toàn vẹn Cấp Trường",
+      "text": "Định nghĩa field, các bảng kiểu dữ liệu của SQL Server (Numeric, String/Character, Date Time, Extra Data Types) và Oracle 12c, 4 mục tiêu chọn data type, kỹ thuật code look-up table, minh họa thiết kế vật lý bảng Tutor và xử lý dữ liệu bị thiếu.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 5–15"
+      },
+      "digest": {
+        "keyPoints": [
+          "Field là đơn vị dữ liệu ứng dụng nhỏ nhất được phần mềm hệ thống nhận biết; thiết kế field gồm chọn data type, mã hóa/nén/mã mật (coding, compression, encryption) và kiểm soát toàn vẹn dữ liệu.",
+          "4 mục tiêu khi chọn data type: (1) biểu diễn mọi giá trị có thể, (2) tăng cường data integrity, (3) hỗ trợ mọi thao tác dữ liệu (tính toán, tìm kiếm, sắp xếp), (4) tối thiểu dung lượng lưu trữ.",
+          "Dùng code look-up table giúp tiết kiệm dung lượng ở bảng lớn (lưu mã 'A'/'B'/'C' thay vì chuỗi dài), nhưng phải đánh đổi thêm thao tác tra cứu/JOIN khi đọc giá trị thật.",
+          "4 cơ chế toàn vẹn ở cấp field: Default value, Range control, Null value control và Referential integrity; xử lý missing data có thể dùng giá trị ước lượng, báo cáo liệt kê hoặc triggers."
+        ],
+        "terms": [
+          {
+            "term": "Field",
+            "meaning": "Đơn vị dữ liệu ứng dụng nhỏ nhất mà phần mềm hệ thống (DBMS) nhận biết và quản lý."
+          },
+          {
+            "term": "Code Look-up Table",
+            "meaning": "Bảng tham chiếu ánh xạ mã viết tắt ngắn (tiết kiệm chỗ trong bảng chính) sang mô tả đầy đủ."
+          },
+          {
+            "term": "VARCHAR / VARCHAR2 vs CHAR",
+            "meaning": "CHAR cấp phát độ dài cố định (độn khoảng trắng nếu ngắn hơn); VARCHAR / VARCHAR2 lưu độ dài biến thiên đúng bằng kích thước chuỗi thực tế cộng overhead."
+          }
+        ],
+        "pitfalls": [
+          "Dùng text, ntext hoặc image trong SQL Server — các bảng trong slide nêu rõ những kiểu này đã deprecated (nên thay bằng varchar(MAX), nvarchar(MAX) hoặc varbinary(MAX)).",
+          "Trong Oracle 12c, kiểu DATE lưu cả ngày lẫn giờ-phút-giây (từ 4712 B.C. đến 9999 A.D.), khác với SQL Server DATE chỉ lưu ngày (từ năm 1 A.D.).",
+          "Nhầm lẫn giữa NULL và 0 hoặc chuỗi rỗng; ở ví dụ Tutor table, cột Allow Nulls để trống nghĩa là bắt buộc NOT NULL."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "DESIGNING FIELDS",
+          "bullets": [
+            "Field: smallest unit of application data recognized by system software",
+            {
+              "text": "Field design",
+              "subBullets": [
+                "Choosing data type",
+                "Coding, compression, encryption",
+                "Controlling data integrity"
+              ]
+            }
+          ],
+          "explanation": [
+            "Field (cột trong bảng vật lý) là thành phần nhỏ nhất mà DBMS đọc/ghi trực tiếp; mọi quyết định sai ở cấp field (ví dụ chọn chuỗi quá rộng hoặc sai kiểu số) sẽ nhân lên theo hàng triệu dòng.",
+            "Ngoài việc chọn kiểu dữ liệu, thiết kế field còn xét đến mã hóa chuẩn hóa giá trị (coding), nén (compression), mã bảo mật (encryption) và các ràng buộc kiểm soát hợp lệ."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Table 6-1 Numeric Data Types",
+          "table": {
+            "caption": "Table 6-1 Numeric Data Types",
+            "headers": [
+              "Data Type",
+              "Description",
+              "Range/Examples"
+            ],
+            "rows": [
+              [
+                "Bigint",
+                "8 bytes integer",
+                "–2^63 (–9,223,372,036,854,775,808) to 2^63–1 (9,223,372,036,854,775,807)"
+              ],
+              [
+                "Int",
+                "4 bytes",
+                "–2^31 (–2,147,483,648) to 2^31–1 (2,147,483,647)"
+              ],
+              [
+                "Smallint",
+                "2 bytes",
+                "–2^15 (–32,768) to 2^15–1 (32,767)"
+              ],
+              [
+                "Tinyint",
+                "1 byte",
+                "0 to 255"
+              ],
+              [
+                "Bit",
+                "1 bit",
+                "0, 1, or null"
+              ],
+              [
+                "Decimal",
+                "User can set precision up to 10^38",
+                "decimal(10,2)"
+              ],
+              [
+                "Money",
+                "8 bytes",
+                "–922,337,203,685,477.5808 to 922,337,203,685,477.5807"
+              ],
+              [
+                "Smallmoney",
+                "4 bytes",
+                "–214,748.3648 to 214,748.3647"
+              ],
+              [
+                "Numeric",
+                "User can set precision up to 10^38",
+                "Same as decimal"
+              ],
+              [
+                "Float",
+                "Approximate numeric type, the number of bytes depends on the number",
+                "–1.79E + 308 to –2.23E–308, 0 and 2.23E–308 to 1.79E + 308"
+              ],
+              [
+                "Real",
+                "Also approximate, 4 bytes",
+                "–3.40E + 38 to –1.18E – 38, 0 and 1.18E – 38 to 3.40E + 38"
+              ]
+            ]
+          },
+          "diagramNote": "Trên slide có khoanh tròn đỏ vào 'Int' và 'Float' kèm chú thích đỏ: 'These are frequently used'.",
+          "ocrNote": "Bảng mang tiêu đề 'Table 6-1' (trích từ tài liệu tham khảo SQL Server) thay vì đánh số Chương 5.",
+          "explanation": [
+            "Bảng tổng hợp các kiểu số của SQL Server: nhóm số nguyên chính xác (Bigint 8B, Int 4B, Smallint 2B, Tinyint 1B không dấu 0..255, Bit), nhóm số thập phân chính xác (Decimal/Numeric với độ chính xác tùy chỉnh tới 10^38, Money/Smallmoney 4 chữ số thập phân) và nhóm số thực xấp xỉ (Float, Real).",
+            "Lưu ý kỹ thuật thực hành: Float/Real là kiểu xấp xỉ dấu phẩy động nên không nên dùng lưu tiền tệ hoặc số yêu cầu chính xác tuyệt đối — hãy dùng Decimal/Numeric (hoặc Money); giảng viên cũng đánh dấu Int và Float là hai kiểu hay gặp nhất."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Table 6-3 String and Character Types",
+          "table": {
+            "caption": "Table 6-3 String and Character Types",
+            "headers": [
+              "Data Type",
+              "Description",
+              "Examples"
+            ],
+            "rows": [
+              [
+                "Char",
+                "Fixed-length ASCII text.",
+                "“Jefferson”—max 255 characters"
+              ],
+              [
+                "Text",
+                "Text stores large blocks of text data. The text and ntext data types are deprecated; use varchar(MAX) or nvarchar(MAX).",
+                "2,147,483,647 bytes"
+              ],
+              [
+                "Varchar",
+                "Variable-length ASCII.",
+                "“Los Angeles,” maximum 255 characters unless MAX (MAX allows 2^31 – 1 bytes)"
+              ],
+              [
+                "Nchar",
+                "Unicode fixed length",
+                "Uses Unicode UCS_2 character set"
+              ],
+              [
+                "Ntext",
+                "Unicode large block. Deprecated.",
+                ""
+              ],
+              [
+                "nvarchar",
+                "Unicode variable-length text.",
+                ""
+              ]
+            ]
+          },
+          "diagramNote": "Trên slide có khoanh tròn đỏ vào 'Varchar' và 'nvarchar' kèm chú thích đỏ: 'These are frequently used'.",
+          "ocrNote": "Bảng mang tiêu đề 'Table 6-3' và xuất hiện trước 'Table 6-2' ở Slide 8; 2 ô Examples cuối của Ntext và nvarchar để trống trên slide.",
+          "explanation": [
+            "So sánh 2 cặp kiểu chuỗi quan trọng: cố định độ dài (Char, Nchar) vs biến thiên độ dài (Varchar, nvarchar), và ASCII (Char/Varchar, 1 byte/ký tự) vs Unicode UCS-2 (Nchar/nvarchar, 2 bytes/ký tự để lưu tiếng Việt, tiếng Nhật...).",
+            "Nên dùng Char/Nchar cho mã cố định như số điện thoại 10 chữ số, mã bang 2 ký tự; dùng Varchar/nvarchar cho tên, địa chỉ có độ dài thay đổi; tránh dùng Text/Ntext vì đã bị khai tử (deprecated)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Table 6-2 Date Time Types",
+          "table": {
+            "caption": "Table 6-2 Date Time Types",
+            "headers": [
+              "Data Type",
+              "Description",
+              "Examples/Range"
+            ],
+            "rows": [
+              [
+                "Date",
+                "New in 2008, stores date values.",
+                "January 1, 1 A.D. through December 31, 9999 A.D"
+              ],
+              [
+                "datetime2",
+                "New. Stores date and time and allows user to set precision in fractions of seconds.",
+                "Same date range as given earlier. Time range = 00:00:00 through 23:59:59.9999999"
+              ],
+              [
+                "datetimeoffset",
+                "Date and time but with time-zone awareness.",
+                "Same"
+              ],
+              [
+                "smalldatetime",
+                "Smaller date and time type.",
+                "January 1, 1753, through December 31, 9999 00:00:00 through 23:59:59.997"
+              ],
+              [
+                "Time",
+                "New. You can set the precision in fractions of a second.",
+                "00:00:00.0000000 through 23:59:59.9999999"
+              ]
+            ]
+          },
+          "diagramNote": "Trên slide có khoanh tròn đỏ vào 'Date' và 'Time' kèm chú thích đỏ: 'These are frequently used'.",
+          "ocrNote": "Bảng mang tiêu đề 'Table 6-2' nhưng được xếp sau 'Table 6-3'.",
+          "explanation": [
+            "Các kiểu thời gian trong SQL Server cho phép tách riêng chỉ ngày (Date), chỉ giờ (Time) hoặc gộp cả hai với độ phân giải tới 100 nano-giây (datetime2), thậm chí lưu thêm múi giờ (datetimeoffset) cho hệ thống đa quốc gia.",
+            "Chú ý smalldatetime chỉ hỗ trợ từ năm 1753 (lịch Gregory tại Anh) và làm tròn đến phút/giây với độ chính xác .997, không lưu được ngày lịch sử cổ đại như Date hay datetime2."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "SOME EXTRA DATA TYPES",
+          "table": {
+            "caption": "Table 6-4 Some Data Types",
+            "headers": [
+              "Data type",
+              "Description",
+              "Examples"
+            ],
+            "rows": [
+              [
+                "Image",
+                "Variable-length binary data. The image data type is deprecated and will go away.",
+                "2^31–1 bytes"
+              ],
+              [
+                "Binary",
+                "Fixed-length binary.",
+                "1 to 8000 bytes"
+              ],
+              [
+                "varbinary",
+                "Variable-length binary.",
+                "1 to 8000 bytes unless you specify MAX, 2 ^31–1 bytes"
+              ],
+              [
+                "uniqueidentifer",
+                "Generates a unique identifier.",
+                "6F9619FF-8B86-D011-B42D-00C04FC964FF"
+              ],
+              [
+                "XML",
+                "Stores XML data as XML, can be validated against schema collections, and queried with xquery.",
+                "<employee> <name>Sue Larson </name></employee>"
+              ]
+            ]
+          },
+          "ocrNote": "Slide viết chính tả là 'uniqueidentifer' (thiếu chữ 'i' trước 'er' so với từ chuẩn SQL Server 'uniqueidentifier').",
+          "explanation": [
+            "Nhóm kiểu bổ sung gồm dữ liệu nhị phân (Binary cố định, varbinary biến thiên, Image đã deprecated và nên thay bằng varbinary(MAX)), kiểu định danh toàn cục GUID (uniqueidentifier) và kiểu bán cấu trúc XML hỗ trợ XQuery.",
+            "GUID (uniqueidentifier) rất hữu ích khi cần tạo khóa chính duy nhất giữa nhiều máy chủ phân tán mà không đụng độ, nhưng tốn 16 bytes (lớn hơn Int 4 bytes)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "CHOOSING DATA TYPES",
+          "table": {
+            "caption": "TABLE 5-1 Commonly Used Data Types in Oracle 12c",
+            "headers": [
+              "Data Type",
+              "Description"
+            ],
+            "rows": [
+              [
+                "VARCHAR2",
+                "Variable-length character data with a maximum length of 4,000 characters; you must enter a maximum field length (e.g., VARCHAR2(30) specifies a field with a maximum length of 30 characters). A string that is shorter than the maximum will consume only the required space. A corresponding data type for Unicode character data allowing for the use of a rich variety of national character sets is NVARCHAR2."
+              ],
+              [
+                "CHAR",
+                "Fixed-length character data with a maximum length of 2,000 characters; default length is 1 character (e.g., CHAR(5) specifies a field with a fixed length of 5 characters, capable of holding a value from 0 to 5 characters long). There is also a data type called NCHAR, which allows the use of Unicode character data."
+              ],
+              [
+                "CLOB",
+                "Character large object, capable of storing up to 4 gigabytes of one variable-length character data field (e.g., to hold a medical instruction or a customer comment)."
+              ],
+              [
+                "NUMBER",
+                "Positive or negative number in the range 10^–130 to 10^126; can specify the precision (total number of digits to the left and right of the decimal point to a maximum of 38) and the scale (the number of digits to the right of the decimal point). For example, NUMBER(5) specifies an integer field with a maximum of 5 digits, and NUMBER(5,2) specifies a field with no more than 5 digits and exactly 2 digits to the right of the decimal point."
+              ],
+              [
+                "DATE",
+                "Any date from January 1, 4712 B.C., to December 31, 9999 A.D.; DATE stores the century, year, month, day, hour, minute, and second."
+              ],
+              [
+                "BLOB",
+                "Binary large object, capable of storing up to 4 gigabytes of binary data (e.g., a photograph or sound clip)."
+              ]
+            ]
+          },
+          "explanation": [
+            "Bảng gốc từ giáo trình Hoffer (Table 5-1) liệt kê 6 kiểu chuẩn trong Oracle 12c: VARCHAR2/NVARCHAR2 (tối đa 4.000 ký tự, chỉ chiếm đúng chỗ chuỗi thật), CHAR/NCHAR (tối đa 2.000, mặc định 1), CLOB & BLOB (lên tới 4 GB), NUMBER(p,s) và DATE.",
+            "Cần nhớ ký hiệu NUMBER(5,2): tổng cộng tối đa 5 chữ số (precision), trong đó có đúng 2 chữ số sau dấu phẩy (scale), tức lưu tối đa tới 999.99 chứ không phải 5 chữ số phần nguyên."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "CHOOSING DATA TYPES",
+          "bullets": [
+            {
+              "text": "Selecting a data type involves four objectives that will have different relative levels of importance for different applications:",
+              "subBullets": [
+                "Represent all possible values.",
+                "Improve data integrity.",
+                "Support all data manipulations.",
+                "Minimize storage space."
+              ]
+            }
+          ],
+          "explanation": [
+            "4 tiêu chí lựa chọn kiểu dữ liệu thường có sự đánh đổi tùy bài toán: chẳng hạn chọn TINYINT tối thiểu hóa dung lượng nhưng có thể vi phạm tiêu chí 'Represent all possible values' nếu số lượng vượt quá 255.",
+            "Tiêu chí 'Support all data manipulations' giải thích vì sao số điện thoại hay mã bưu chính nên lưu chuỗi (CHAR/VARCHAR) chứ không phải số nguyên (để giữ số 0 đầu), còn tiền tệ hay điểm số cần tính tổng/trung bình phải lưu dạng số (NUMBER/DECIMAL)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Figure 5-2 Example of a code look-up table (Pine Valley Furniture Company)",
+          "diagramText": [
+            "PRODUCT Table (ProductNo | Description | ProductFinish | ...):",
+            "- B100 | Chair | C | ...",
+            "- B120 | Desk | A | ...",
+            "- M128 | Table | C | ...",
+            "- T100 | Bookcase | B | ...",
+            "PRODUCT FINISH Lookup Table (Code | Value):",
+            "- A | Birch",
+            "- B | Maple",
+            "- C | Oak",
+            "Mũi tên tham chiếu: ProductFinish = C → Code C (Oak), A → A (Birch), C → C (Oak), B → B (Maple).",
+            "Ghi chú chữ đỏ: Code saves space, but costs an additional lookup to obtain actual value"
+          ],
+          "diagramNote": "Các đường nối giữa cột ProductFinish trong bảng PRODUCT và cột Code trong bảng PRODUCT FINISH Lookup Table.",
+          "explanation": [
+            "Kỹ thuật coding dùng bảng tra cứu (look-up table): thay vì lặp lại chuỗi 'Birch', 'Maple', 'Oak' ở hàng triệu dòng bảng PRODUCT, ta chỉ lưu 1 ký tự mã ('A', 'B', 'C'), vừa tiết kiệm đĩa vừa bảo đảm thống nhất chính tả (data integrity).",
+            "Đánh đổi kinh điển được ghi chú ngay trên hình: mã hóa tiết kiệm dung lượng lưu trữ nhưng làm tăng chi phí thêm một bước tra cứu/JOIN với bảng lookup khi cần hiển thị tên đầy đủ."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "PHYSICAL DESIGN OF TUTOR TABLE",
+          "table": {
+            "caption": "Physical design (Table) — Tutor",
+            "headers": [
+              "Column Name",
+              "Data Type",
+              "Allow Nulls"
+            ],
+            "rows": [
+              [
+                "*TutorKey",
+                "nchar(10)",
+                ""
+              ],
+              [
+                "TutorLastName",
+                "nvarchar(50)",
+                ""
+              ],
+              [
+                "TutorFirstName",
+                "nvarchar(50)",
+                "X"
+              ],
+              [
+                "TutorPhone",
+                "nchar(10)",
+                ""
+              ],
+              [
+                "TutorEmail",
+                "nvarchar(50)",
+                "X"
+              ],
+              [
+                "TutorHireDate",
+                "Date",
+                ""
+              ],
+              [
+                "TutorStatus",
+                "nchar(10)",
+                ""
+              ]
+            ]
+          },
+          "diagramText": [
+            "Logical design (Entity): Tutor",
+            "- PK: TutorKey (in đậm, gạch chân)",
+            "- Thuộc tính in đậm (bắt buộc / NOT NULL): TutorLastName, TutorPhone, TutorHireDate, TutorStatus",
+            "- Thuộc tính chữ thường (tùy chọn / Allow Nulls = X): TutorFirstName, TutorEmail"
+          ],
+          "ocrNote": "Trên ảnh slide, dòng tiêu đề 'Physical design (Table)' bị tràn nhẹ đè lên chữ 'Column Name' ở dòng đầu bảng bên phải.",
+          "explanation": [
+            "Ví dụ trực quan bước chuyển từ Entity Tutor (mức logic) sang đặc tả bảng vật lý cụ thể: khóa chính và mã có độ dài cố định dùng `nchar(10)`, họ tên và email dùng `nvarchar(50)` để hỗ trợ Unicode với độ dài thay đổi, ngày tuyển dụng dùng `Date`.",
+            "Quy tắc ánh xạ độ bắt buộc: các thuộc tính in đậm ở sơ đồ thực thể (`TutorKey`, `TutorLastName`, `TutorPhone`, `TutorHireDate`, `TutorStatus`) có cột `Allow Nulls` để trống (NOT NULL); hai thuộc tính không in đậm (`TutorFirstName`, `TutorEmail`) được đánh dấu `X` cho phép NULL."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "FIELD DATA INTEGRITY",
+          "bullets": [
+            {
+              "text": "Supported field data integrity RDBMS can support",
+              "subBullets": [
+                "Default value–assumed value if no explicit value",
+                "Range control–allowable value limitations (constraints or validation rules)",
+                "Null value control–allowing or prohibiting empty fields",
+                "Referential integrity–range control (and null value allowances) for foreign-key to primary-key match-ups"
+              ]
+            }
+          ],
+          "explanation": [
+            "RDBMS thực thi 4 lớp kiểm soát toàn vẹn ngay ở cấp cột thay cho code ứng dụng: Default value (tự điền giá trị mặc định nếu người dùng bỏ qua), Range control (như CHECK constraint kiểm tra tuổi >= 0 hoặc điểm 0..10), Null control (NOT NULL / NULL) và Referential integrity (FOREIGN KEY REFERENCES).",
+            "Đẩy các quy tắc toàn vẹn này xuống tầng RDBMS giúp mọi ứng dụng, script nhập liệu hay truy vấn trực tiếp đều tuân thủ cùng một chuẩn dữ liệu."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "HANDLING MISSING DATA",
+          "paragraphs": [
+            "Missing data is inevitable. The following methods can be used to handle missing data",
+            "Triggers can be used to perform these operations."
+          ],
+          "bullets": [
+            "Substitute an estimate of the missing value (e.g., using a formula)",
+            "Construct a report listing missing values",
+            "In programs, ignore missing data unless the value is significant (sensitivity testing)"
+          ],
+          "diagramNote": "Câu cuối 'Triggers can be used to perform these operations.' được tô đỏ nổi bật ở cuối slide.",
+          "explanation": [
+            "Trong thực tế vận hành dữ liệu bị thiếu (NULL) là không thể tránh khỏi, nhưng không được xử lý tùy tiện (như gán bừa bằng 0 khiến sai lệch giá trị trung bình). Có 3 cách xử lý: thay bằng giá trị ước lượng theo công thức, xuất báo cáo riêng liệt kê dòng thiếu để rà soát, hoặc bỏ qua nếu không ảnh hưởng đáng kể (kiểm tra độ nhạy).",
+            "Các Trigger trong cơ sở dữ liệu có thể được kích hoạt tự động khi INSERT/UPDATE để thực thi việc ước lượng hoặc ghi log báo cáo dữ liệu thiếu."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 15"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Phi chuẩn hóa (Denormalization) — Động lực, 3 Tình huống & Rủi ro",
+      "text": "Lý do cần phi chuẩn hóa để giảm chi phí JOIN, định nghĩa và lợi ích/chi phí của denormalization, 3 tình huống ứng dụng kinh điển (Figure 5-3 đến 5-5: quan hệ 1:1, M:N có thuộc tính non-key, dữ liệu tham chiếu 1:N) cùng cảnh báo thận trọng.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 16–21"
+      },
+      "digest": {
+        "keyPoints": [
+          "CSDL chuẩn hóa cao (3NF) sinh ra rất nhiều bảng; mỗi lần truy vấn ghép nhiều bảng (JOIN) rất tốn thời gian, tạo chênh lệch hiệu năng lớn so với mô hình phi chuẩn hóa một phần.",
+          "Denormalization là quá trình chuyển các quan hệ đã chuẩn hóa thành đặc tả bản ghi vật lý không chuẩn hóa nhằm giảm số lần tra bảng/JOIN.",
+          "Chi phí của denormalization: trùng lặp dữ liệu, lãng phí dung lượng, tái sinh nguy cơ mất toàn vẹn/anomaly (Insert/Update/Delete anomaly) và buộc phải sửa code ứng dụng nếu quy tắc nghiệp vụ thay đổi.",
+          "3 cơ hội phi chuẩn hóa phổ biến: (1) Hai thực thể quan hệ 1:1 gộp chung 1 bảng; (2) Quan hệ M:N có thuộc tính non-key — sao chép thuộc tính của một bên vào bảng trung gian; (3) Reference data trong quan hệ 1:N khi bên 1 ít bản ghi con và không dùng ở quan hệ khác."
+        ],
+        "terms": [
+          {
+            "term": "Denormalization",
+            "meaning": "Việc gộp có chủ đích các quan hệ đã chuẩn hóa (ví dụ 3NF) về dạng chưa chuẩn hóa ở mức vật lý để giảm số phép JOIN và tăng tốc đọc."
+          },
+          {
+            "term": "Reference Data (1:N Denormalization)",
+            "meaning": "Dữ liệu tham chiếu ở đầu 1 của quan hệ 1:N; khi bảng đầu 1 không tham gia quan hệ nào khác và mỗi dòng đầu 1 có ít dòng đầu N, có thể nhúng thuộc tính của nó vào bảng đầu N."
+          }
+        ],
+        "pitfalls": [
+          "Lạm dụng denormalization quá sớm thay vì kiểm tra file organization, clustering hay tối ưu câu truy vấn (Slide 21).",
+          "Nhầm rằng gộp bảng M:N trong Figure 5-4 là gộp cả 3 bảng thành 1; thực chất chỉ sao chép thuộc tính mô tả từ bảng ít thay đổi (như ITEM.Description) vào bảng giao dịch trung gian (ITEM QUOTE) để bỏ 1 phép JOIN."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "THE NEED OF DENORMALIZATION",
+          "bullets": [
+            "A fully normalized database usually creates a large number of tables",
+            "RDBMS often match tables together to form query result (called joining)",
+            "Because joining is time-consuming, performance between total normalized and partial normalized is dramatic.",
+            "Therefore, denormalization is a solution"
+          ],
+          "explanation": [
+            "Chuẩn hóa ở Chương 4 chia nhỏ dữ liệu ra rất nhiều bảng để triệt tiêu dư thừa và anomaly, nhưng mặt trái là khi đọc dữ liệu nghiệp vụ hoàn chỉnh (ví dụ in hóa đơn hoặc hồ sơ sinh viên), DBMS phải thực hiện hàng loạt phép JOIN tốn I/O và CPU.",
+            "Sự chênh lệch tốc độ giữa CSDL chuẩn hóa hoàn toàn và bán chuẩn hóa (partial normalized) có thể rất lớn trên hệ thống báo cáo hoặc đọc nhiều, tạo động lực cho kỹ thuật denormalization."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "DENORMALIZATION",
+          "bullets": [
+            "Transforming normalized relations into non-normalized physical record specifications",
+            {
+              "text": "Benefits:",
+              "subBullets": [
+                "Can improve performance (speed) by reducing number of table lookups (i.e. reduce number of necessary join queries)"
+              ]
+            },
+            {
+              "text": "Costs (due to data duplication)",
+              "subBullets": [
+                "Wasted storage space",
+                "Data integrity/consistency threats"
+              ]
+            },
+            {
+              "text": "Common denormalization opportunities",
+              "subBullets": [
+                "One-to-one relationship (Fig. 5-3)",
+                "Many-to-many relationship with non-key attributes (associative entity) (Fig. 5-4)",
+                "Reference data (1:N relationship where 1-side has data not used in any other relationship) (Fig. 5-5)"
+              ]
+            }
+          ],
+          "explanation": [
+            "Định nghĩa chuẩn xác của Denormalization luôn gắn với 'physical record specifications' — tức là thiết kế logic (Chương 4) vẫn giữ chuẩn 3NF để hiểu đúng nghiệp vụ, chỉ biến đổi khi sang mức vật lý.",
+            "Hội tụ đủ 3 tình huống chuẩn của Hoffer: quan hệ 1:1 (Fig. 5-3), quan hệ M:N có thuộc tính phi khóa / associative entity (Fig. 5-4) và dữ liệu tham chiếu ở quan hệ 1:N (Fig. 5-5)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Figure 5-3 A possible denormalization situation: two entities with one-to-one relationship",
+          "paragraphs": [
+            "Combine these two relations into one record definition"
+          ],
+          "diagramText": [
+            "E-R: STUDENT (Student ID [PK], Campus Address) —[1:1 mandatory on Student, 0:1 optional on Application, 'Submits']— APPLICATION (Application ID [PK], Application Date, Qualifications)",
+            "Normalized relations:",
+            "- STUDENT(StudentID [PK], CampusAddress)",
+            "- APPLICATION(ApplicationID [PK], ApplicationDate, Qualifications, StudentID [FK -> STUDENT.StudentID])",
+            "Denormalized relation:",
+            "- STUDENT(StudentID [PK], CampusAddress, ApplicationDate, Qualifications)",
+            "Note: and ApplicationDate and Qualifications may be null"
+          ],
+          "explanation": [
+            "Khi hai thực thể liên kết 1:1 (như STUDENT và APPLICATION) luôn hoặc thường xuyên được truy vấn chung với nhau, việc gộp chúng vào một bảng duy nhất STUDENT loại bỏ hoàn toàn phép JOIN 1:1.",
+            "Lưu ý hệ quả phụ ở ghi chú hình vẽ: vì APPLICATION là tùy chọn (không phải sinh viên nào cũng nộp hồ sơ), ApplicationDate và Qualifications có thể chứa giá trị NULL khi gộp bảng, đồng thời mất ApplicationID nếu không cần quản lý riêng."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Figure 5-4 A possible denormalization situation: a many-to-many relationship with nonkey attributes",
+          "paragraphs": [
+            "Combine attributes from one of the entities into the record representing the many-to-many relationship, thus avoiding one of the join operations"
+          ],
+          "diagramText": [
+            "E-R: VENDOR (Vendor ID [PK], Address, Contact Name) — M:N via associative entity PRICE QUOTE (Price) — ITEM (Item ID [PK], Description)",
+            "Normalized relations (3 bảng):",
+            "- VENDOR(VendorID [PK], Address, ContactName)",
+            "- PRICE QUOTE(VendorID [PK/FK -> VENDOR], ItemID [PK/FK -> ITEM], Price)",
+            "- ITEM(ItemID [PK], Description)  [Chú thích đỏ: Extra table access required]",
+            "Denormalized relations (2 bảng):",
+            "- VENDOR(VendorID [PK], Address, ContactName)",
+            "- ITEM QUOTE(VendorID [PK/FK -> VENDOR], ItemID [PK], Description, Price)  [Chú thích đỏ: Duplicate description possible]"
+          ],
+          "explanation": [
+            "Trong quan hệ M:N có thuộc tính Price, mô hình chuẩn tạo 3 bảng (VENDOR, PRICE QUOTE, ITEM). Nếu báo giá luôn cần hiển thị tên mặt hàng (Description) cùng giá mà ít cần truy cập bảng ITEM cho cột khác, ta nhúng Description sang bảng trung gian (đổi tên thành ITEM QUOTE).",
+            "Kết quả tránh được 1 lần truy cập bảng ITEM khi đọc báo giá, nhưng rủi ro chữ đỏ nêu rõ: Description bị trùng lặp ở nhiều dòng báo giá của cùng một mặt hàng, nên nếu sửa mô tả hàng hóa phải đồng bộ nhiều dòng."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Figure 5-5 A possible denormalization situation: reference data",
+          "paragraphs": [
+            "Merging the two entities in this situation into one record definition when there are few instances of the entity on the many side for each entity instance on the one side"
+          ],
+          "diagramText": [
+            "E-R: STORAGE INSTRUCTIONS (Instr ID [PK], Where Store, Container Type) —[1:N 'Control For']— ITEM (Item ID [PK], Description)",
+            "Normalized relations (2 bảng):",
+            "- STORAGE(InstrID [PK], WhereStore, ContainerType)",
+            "- ITEM(ItemID [PK], Description, InstrID [FK -> STORAGE.InstrID])  [Chú thích đỏ: Extra table access required]",
+            "Denormalized relation (1 bảng):",
+            "- ITEM(ItemID [PK], Description, WhereStore, ContainerType)  [Chú thích đỏ: Data duplication]"
+          ],
+          "explanation": [
+            "Tình huống Reference data xảy ra khi bảng đầu 1 (STORAGE INSTRUCTIONS) không liên kết với bất kỳ bảng nào khác ngoài ITEM, và mỗi hướng dẫn bảo quản chỉ áp dụng cho số lượng ít các ITEM (few instances on the many side).",
+            "Nếu một hướng dẫn bảo quản dùng chung cho hàng ngàn sản phẩm thì tuyệt đối không nên gộp (vì nhân bản quá lớn và dễ mất nhất quán); chỉ gộp khi tỷ lệ lặp thấp và muốn bỏ hẳn bảng phụ STORAGE."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "DENORMALIZE WITH CAUTION",
+          "bullets": [
+            {
+              "text": "Denormalization can",
+              "subBullets": [
+                "Increase chance of errors and inconsistencies",
+                "Reintroduce anomalies",
+                "Force reprogramming when business rules change"
+              ]
+            },
+            {
+              "text": "Perhaps other methods could be used to improve performance of joins",
+              "subBullets": [
+                "Organization of tables in the database (file organization and clustering)",
+                "Proper query design and optimization"
+              ]
+            }
+          ],
+          "explanation": [
+            "Phi chuẩn hóa là con dao hai lưỡi: một khi đã gộp bảng, các dị thường chèn/xóa/sửa (anomalies) từng được loại bỏ ở Chương 4 sẽ quay trở lại, đòi hỏi lập trình viên viết thêm code kiểm tra nhất quán hoặc trigger.",
+            "Trước khi quyết định denormalize, cần cân nhắc các giải pháp giữ nguyên 3NF mà vẫn tăng tốc JOIN: chọn file organization phù hợp, clustering (gom bản ghi hay join gần nhau) và tối ưu hóa câu truy vấn / index."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 21"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Phân vùng Dữ liệu (Data Partitioning) — Ngang, Dọc & Đánh đổi",
+      "text": "Kỹ thuật chia bảng logic thành nhiều bảng vật lý theo hàng (Horizontal: Key Range, Hash, Composite) hoặc theo cột (Vertical: bắt buộc lặp Primary Key), ví dụ minh họa và bảng so sánh ưu/nhược điểm (Table 5-2).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 22–27"
+      },
+      "digest": {
+        "keyPoints": [
+          "Horizontal Partitioning chia các hàng của một quan hệ logic thành nhiều bảng riêng (theo giá trị cột chung), gồm 3 phương pháp: Key Range, Hash và Composite Partitioning.",
+          "Vertical Partitioning chia các cột của một quan hệ logic thành nhiều bảng vật lý theo nhóm người dùng/nhu cầu truy cập; BẮT BUỘC lặp lại Primary Key ở mọi partition để ghép lại bằng JOIN khi cần.",
+          "Có thể kết hợp cả Horizontal và Vertical partitioning cho bảng rất lớn.",
+          "Table 5-2 nêu 5 lợi ích của partitioning (Efficiency, Local optimization, Security, Recovery and uptime, Load balancing) và 3 nhược điểm (Inconsistent access speed, Complexity, Extra space and update time)."
+        ],
+        "terms": [
+          {
+            "term": "Horizontal Partitioning",
+            "meaning": "Phân tách các dòng (rows) của một bảng vào các phân vùng khác nhau dựa trên giá trị khóa/cột (ví dụ theo vùng, năm, khoảng khóa)."
+          },
+          {
+            "term": "Vertical Partitioning",
+            "meaning": "Phân tách các cột (columns) ít dùng hoặc thuộc nhóm nghiệp vụ riêng ra nhiều bảng vật lý, luôn giữ chung Primary Key ở mỗi phần."
+          }
+        ],
+        "pitfalls": [
+          "Quên lặp Primary Key trong Vertical Partitioning — nếu thiếu PK sẽ không thể JOIN khôi phục dòng dữ liệu gốc.",
+          "Nhầm rằng Partitioning luôn tăng tốc mọi truy vấn; Table 5-2 cảnh báo khi phải kết hợp dữ liệu xuyên nhiều partition, tốc độ phản hồi có thể chậm hơn đáng kể so với bảng không phân vùng."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "PARTITIONING",
+          "bullets": [
+            {
+              "text": "Horizontal Partitioning: Distributing the rows of a logical relation into several separate tables",
+              "subBullets": [
+                "Useful for situations where different users need access to different rows",
+                "Three types: Key Range Partitioning, Hash Partitioning, or Composite Partitioning"
+              ]
+            },
+            {
+              "text": "Vertical Partitioning: Distributing the columns of a logical relation into several separate physical tables",
+              "subBullets": [
+                "Useful for situations where different users need access to different columns",
+                "The primary key must be repeated in each file"
+              ]
+            },
+            "Combinations of Horizontal and Vertical"
+          ],
+          "explanation": [
+            "Khác với denormalization (gộp nhiều bảng thành ít bảng), Partitioning tách một quan hệ logic lớn thành nhiều bảng vật lý nhỏ hơn theo chiều ngang (hàng), chiều dọc (cột) hoặc kết hợp cả hai.",
+            "Khi chọn Horizontal Partitioning có 3 chiến lược chia: theo khoảng khóa (Key Range — ví dụ theo năm hoặc mã từ 01-02 vs 03-04), theo hàm băm (Hash — trải đều tải) hoặc kết hợp (Composite)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "HORIZONTAL PARTITIONING",
+          "bullets": [
+            "Placing different rows into different tables, based on common column values",
+            {
+              "text": "Benefits",
+              "subBullets": [
+                "Make maintenance of a table more efficient because fragmenting and rebuilding can be isolated to single partitions as storage space needs to be reorganized",
+                "More secure because file-level security can be used to prohibit users from seeing certain rows of data"
+              ]
+            }
+          ],
+          "explanation": [
+            "Phân vùng ngang gom các dòng có cùng tính chất (như cùng chi nhánh, cùng khu vực địa lý, cùng năm tài chính) vào từng bảng vật lý riêng, giúp bảo trì/tái tổ chức (rebuild) chỉ tác động cục bộ trên phân vùng cần thiết.",
+            "Lợi ích bảo mật mức file (file-level security): có thể đặt dữ liệu nhạy cảm hoặc dữ liệu theo chi nhánh vào phân vùng riêng và giới hạn quyền truy cập hệ điều hành/DBMS tới từng nhóm người dùng."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "HORZ. PARTITIONING EXAMPLE",
+          "diagramText": [
+            "Bảng gốc (5 cột: Key | Product Name | Short Description | Review | Picture):",
+            "- 01 | Americano @ Starbucks | Black, no sugar | I'd buy again | [Image]",
+            "- 02 | BB @ Seattle's Best | Black, no sugar | The best | [Image]",
+            "- 03 | TB @ Zoka Coffee | Black, no sugar | It's okay | [Image]",
+            "- 04 | BC @ Coffee | Black, no sugar | Never again | [Image]",
+            "Phân vùng trái (Đĩa 1 - Key 01–02): giữ nguyên cả 5 cột cho Key 01 và 02.",
+            "Phân vùng phải (Đĩa 2 - Key 03–04): giữ nguyên cả 5 cột cho Key 03 và 04."
+          ],
+          "diagramNote": "Sơ đồ minh họa cắt bảng theo chiều ngang dựa trên giá trị Key (01–02 sang đĩa trái, 03–04 sang đĩa phải); mọi cột vẫn giữ đầy đủ ở mỗi phân vùng.",
+          "explanation": [
+            "Minh họa Key Range Horizontal Partitioning: mỗi phân vùng giữ toàn bộ 5 cột cấu trúc y hệt bảng gốc, chỉ khác tập hợp các dòng dữ liệu chứa trong đó.",
+            "Khi người dùng chỉ truy vấn các Key 01–02, hệ thống chỉ cần quét đĩa 1 thay vì quét toàn bộ bảng lớn."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "VERTICAL PARTITIONING",
+          "bullets": [
+            "Distribution of the columns of a logical relation into several separate physical tables.",
+            {
+              "text": "Example:",
+              "subBullets": [
+                "One PART table involving accounting, engineering, and sales attributes.",
+                "Split into three, each with the same Product ID, one for each user group.",
+                "This reduces demand on individual relations.",
+                "When combinations of data are required, perform join queries for all needed relations."
+              ]
+            }
+          ],
+          "explanation": [
+            "Phân vùng dọc tách các nhóm cột phục vụ từng phòng ban riêng biệt (như kế toán, kỹ thuật, bán hàng trên bảng PART) thành 3 bảng vật lý riêng đều mang chung khóa chính Product ID.",
+            "Nhờ vậy, phòng bán hàng khi quét giá và tồn kho không phải đọc qua hàng loạt cột bản vẽ nặng nề của phòng kỹ thuật; tuy nhiên khi lập báo cáo tổng hợp cả 3 mảng thì buộc phải JOIN theo Product ID."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "VERTICAL PARTITIONING EXAMPLE",
+          "diagramText": [
+            "Bảng gốc (5 cột: Key | Product Name | Short Description | Review | Picture — 4 dòng 01..04).",
+            "Phân vùng trái (Đĩa 1): gồm 3 cột [Key | Product Name | Review] cho cả 4 dòng 01..04.",
+            "Phân vùng phải (Đĩa 2): gồm 3 cột [Key | Short Description | Picture] cho cả 4 dòng 01..04."
+          ],
+          "diagramNote": "Cột Key (Primary Key) bắt buộc xuất hiện ở cả hai phân vùng vật lý để liên kết lại từng sản phẩm 01..04.",
+          "explanation": [
+            "So sánh trực tiếp với Slide 24: trong Vertical Partitioning, cả 4 dòng (01–04) đều có mặt ở cả hai đĩa, nhưng tập cột bị tách ra; riêng cột nặng dung lượng (`Picture`) được đẩy sang đĩa phải để bảng đánh giá/tên (`Product Name`, `Review`) gọn nhẹ hơn.",
+            "Nhắc lại nguyên tắc sống còn: cột `Key` được lặp ở cả hai bảng vật lý."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "PARTITIONING PROS AND CONS",
+          "table": {
+            "caption": "TABLE 5-2 Advantages and Disadvantages of Data Partitioning",
+            "headers": [
+              "Group",
+              "Item",
+              "Detail"
+            ],
+            "rows": [
+              [
+                "Advantages",
+                "1. Efficiency",
+                "Data queried together are stored close to one another and separate from data not used together. Data maintenance is isolated in smaller partitions."
+              ],
+              [
+                "Advantages",
+                "2. Local optimization",
+                "Each partition of data can be stored to optimize performance for its own use."
+              ],
+              [
+                "Advantages",
+                "3. Security",
+                "Data not relevant to one group of users can be segregated from data those users are allowed to use."
+              ],
+              [
+                "Advantages",
+                "4. Recovery and uptime",
+                "Smaller files take less time to back up and recover, and other files are still accessible if one file is damaged, so the effects of damage are isolated."
+              ],
+              [
+                "Advantages",
+                "5. Load balancing",
+                "Files can be allocated to different storage areas (disks or other media), which minimizes contention for access to the same storage area or even allows for parallel access to the different areas."
+              ],
+              [
+                "Disadvantages",
+                "1. Inconsistent access speed",
+                "Different partitions may have different access speeds, thus confusing users. Also, when data must be combined across partitions, users may have to deal with significantly slower response times than in a non-partitioned approach."
+              ],
+              [
+                "Disadvantages",
+                "2. Complexity",
+                "Partitioning is usually not transparent to programmers, who will have to write more complex programs when combining data across partitions."
+              ],
+              [
+                "Disadvantages",
+                "3. Extra space and update time",
+                "Data may be duplicated across the partitions, taking extra storage space compared to storing all the data in normalized files. Updates that affect data in multiple partitions can take more time than if one file were used."
+              ]
+            ]
+          },
+          "explanation": [
+            "Table 5-2 tổng kết cân bằng giữa 5 lợi thế và 3 bất lợi của Partitioning: lợi ích lớn nhất là cô lập sự cố/bảo trì, tối ưu cục bộ từng phân vùng và cân bằng tải song song trên nhiều ổ đĩa.",
+            "Nhược điểm cần lưu tâm khi thiết kế: tính phức tạp khi lập trình tổng hợp xuyên phân vùng (không phải lúc nào cũng trong suốt với dev), tốn thêm dung lượng lặp khóa/dữ liệu và chậm hơn khi UPDATE/JOIN chạm nhiều phân vùng cùng lúc."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 27"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Phân cấp Lưu trữ Vật lý & Các kiểu Tổ chức File (File Organizations)",
+      "text": "Phân cấp lưu trữ từ Physical File/Tablespace xuống Segment, Extent và Data block (minh họa Oracle 12c ở Figure 5-6), 6 tiêu chí chọn tổ chức file và phân tích chi tiết Heap, Sequential, Indexed (cây tìm kiếm), Hashed, Join Indexes cùng bảng so sánh Table 5-3.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 28–36"
+      },
+      "digest": {
+        "keyPoints": [
+          "Phân cấp lưu trữ vật lý trong Oracle 12c (từ lớn đến nhỏ): Oracle Database → Oracle Tablespace (Special: System/Undo/Temporary; User Data) → Segment (Data/Index/Temp) → Extent → Oracle Data Block; mỗi Tablespace lại lưu trong Operating System File gồm nhiều OS Block.",
+          "4 kiểu File Organization: Heap (không sắp xếp, tìm trung bình n/2), Sequential (xếp theo PK, tìm nhị phân trung bình log2 n nhưng khó chèn/xóa), Indexed (dùng cây chỉ mục hỗ trợ nhiều khóa) và Hashed (hàm băm tính thẳng địa chỉ, cực nhanh khi truy cập ngẫu nhiên theo PK).",
+          "Join Index lưu sẵn cặp RowID của hai bảng khớp nhau (theo PK-FK hoặc theo cột non-key chung) giúp tăng tốc vượt bậc phép JOIN.",
+          "Table 5-3 so sánh 7 tiêu chí: Hashed mạnh nhất về random retrieval và insert/update/delete đơn lẻ (dù phải xử lý collision), nhưng impractical với truy cập tuần tự hoặc theo khoảng."
+        ],
+        "terms": [
+          {
+            "term": "Tablespace / Segment / Extent / Data block",
+            "meaning": "Tablespace là đơn vị logic chứa nhiều đối tượng; gồm các Segment (bảng/index/partition); mỗi Segment gồm các Extent (vùng đĩa liên tiếp); Data block là đơn vị I/O nhỏ nhất của DBMS."
+          },
+          {
+            "term": "Secondary Key (Nonunique Key)",
+            "meaning": "Trường hoặc tổ hợp trường khác Primary Key được tạo chỉ mục (thường không bắt buộc duy nhất) để tăng tốc tìm kiếm hoặc gom nhóm."
+          },
+          {
+            "term": "Join Index",
+            "meaning": "Cấu trúc chỉ mục lưu sẵn các cặp RowID của các dòng khớp điều kiện nối giữa hai bảng (PK-FK hoặc thuộc tính chung)."
+          }
+        ],
+        "pitfalls": [
+          "Đọc nhầm hướng phân cấp: từ lớn xuống nhỏ là Database → Tablespace → Segment → Extent → Data Block (nhớ: Extent lớn hơn Data block).",
+          "Tưởng Hashed dùng được cho truy vấn khoảng (như WHERE Price BETWEEN 10 AND 50) hoặc ORDER BY theo khóa — Table 5-3 chỉ rõ Hashed 'Impractical' cho truy xuất tuần tự nếu không có cấu trúc chỉ mục bổ trợ.",
+          "Quên xử lý hash collision (va chạm băm — multiple keys with the same address) khi thêm bản ghi vào file Hashed."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "DESIGNING PHYSICAL DATABASE FILES",
+          "bullets": [
+            {
+              "text": "Physical File:",
+              "subBullets": [
+                "A named portion of secondary memory allocated for the purpose of storing physical records",
+                "Tablespace–named logical storage unit in which data from multiple tables/views/objects can be stored"
+              ]
+            },
+            {
+              "text": "Tablespace components",
+              "subBullets": [
+                "Segment – a table, index, or partition",
+                "Extent–contiguous section of disk space",
+                "Data block – smallest unit of storage"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide phân biệt vỏ bọc hệ điều hành (Physical File trên đĩa) với đơn vị quản lý của DBMS (Tablespace) và 3 cấp thành phần lồng nhau bên trong Tablespace: Segment → Extent → Data block.",
+            "Cần nhớ đúng ý nghĩa từng tầng: 1 bảng hay 1 index tương ứng 1 Segment; khi Segment lớn dần DBMS cấp thêm từng mảng không gian liên tiếp gọi là Extent; mỗi lần đọc/ghi với OS, DBMS truyền tải nguyên cả Data block."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Figure 5-6 DBMS terminology in an Oracle 12c environment",
+          "diagramText": [
+            "Lớp Physical Storage (Hệ điều hành):",
+            "- Operating System File (1) —— (1..N) Operating System Block",
+            "Phân cấp logic Oracle:",
+            "- Oracle Database (1) —[Consists of]— (1..N) Oracle Tablespace",
+            "- Oracle Tablespace —[Is stored in]— Operating System File",
+            "- Oracle Tablespace [d - disjoint] gồm: Special Oracle Tablespace (System, Undo, Temporary) và User Data Tablespace",
+            "- Oracle Tablespace (1) —[Consists of]— (0..N) Segment",
+            "- Segment [d - disjoint] gồm: Data, Index, Temp",
+            "- Segment (1) —[Consists of]— (1..N) Extent",
+            "- Extent (1) —[Consists of]— (1..N) Oracle Data Block",
+            "- Oracle Data Block (1..N) ánh xạ với Operating System Block"
+          ],
+          "diagramNote": "Sơ đồ EER mô tả cấu trúc lưu trữ Oracle 12c: kết nối vùng Physical Storage (viền nét đứt phía trên) với phân cấp logic Database → Tablespace → Segment → Extent → Oracle Data Block.",
+          "explanation": [
+            "Figure 5-6 chỉ rõ điểm giao giữa thế giới DBMS và Hệ điều hành: một Oracle Data Block có thể gồm một hay nhiều Operating System Block, và một Oracle Tablespace được lưu trên một hay nhiều Operating System File.",
+            "Sơ đồ cũng phân loại 2 nhánh con tách rời (chữ 'd' = disjoint): Tablespace chia thành Special (System, Undo, Temporary) và User Data; còn Segment chia thành 3 loại Data, Index và Temp."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "FILE ORGANIZATIONS",
+          "bullets": [
+            "Technique for physically arranging records of a file on secondary storage",
+            {
+              "text": "Factors for selecting file organization:",
+              "subBullets": [
+                "Fast data retrieval and throughput: performance time",
+                "Efficient storage space utilization",
+                "Protection from failure and data loss: backup/restore.",
+                "Minimizing need for reorganization",
+                "Accommodating growth",
+                "Security from unauthorized use: password"
+              ]
+            },
+            {
+              "text": "Types of file organizations",
+              "subBullets": [
+                "Heap – no particular order",
+                "Sequential",
+                "Indexed",
+                "Hashed"
+              ]
+            }
+          ],
+          "explanation": [
+            "File Organization là cách DBMS sắp xếp vật lý các bản ghi trên bộ nhớ thứ cấp (ổ đĩa). Không có một kiểu tổ chức nào tốt cho mọi bài toán, nên kỹ sư phải cân đo 6 tiêu chí từ tốc độ, dung lượng tới bảo trì khi dữ liệu tăng trưởng.",
+            "Slide giới thiệu 4 loại tổng quát (Heap, Sequential, Indexed, Hashed), trong đó Heap đơn giản chỉ ghi nối vào cuối chỗ trống nên không xếp thứ tự, phù hợp ghi nhật ký/tạm thời nhưng tìm kiếm chậm (trung bình duyệt nửa file)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "Figure 5-7a Sequential file organization",
+          "diagramText": [
+            "Cấu trúc file xếp thứ tự bảng chữ cái: Aces | Boilermakers | Devils | Flyers | Hawkeyes | Hoosiers | ... | Miners | Panthers | ... | Seminoles | ...",
+            "Mũi tên 'Start of file' trỏ vào Aces, mũi tên 'Scan' đi dọc xuống Flyers.",
+            "Records of the file are stored in sequence by the primary key field values.",
+            "Sequential storage: Average time to find desired record = log₂ n",
+            "If this were a heap, Average time to find desired record = n/2"
+          ],
+          "ocrNote": "Khung hình màu xanh nhạt trên slide che khuất nhẹ dòng chân trang Copyright ở phía dưới.",
+          "explanation": [
+            "Khi bản ghi được lưu tuần tự theo giá trị Primary Key (ví dụ sắp xếp theo vần từ Aces đến Seminoles), ta có thể dùng tìm kiếm nhị phân (binary search) nên số bước trung bình tìm ra bản ghi là log₂(n) — nhanh hơn rất nhiều so với quét tuyến tính n/2 của Heap.",
+            "Tuy nhiên, nhược điểm lớn của lưu trữ tuần tự là mỗi khi chèn thêm bản ghi mới vào giữa (hoặc mở rộng nhiều), DBMS phải dịch chuyển chỗ hoặc viết lại file để giữ nguyên thứ tự."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 31"
+          }
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "INDEXED FILE ORGANIZATIONS",
+          "bullets": [
+            "Storage of records sequentially or nonsequentially with an index that allows software to locate individual records",
+            "Index: a table or other data structure used to determine in a file the location of records that satisfy some condition",
+            "Primary keys are automatically indexed",
+            "Other fields or combinations of fields can also be indexed; these are called secondary keys (or nonunique keys)"
+          ],
+          "explanation": [
+            "Indexed file tách cấu trúc tra cứu (Index) ra khỏi vị trí vật lý của bản ghi — nghĩa là dữ liệu thật không bắt buộc phải sắp xếp tuần tự vật lý mà vẫn tìm cực nhanh nhờ chỉ mục lưu địa chỉ/con trỏ tới bản ghi.",
+            "Hầu hết DBMS tự động tạo chỉ mục cho Primary Key; các chỉ mục do người thiết kế tạo thêm cho các cột tìm kiếm khác gọi là Secondary Key (hay nonunique key nếu giá trị cột được phép trùng)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "Figure 5-7b Indexed file organization",
+          "diagramText": [
+            "Tìm Key (Flyers) qua cấu trúc cây chỉ mục nhiều tầng:",
+            "- Nút gốc (Root): [ F | P | Z ] → nhánh con trái (≤ F) đi tới nút [ B | D | F ]",
+            "- Nút giữa: [ B | D | F ], [ H | L | P ], [ R | S | Z ]",
+            "- Từ khóa F ở nút [ B | D | F ], mũi tên xanh trỏ thẳng xuống block dữ liệu chứa [ Flyers ]",
+            "- Các block dữ liệu khác: [ Aces, Boilermakers ], [ Devils ], [ Hawkeyes, Hoosiers ], [ Miners, Panthers ], [ Seminoles ]",
+            "Chú thích đỏ: uses a tree search — Average time to find desired record based on depth of the tree and length of the list"
+          ],
+          "explanation": [
+            "Minh họa tìm kiếm dạng cây (ví dụ B-tree / B+ tree): để tìm 'Flyers', DBMS đọc nút gốc `[F | P | Z]`, rẽ trái vào nút `[B | D | F]` rồi đi thẳng tới block lá chứa `Flyers` chỉ qua vài lần đọc block.",
+            "Thời gian tìm kiếm trong chỉ mục cây phụ thuộc vào độ sâu của cây (depth of the tree — thường chỉ 3–4 mức với hàng triệu dòng) và độ dài danh sách lá."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 33"
+          }
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "(c) Hashed (Figure 5-7c Hashed file organization)",
+          "diagramText": [
+            "(c) Hashed:",
+            "Key (Flyers) → [Hashing algorithm] → Relative record number → trỏ thẳng vào vị trí chứa Flyers trong danh sách bản ghi lộn xộn thứ tự [Miners, Hawkeyes, Aces, ..., Hoosiers, Seminoles, Devils, Flyers, Panthers, ..., Boilermakers, ...]"
+          ],
+          "ocrNote": "Slide này được chụp/cắt riêng phần hình '(c) Hashed', thiếu khung tiêu đề chuẩn phía trên và bị cắt nhẹ phần chân trang (chỉ thấy lấp ló dòng chữ Copyright ở đáy).",
+          "explanation": [
+            "Trong tổ chức file Hashed, DBMS không cần sắp xếp các bản ghi (thấy rõ Miners đứng trước Aces rồi Hawkeyes, Boilermakers ở cuối) và cũng không phải leo từng tầng cây như B-tree.",
+            "Thay vào đó, giá trị khóa (như 'Flyers') đi qua hàm băm (Hashing algorithm) để tính trực tiếp ra Relative record number (địa chỉ tương đối trên đĩa) chỉ trong O(1) bước I/O."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "Figure 5-8 Join Indexes – to speed up join operations",
+          "diagramText": [
+            "a) Join index for common non-key columns:",
+            "- Customer (RowID, Cust#, CustName, City, State): 10001 C2027 Hadley Dayton Ohio | 10002 C1026 Baines Columbus Ohio | 10003 C0042 Ruskin Columbus Ohio | 10004 C3861 Davies Toledo Ohio",
+            "- Store (RowID, Store#, City, Size, Manager): 20001 S4266 Dayton K2 E2166 | 20002 S2654 Columbus K3 E0245 | 20003 S3789 Dayton K4 E3330 | 20004 S1941 Toledo K1 E0874",
+            "- Join Index (CustRowID | StoreRowID | Common Value*): 10001|20001|Dayton; 10001|20003|Dayton; 10002|20002|Columbus; 10003|20002|Columbus; 10004|20004|Toledo",
+            "- Footnote: *This column may or may not be included, as needed. Join index could be sorted on any of the three columns. Sometimes two join indexes are created, one as above and one with the two RowID columns reversed.",
+            "b) Join index for matching foreign key (FK) and primary key (PK):",
+            "- Order (RowID, Order#, Order Date, Cust#(FK)): 30001 O5532 10/01/2015 C3861 | 30002 O3478 10/01/2015 C1062 | 30003 O8734 10/02/2015 C1062 | 30004 O9845 10/02/2015 C2027",
+            "- Customer (RowID, Cust#(PK), CustName, City, State): 10001 C2027 Hadley Dayton Ohio | 10002 C1062 Baines Columbus Ohio | 10003 C0042 Ruskin Columbus Ohio | 10004 C3861 Davies Toledo Ohio",
+            "- Join Index (CustRowID | OrderRowID | Cust#): 10001|30004|C2027; 10002|30002|C1062; 10002|30003|C1062; 10004|30001|C3861"
+          ],
+          "ocrNote": "Trong hình (a), dòng thứ hai bảng Customer ghi mã là C1026, còn trong hình (b) dòng tương ứng ghi là C1062 (giữ nguyên đúng như bản in gốc).",
+          "explanation": [
+            "Join Index tính sẵn trước (materialized) danh sách các cặp địa chỉ bản ghi (`CustRowID`, `StoreRowID` hoặc `OrderRowID`) khớp với nhau khi JOIN theo cột chung (`City`) hoặc theo cặp `FK-PK` (`Cust#`).",
+            "Khi chạy truy vấn JOIN hoặc đếm/tổng hợp trên 2 bảng đó, DBMS chỉ cần đọc bảng Join Index nhỏ gọn để biết ngay dòng nào ghép với dòng nào thay vì quét và so sánh lại toàn bộ hai bảng lớn."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 35"
+          }
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "COMPARATIVE FEATURES OF FILE ORG.",
+          "table": {
+            "caption": "TABLE 5-3 Comparative Features of Different File Organizations",
+            "headers": [
+              "Factor",
+              "Sequential",
+              "Indexed",
+              "Hashed"
+            ],
+            "rows": [
+              [
+                "Storage space",
+                "No wasted space",
+                "No wasted space for data but extra space for index",
+                "Extra space may be needed to allow for addition and deletion of records after the initial set of records is loaded"
+              ],
+              [
+                "Sequential retrieval on primary key",
+                "Very fast",
+                "Moderately fast",
+                "Impractical, unless using a hash index"
+              ],
+              [
+                "Random retrieval on primary key",
+                "Impractical",
+                "Moderately fast",
+                "Very fast"
+              ],
+              [
+                "Multiple-key retrieval",
+                "Possible but requires scanning whole file",
+                "Very fast with multiple indexes",
+                "Not possible unless using a hash index"
+              ],
+              [
+                "Deleting records",
+                "Can create wasted space or require reorganizing",
+                "If space can be dynamically allocated, this is easy but requires maintenance of indexes",
+                "Very easy"
+              ],
+              [
+                "Adding new records",
+                "Requires rewriting a file",
+                "If space can be dynamically allocated, this is easy but requires maintenance of indexes",
+                "Very easy, but multiple keys with the same address require extra work"
+              ],
+              [
+                "Updating records",
+                "Usually requires rewriting a file",
+                "Easy but requires maintenance of indexes",
+                "Very easy"
+              ]
+            ]
+          },
+          "explanation": [
+            "Table 5-3 là bảng so sánh trọng tâm hay ra thi nhất Chương 5: Sequential dẫn đầu về đọc tuần tự theo PK và tiết kiệm chỗ, nhưng tệ khi chèn/sửa/xóa hoặc tìm ngẫu nhiên; Hashed ngược lại cực nhanh khi tìm ngẫu nhiên và cập nhật đơn lẻ nhưng bất lực với truy cập tuần tự/đa khóa trừ khi dựng thêm index.",
+            "Indexed file đóng vai trò điểm cân bằng đa năng nhất cho RDBMS thực tế: hỗ trợ tốt cả đọc tuần tự, đọc ngẫu nhiên và đặc biệt mạnh khi tìm theo nhiều khóa (multiple-key retrieval), chỉ tốn thêm chỗ lưu cây chỉ mục và chi phí cập nhật cây."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 36"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Chỉ mục (Indexes), Câu lệnh SQL & 9 Quy tắc Sử dụng Index",
+      "text": "Phân biệt Unique (Primary) Index và Nonunique (Secondary) Index kèm câu lệnh SQL CREATE INDEX mẫu, cùng trọn vẹn 9 quy tắc thực hành khi quyết định tạo hay tránh tạo index và trang thông báo bản quyền cuối chương.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 37–40"
+      },
+      "digest": {
+        "keyPoints": [
+          "Unique (primary) index dùng `CREATE UNIQUE INDEX ...` bảo đảm không có hai dòng trùng giá trị (cho PK hoặc các trường duy nhất như Email/CMND); Nonunique (secondary) index dùng `CREATE INDEX ...` cho cột hay lọc hoặc gom nhóm.",
+          "9 quy tắc dùng index: (1) dùng cho bảng lớn; (2) index mọi PK; (3) index search fields trong `WHERE`; (4) index trường trong `ORDER BY` và `GROUP BY`; (5) chỉ index khi số giá trị phân biệt > 100, tránh khi < 30.",
+          "Quy tắc 6–9: (6) tránh index trường có chuỗi quá dài (nên nén trước); (7) nếu khóa index quyết định vị trí vật lý (clustering) nên dùng surrogate/sequence key tăng dần để trải đều; (8) lưu ý giới hạn DBMS về số index/bảng và số bytes/khóa; (9) cẩn thận với cột chứa `NULL` vì nhiều DBMS không đưa NULL vào tìm kiếm chỉ mục."
+        ],
+        "terms": [
+          {
+            "term": "Unique (Primary) Index",
+            "meaning": "Chỉ mục cưỡng chế tính duy nhất của giá trị khóa, tạo mặc định cho Primary Key hoặc dùng `CREATE UNIQUE INDEX` cho các khóa thay thế."
+          },
+          {
+            "term": "Nonunique (Secondary) Index",
+            "meaning": "Chỉ mục thông thường (`CREATE INDEX`) cho phép trùng giá trị, phục vụ tăng tốc WHERE, GROUP BY, ORDER BY."
+          },
+          {
+            "term": "Selectivity (>100 vs <30 rule)",
+            "meaning": "Nguyên tắc chọn cột có độ phân biệt cao (>100 giá trị khác nhau); tránh cột ít giá trị (<30 như Giới tính) vì quét tuần tự bảng thường nhanh hơn tra index."
+          }
+        ],
+        "pitfalls": [
+          "Tạo index trên cột có độ chọn lọc quá thấp (<30 giá trị như Giới tính Nam/Nữ hoặc Trạng thái Đang hoạt động/Đã hủy): chi phí nhảy qua lại giữa index và block dữ liệu lớn hơn đọc thẳng tuần tự.",
+          "Tạo quá nhiều index trên bảng ghi/sửa nhiều: mỗi câu INSERT/UPDATE/DELETE phải cập nhật lại toàn bộ các cây index liên quan, gây nghẽn hiệu năng ghi.",
+          "Viết `WHERE Col IS NULL` mà kỳ vọng dùng index thông thường — theo Quy tắc 9, nhiều DBMS không index các giá trị NULL."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "UNIQUE AND NONUNIQUE INDEXES",
+          "bullets": [
+            {
+              "text": "Unique (primary) Index",
+              "subBullets": [
+                "Typically done for primary keys, but could also apply to other unique fields"
+              ]
+            },
+            {
+              "text": "Nonunique (secondary) index",
+              "subBullets": [
+                "Done for fields that are often used to group individual entities (e.g. zip code, product category)"
+              ]
+            }
+          ],
+          "code": {
+            "lang": "sql",
+            "text": "CREATE UNIQUE INDEX CustIndex_PK ON Customer_T(CustomerID);\n\nCREATE INDEX DescIndex_FK ON Product_T(Description);"
+          },
+          "explanation": [
+            "Cú pháp chuẩn tạo 2 loại chỉ mục trong SQL: thêm từ khóa `UNIQUE` để DBMS từ chối giá trị trùng lặp (áp dụng cho PK hoặc cột unique như mã thuế), và bỏ `UNIQUE` cho secondary index phục vụ gom nhóm/tìm kiếm.",
+            "Quy ước đặt tên trên slide dùng hậu tố `_PK` hoặc `_FK` (tùy chọn của tác giả để dễ nhận diện vai trò chỉ mục trong giáo trình)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 37"
+          }
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "RULES FOR USING INDEXES",
+          "bullets": [
+            "1. Use on larger tables",
+            "2. Index the primary key of each table",
+            {
+              "text": "3. Index search fields (fields frequently in WHERE clause)",
+              "subBullets": [
+                "Eg: WHERE ProductFinish =“Oak,” for which an index on ProductFinish would speed retrieval"
+              ]
+            },
+            "4. Fields in SQL ORDER BY and GROUP BY commands",
+            "5. When there are >100 values but not when there are <30 values"
+          ],
+          "explanation": [
+            "5 quy tắc đầu xác định 'nên index cột nào': bảng phải đủ lớn (bảng nhỏ vài chục dòng quét thẳng trên RAM/1 block nhanh hơn tra cây index), ưu tiên PK và các cột xuất hiện thường xuyên trong `WHERE`, `ORDER BY`, `GROUP BY` (giúp bỏ qua bước sort đắt đỏ).",
+            "Ngưỡng định lượng kinh điển ở quy tắc 5: nên tạo index khi cột có > 100 giá trị phân biệt, và KHÔNG nên khi < 30 giá trị (trừ ngoại lệ đặc biệt dùng bitmap index trong data warehouse)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 38"
+          }
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "RULES FOR USING INDEXES (CONT.)",
+          "bullets": [
+            "6. Avoid use of indexes for fields with long values; perhaps compress values first",
+            "7. If key to index is used to determine location of record, use surrogate (like sequence number) to allow even spread in storage area. Many DBMSs create a sequence number so that when each row is inserted, sequence increases.",
+            "8. DBMS may have limit on number of indexes per table and number of bytes per indexed field(s)",
+            "9. Be careful of indexing attributes with null values; many DBMSs will not recognize null values in an index search"
+          ],
+          "explanation": [
+            "4 quy tắc cuối nhấn mạnh giới hạn vật lý của chỉ mục: (6) cột chuỗi quá dài làm mỗi nút cây index phình to, cây sâu hơn và tốn RAM hơn — nên nén hoặc tránh index trực tiếp; (7) với clustered/location key, dùng surrogate/sequence key để trải đều dữ liệu khi chèn; (8) luôn kiểm tra trần số lượng index và độ dài khóa tối đa của từng DBMS.",
+            "Quy tắc 9 nhắc bẫy SQL thực tế: nhiều DBMS truyền thống (như Oracle B-tree index cho một cột) không lưu các dòng có toàn giá trị NULL vào cây chỉ mục, khiến truy vấn `IS NULL` vẫn phải Full Table Scan."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 39"
+          }
+        },
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "Pearson Copyright Notice",
+          "paragraphs": [
+            "This work is protected by United States copyright laws and is provided solely for the use of instructors in teaching their courses and assessing student learning. Dissemination or sale of any part of this work (including on the World Wide Web) will destroy the integrity of the work and is not permitted. The work and materials from it should never be made available to students except by instructors using the accompanying text in their classes. All recipients of this work are expected to abide by these restrictions and to honor the intended pedagogical purposes and the needs of other instructors who rely on these materials.",
+            "Chapter 5 — Copyright © 2016 Pearson Education, Inc. — 5-40"
+          ],
+          "explanation": [
+            "Trang cuối chuẩn của bộ slide giảng dạy nhà xuất bản Pearson Education (không chứa nội dung kỹ thuật mới nhưng được giữ lại để bảo đảm đối chiếu đủ 40/40 trang với file PDF gốc)."
+          ],
+          "source": {
+            "file": "Chapter 05.pdf",
+            "loc": "Slide 40"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch05-c01", "front": "Denormalization có lợi và hại gì?", "back": "Lợi: ít JOIN, truy vấn nhanh. Hại: tốn dung lượng, nguy cơ anomaly/inconsistency, phải lập trình lại khi nghiệp vụ đổi.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 16–21" } },
-    { "id": "dbs-ch05-c02", "front": "Horizontal vs vertical partitioning?", "back": "Horizontal chia theo hàng (key range, hash, composite). Vertical chia theo cột và phải lặp PK ở mỗi partition.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 22–27" } },
-    { "id": "dbs-ch05-c03", "front": "Thứ tự phân cấp lưu trữ từ lớn đến nhỏ?", "back": "Database → Tablespace → Segment → Extent → Data Block.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 28–29" } },
-    { "id": "dbs-ch05-c04", "front": "Hashed file organization mạnh và yếu ở đâu?", "back": "Rất nhanh với truy cập ngẫu nhiên theo PK, dễ insert/delete/update; không thực tế cho truy cập tuần tự/theo khoảng và có hash collision.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 33–36" } },
-    { "id": "dbs-ch05-c05", "front": "Khi nào nên và không nên tạo index theo số giá trị khác nhau?", "back": "Nên khi có hơn 100 giá trị khác nhau; không nên khi ít hơn 30.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 38–39" } },
-    { "id": "dbs-ch05-c06", "front": "4 mục tiêu khi chọn data type?", "back": "Biểu diễn mọi giá trị; tăng data integrity; hỗ trợ mọi thao tác; tối thiểu dung lượng lưu trữ.", "source": { "file": "Chapter 05.pdf", "loc": "Slide 11" } }
+    {
+      "id": "dbs-ch05-c01",
+      "front": "Mục đích (Purpose) và Mục tiêu (Goal) của Physical Database Design là gì?",
+      "back": "Purpose: chuyển mô tả logic thành đặc tả kỹ thuật để lưu trữ và truy xuất dữ liệu. Goal: đạt hiệu năng đủ tốt (adequate performance) đồng thời bảo đảm integrity, security và recoverability.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-ch05-c02",
+      "front": "8 Inputs và 5 Decisions chính trong Physical Design Process (Slide 4)?",
+      "back": "Inputs: Normalized relations, Volume estimates, Attribute definitions, Response time expectations, Data security needs, Backup/recovery needs, Integrity expectations, DBMS technology used. Decisions: Attribute data types, Physical record descriptions, File organizations, Indexes & architectures, Query optimization.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-ch05-c03",
+      "front": "4 mục tiêu khi chọn Data Type cho một Field (Slide 11)?",
+      "back": "1) Biểu diễn mọi giá trị có thể (Represent all possible values); 2) Tăng cường toàn vẹn dữ liệu (Improve data integrity); 3) Hỗ trợ mọi thao tác dữ liệu (Support all data manipulations); 4) Tối thiểu dung lượng lưu trữ (Minimize storage space).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-ch05-c04",
+      "front": "Phân biệt CHAR vs VARCHAR / VARCHAR2 và lưu ý deprecation ở SQL Server?",
+      "back": "CHAR/NCHAR cấp phát độ dài cố định; VARCHAR/VARCHAR2/nvarchar chỉ dùng dung lượng theo độ dài chuỗi thực tế. Ở SQL Server, text, ntext và image đã bị deprecated (thay bằng varchar(MAX), nvarchar(MAX), varbinary(MAX)).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 7, 9–10"
+      }
+    },
+    {
+      "id": "dbs-ch05-c05",
+      "front": "Lợi và hại của Code Look-up Table (Figure 5-2) là gì?",
+      "back": "Tiết kiệm dung lượng lưu trữ ở bảng chính và giúp giá trị nhất quán (lưu 'A', 'B', 'C' thay vì chuỗi dài), nhưng tốn thêm chi phí một bước tra cứu/JOIN để lấy giá trị thật (Birch, Maple, Oak).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "dbs-ch05-c06",
+      "front": "4 cơ chế toàn vẹn dữ liệu cấp Field mà RDBMS hỗ trợ và cách xử lý Missing Data?",
+      "back": "4 cơ chế: Default value, Range control, Null value control, Referential integrity. Xử lý missing data: thay bằng giá trị ước lượng (công thức), lập báo cáo liệt kê thiếu, hoặc bỏ qua nếu không ảnh hưởng đáng kể (kiểm tra độ nhạy); có thể dùng Triggers.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 14–15"
+      }
+    },
+    {
+      "id": "dbs-ch05-c07",
+      "front": "Denormalization là gì? 3 tình huống phi chuẩn hóa thường gặp (Fig. 5-3 đến 5-5)?",
+      "back": "Biến đổi các normalized relations thành đặc tả bản ghi vật lý phi chuẩn hóa để giảm JOIN và tăng tốc đọc. 3 tình huống: (1) Quan hệ 1:1 (gộp 1 bảng); (2) Quan hệ M:N có thuộc tính non-key (nhúng thuộc tính từ 1 bảng vào bảng trung gian); (3) Reference data ở quan hệ 1:N (khi bên 1 ít dòng con và không dùng ở nơi khác).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 17–20"
+      }
+    },
+    {
+      "id": "dbs-ch05-c08",
+      "front": "Các rủi ro và giải pháp thay thế trước khi quyết định Denormalize (Slide 21)?",
+      "back": "Rủi ro: tăng lỗi và bất nhất dữ liệu, tái xuất hiện anomalies, buộc lập trình lại khi nghiệp vụ đổi. Giải pháp thay thế: chọn file organization phù hợp + clustering, tối ưu thiết kế truy vấn và chỉ mục.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 17, 21"
+      }
+    },
+    {
+      "id": "dbs-ch05-c09",
+      "front": "Phân biệt Horizontal Partitioning (3 loại) và Vertical Partitioning (yêu cầu bắt buộc)?",
+      "back": "Horizontal chia các hàng sang các bảng/phân vùng riêng (gồm Key Range, Hash, Composite Partitioning). Vertical chia các cột cho từng nhóm người dùng và BẮT BUỘC lặp lại Primary Key ở mọi partition.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 22–26"
+      }
+    },
+    {
+      "id": "dbs-ch05-c10",
+      "front": "5 ưu điểm và 3 nhược điểm của Data Partitioning (Table 5-2)?",
+      "back": "Ưu điểm: Efficiency, Local optimization, Security, Recovery and uptime, Load balancing. Nhược điểm: Inconsistent access speed (chậm khi gộp xuyên phân vùng), Complexity (khó cho dev), Extra space and update time.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 27"
+      }
+    },
+    {
+      "id": "dbs-ch05-c11",
+      "front": "Thứ tự phân cấp lưu trữ vật lý từ lớn đến nhỏ trong Oracle 12c (Figure 5-6)?",
+      "back": "Oracle Database → Oracle Tablespace (Special: System/Undo/Temporary; User Data) → Segment (Data/Index/Temp) → Extent → Oracle Data Block (nằm trên các Operating System Block của Operating System File).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 28–29"
+      }
+    },
+    {
+      "id": "dbs-ch05-c12",
+      "front": "So sánh tốc độ tìm kiếm trung bình giữa Heap, Sequential, Indexed và Hashed file?",
+      "back": "Heap: tìm trung bình n/2. Sequential: tìm nhị phân theo PK mất trung bình log₂(n), rất nhanh đọc tuần tự nhưng chèn/sửa/xóa khó. Indexed: tìm theo độ sâu cây + độ dài list, hỗ trợ rất tốt tìm nhiều khóa. Hashed: tính thẳng địa chỉ O(1) rất nhanh khi đọc ngẫu nhiên theo PK, không hợp đọc tuần tự.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 31–36"
+      }
+    },
+    {
+      "id": "dbs-ch05-c13",
+      "front": "Join Index (Figure 5-8) hoạt động như thế nào?",
+      "back": "Lưu sẵn bảng các cặp RowID của những bản ghi khớp nhau giữa hai bảng (theo cột non-key chung như City hoặc theo FK-PK như Cust#), giúp tăng tốc vượt bậc phép JOIN mà không cần quét nối trực tiếp hai bảng lớn mỗi lần.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 35"
+      }
+    },
+    {
+      "id": "dbs-ch05-c14",
+      "front": "9 quy tắc sử dụng Index (Slides 38–39) — đặc biệt các ngưỡng và cảnh báo quan trọng?",
+      "back": "1) Bảng lớn; 2) Index PK; 3) Search fields (WHERE); 4) Trường ORDER BY/GROUP BY; 5) Nên khi >100 giá trị khác nhau, tránh khi <30; 6) Tránh giá trị quá dài; 7) Khóa định vị nên dùng surrogate/sequence; 8) Để ý giới hạn số index & bytes của DBMS; 9) Cẩn thận cột có NULL.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 37–39"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch05-q01", "stem": "Trong vertical partitioning, điều nào bắt buộc?", "options": ["Không được lặp cột nào", "PK phải lặp lại ở mọi partition", "Chỉ chia theo khoảng khóa", "Phải dùng hash"], "answer": 1, "explanation": "Slide về vertical partitioning nêu PK phải được lặp ở mỗi partition.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 24–26" } },
-    { "id": "dbs-ch05-q02", "stem": "Đơn vị I/O nhỏ nhất của DBMS trong phân cấp lưu trữ là gì?", "options": ["Tablespace", "Segment", "Extent", "Data block"], "answer": 3, "explanation": "Data block là đơn vị I/O nhỏ nhất, gồm các OS block.", "source": { "file": "Chapter 05.pdf", "loc": "Slides 28–29" } },
-    { "id": "dbs-ch05-q03", "stem": "Tổ chức file nào phù hợp nhất cho truy xuất ngẫu nhiên nhanh theo PK nhưng không hợp truy cập tuần tự?", "options": ["Sequential", "Hashed", "Heap", "Indexed tuần tự"], "answer": 1, "explanation": "Theo Table 5-3: hashed rất nhanh cho random retrieval trên PK và impractical cho sequential retrieval.", "source": { "file": "Chapter 05.pdf", "loc": "Slide 36" } }
+    {
+      "id": "dbs-ch05-q01",
+      "stem": "Theo Slide 4 (Physical Design Process), phát biểu nào ĐÚNG về mối quan hệ giữa Physical Record Description và Logical Design?",
+      "options": [
+        "Thiết kế bản ghi vật lý bắt buộc phải trùng khớp 1-1 với từng bảng ở thiết kế logic",
+        "Thiết kế bản ghi vật lý không nhất thiết luôn khớp với thiết kế logic (có thể gộp hoặc tách bảng vì hiệu năng)",
+        "Thiết kế bản ghi vật lý là đầu vào (Input) để xây dựng Normalized relations",
+        "Chỉ có kiểu dữ liệu là được thay đổi ở pha thiết kế vật lý"
+      ],
+      "answer": 1,
+      "explanation": "Slide 4 ghi rõ trong hộp Decisions: 'Physical record descriptions (doesn’t always match logical design)' do có thể áp dụng denormalization hoặc partitioning.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-ch05-q02",
+      "stem": "Trong Table 5-1 (Oracle 12c), định nghĩa cột `NUMBER(5,2)` biểu diễn kiểu số có đặc điểm nào sau đây?",
+      "options": [
+        "Lưu tối đa 5 chữ số trước dấu phẩy và 2 chữ số sau dấu phẩy (tổng 7 chữ số)",
+        "Lưu tổng cộng tối đa 5 chữ số, trong đó có đúng 2 chữ số ở bên phải dấu phẩy (tối đa 999.99)",
+        "Lưu số nguyên chính xác 5 bytes",
+        "Lưu chính xác 2 chữ số thập phân với tối thiểu 5 chữ số nguyên"
+      ],
+      "answer": 1,
+      "explanation": "Slide 10 (Table 5-1) giải thích rõ: 'NUMBER(5,2) specifies a field with no more than 5 digits and exactly 2 digits to the right of the decimal point'.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 10"
+      }
+    },
+    {
+      "id": "dbs-ch05-q03",
+      "stem": "Theo bảng thiết kế vật lý bảng Tutor ở Slide 13, vì sao cột `TutorFirstName` và `TutorEmail` được đánh dấu `X` ở cột `Allow Nulls`, còn `TutorPhone` để trống?",
+      "options": [
+        "Vì `TutorFirstName` và `TutorEmail` dùng `nchar` nên bắt buộc đánh dấu `X`",
+        "Vì trên Logical Entity `Tutor`, `TutorPhone` được in đậm (bắt buộc / NOT NULL) nên Allow Nulls để trống, còn `TutorFirstName` và `TutorEmail` không in đậm (tùy chọn / cho phép NULL)",
+        "Vì `X` có nghĩa là cấm tuyệt đối giá trị NULL (NOT NULL)",
+        "Vì khóa chính luôn phải đánh dấu `X` ở Allow Nulls"
+      ],
+      "answer": 1,
+      "explanation": "Slide 13 đối chiếu Logical design (Entity Tutor) với Physical design (Table): 5 thuộc tính in đậm (`*TutorKey`, `TutorLastName`, `TutorPhone`, `TutorHireDate`, `TutorStatus`) là NOT NULL (Allow Nulls trống), còn 2 thuộc tính không in đậm cho phép NULL (`X`).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "dbs-ch05-q04",
+      "stem": "Khi áp dụng Code Look-up Table (như lưu mã 'A', 'B', 'C' trong bảng PRODUCT rồi tra sang PRODUCT FINISH Lookup Table ở Figure 5-2), đánh đổi chính là gì?",
+      "options": [
+        "Tốn nhiều dung lượng ở bảng PRODUCT hơn nhưng giảm số lần JOIN",
+        "Tiết kiệm dung lượng lưu trữ nhưng phải tốn thêm một bước tra cứu/lookup để lấy giá trị thật",
+        "Làm mất hoàn toàn toàn vẹn dữ liệu trên cột ProductFinish",
+        "Không thể đánh chỉ mục trên cột mã Code"
+      ],
+      "answer": 1,
+      "explanation": "Chú thích đỏ ngay trên Figure 5-2 (Slide 12) nêu rõ: 'Code saves space, but costs an additional lookup to obtain actual value'.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "dbs-ch05-q05",
+      "stem": "Trong Figure 5-4 (phi chuẩn hóa quan hệ M:N VENDOR — PRICE QUOTE — ITEM có thuộc tính non-key Price), giải pháp được áp dụng là gì và rủi ro nào phát sinh?",
+      "options": [
+        "Gộp cả 3 bảng thành 1 bảng duy nhất; rủi ro làm mất khóa chính",
+        "Sao chép thuộc tính `Description` từ bảng ITEM vào bảng trung gian (`ITEM QUOTE`) để bỏ phép JOIN sang ITEM; rủi ro có thể trùng lặp `Description` (`Duplicate description possible`)",
+        "Xóa hẳn cột `Price` khỏi bảng trung gian",
+        "Chuyển `VendorID` thành chuỗi mô tả dài thay vì dùng khóa ngoại"
+      ],
+      "answer": 1,
+      "explanation": "Slide 19 minh họa chuyển 3 bảng (VENDOR, PRICE QUOTE, ITEM) thành 2 bảng (VENDOR, ITEM QUOTE) bằng cách đưa `Description` vào `ITEM QUOTE`, tránh một lần truy cập bảng ITEM nhưng có nguy cơ trùng lặp mô tả.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 19"
+      }
+    },
+    {
+      "id": "dbs-ch05-q06",
+      "stem": "Trong Vertical Partitioning, yêu cầu nào BẮT BUỘC phải tuân thủ đối với các bảng vật lý sau khi tách?",
+      "options": [
+        "Không được có bất kỳ cột nào xuất hiện ở hai partition khác nhau",
+        "Primary Key phải được lặp lại ở mọi partition",
+        "Phải luôn chia dữ liệu theo hàm băm (Hash partitioning)",
+        "Mỗi partition chỉ được chứa đúng một cột non-key"
+      ],
+      "answer": 1,
+      "explanation": "Slide 22 nhấn mạnh: 'The primary key must be repeated in each file' (minh họa rõ ở Slides 25–26 khi cột Product ID / Key có mặt ở tất cả partition để JOIN lại khi cần).",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 22, 25–26"
+      }
+    },
+    {
+      "id": "dbs-ch05-q07",
+      "stem": "Thứ tự phân cấp lưu trữ logic trong Oracle 12c (Figure 5-6) từ LỚN ĐẾN NHỎ là dãy nào sau đây?",
+      "options": [
+        "Database → Tablespace → Extent → Segment → Data Block",
+        "Database → Tablespace → Segment → Extent → Data Block",
+        "Tablespace → Database → Segment → Data Block → Extent",
+        "Operating System Block → Extent → Segment → Tablespace → Database"
+      ],
+      "answer": 1,
+      "explanation": "Slides 28–29 (Figure 5-6): Oracle Database gồm các Oracle Tablespace; mỗi Tablespace gồm các Segment (Data/Index/Temp); mỗi Segment gồm các Extent; mỗi Extent gồm nhiều Oracle Data Block.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 28–29"
+      }
+    },
+    {
+      "id": "dbs-ch05-q08",
+      "stem": "So sánh tốc độ tìm kiếm trung bình của file có n bản ghi giữa Heap file và Sequential file (Figure 5-7a):",
+      "options": [
+        "Heap mất log₂(n); Sequential mất n/2",
+        "Heap mất n/2; Sequential mất log₂(n)",
+        "Cả hai đều mất O(1) nhờ hàm băm",
+        "Heap mất n²; Sequential mất n"
+      ],
+      "answer": 1,
+      "explanation": "Slide 31 (Figure 5-7a) nêu rõ: 'Sequential storage: Average time to find desired record = log₂n. If this were a heap, Average time to find desired record = n/2'.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 31"
+      }
+    },
+    {
+      "id": "dbs-ch05-q09",
+      "stem": "Theo Table 5-3, kiểu tổ chức file nào phù hợp nhất cho truy xuất ngẫu nhiên (random retrieval) rất nhanh theo Primary Key và thêm/xóa/sửa dễ dàng, nhưng KHÔNG thực tế (Impractical) cho truy xuất tuần tự theo PK?",
+      "options": [
+        "Sequential file organization",
+        "Indexed file organization",
+        "Hashed file organization",
+        "Heap file organization"
+      ],
+      "answer": 2,
+      "explanation": "Table 5-3 (Slide 36) ghi nhận Hashed đạt 'Very fast' cho Random retrieval on PK và 'Very easy' cho Deleting/Updating records (chỉ cần xử lý collision khi thêm bản ghi cùng địa chỉ), nhưng 'Impractical, unless using a hash index' cho Sequential retrieval on PK.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slide 36"
+      }
+    },
+    {
+      "id": "dbs-ch05-q10",
+      "stem": "Theo bộ 9 quy tắc sử dụng Index (Slides 38–39), phát biểu nào SAI?",
+      "options": [
+        "Nên đánh index khi cột có > 100 giá trị phân biệt và tránh khi có < 30 giá trị",
+        "Cột thường xuất hiện trong `WHERE`, `ORDER BY`, `GROUP BY` của bảng lớn là ứng viên tốt để đánh index",
+        "Mọi DBMS đều tự động đưa các giá trị NULL vào cây chỉ mục để tăng tốc truy vấn tìm NULL",
+        "Nên tránh đánh index trên các trường có giá trị quá dài hoặc cân nhắc nén giá trị trước"
+      ],
+      "answer": 2,
+      "explanation": "Quy tắc 9 (Slide 39) cảnh báo ngược lại: 'Be careful of indexing attributes with null values; many DBMSs will not recognize null values in an index search'. Các phương án còn lại đúng theo Quy tắc 1, 3, 4, 5, 6.",
+      "source": {
+        "file": "Chapter 05.pdf",
+        "loc": "Slides 38–39"
+      }
+    }
   ]
 }

@@ -1,26 +1,1427 @@
 {
-  "id": "se1-l07", "order": 6,
+  "id": "se1-l07",
+  "order": 6,
   "title": "Lecture 7: Requirement Engineering",
-  "summary": [
-    { "h": "Định nghĩa", "text": "Requirements là mô tả các dịch vụ hệ thống cung cấp và các ràng buộc khi vận hành. Requirements engineering là quá trình tìm hiểu, phân tích, ghi tài liệu và kiểm tra các dịch vụ và ràng buộc đó. Functional requirements: dịch vụ hệ thống cung cấp, phản ứng với input cụ thể, hành vi trong tình huống cụ thể, và điều hệ thống không làm. Non-functional requirements: ràng buộc lên dịch vụ/chức năng (thời gian, bộ nhớ, luật...) và thường quan trọng hơn từng functional requirement riêng lẻ." },
-    { "h": "Phân loại non-functional", "text": "Product (hiệu năng, bộ nhớ, độ tin cậy: efficiency, dependability, security, usability), Organizational (environmental, operational, development), External (regulatory, ethical, legislative). Nên viết định lượng để kiểm thử khách quan: tốc độ (giao dịch/giây, thời gian phản hồi), kích thước, dễ dùng (thời gian training), độ tin cậy (mean time to failure), robustness, portability." },
-    { "h": "Quy trình RE", "text": "Lặp theo xoắn ốc gồm elicitation, specification, validation. Elicitation khó vì: stakeholder không biết mình muốn gì; kỹ sư thiếu hiểu biết miền; mỗi stakeholder một yêu cầu; yếu tố chính trị; môi trường kinh doanh thay đổi. 4 hoạt động: discovery, classification & organization, prioritization & negotiation, specification. Hai cách tiếp cận: Interviewing và Observation/ethnography (không hiệu quả để tìm yêu cầu tổ chức rộng hơn và gợi ý đổi mới)." },
-    { "h": "Specification và use case", "text": "User requirements viết bằng ngôn ngữ tự nhiên, hình, bảng, không dùng thuật ngữ phần mềm. System requirements có thể dùng structured natural language, UML, đặc tả toán học, và không bàn thiết kế/cài đặt. Use case diagram gồm actor, use case, system boundary và 4 quan hệ: association, include (bao gồm vô điều kiện), extend (mở rộng có điều kiện), generalization (is-a). Use case template gồm Name, ID, Description, Actor, Organizational Benefits, Frequency of Use, Triggers, Precondition, Postcondition, Main Course, Alternate Courses, Exceptions." },
-    { "h": "SRS và validation", "text": "SRS phục vụ 5 nhóm: customers, managers, developers, testers, maintenance engineers. Validation có 5 kiểm tra: validity, consistency, completeness, realism, verifiability. Yêu cầu thay đổi liên tục nên cần traceability; evolutionary model và agile phù hợp." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 7.pdf",
+    "totalPages": 31,
+    "extractedPages": 31,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 7.pdf là PDF dạng cuộn ảnh 1 trang dài (kích thước 960x22320) chứa đúng 31 slides; do file gốc chỉ có 1 trang PDF vật lý nên toàn bộ 31 slides đặt pageNumber: 1 kèm slideNumber \"Slide 1\"–\"Slide 31\".",
+      "Slide 9: Slide gốc viết 'It load documents from folder' (thiếu -s ở load và thiếu mạo từ), giữ nguyên văn.",
+      "Slide 10: Hai dòng cuối được tô màu nâu vàng để đánh dấu yêu cầu phi chức năng về bảo mật (security); dòng cuối viết 'User need to login to use application.' (giữ nguyên văn).",
+      "Slide 13: Slide gốc viết tách từ 'require ments' (giữ nguyên văn).",
+      "Slide 16: Slide gốc viết 'Ethnography focus on...', 'discovering broader organizational' và 'suggestion innovations' (giữ nguyên văn).",
+      "Slide 19: Bảng Use Case Template trên slide gốc không có dòng tiêu đề và mục EX2 viết 'EX2 <condition...>' không có dấu hai chấm như EX1 (giữ nguyên văn).",
+      "Slides 20–21: Slide 20 viết 'Use cases describes...'; Slide 21 viết 'Boudary of system' (thiếu chữ n) và 'Actor are outside...' (giữ nguyên văn).",
+      "Slide 23: Trong sơ đồ minh họa, oval 'Make payment' của Customer Front-end nằm vắt qua mép trái đường viền hộp ranh giới hệ thống.",
+      "Slide 24: Bảng đối tượng đọc SRS viết 'Tester' (số ít) và 'to Understand' (viết hoa chữ U), giữ nguyên văn.",
+      "Slides 28–29: Câu mở đầu Slide 28 bị cụt tại '...checking that requirements' (thiếu phần vị ngữ cuối câu); bảng Slide 29 có dòng tiêu đề màu xanh để trống chữ."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 7.pdf",
+      "loc": "Slides 1–31 (PDF cuộn ảnh 1 trang dài chứa 31 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 7.pdf", "loc": "Slides 1–31 (PDF ảnh 1 trang)" }],
+  "summary": [
+    {
+      "h": "Giới thiệu bài giảng, Mục lục & Tài liệu tham khảo",
+      "text": "Giới thiệu bài giảng Lecture 7 về Requirement Engineering (Kỹ nghệ yêu cầu), dàn ý 4 chủ điểm chính và 2 giáo trình tham khảo của Sommerville và Pressman & Maxim.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 1–3"
+      },
+      "digest": {
+        "keyPoints": [
+          "Lecture 7 mở rộng hoạt động Software Specification trong Lecture 6 thành quy trình hoàn chỉnh: phân tích vì sao cần yêu cầu, phân biệt Functional vs Non-functional, quy trình RE (elicitation, specification, validation) và quản lý thay đổi yêu cầu.",
+          "Hai giáo trình tham khảo chính là Sommerville (Software Engineering, part 1) và Pressman & Maxim (Software engineering: a practitioners approach, part 2)."
+        ],
+        "terms": [
+          {
+            "term": "Requirement Engineering (RE)",
+            "meaning": "Quy trình tìm hiểu, phân tích, lập tài liệu và kiểm tra các dịch vụ cùng ràng buộc của hệ thống phần mềm."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 7: Requirement Engineering",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 7",
+            "Requirement Engineering"
+          ],
+          "explanation": [
+            "Slide tiêu đề của bài giảng Lecture 7 thuộc môn 61FIT3SE1 - Software Engineering 1 với chủ đề Requirement Engineering (Kỹ nghệ yêu cầu / Phân tích yêu cầu).",
+            "Nội dung bài này đi sâu vào pha đầu tiên của vòng đời phát triển phần mềm đã giới thiệu ở Lecture 6."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 1,
+          "title": "Outline",
+          "bullets": [
+            "Why requirement analysis?",
+            "Functional vs non-functional requirement",
+            {
+              "text": "Requirements engineering processes",
+              "subBullets": [
+                "Requirements elicitation",
+                "Requirements specification",
+                "Requirements validation"
+              ]
+            },
+            "Requirements change"
+          ],
+          "explanation": [
+            "Dàn ý bài học gồm 4 phần chính: (1) Lý do phải phân tích yêu cầu, (2) Phân biệt yêu cầu chức năng (Functional) và phi chức năng (Non-functional).",
+            "(3) Quy trình kỹ nghệ yêu cầu gồm 3 bước lặp: thu thập (elicitation), đặc tả (specification) và kiểm chứng (validation); (4) Quản lý sự thay đổi yêu cầu (Requirements change)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 1,
+          "title": "References",
+          "bullets": [
+            "Sommerville, Software Engineering, part 1",
+            "Roger S. Pressman, Bruce R. Maxim, Software engineering: a practitioners approach, part 2"
+          ],
+          "explanation": [
+            "Slide trích 2 tài liệu gốc dùng để biên soạn bài giảng: bộ khung phân loại NFR, vòng xoắn RE, quy trình Elicitation và bảng Validation lấy từ Sommerville (Part 1); Use Case Template và ví dụ lấy thêm từ Pressman & Maxim (Part 2).",
+            "Khi ôn thi cần đặc biệt chú ý các bảng định nghĩa và phân loại chuẩn từ Sommerville vì câu hỏi trắc nghiệm thường bám sát thuật ngữ trong giáo trình này."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 3"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Định nghĩa Requirements & Phân loại Functional vs Non-functional",
+      "text": "Định nghĩa requirements và requirements engineering, phân biệt Functional vs Non-functional requirements (NFR), 3 nguồn gốc phát sinh NFR (Product, Organizational, External), thang đo định lượng NFR và 2 ví dụ minh họa Search Engine & ST Monthly Report.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 4–10"
+      },
+      "digest": {
+        "keyPoints": [
+          "Requirements mô tả các dịch vụ hệ thống cung cấp và các ràng buộc vận hành; Requirements engineering là quá trình tìm hiểu, phân tích, tài liệu hóa và kiểm tra chúng.",
+          "Functional requirements quy định dịch vụ cung cấp, phản ứng với input, hành vi trong tình huống cụ thể và điều hệ thống không được làm; Non-functional requirements đặt ràng buộc (thời gian, bộ nhớ, luật...) và thường quan trọng hơn từng yêu cầu chức năng đơn lẻ.",
+          "Ba nguồn NFR: Product (efficiency, dependability, security, usability), Organizational (environmental, operational, development) và External (regulatory, ethical, legislative).",
+          "NFR cần viết định lượng (Processed transactions/second, response time, MTTF, training time...) để kiểm thử khách quan.",
+          "User requirements mô tả tổng quan cho người dùng/khách hàng; System requirements chi tiết hóa chính xác hơn cho đội phát triển (có thể tách rõ các dòng security là non-functional)."
+        ],
+        "terms": [
+          {
+            "term": "Functional requirements",
+            "meaning": "Mô tả dịch vụ hệ thống cung cấp, cách phản ứng với đầu vào cụ thể, hành vi trong từng tình huống và điều hệ thống không làm."
+          },
+          {
+            "term": "Non-functional requirements (NFR)",
+            "meaning": "Các ràng buộc lên dịch vụ hoặc chức năng của hệ thống (thời gian, bộ nhớ, bảo mật, luật pháp...) thường mang tính sống còn đối với toàn hệ thống."
+          }
+        ],
+        "pitfalls": [
+          "Nhiều sinh viên nhầm mọi yêu cầu đều là functional — ví dụ ở Slide 10, quy định 'User need to login to use application' và giới hạn truy cập theo ACL được bài giảng xếp vào Non-functional (security).",
+          "Không được viết NFR mơ hồ kiểu 'hệ thống phải nhanh/dễ dùng' — Slide 8 yêu cầu phải lượng hóa bằng các chỉ số đo được như response time hay training time."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 1,
+          "title": "Requirement Engineering",
+          "bullets": [
+            {
+              "text": "The requirements:",
+              "subBullets": [
+                "the descriptions of the services that a system should provide and the constraints on its operation"
+              ]
+            },
+            {
+              "text": "Requirements engineering (or requirement analysis):",
+              "subBullets": [
+                "The process of finding out, analyzing, documenting and checking these services and constraints"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide định nghĩa hai khái niệm gốc: Requirement gồm cả phần 'dịch vụ cần cung cấp' (services) lẫn phần 'ràng buộc vận hành' (constraints).",
+            "Requirements engineering gồm 4 động từ nối tiếp: finding out (khám phá), analyzing (phân tích), documenting (tài liệu hóa) và checking (kiểm tra tính đúng đắn)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 1,
+          "title": "The Requirement",
+          "paragraphs": [
+            "Software system requirements consists of 2 types:",
+            "Non-functional requirements are often more critical than individual functional requirements."
+          ],
+          "bullets": [
+            {
+              "text": "Functional requirements:",
+              "subBullets": [
+                "Services the system should provide",
+                "How the system should react to particular inputs",
+                "How the system should behave in particular situations.",
+                "State what the system should not do"
+              ]
+            },
+            {
+              "text": "Non-functional requirements:",
+              "subBullets": [
+                "Constraints on the services or functions: time, memory, law, ..."
+              ]
+            }
+          ],
+          "explanation": [
+            "Hệ thống phần mềm có 2 loại yêu cầu: Functional (hệ thống làm gì, phản ứng với input nào, hành xử ra sao, và đôi khi nêu rõ không được làm gì) và Non-functional (các ràng buộc về thời gian, bộ nhớ, pháp luật...).",
+            "Câu kết nhấn mạnh NFR thường quan trọng hơn từng functional requirement riêng lẻ: nếu thiếu 1 tính năng nhỏ hệ thống vẫn dùng tạm được, nhưng nếu vi phạm NFR (chậm, sập, hở bảo mật hoặc trái luật) thì cả hệ thống trở nên vô dụng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 1,
+          "title": "Non-functional Requirement",
+          "paragraphs": [
+            "The non-functional requirements may come from:"
+          ],
+          "bullets": [
+            {
+              "text": "Required characteristics of the software (product requirements):",
+              "subBullets": [
+                "These requirements specify or constrain the runtime behavior of the software: performance, memory, reliability, ..."
+              ]
+            },
+            {
+              "text": "The organization developing the software (organizational requirements):",
+              "subBullets": [
+                "These requirements are from policies and procedures in the customer’s and developer’s organizations"
+              ]
+            },
+            {
+              "text": "External sources:",
+              "subBullets": [
+                "These requirements are from regulatory standards, general public, law, and so on"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide giải thích 3 nguồn gốc sinh ra NFR: (1) Product requirements ràng buộc hành vi lúc chạy (hiệu năng, bộ nhớ, độ tin cậy...); (2) Organizational requirements bắt nguồn từ chính sách/quy trình của công ty khách hàng và công ty phát triển.",
+            "(3) External requirements đến từ bên ngoài hai tổ chức như tiêu chuẩn ngành, dư luận xã hội hoặc quy định pháp luật."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 1,
+          "title": "Non-functional Requirement — Classification Tree",
+          "diagramText": [
+            "Non-functional requirements",
+            "├── Product requirements",
+            "│   ├── Usability requirements",
+            "│   ├── Efficiency requirements",
+            "│   │   ├── Performance requirements",
+            "│   │   └── Space requirements",
+            "│   ├── Dependability requirements",
+            "│   └── Security requirements",
+            "├── Organizational requirements",
+            "│   ├── Environmental requirements",
+            "│   ├── Operational requirements",
+            "│   └── Development requirements",
+            "└── External requirements",
+            "    ├── Regulatory requirements",
+            "    ├── Ethical requirements",
+            "    └── Legislative requirements",
+            "        ├── Accounting requirements",
+            "        └── Safety/security requirements"
+          ],
+          "diagramNote": "Sơ đồ cây phân cấp Non-functional requirements (Sommerville) gồm 3 nhánh cấp 1 (Product, Organizational, External) và các nhánh con chi tiết.",
+          "explanation": [
+            "Sơ đồ cây giúp ghi nhớ chính xác từng nhánh con thuộc 3 nhóm NFR: Product gồm Usability, Efficiency (Performance & Space), Dependability và Security.",
+            "Organizational gồm Environmental, Operational, Development; còn External gồm Regulatory, Ethical và Legislative (chia tiếp thành Accounting và Safety/security)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 1,
+          "title": "Non-functional Requirement — Quantitative Metrics",
+          "paragraphs": [
+            "You should write non-functional requirements quantitatively so that they can be objectively tested."
+          ],
+          "table": {
+            "headers": [
+              "Property",
+              "Measure"
+            ],
+            "rows": [
+              [
+                "Speed",
+                "Processed transactions/second ,\nUser/event response time\nScreen refresh time"
+              ],
+              [
+                "Size",
+                "Megabytes/Number of ROM chips"
+              ],
+              [
+                "Ease of use",
+                "Training time"
+              ],
+              [
+                "Reliability",
+                "Mean time to failure , probability of unavailability\nRate of failure occurrence"
+              ],
+              [
+                "Robustness",
+                "Time to restart after failure\nPercentage of events causing failure\nProbability of data corruption on failure"
+              ],
+              [
+                "Portability",
+                "Number of target systems"
+              ]
+            ]
+          },
+          "explanation": [
+            "Nguyên tắc cốt lõi khi viết NFR là phải định lượng được (quantitatively) để kiểm thử khách quan thay vì nhận xét cảm tính.",
+            "Ví dụ: Speed đo bằng số giao dịch/giây hoặc thời gian phản hồi; Ease of use đo bằng thời gian đào tạo người dùng (Training time); Reliability dùng Mean time to failure (MTTF); Robustness đo thời gian khởi động lại và tỷ lệ hỏng dữ liệu khi gặp sự cố; Portability đo bằng số nền tảng/hệ thống đích hỗ trợ."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 1,
+          "title": "Example Search Engine",
+          "bullets": [
+            {
+              "text": "User requirements definition:",
+              "subBullets": [
+                "An application that allows the user to run queries against a collection of documents."
+              ]
+            },
+            {
+              "text": "System requirements specification:",
+              "subBullets": [
+                "It load documents from folder and the collections can be enlarged at any time.",
+                "A query begins by the user presenting a single word. It only searches for the words in queries (called keywords) that aren’t in stopwords list. Stopwords list is stored in a config file.",
+                "The result is ranked by the frequency of keyword.",
+                "The user can “refine” a query by providing another keyword; the matching documents must contain all the keywords."
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết 'It load documents from folder' (thiếu -s ở load và thiếu mạo từ ở folder / stopwords list / config file), giữ nguyên văn.",
+          "explanation": [
+            "Ví dụ minh họa rõ sự chuyển dịch từ User requirements (1 câu tổng quát cho khách hàng: truy vấn trên bộ tài liệu) sang System requirements (chi tiết hành vi cho dev: nạp từ thư mục, loại bỏ stopwords từ file cấu hình, xếp hạng theo tần suất, lọc tiếp theo logic AND khi refine).",
+            "Nhờ tách hai mức độ như vậy, khách hàng không bị rối bởi chi tiết file cấu hình hay cơ chế stopwords, còn lập trình viên lại có tiêu chí cài đặt rõ ràng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 1,
+          "title": "Example",
+          "bullets": [
+            {
+              "text": "User requirements definition:",
+              "subBullets": [
+                "The ST system shall generate monthly management reports showing the cost of goods sold by each store during that month."
+              ]
+            },
+            {
+              "text": "System requirements specification:",
+              "subBullets": [
+                "On the last working day of each month, a summary of the sold products, their cost and the sold stores shall be generated.",
+                "The system shall generate the report for printing after 17.30 on the last working day of the month.",
+                "A report shall be created for each store and shall list the individual product names, the total number of sales and the total cost of the sold products.",
+                "If products are available in different mass units (e.g. 500g, 1kg, etc.) separate reports shall be created for each mass unit.",
+                "Access to goods cost reports shall be restricted to authorized users as listed on a management access control list.",
+                "User need to login to use application."
+              ]
+            }
+          ],
+          "ocrNote": "Hai gạch đầu dòng cuối trên slide gốc được tô màu nâu vàng để đánh dấu yêu cầu phi chức năng (security); dòng cuối viết nguyên văn 'User need to login to use application.'.",
+          "explanation": [
+            "Ví dụ hệ thống báo cáo cửa hàng (ST system) tiếp tục minh họa cách tách 1 yêu cầu người dùng thành nhiều đặc tả hệ thống chi tiết về thời điểm chạy (sau 17:30 ngày làm việc cuối tháng), nội dung cột báo cáo và tách riêng theo đơn vị khối lượng (500g, 1kg...).",
+            "Hai dòng cuối được slide tô màu khác biệt nhằm nhấn mạnh: yêu cầu giới hạn quyền xem qua danh sách kiểm soát truy cập (ACL) và yêu cầu đăng nhập thực chất là Non-functional requirements về bảo mật (security)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 10"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Quy trình Kỹ nghệ yêu cầu & Thu thập yêu cầu (Requirements Elicitation)",
+      "text": "Trình bày bản chất lặp xoắn ốc của quy trình kỹ nghệ yêu cầu, các nguyên nhân khiến elicitation khó khăn, mô hình 4 bước của quy trình elicitation & analysis, cùng hai phương pháp tiếp cận Interviewing và Observation/Ethnography.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 11–16"
+      },
+      "digest": {
+        "keyPoints": [
+          "Trong thực tế, Requirements Engineering là quy trình lặp xen kẽ (iterative & interleaved) theo vòng xoắn từ Feasibility study ra tới System requirements document qua 3 vùng: Elicitation, Specification, Validation.",
+          "Thu thập yêu cầu (Elicitation) khó vì 5 lý do: stakeholder không biết mình muốn gì, kỹ sư thiếu hiểu biết miền nghiệp vụ, các stakeholder diễn đạt khác nhau, yếu tố chính trị nội bộ và môi trường kinh doanh luôn biến động.",
+          "Chu trình elicitation & analysis gồm 4 bước lặp: (1) Discovery & understanding → (2) Classification & organization → (3) Prioritization & negotiation → (4) Documentation.",
+          "Hai phương pháp chính: Interviewing (khó vì thuật ngữ chuyên ngành và kiến thức ngầm quá hiển nhiên với chuyên gia) và Observation/ethnography (khó phát hiện yêu cầu tổ chức rộng hơn và gợi ý đổi mới)."
+        ],
+        "terms": [
+          {
+            "term": "Requirements elicitation",
+            "meaning": "Quá trình tìm hiểu công việc của các bên liên quan (stakeholders) và cách họ sẽ sử dụng hệ thống."
+          },
+          {
+            "term": "Ethnography (Observation)",
+            "meaning": "Kỹ thuật quan sát trực tiếp người dùng làm việc trong môi trường thật để thấy họ dùng công cụ/tài liệu gì và thao tác như thế nào."
+          }
+        ],
+        "pitfalls": [
+          "Hạn chế hay bị hỏi của Ethnography (Slide 16): vì tập trung vào thao tác hằng ngày của người dùng cuối nên nó KHÔNG hiệu quả để tìm các yêu cầu tầm tổ chức rộng hơn (broader organizational requirements) và gợi ý đổi mới quy trình (suggesting innovations)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 1,
+          "title": "Requirements Engineering Processes",
+          "paragraphs": [
+            "Requirements Engineering Processes"
+          ],
+          "explanation": [
+            "Slide chuyển mục bước vào phần trọng tâm thứ ba: Quy trình Kỹ nghệ yêu cầu (Requirements Engineering Processes).",
+            "Phần này triển khai chi tiết 3 pha: Elicitation (Slide 13–16), Specification (Slide 17–27) và Validation (Slide 28–29)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 1,
+          "title": "Requirements Engineering Processes — Spiral View",
+          "bullets": [
+            "In practice, requirements engineering is an iterative process in which the activities are interleaved."
+          ],
+          "diagramText": [
+            "Biểu đồ xoắn ốc chia 3 vùng (mở rộng từ tâm Start ra ngoài):",
+            "• Vùng Requirements elicitation: Start → User requirements elicitation → System req. elicitation",
+            "• Vùng Requirements specification: Business requirements specification → User requirements specification → System requirements specification and modeling",
+            "• Vùng Requirements validation: Feasibility study → Prototyping → Reviews → đầu ra cuối cùng: System requirements document"
+          ],
+          "diagramNote": "Mô hình xoắn ốc RE của Sommerville minh họa 3 hoạt động elicitation, specification và validation đan xen qua từng vòng từ mức nghiệp vụ/khả thi đến đặc tả hệ thống.",
+          "explanation": [
+            "Khác với suy nghĩ làm xong bước này mới sang bước kia, RE thực tế là quy trình lặp đan xen: ta làm nghiên cứu khả thi, đặc tả bài toán kinh doanh, rồi tiếp tục vòng ngoài với yêu cầu người dùng, dựng prototype, rồi sang yêu cầu hệ thống và review.",
+            "Cách đi theo vòng xoắn đảm bảo mỗi vòng đều quay lại kiểm chứng với stakeholder trước khi chốt System requirements document."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 1,
+          "title": "Requirements Elicitation",
+          "bullets": [
+            {
+              "text": "Requirements elicitation process:",
+              "subBullets": [
+                "to understand the work that stakeholders do and how they might use the system."
+              ]
+            },
+            {
+              "text": "Eliciting requirement is a difficult process for several reasons:",
+              "subBullets": [
+                "Stakeholders often don’t know what they want",
+                "Requirements engineers, without experience in the customer’s domain, may not understand these requirements",
+                "Different stakeholders, with diverse requirements, may express their require ments in different ways.",
+                "Political factors may influence the requirements of a system",
+                "The economic and business environment in which the analysis takes place is dynamic. It inevitably changes during the analysis process"
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết tách từ 'require ments' (giữ nguyên văn).",
+          "explanation": [
+            "Mục tiêu của Requirements elicitation không chỉ là hỏi 'anh muốn phần mềm có nút gì' mà là hiểu công việc thực tế của các stakeholder và cách họ sẽ dùng hệ thống.",
+            "Slide liệt kê 5 rào cản kinh điển trong thực tế khiến việc lấy yêu cầu rất khó khăn: từ phía khách hàng (không biết rõ mình muốn gì, mâu thuẫn lợi ích giữa các phòng ban/yếu tố chính trị), từ phía kỹ sư (thiếu kiến thức miền nghiệp vụ) và từ môi trường kinh doanh biến đổi liên tục."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 1,
+          "title": "Requirements Elicitation — Process Model",
+          "bullets": [
+            {
+              "text": "A process model of the elicitation and analysis process:",
+              "subBullets": [
+                "Requirements discovery and understanding: Domain requirements from stakeholders and documentation are also discovered",
+                "Requirements classification and organization: groups related requirements and organizes them into coherent clusters",
+                "Requirements prioritization and negotiation: prioritizes requirements and finds and resolves requirements conflicts through negotiation",
+                "Requirements documentation: The requirements are documented and input into the next round of the spiral"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide mô tả 4 bước trong quy trình thu thập và phân tích yêu cầu: (1) Discovery & understanding giúp khai phá thêm yêu cầu miền nghiệp vụ (domain requirements) từ con người và tài liệu hiện có.",
+            "(2) Classification & organization gom nhóm các yêu cầu liên quan thành các cụm mạch lạc; (3) Prioritization & negotiation xếp độ ưu tiên và thương lượng giải quyết xung đột giữa các bên; (4) Documentation ghi thành tài liệu đầu vào cho vòng xoắn kế tiếp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 1,
+          "title": "Requirements Elicitation — Cycle Diagram",
+          "paragraphs": [
+            "The elicitation and analysis process"
+          ],
+          "diagramText": [
+            "Chu trình khép kín 4 bước theo chiều kim đồng hồ:",
+            "1. Requirements discovery and understanding → 2. Requirements classification and organization → 3. Requirements prioritization and negotiation → 4. Requirements documentation → (quay lại 1.)"
+          ],
+          "diagramNote": "Sơ đồ vòng lặp 4 bước của quy trình elicitation & analysis (Sommerville).",
+          "explanation": [
+            "Sơ đồ trực quan hóa mối liên hệ khép kín giữa 4 bước đã nêu ở Slide 14.",
+            "Sau bước 4 (Documentation), kết quả không đứng yên mà quay ngược về bước 1 để tiếp tục khám phá và tinh chỉnh sâu hơn ở vòng lặp tiếp theo."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 1,
+          "title": "Requirements Elicitation — Approaches",
+          "bullets": [
+            {
+              "text": "Two fundamental approaches:",
+              "subBullets": [
+                "Interviewing, where you talk to people about what they do",
+                "Observation or ethnography, where you watch people doing their job to see what artifacts they use, how they use them, and so on."
+              ]
+            },
+            {
+              "text": "Interviews can be difficult, for two reasons:",
+              "subBullets": [
+                "Application specialists use jargon specific to their area of work.",
+                "Some domain knowledge is so familiar to stakeholders that they think it is so fundamental that it isn’t worth mentioning."
+              ]
+            },
+            {
+              "text": "Ethnography focus on the end user so it is not effective for:",
+              "subBullets": [
+                "discovering broader organizational",
+                "suggestion innovations"
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết 'Ethnography focus on...', 'discovering broader organizational' và 'suggestion innovations' (giữ nguyên văn).",
+          "explanation": [
+            "Hai kỹ thuật nền tảng là Phỏng vấn (Interviewing — nói chuyện trực tiếp) và Quan sát / Dân tộc học (Observation / ethnography — ngồi xem người dùng làm việc thật với giấy tờ/công cụ gì).",
+            "Phỏng vấn dễ hụt thông tin vì chuyên gia hay dùng biệt ngữ (jargon) hoặc bỏ qua những quy tắc ngầm mà họ tưởng ai cũng biết; còn quan sát giúp bắt được các thao tác ngầm đó nhưng lại yếu khi tìm yêu cầu cấp tổ chức rộng hơn hoặc đề xuất cách làm mới đột phá."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 16"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Đặc tả yêu cầu (Specification), Use Case Template & Use Case Diagram",
+      "text": "Cách viết User vs System requirements, 7 thành phần của Structured natural language, mẫu bảng Use Case Template 12 trường và cấu trúc Use Case Diagram (actor, use case, boundary, 4 quan hệ association, include, extend, generalization) cùng sơ đồ ví dụ hệ thống vé/ngân hàng.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 17–23"
+      },
+      "digest": {
+        "keyPoints": [
+          "User requirements viết bằng ngôn ngữ tự nhiên, hình/bảng, tránh thuật ngữ phần mềm hay ký hiệu hình thức; System requirements dùng ngôn ngữ tự nhiên có cấu trúc (template), UML hoặc đặc tả toán học và không nói về cách thiết kế/cài đặt.",
+          "Structured natural language template nên có: mô tả hàm/thực thể, inputs & nguồn gốc, outputs & đích đến, thông tin/thực thể cần có ('requires'), hành động, precondition/postcondition và tác dụng phụ (side effects).",
+          "Use Case Template mẫu gồm 12 trường: Name (<action> + <object>), ID, Description, Actors, Organizational Benefits, Frequency of Use, Triggers, Preconditions, Postconditions, Main Course, Alternate Courses (AC1, AC2...), Exceptions (EX1, EX2...).",
+          "Use Case Diagram gồm Actor (ngoài khung chữ nhật), Use case (hình oval), System boundary (hình chữ nhật) và 4 quan hệ: Association, Include (bao gồm chức năng use case khác), Extend (mở rộng trong điều kiện cụ thể), Generalization (quan hệ 'is-a' giữa 2 use case hoặc 2 actor)."
+        ],
+        "terms": [
+          {
+            "term": "Include relationship",
+            "meaning": "Quan hệ biểu thị một use case luôn bao gồm chức năng của một use case khác; mũi tên nét đứt chỉ từ use case gốc sang use case được include."
+          },
+          {
+            "term": "Extend relationship",
+            "meaning": "Quan hệ biểu thị một use case có thể được mở rộng thêm bởi use case khác trong điều kiện cụ thể; mũi tên nét đứt chỉ từ use case mở rộng về use case cơ sở."
+          },
+          {
+            "term": "Generalization (Use Case Diagram)",
+            "meaning": "Quan hệ kế thừa 'is-a' giữa hai use case hoặc giữa hai actor."
+          }
+        ],
+        "pitfalls": [
+          "Chiều mũi tên «include» và «extend» trên Slide 23 ngược nhau: «include» chĩa TỪ use case chính (Buy Ticket) TỚI use case được dùng chung (Make payment); còn «extend» chĩa TỪ use case mở rộng (Edit account, Remove account, View transaction details) VỀ use case nền.",
+          "System requirements chỉ đặc tả hệ thống làm gì và ràng buộc gì — KHÔNG được sa đà vào việc thiết kế lớp, database hay công nghệ cài đặt."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 1,
+          "title": "Requirements Specification",
+          "paragraphs": [
+            "Requirements specification is the process of writing down the user and system requirements in a requirements document."
+          ],
+          "bullets": [
+            {
+              "text": "User requirements are written using:",
+              "subBullets": [
+                "Natural language sentences",
+                "Figures and tables",
+                "Should not use software jargon, structured notations, or formal notations"
+              ]
+            },
+            {
+              "text": "System requirements are written using:",
+              "subBullets": [
+                "Natural language sentences",
+                "Structured natural language (a standard form or template)",
+                "Graphical notations (UML diagrams)",
+                "Mathematical specifications (set notions, finite notions, ...)",
+                "Should not be concerned with how the system should be designed or implemented"
+              ]
+            }
+          ],
+          "explanation": [
+            "Đặc tả yêu cầu phân tách rõ đối tượng đọc: User requirements viết cho khách hàng/lãnh đạo nên chỉ dùng câu chữ tự nhiên, hình minh họa và bảng biểu — tuyệt đối tránh biệt ngữ kỹ thuật phần mềm hay ký hiệu hình thức khó hiểu.",
+            "Ngược lại, System requirements viết cho đội kỹ thuật nên có thể dùng mẫu chuẩn (structured natural language), sơ đồ UML hay ký hiệu toán học; nhưng vẫn giữ ranh giới nghiêm ngặt là chỉ mô tả yêu cầu chứ không bàn thiết kế hay code."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 1,
+          "title": "Structured natural language",
+          "bullets": [
+            "You define one or more standard templates for requirements and represent these templates as structured forms.",
+            {
+              "text": "Information should be included in template:",
+              "subBullets": [
+                "A description of the function or entity being specified",
+                "A description of its inputs and the origin of these inputs",
+                "A description of its outputs and the destination of these outputs.",
+                "Information about the information needed for the computation or other entities in the system that are required (the “requires” part).",
+                "A description of the action to be taken.",
+                "If a functional approach is used, a precondition setting out what must be true before the function is called, and a postcondition specifying what is true after the function is called.",
+                "A description of the side effects (if any) of the operation."
+              ]
+            }
+          ],
+          "explanation": [
+            "Ngôn ngữ tự nhiên thuần túy dễ gây hiểu lầm, nên người ta chuẩn hóa thành các mẫu form (structured natural language) buộc người viết phải điền đủ mọi khía cạnh của một chức năng.",
+            "Bảy mục thông tin trên slide giúp lập trình viên không bao giờ thiếu dữ kiện: đầu vào từ đâu tới, đầu ra đi đâu, phụ thuộc dữ liệu/thực thể nào ('requires'), điều kiện trước-sau (precondition/postcondition) và cả tác dụng phụ (side effects) nếu có."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 1,
+          "title": "Example Usecase Template",
+          "table": {
+            "caption": "Bảng mẫu Use Case Template (slide gốc trình bày 2 cột không có dòng tiêu đề).",
+            "headers": [
+              "Field",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Name",
+                "The Use Case name. Typically the name is of the format <action> + <object>."
+              ],
+              [
+                "ID",
+                "An identifier that is unique to each Use Case."
+              ],
+              [
+                "Description",
+                "A brief sentence that states what the user wants to be able to do and what benefit he will derive."
+              ],
+              [
+                "Actors",
+                "The type of user who interacts with the system to accomplish the task. Actors are identified by role name."
+              ],
+              [
+                "Organizational Benefits",
+                "The value the organization expects to receive from having the functionality described. Ideally this is a link directly to a Business Objective."
+              ],
+              [
+                "Frequency of Use",
+                "How often the Use Case is executed."
+              ],
+              [
+                "Triggers",
+                "Concrete actions made by the user within the system to start the Use Case."
+              ],
+              [
+                "Preconditions",
+                "Any states that the system must be in or conditions that must be met before the Use Case is started."
+              ],
+              [
+                "Postconditions",
+                "Any states that the system must be in or conditions that must be met after the Use Case is completed successfully. These will be met if the Main Course or any Alternate Courses are followed. Some Exceptions may result in failure to meet the Postconditions."
+              ],
+              [
+                "Main Course",
+                "The most common path of interactions between the user and the system.\n1. Step 1\n2. Step 2"
+              ],
+              [
+                "Alternate Courses",
+                "Alternate paths through the system.\nAC1: <condition for the alternate to be called>\n1. Step 1\n2. Step 2\nAC2: <condition for the alternate to be called>\n1. Step 1"
+              ],
+              [
+                "Exceptions",
+                "Exception handling by the system.\nEX1: <condition for the exception to be called>\n1. Step 1\n2. Step 2\nEX2 <condition for the exception to be called>\n1. Step 1"
+              ]
+            ]
+          },
+          "ocrNote": "Trong ô Exceptions trên slide gốc, dòng EX2 viết 'EX2 <condition...>' không có dấu hai chấm như EX1 (giữ nguyên văn).",
+          "explanation": [
+            "Bảng giới thiệu mẫu tài liệu Use Case hoàn chỉnh gồm 12 trường: từ định danh (Name theo cú pháp <động từ> + <tân ngữ>, ID), ngữ cảnh (Actors xác định theo vai trò, Organizational Benefits, Frequency of Use, Triggers), ràng buộc trạng thái (Preconditions, Postconditions) tới luồng bước thực thi.",
+            "Cần phân biệt rõ 3 luồng cuối: Main Course là kịch bản chuẩn phổ biến nhất, Alternate Courses (AC) là nhánh rẽ hợp lệ khác vẫn đạt được Postconditions, còn Exceptions (EX) là xử lý tình huống lỗi có thể khiến Use Case thất bại và không đạt được Postconditions."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 1,
+          "title": "Use Case Diagram",
+          "bullets": [
+            "Use cases describes how a user interacts with the system by defining the steps required to accomplish a specific goal",
+            "UML use case diagram: an overview of all the use cases and how they are related."
+          ],
+          "ocrNote": "Slide gốc viết 'Use cases describes' (giữ nguyên văn).",
+          "explanation": [
+            "Slide phân biệt giữa bản mô tả kịch bản từng Use Case (mô tả các bước tương tác để hoàn thành một mục tiêu cụ thể) và Sơ đồ Use Case (Use case diagram).",
+            "Sơ đồ Use Case đóng vai trò bức tranh tổng quan cho thấy toàn bộ các tính năng của hệ thống và mối liên hệ giữa chúng với các tác nhân bên ngoài."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 1,
+          "title": "Use Case Diagram — Basic Components",
+          "bullets": [
+            {
+              "text": "Basic components in use case diagram:",
+              "subBullets": [
+                "Actor: user of the system",
+                "Use case: the features of the system. They are displayed as ovals",
+                "Boudary of system: are displayed as rectangles. Actor are outside of these rectangles.",
+                "Relationship: Association, extend, include and generalization"
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết 'Boudary of system' (thiếu chữ n) và 'Actor are outside...' (giữ nguyên văn).",
+          "explanation": [
+            "Một sơ đồ Use Case chuẩn gồm 4 thành phần cơ bản: Actor (tác nhân người dùng/hệ thống ngoài), Use case (tính năng hệ thống vẽ bằng hình oval), System boundary (hình chữ nhật bao quanh các use case của hệ thống) và các đường Relationship.",
+            "Quy tắc trình bày bắt buộc: mọi Use case nằm bên trong hình chữ nhật System boundary, còn Actor luôn đặt bên ngoài ranh giới đó."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 1,
+          "title": "Use Case Diagram — Relationships",
+          "bullets": [
+            {
+              "text": "Association relationship:",
+              "subBullets": [
+                "a communication or interaction between an actor and a use case"
+              ]
+            },
+            {
+              "text": "Include relationship:",
+              "subBullets": [
+                "Indicates that a use case includes the functionality of another use case"
+              ]
+            },
+            {
+              "text": "Extend relationship:",
+              "subBullets": [
+                "Illustrates that a use case can be extended by another use case under specific conditions"
+              ]
+            },
+            {
+              "text": "Generalization relationship:",
+              "subBullets": [
+                "Establishes an “is-a” connection between two use cases or two actors."
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide định nghĩa 4 loại quan hệ trong Use Case Diagram: Association là đường nối giao tiếp giữa Actor và Use Case; Include là bao gồm chức năng của một use case khác (luôn xảy ra khi use case chính chạy).",
+            "Extend là mở rộng hành vi cho một use case chỉ trong những điều kiện cụ thể (không bắt buộc); Generalization thiết lập quan hệ kế thừa 'is-a' giữa hai Actor hoặc giữa hai Use Case."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 1,
+          "title": "Example Use case Diagram",
+          "diagramText": [
+            "4 hộp System Boundary và 3 Actor (Customer, Banker, Admin):",
+            "1) [Customer Front-end] ↔ Actor Customer:",
+            "   • Customer — Register account, Login, Buy Ticket, List orders, View order details",
+            "   • (Buy Ticket) ----«include»----> (Make payment)  [oval Make payment nằm vắt qua mép trái khung Customer Front-end]",
+            "2) [Banking Front-end] ↔ Actor Customer:",
+            "   • Customer — Login, View transaction history, View balance",
+            "   • (View transaction details) ----«extend»----> (View transaction history)",
+            "3) [Admin Back-end] ↔ Actor Admin:",
+            "   • Admin — List customer orders, Generate revenue report",
+            "   • (View order details) ----«extend»----> (List customer orders)",
+            "4) [Banking Back-end] ↔ Actor Banker:",
+            "   • Banker — Create bank account, Create transaction, Search for accounts, Search for transactions",
+            "   • (View transaction details) ----«extend»----> (Search for transactions)",
+            "   • (View account information) ----«extend»----> (Search for accounts)",
+            "   • (Edit account) ----«extend»----> (View account information)",
+            "   • (Remove account) ----«extend»----> (View account information)",
+            "   • Folded Note (ngoài góc trên phải Banking Back-end) - - - (Create transaction): \"Transaction includes Deposit and Withdrawal\""
+          ],
+          "diagramNote": "Sơ đồ Use Case minh họa kiến trúc 4 phân hệ (Customer/Banking Front-end & Admin/Banking Back-end) cho thấy sự kết hợp cả 3 actor và hướng mũi tên chuẩn của «include» so với «extend».",
+          "ocrNote": "Trên hình gốc, oval 'Make payment' bị vẽ vắt ngang mép trái khung chữ nhật Customer Front-end.",
+          "explanation": [
+            "Quan sát chiều mũi tên trên sơ đồ ví dụ là cách tốt nhất để không nhầm khi đi thi: ở Customer Front-end, mũi tên «include» xuất phát từ 'Buy Ticket' trỏ sang 'Make payment' vì mua vé luôn kéo theo bước thanh toán.",
+            "Ngược lại, toàn bộ các mũi tên «extend» (ví dụ Edit account / Remove account → View account information → Search for accounts) đều trỏ ngược từ ca mở rộng tùy chọn về ca nền tảng, vì người dùng tìm tài khoản xong mới có thể tùy chọn xem, sửa hoặc xóa."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 23"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Tài liệu SRS, Kiểm chứng yêu cầu (Validation), Thay đổi yêu cầu & Tổng kết",
+      "text": "Khái niệm Software Requirements Document (SRS), 5 nhóm người đọc SRS và cách dùng, cấu trúc mẫu 10 chương của một Requirements Document, 5 phép kiểm tra Requirements Validation (validity, consistency, completeness, realism, verifiability), nguyên nhân thay đổi yêu cầu và tổng kết bài giảng.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 24–31"
+      },
+      "digest": {
+        "keyPoints": [
+          "SRS (Software Requirements Document / Specification) chứa cả user requirements và system requirements, phục vụ 5 đối tượng: Customers, Managers, Developers, Testers và Maintenance engineers.",
+          "Cấu trúc mẫu tài liệu yêu cầu gồm các mục: Preface, Introduction, Glossary, User requirements definition, System architecture, System requirements specification, System models, System evolution, Appendices, Index.",
+          "Requirements validation kiểm tra tài liệu yêu cầu nhằm tránh chi phí sửa lại lớn (extensive rework costs) qua 5 tiêu chí: Validity, Consistency, Completeness, Realism và Verifiability.",
+          "Yêu cầu hệ thống lớn luôn thay đổi vì bài toán không thể định nghĩa trọn vẹn từ đầu và môi trường kinh doanh biến đổi; cần lưu vết liên kết phụ thuộc (traceability) để đánh giá tác động thay đổi, và dùng mô hình Evolutionary / Agile để đối phó."
+        ],
+        "terms": [
+          {
+            "term": "Software Requirements Document (SRS)",
+            "meaning": "Sản phẩm tài liệu chính thức của quy trình kỹ nghệ yêu cầu, chứa cả user requirements và system requirements."
+          },
+          {
+            "term": "Requirements Validation",
+            "meaning": "Quá trình kiểm tra tài liệu yêu cầu qua 5 tiêu chí: Validity, Consistency, Completeness, Realism và Verifiability."
+          },
+          {
+            "term": "Verifiability",
+            "meaning": "Tính có thể kiểm chứng: yêu cầu hệ thống phải viết sao cho kiểm tra/test được nhằm giảm tranh chấp giữa khách hàng và nhà thầu."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm Validity (kiểm tra yêu cầu có phản ánh đúng nhu cầu thực tế hiện tại của người dùng không) với Verifiability (yêu cầu có viết đủ rõ để đo/kiểm thử được không) hay Realism (có khả thi về công nghệ, ngân sách và tiến độ không)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 1,
+          "title": "Requirements Document",
+          "paragraphs": [
+            "The software requirements document (sometimes called the software requirements specification or SRS) is the product of requirement engineering process. It contains: user requirements and system requirements"
+          ],
+          "table": {
+            "headers": [
+              "User",
+              "How to use requirements document"
+            ],
+            "rows": [
+              [
+                "Customers",
+                "Specify the requirements and read them to check that they meet their needs"
+              ],
+              [
+                "Managers",
+                "To plan a bid for the system and to plan the system development process."
+              ],
+              [
+                "Developers",
+                "To understand what system is to be developed."
+              ],
+              [
+                "Tester",
+                "To develop validation tests for the system."
+              ],
+              [
+                "Maintenance engineers",
+                "to Understand the system and the relationships between its parts."
+              ]
+            ]
+          },
+          "ocrNote": "Bảng gốc ghi 'Tester' (số ít) và 'to Understand' (viết hoa chữ U), giữ nguyên văn.",
+          "explanation": [
+            "SRS là đầu ra chính thức của quy trình kỹ nghệ yêu cầu, gom chung cả hai lớp đặc tả (user requirements và system requirements) vào một nguồn sự thật thống nhất.",
+            "Năm nhóm đối tượng sử dụng SRS theo mục đích khác nhau rõ rệt: khách hàng nghiệm thu nhu cầu, quản lý lập giá thầu và kế hoạch dự án, dev nắm thứ cần xây dựng, tester viết test kiểm định, còn kỹ sư bảo trì hiểu cấu trúc liên kết giữa các phần."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 1,
+          "title": "Example of Requirements Document (1/3)",
+          "table": {
+            "headers": [
+              "Chapter",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Preface",
+                "This defines the expected readership of the document and describe its version history, including a rationale for the creation of a new version and a summary of the changes made in each version."
+              ],
+              [
+                "Introduction",
+                "This describes the need for the system. It should briefly describe the system’s functions and explain how it will work with other systems. It should also describe how the system fits into the overall business or strategic objectives of the organization commissioning the software."
+              ],
+              [
+                "Glossary",
+                "This defines the technical terms used in the document. You should not make assumptions about the experience or expertise of the reader."
+              ],
+              [
+                "User requirements definition",
+                "Here, you describe the services provided for the user. The nonfunctional system requirements should also be described in this section. This description may use natural language, diagrams, or other notations that are understandable to customers. Product and process standards that must be followed should be specified."
+              ]
+            ]
+          },
+          "explanation": [
+            "Bốn chương đầu của mẫu SRS chuẩn (theo Sommerville) thiết lập bối cảnh chung cho mọi độc giả: Preface quản lý phiên bản và đối tượng đọc; Introduction nêu lý do ra đời và sự phù hợp với chiến lược tổ chức.",
+            "Glossary định nghĩa toàn bộ thuật ngữ kỹ thuật để không giả định sẵn trình độ người đọc, sau đó User requirements definition trình bày dịch vụ và yêu cầu phi chức năng bằng ngôn ngữ dễ hiểu với khách hàng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 1,
+          "title": "Example of Requirements Document (2/3)",
+          "table": {
+            "headers": [
+              "Chapter",
+              "Description"
+            ],
+            "rows": [
+              [
+                "System architecture",
+                "This chapter presents a high-level overview of the anticipated system architecture, showing the distribution of functions across system modules. Architectural components that are reused should be highlighted."
+              ],
+              [
+                "System requirements specification",
+                "This describes the functional and nonfunctional requirements in more detail. If necessary, further detail may also be added to the nonfunctional requirements. Interfaces to other systems may be defined."
+              ],
+              [
+                "System models",
+                "This chapter includes graphical system models showing the relationships between the system components and the system and its environment. Examples of possible models are object models, data-flow models, or semantic data models."
+              ],
+              [
+                "System evolution",
+                "This describes the fundamental assumptions on which the system is based, and any anticipated changes due to hardware evolution, changing user needs, and so on. This section is useful for system designers as it may help them avoid design decisions that would constrain likely future changes to the system."
+              ]
+            ]
+          },
+          "explanation": [
+            "Phần giữa của mẫu SRS chuyển sang mức kỹ thuật cho đội ngũ phát triển: System architecture phác họa phân bổ chức năng vào các module (và nêu bật thành phần tái sử dụng), System requirements specification chi tiết hóa các yêu cầu và giao diện hệ thống ngoài.",
+            "System models bổ sung sơ đồ trực quan (mô hình đối tượng, luồng dữ liệu, dữ liệu ngữ nghĩa), còn System evolution ghi lại giả định nền và các thay đổi dự kiến trong tương lai để kiến trúc sư tránh thiết kế khóa cứng hệ thống."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 1,
+          "title": "Example of Requirements Document (3/3)",
+          "table": {
+            "headers": [
+              "Chapter",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Appendices",
+                "These provide detailed, specific information that is related to the application being developed—for example, hardware and database descriptions. Hardware requirements define the minimal and optimal configurations for the system. Database requirements define the logical organization of the data used by the system and the relationships between data."
+              ],
+              [
+                "Index",
+                "Several indexes to the document may be included. There may be an index of diagrams, an index of functions, and so on."
+              ]
+            ]
+          },
+          "explanation": [
+            "Hai chương cuối khép lại cấu trúc SRS chuẩn: Appendices chứa thông tin kỹ thuật chuyên biệt gắn với ứng dụng cụ thể như cấu hình phần cứng tối thiểu/tối ưu và mô hình logic cơ sở dữ liệu.",
+            "Index giúp người đọc nhanh chóng tra cứu danh mục sơ đồ, danh mục chức năng trong các tài liệu SRS đồ sộ."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 1,
+          "title": "Requirements Validation",
+          "paragraphs": [
+            "Requirements validation is the process of checking that requirements",
+            "Errors in a requirements document can lead to extensive rework costs",
+            "Different types of checks:"
+          ],
+          "bullets": [
+            "Validity checks",
+            "Consistency checks",
+            "Completeness checks",
+            "Realism checks",
+            "Verifiability"
+          ],
+          "ocrNote": "Câu đầu tiên trên slide gốc bị ngắt cụt tại '...process of checking that requirements' (theo giáo trình Sommerville đầy đủ là kiểm tra xem yêu cầu có định nghĩa đúng hệ thống khách hàng thực sự muốn hay không; giữ nguyên văn slide).",
+          "explanation": [
+            "Requirements validation là bước rà soát cuối cùng nhằm phát hiện lỗi trong tài liệu yêu cầu trước khi bước vào thiết kế và lập trình — vì sai từ khâu yêu cầu sẽ gây chi phí làm lại (rework costs) cực kỳ đắt đỏ.",
+            "Năm nhóm phép kiểm tra (Validity, Consistency, Completeness, Realism, Verifiability) đóng vai trò bộ lọc toàn diện từ tính đúng nhu cầu thực tế tới khả năng kiểm thử."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 1,
+          "title": "Requirements Validation — Five Checks",
+          "table": {
+            "caption": "Bảng 5 tiêu chí kiểm chứng yêu cầu (hàng tiêu đề màu xanh trên slide gốc để trống chữ).",
+            "headers": [
+              "Check",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Validity checks",
+                "These check that the requirements reflect the real needs of system users. Because of changing circumstances, the user requirements may have changed"
+              ],
+              [
+                "Consistency checks",
+                "Requirements in the document should not conflict. There should not be contradictory constraints or different descriptions of the same system function."
+              ],
+              [
+                "Completeness checks",
+                "The requirements document should include requirements that define all functions and the constraints."
+              ],
+              [
+                "Realism checks",
+                "By using knowledge of existing technologies, the requirements should be checked to ensure that they can be implemented. These checks should also take account of the budget and schedule for the system development."
+              ],
+              [
+                "Verifiability",
+                "To reduce the potential for dispute between customer and contractor, system requirements should always be written so that they are verifiable."
+              ]
+            ]
+          },
+          "ocrNote": "Hàng tiêu đề đầu bảng trên slide gốc tô nền xanh dương nhưng không ghi chữ.",
+          "explanation": [
+            "Bảng giải thích cụ thể từng tiêu chí: Validity đảm bảo phản ánh đúng nhu cầu hiện tại (vì hoàn cảnh có thể đã đổi); Consistency đảm bảo không tự mâu thuẫn ràng buộc hay mô tả hai kiểu khác nhau cho cùng một chức năng.",
+            "Completeness kiểm tra đã đủ mọi hàm và ràng buộc chưa; Realism cân đối tính khả thi theo công nghệ hiện có, ngân sách và tiến độ; còn Verifiability giúp khách hàng và nhà thầu có căn cứ nghiệm thu khách quan, tránh tranh chấp hợp đồng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 1,
+          "title": "Requirements Change",
+          "bullets": [
+            {
+              "text": "The requirements for large software systems are always changing because:",
+              "subBullets": [
+                "The problem cannot be fully defined",
+                "The business environment changes"
+              ]
+            },
+            "You need to keep track of individual requirements and maintain links between dependent requirements so that you can assess the impact of requirements changes.",
+            "Evolutionary process models and processes applied Agile methods are suitable to cope requirement change during the development process"
+          ],
+          "explanation": [
+            "Ở hệ thống phần mềm lớn, sự thay đổi yêu cầu là điều tất yếu vì ngay từ đầu không ai định nghĩa được 100% bài toán và môi trường kinh doanh luôn dịch chuyển.",
+            "Để quản lý thay đổi an toàn, đội dự án phải duy trì khả năng truy vết (traceability) — tức theo dõi từng yêu cầu và các liên kết phụ thuộc để đánh giá tác động (impact assessment) khi sửa đổi, kết hợp áp dụng các mô hình Evolutionary hoặc Agile."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 1,
+          "title": "Summary",
+          "bullets": [
+            "Why requirement analysis?",
+            "Functional vs non-functional requirement",
+            {
+              "text": "Requirements engineering processes",
+              "subBullets": [
+                "Requirements elicitation",
+                "Requirements specification",
+                "Requirements validation"
+              ]
+            },
+            "Requirements change"
+          ],
+          "explanation": [
+            "Slide tổng kết toàn bộ 4 chủ điểm của Lecture 7 tương ứng với dàn ý ở Slide 2.",
+            "Khi ôn tập, bạn nên nắm vững hai trụ cột hay thi nhất: (1) phân biệt & lượng hóa Functional vs Non-functional requirements, và (2) đọc/vẽ Use Case Diagram (đặc biệt chiều mũi tên «include» vs «extend») cùng 5 phép kiểm tra Requirements validation."
+          ],
+          "source": {
+            "file": "Resources/Lecture 7.pdf",
+            "loc": "Slide 31"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l07-c01", "front": "Functional và non-functional requirement?", "back": "Functional: dịch vụ và hành vi hệ thống. Non-functional: ràng buộc lên dịch vụ (thời gian, bộ nhớ, luật...), thường quan trọng hơn từng functional requirement.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 5" } },
-    { "id": "se1-l07-c02", "front": "Ba nguồn của non-functional requirement?", "back": "Product, Organizational, External.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slides 6–7" } },
-    { "id": "se1-l07-c03", "front": "Bốn hoạt động của elicitation và analysis?", "back": "Discovery & understanding; classification & organization; prioritization & negotiation; specification (documentation).", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slides 14–15" } },
-    { "id": "se1-l07-c04", "front": "include và extend trong use case diagram?", "back": "include: use case bao gồm chức năng của use case khác vô điều kiện. extend: use case được mở rộng bởi use case khác trong điều kiện cụ thể.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 22" } },
-    { "id": "se1-l07-c05", "front": "Năm kiểm tra của requirements validation?", "back": "Validity, consistency, completeness, realism, verifiability.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 29" } },
-    { "id": "se1-l07-c06", "front": "Hai hạn chế của ethnography?", "back": "Không hiệu quả để phát hiện yêu cầu tổ chức rộng hơn và để gợi ý đổi mới (vì tập trung vào người dùng cuối).", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 16" } },
-    { "id": "se1-l07-c07", "front": "Năm nhóm đọc SRS?", "back": "Customers, managers, developers, testers, maintenance engineers.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 24" } }
+    {
+      "id": "se1-l07-c01",
+      "front": "Phân biệt Functional và Non-functional requirement?",
+      "back": "Functional: dịch vụ hệ thống cung cấp, phản ứng với input cụ thể, hành vi trong tình huống cụ thể và điều hệ thống không làm. Non-functional: ràng buộc lên dịch vụ/chức năng (thời gian, bộ nhớ, bảo mật, luật...), thường quan trọng hơn từng functional requirement riêng lẻ.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 5"
+      }
+    },
+    {
+      "id": "se1-l07-c02",
+      "front": "Ba nguồn phát sinh của Non-functional requirements (NFR)?",
+      "back": "Product requirements (usability, efficiency [performance, space], dependability, security); Organizational requirements (environmental, operational, development); External requirements (regulatory, ethical, legislative [accounting, safety/security]).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 6–7"
+      }
+    },
+    {
+      "id": "se1-l07-c03",
+      "front": "Tại sao phải viết Non-functional requirements định lượng và cho 3 ví dụ thước đo?",
+      "back": "Để có thể kiểm thử một cách khách quan (objectively tested). Ví dụ: Speed (transactions/second, response time, screen refresh time), Ease of use (training time), Reliability (mean time to failure, rate of failure occurrence).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l07-c04",
+      "front": "Năm lý do khiến việc thu thập yêu cầu (Requirements Elicitation) khó khăn?",
+      "back": "1) Stakeholders thường không biết mình muốn gì; 2) Kỹ sư thiếu kinh nghiệm miền có thể không hiểu yêu cầu; 3) Các stakeholder khác nhau diễn đạt yêu cầu khác nhau; 4) Yếu tố chính trị nội bộ; 5) Môi trường kinh tế-kinh doanh năng động và luôn thay đổi.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "se1-l07-c05",
+      "front": "Bốn hoạt động lặp trong quy trình Elicitation và Analysis?",
+      "back": "1) Requirements discovery and understanding; 2) Requirements classification and organization; 3) Requirements prioritization and negotiation; 4) Requirements documentation.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 14–15"
+      }
+    },
+    {
+      "id": "se1-l07-c06",
+      "front": "Hạn chế của phỏng vấn (Interviewing) và quan sát (Ethnography)?",
+      "back": "Interviewing: chuyên gia dùng biệt ngữ (jargon) và bỏ qua kiến thức quá hiển nhiên với họ. Ethnography: tập trung vào người dùng cuối nên không hiệu quả để phát hiện yêu cầu tầm tổ chức rộng hơn và gợi ý đổi mới.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "se1-l07-c07",
+      "front": "User requirements và System requirements khác nhau thế nào về cách viết?",
+      "back": "User requirements: câu ngôn ngữ tự nhiên, hình, bảng; KHÔNG dùng biệt ngữ phần mềm, ký hiệu có cấu trúc hay hình thức. System requirements: câu tự nhiên, structured natural language (template), UML hoặc đặc tả toán học; KHÔNG bàn cách thiết kế hay cài đặt.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l07-c08",
+      "front": "Structured natural language template cần chứa 7 loại thông tin nào?",
+      "back": "Mô tả chức năng/thực thể; inputs & nguồn; outputs & đích; thông tin/thực thể cần thiết ('requires'); hành động thực hiện; precondition & postcondition (nếu hướng hàm); tác dụng phụ (side effects nếu có).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 18"
+      }
+    },
+    {
+      "id": "se1-l07-c09",
+      "front": "Phân biệt Main Course, Alternate Courses và Exceptions trong Use Case Template?",
+      "back": "Main Course: luồng tương tác chuẩn phổ biến nhất. Alternate Courses (AC): nhánh rẽ hợp lệ khác vẫn đạt Postconditions. Exceptions (EX): xử lý ngoại lệ của hệ thống, một số trường hợp khiến không đạt Postconditions.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 19"
+      }
+    },
+    {
+      "id": "se1-l07-c10",
+      "front": "Phân biệt Include và Extend trong Use Case Diagram (kèm chiều mũi tên)?",
+      "back": "Include: use case bao gồm chức năng của use case khác (mũi tên nét đứt từ use case gốc sang use case được include). Extend: use case có thể được mở rộng bởi use case khác trong điều kiện cụ thể (mũi tên nét đứt từ use case mở rộng về use case cơ sở).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 22–23"
+      }
+    },
+    {
+      "id": "se1-l07-c11",
+      "front": "Năm nhóm đối tượng đọc tài liệu SRS và vai trò chính?",
+      "back": "Customers (kiểm tra khớp nhu cầu), Managers (lập giá thầu và kế hoạch phát triển), Developers (hiểu hệ thống cần xây dựng), Testers (viết validation tests), Maintenance engineers (hiểu hệ thống và quan hệ giữa các phần).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 24"
+      }
+    },
+    {
+      "id": "se1-l07-c12",
+      "front": "Năm phép kiểm tra của Requirements Validation?",
+      "back": "Validity checks (khớp nhu cầu thực tế), Consistency checks (không mâu thuẫn), Completeness checks (đủ mọi hàm và ràng buộc), Realism checks (khả thi về công nghệ, ngân sách, tiến độ), Verifiability (viết để kiểm chứng được, tránh tranh chấp).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slides 28–29"
+      }
+    },
+    {
+      "id": "se1-l07-c13",
+      "front": "Vì sao yêu cầu luôn thay đổi và cần làm gì để ứng phó?",
+      "back": "Vì bài toán của hệ thống lớn không thể định nghĩa trọn vẹn và môi trường kinh doanh thay đổi. Cần theo dõi từng yêu cầu cùng liên kết phụ thuộc để đánh giá tác động thay đổi, và dùng mô hình Evolutionary / Agile.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 30"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l07-q01", "stem": "Yêu cầu 'Chỉ người dùng được phép (trong access control list) mới xem báo cáo chi phí' thuộc loại nào?", "options": ["Functional", "Non-functional (security)", "Domain", "Không phải yêu cầu"], "answer": 1, "explanation": "Slide 10 đánh dấu ràng buộc truy cập/đăng nhập là non-functional về bảo mật.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 10" } },
-    { "id": "se1-l07-q02", "stem": "Quan hệ nào trong use case diagram thiết lập kết nối 'is-a' giữa hai actor hoặc hai use case?", "options": ["Include", "Extend", "Generalization", "Association"], "answer": 2, "explanation": "Generalization tạo quan hệ is-a.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 22" } },
-    { "id": "se1-l07-q03", "stem": "Kiểm tra 'yêu cầu phải viết sao cho có thể kiểm thử' là kiểm tra nào?", "options": ["Validity", "Consistency", "Realism", "Verifiability"], "answer": 3, "explanation": "Verifiability: yêu cầu hệ thống phải viết sao cho có thể kiểm chứng.", "source": { "file": "Resources/Lecture 7.pdf", "loc": "Slide 29" } }
+    {
+      "id": "se1-l07-q01",
+      "stem": "Yêu cầu 'Chỉ người dùng được phép (trong access control list) mới được xem báo cáo chi phí và phải login để dùng ứng dụng' thuộc loại nào?",
+      "options": [
+        "Functional requirement",
+        "Non-functional requirement (security)",
+        "Organizational development requirement",
+        "Không phải yêu cầu hệ thống"
+      ],
+      "answer": 1,
+      "explanation": "Slide 10 tô màu nâu vàng hai dòng kiểm soát truy cập (ACL) và login để nhấn mạnh đây là các yêu cầu phi chức năng về bảo mật (security).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 10"
+      }
+    },
+    {
+      "id": "se1-l07-q02",
+      "stem": "Quan hệ nào trong Use Case Diagram thiết lập kết nối 'is-a' giữa hai actor hoặc hai use case?",
+      "options": [
+        "Include",
+        "Extend",
+        "Generalization",
+        "Association"
+      ],
+      "answer": 2,
+      "explanation": "Slide 22: Generalization relationship thiết lập kết nối 'is-a' giữa hai use case hoặc hai actor.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l07-q03",
+      "stem": "Phép kiểm tra 'yêu cầu hệ thống phải luôn được viết sao cho có thể kiểm chứng nhằm giảm tranh chấp giữa khách hàng và nhà thầu' là phép kiểm tra nào?",
+      "options": [
+        "Validity checks",
+        "Consistency checks",
+        "Realism checks",
+        "Verifiability"
+      ],
+      "answer": 3,
+      "explanation": "Slide 29: Verifiability yêu cầu system requirements phải luôn được viết sao cho có thể kiểm chứng (verifiable) nhằm giảm nguy cơ tranh chấp giữa customer và contractor.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "se1-l07-q04",
+      "stem": "Trong sơ đồ cây phân loại Non-functional requirements (Slide 7), 'Efficiency requirements' bao gồm hai nhánh con nào?",
+      "options": [
+        "Usability requirements và Security requirements",
+        "Performance requirements và Space requirements",
+        "Dependability requirements và Operational requirements",
+        "Accounting requirements và Safety/security requirements"
+      ],
+      "answer": 1,
+      "explanation": "Slide 7 đặt Efficiency requirements dưới Product requirements và chia tiếp thành hai nhánh con: Performance requirements và Space requirements.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 7"
+      }
+    },
+    {
+      "id": "se1-l07-q05",
+      "stem": "Thước đo định lượng nào được Slide 8 dùng cho thuộc tính 'Robustness'?",
+      "options": [
+        "Training time",
+        "Megabytes/Number of ROM chips",
+        "Time to restart after failure, Percentage of events causing failure, Probability of data corruption on failure",
+        "Processed transactions/second và Screen refresh time"
+      ],
+      "answer": 2,
+      "explanation": "Slide 8 liệt kê 3 thước đo cho Robustness: thời gian khởi động lại sau lỗi, phần trăm sự kiện gây lỗi và xác suất hỏng dữ liệu khi lỗi; còn Training time là của Ease of use.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l07-q06",
+      "stem": "Theo Slide 16, phương pháp quan sát (Ethnography) KHÔNG hiệu quả cho việc nào sau đây?",
+      "options": [
+        "Thấy người dùng sử dụng những tài liệu/công cụ gì khi làm việc",
+        "Phát hiện yêu cầu tầm tổ chức rộng hơn và gợi ý đổi mới (discovering broader organizational & suggestion innovations)",
+        "Phát hiện kiến thức ngầm mà người dùng quên nhắc tới khi phỏng vấn",
+        "Quan sát thao tác thực tế của người dùng cuối"
+      ],
+      "answer": 1,
+      "explanation": "Slide 16 nêu rõ: vì Ethnography tập trung vào người dùng cuối nên nó không hiệu quả để phát hiện yêu cầu tổ chức rộng hơn (discovering broader organizational) và gợi ý đổi mới (suggestion innovations).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "se1-l07-q07",
+      "stem": "Nguyên tắc nào ĐÚNG khi viết User requirements và System requirements theo Slide 17?",
+      "options": [
+        "User requirements nên dùng ký hiệu toán học để chặt chẽ nhất",
+        "System requirements phải chỉ rõ cách thiết kế lớp và cài đặt chi tiết",
+        "User requirements tránh software jargon/formal notations; System requirements không nên bàn cách hệ thống được thiết kế hay cài đặt",
+        "Cả hai đều chỉ được dùng ngôn ngữ tự nhiên thuần túy"
+      ],
+      "answer": 2,
+      "explanation": "Slide 17 nhấn mạnh: User requirements không dùng software jargon, structured/formal notations; System requirements có thể dùng template/UML/toán học nhưng không bàn cách thiết kế hay cài đặt.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l07-q08",
+      "stem": "Trong sơ đồ Use Case mẫu ở Slide 23, mối quan hệ giữa 'Buy Ticket' và 'Make payment' được vẽ như thế nào?",
+      "options": [
+        "Mũi tên nét đứt «extend» từ Make payment trỏ về Buy Ticket",
+        "Mũi tên nét đứt «include» từ Buy Ticket trỏ sang Make payment",
+        "Mũi tên nét đứt «include» từ Make payment trỏ về Buy Ticket",
+        "Quan hệ Generalization từ Make payment trỏ lên Buy Ticket"
+      ],
+      "answer": 1,
+      "explanation": "Slide 23 vẽ mũi tên nét đứt gắn nhãn «include» xuất phát từ oval Buy Ticket trỏ sang oval Make payment (tính năng mua vé luôn bao gồm thanh toán).",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "se1-l07-q09",
+      "stem": "Trong mẫu tài liệu Requirements Document (Slides 25–26), chương nào giải thích toàn bộ thuật ngữ kỹ thuật dùng trong tài liệu để tránh giả định trình độ người đọc?",
+      "options": [
+        "Preface",
+        "Glossary",
+        "System evolution",
+        "Appendices"
+      ],
+      "answer": 1,
+      "explanation": "Slide 25 định nghĩa chương Glossary là nơi giải thích các thuật ngữ kỹ thuật dùng trong tài liệu, không đưa ra giả định trước về kinh nghiệm hay chuyên môn của người đọc.",
+      "source": {
+        "file": "Resources/Lecture 7.pdf",
+        "loc": "Slide 25"
+      }
+    }
   ]
 }

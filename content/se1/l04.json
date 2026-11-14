@@ -1,25 +1,1636 @@
 {
-  "id": "se1-l04-5", "order": 4,
+  "id": "se1-l04-5",
+  "order": 4,
   "title": "Lecture 4–5: Unit test với JUnit 5 và Mockito",
-  "summary": [
-    { "h": "Mức kiểm thử và 4 pha unit test", "text": "Kim tự tháp: Unit → Integration → System → Acceptance. Unit/Integration/System là development testing (verification); Acceptance là user testing (validation). 4 pha của unit test case: Setup (@BeforeAll, @BeforeEach), Exercise (@Test), Verify (assertion), Teardown (@AfterEach, @AfterAll)." },
-    { "h": "Kiến trúc JUnit 5", "text": "JUnit do Kent Beck và Erich Gamma phát triển cuối 1995; JUnit 5 ra ngày 10/09/2017. Ba thành phần: Platform (nền tảng chạy testing framework trên JVM), Jupiter (mô hình lập trình/extension mới), Vintage (engine chạy test JUnit 3 và 4). Tương ứng annotation: @BeforeEach = @Before, @AfterEach = @After, @BeforeAll = @BeforeClass, @AfterAll = @AfterClass (hai cái sau phải static). Khác: @Disabled, @DisplayName, @Tag, @RepeatedTest." },
-    { "h": "Assertion", "text": "Một assertion gồm expected value, actual value, logic comparator → test verdict. assertAll chạy mọi assertion và báo lỗi gộp; assertThrows; assertTimeout chờ đến khi xong dù quá hạn; assertTimeoutPreemptively hủy ngay khi quá hạn.", "code": { "lang": "java", "text": "@Test\nvoid sumNull() {\n  Exception e = assertThrows(Exception.class, () -> ArraySum.sum(null));\n  assertEquals(\"Array is null\", e.getMessage());\n}" } },
-    { "h": "Dynamic và parameterized test", "text": "@TestFactory phương thức trả về Stream/Collection/Iterable/Iterator của DynamicTest (trả List<String> sẽ ném exception). @ParameterizedTest với nguồn đối số: @ValueSource, @EnumSource, @MethodSource (static method trả Stream), @CsvSource, @CsvFileSource, @ArgumentsSource (lớp implement ArgumentsProvider)." },
-    { "h": "Mockito", "text": "Cô lập SUT (System Under Test) khỏi DOC (Depended-On Components) qua 3 bước: mocking, setting expectations (stubbing), verification. Dùng @ExtendWith(MockitoExtension.class), @Mock cho DOC, @InjectMocks cho SUT. Stubbing: when(x).thenReturn(y), thenThrow, thenAnswer, thenCallRealMethod. Verification: verify(mock, mode) với times, never, atLeastOnce, atLeast, atMost, only, timeout." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 4_5.pdf",
+    "totalPages": 44,
+    "extractedPages": 44,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 4_5.pdf có đúng 44 trang (Slides 1–44), đầy đủ text layer và sơ đồ kim tự tháp, kiến trúc JUnit 5, luồng lifecycle.",
+      "Tên file là Lecture 4_5.pdf nhưng Slide 1 ghi tiêu đề 'Lecture 4 / Unit test with java' (giữ nguyên văn).",
+      "Slides 7, 8, 9, 10, 11: Slide gốc viết 'Junit 5' (chữ u thường) ở một số vị trí (giữ nguyên văn).",
+      "Slide 15: Slide gốc ghi Assertions nằm trong gói org.junit.jupiter (thực tế là org.junit.jupiter.api; giữ nguyên văn và chú thích ở ocrNote).",
+      "Slide 16: Cột trái bảng gốc viết sai chính tả 'assertTimeoutPreemtively' (thiếu chữ p), trong khi mô tả bên phải và Slide 19 viết đúng 'assertTimeoutPreemptively' (giữ nguyên văn).",
+      "Slide 26: Bảng gốc viết '@ArgumentSource' (thiếu chữ s) và dư dấu ')' sau 'interface)'; Slide 32 viết đúng '@ArgumentsSource' (giữ nguyên văn).",
+      "Slide 31: Nội dung minh họa input.csv trên slide dùng dấu ngoặc kép cong “hi, there” (giữ nguyên văn kèm lưu ý dùng ASCII quotes trong file thật).",
+      "Slide 42: Code gốc đặt tên biến là reseponseLogin (giữ nguyên văn)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 4_5.pdf",
+      "loc": "Slides 1–44 (đầy đủ 44/44 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 1–44" }],
+  "summary": [
+    {
+      "h": "1. Tổng quan Unit Test & Chu trình 4 pha của Test Case",
+      "text": "Giới thiệu các mức kiểm thử phần mềm (Unit, Integration, System, Acceptance), lý do viết unit test và cấu trúc 4 pha tuần tự Setup → Exercise → Verify → Teardown khi kiểm thử đơn vị ở trạng thái cô lập.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 1–6"
+      },
+      "digest": {
+        "keyPoints": [
+          "Bốn mức kiểm thử: Unit testing, Integration testing, System testing thuộc Development testing (verification); Acceptance testing ở đỉnh kim tự tháp thuộc User testing (validation).",
+          "Ba lợi ích chính của unit test: phát hiện sớm lỗi chất lượng, xác thực yêu cầu chức năng (functional requirements) và đơn giản hóa quá trình debug.",
+          "Mỗi unit test case thực thi tuần tự 4 pha: Setup (chuẩn bị test fixture/trạng thái trước), Exercise (chạy đơn vị với input để thu outcome/actual value), Verify (so sánh actual value với expected value), Teardown (dọn dẹp test fixture về trạng thái ban đầu).",
+          "Unit testing luôn kiểm thử unit under test (SUT) trong trạng thái cô lập (in isolation)."
+        ],
+        "terms": [
+          {
+            "term": "Development testing (verification)",
+            "meaning": "Kiểm thử do đội phát triển thực hiện (Unit, Integration, System) nhằm đảm bảo hệ thống được xây đúng thiết kế và đặc tả."
+          },
+          {
+            "term": "User testing (validation)",
+            "meaning": "Kiểm thử chấp nhận (Acceptance testing) từ phía người dùng/khách hàng nhằm kiểm chứng hệ thống đáp ứng đúng nhu cầu nghiệp vụ."
+          },
+          {
+            "term": "Test fixture",
+            "meaning": "Trạng thái nền cố định (dữ liệu, đối tượng khởi tạo trước) cần thiết ở pha Setup để đơn vị được kiểm thử thể hiện đúng hành vi kỳ vọng."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm lẫn verification (xây sản phẩm đúng cách — Unit/Integration/System) với validation (xây đúng sản phẩm người dùng cần — Acceptance).",
+          "Chạy unit test nhưng không cô lập các thành phần phụ thuộc (DOC), dẫn tới lỗi ở module khác làm sai lệch kết quả kiểm thử đơn vị."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 4: Unit test with java",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 4",
+            "Unit test with java"
+          ],
+          "explanation": [
+            "Slide mở đầu bài giảng về kiểm thử đơn vị (Unit Testing) trong Java, tương ứng tệp Lecture 4_5.pdf của học phần 61FIT3SE1.",
+            "Bài giảng đi từ nền tảng lý thuyết test case đến thực hành với hai thư viện tiêu chuẩn trong hệ sinh thái Java: JUnit 5 và Mockito."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Outline",
+          "bullets": [
+            "Unit testing and test case",
+            "JUnit",
+            "Mockito"
+          ],
+          "explanation": [
+            "Nội dung chính gồm 3 phần: khái niệm Unit testing & cấu trúc Test case, framework JUnit 5 (vòng đời, assertion, dynamic/parameterized test) và Mockito (cô lập thành phần phụ thuộc).",
+            "Ba phần đi theo trình tự tự nhiên: hiểu bài toán kiểm thử → viết test bằng JUnit 5 → xử lý phụ thuộc bằng Mockito."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "References",
+          "bullets": [
+            "Boni García, Mastering Software Testing with JUnit 5"
+          ],
+          "explanation": [
+            "Tài liệu tham khảo chính là cuốn 'Mastering Software Testing with JUnit 5' của Boni García — nguồn gốc các sơ đồ kiến trúc, bảng annotation và ví dụ LoginController/UserForm trong bài giảng.",
+            "Việc bám theo giáo trình chuẩn giúp các khái niệm JUnit Jupiter, Vintage, Platform và Mockito được trình bày nhất quán."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "What is unit test?",
+          "paragraphs": [
+            "Testing levels contains 4 phases:"
+          ],
+          "bullets": [
+            "Unit testing",
+            "Integration testing",
+            "System testing",
+            "Acceptance testing"
+          ],
+          "diagramText": [
+            "Pyramid (đỉnh -> đáy): Acceptance -> System -> Integration -> Unit",
+            "Caption: Testing levels",
+            "User testing (validation) <-> Acceptance",
+            "Development testing (verification) <-> System, Integration, Unit"
+          ],
+          "diagramNote": "Kim tự tháp 4 tầng kiểm thử: tầng đáy rộng nhất là Unit, phía trên lần lượt là Integration, System (cả 3 thuộc Development testing / verification), và tầng đỉnh là Acceptance (thuộc User testing / validation).",
+          "explanation": [
+            "Unit testing là mức kiểm thử nền tảng nhất (đáy kim tự tháp), tập trung vào từng đơn vị nhỏ nhất của mã nguồn (method, class) với số lượng test nhiều nhất và tốc độ chạy nhanh nhất.",
+            "Integration (tích hợp giữa các module) và System (toàn hệ thống) vẫn nằm trong nhóm Verification do lập trình viên/QA nội bộ thực hiện, khác với Acceptance là Validation do phía người dùng/khách hàng đánh giá."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "Why unit test?",
+          "bullets": [
+            "Quality Issue Identification",
+            "Validation of Functional Requirements",
+            "Simplified Debugging"
+          ],
+          "explanation": [
+            "Phát hiện vấn đề chất lượng (Quality Issue Identification): giúp tìm ra bug ngay từ lúc code từng đơn vị trước khi tích hợp phức tạp, giảm chi phí sửa lỗi.",
+            "Xác nhận yêu cầu chức năng (Validation of Functional Requirements) và đơn giản hóa gỡ lỗi (Simplified Debugging): khi một unit test thất bại, phạm vi khoanh vùng lỗi chỉ nằm trong đơn vị đó."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Unit Test case",
+          "bullets": [
+            "A test case is a sample of executions",
+            {
+              "text": "In a unit test case, there are 4 phases executed in sequence:",
+              "subBullets": [
+                "Setup: Initializes the test fixture, that is the before picture required for the unit to exhibit the expected behavior.",
+                "Exercise: Run the given unit with input data to get some outcome (actual value) as a result",
+                "Verify: Determine whether the expected value has been obtained",
+                "Teardown: Tear down the test fixture to put the methods back into the initial state"
+              ]
+            },
+            "Unit testing is done with the unit under test in isolation"
+          ],
+          "explanation": [
+            "Bốn pha Setup → Exercise → Verify → Teardown là khuôn mẫu chuẩn của xUnit cho mọi test case: chuẩn bị ngữ cảnh, gọi hàm với dữ liệu đầu vào, đối chiếu kết quả thực tế với kỳ vọng, rồi khôi phục trạng thái ban đầu.",
+            "Nguyên tắc 'in isolation' (cô lập) ở ý cuối chính là cầu nối sang phần Mockito ở cuối bài: nếu hàm đang test gọi tới database hay service khác, ta phải thay thế phụ thuộc đó bằng mock."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 6"
+          }
+        }
+      ]
+    },
+    {
+      "h": "2. Giới thiệu JUnit 5, Kiến trúc & Vòng đời Test (Lifecycle)",
+      "text": "Tìm hiểu lịch sử JUnit 4 và JUnit 5, kiến trúc 3 module (Platform, Jupiter, Vintage), thứ tự thực thi các annotation vòng đời (@BeforeAll, @BeforeEach, @Test, @AfterEach, @AfterAll) cùng các annotation bổ trợ khác.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 7–13"
+      },
+      "digest": {
+        "keyPoints": [
+          "JUnit do Kent Beck và Erich Gamma phát triển cuối năm 1995; JUnit 4.0 ra mắt 18/02/2006, JUnit 5.0 ra mắt 10/09/2017.",
+          "Kiến trúc JUnit 5 gồm 3 thành phần chính: Platform (nền tảng khởi chạy test trên JVM, kết nối IDE/Maven/Gradle), Jupiter (mô hình lập trình & extension mới cho JUnit 5) và Vintage (TestEngine chạy test JUnit 3/4 cũ).",
+          "Vòng đời 1 lớp test trong JUnit 5: @BeforeAll (1 lần trước tất cả, thường là static) → lặp [@BeforeEach → @Test → @AfterEach] cho từng test case → @AfterAll (1 lần sau tất cả, thường là static).",
+          "Ánh xạ sang JUnit 4: @BeforeAll ↔ @BeforeClass, @BeforeEach ↔ @Before, @AfterEach ↔ @After, @AfterAll ↔ @AfterClass, @Test giữ nguyên.",
+          "Annotation bổ trợ: @Disabled (bỏ qua test), @DisplayName (đặt tên hiển thị), @Tag (gắn thẻ lọc test), @AutoClose (tự đóng tài nguyên ở field), @RepeatedTest (lặp lại test N lần)."
+        ],
+        "terms": [
+          {
+            "term": "JUnit Platform",
+            "meaning": "Tầng nền tảng khởi chạy các framework kiểm thử trên JVM và cung cấp API cho IDE/build tool (Eclipse, IntelliJ IDEA, Maven, Gradle)."
+          },
+          {
+            "term": "JUnit Jupiter",
+            "meaning": "Module chứa API lập trình và extension model mới của JUnit 5 (như @BeforeEach, @TestFactory, @ParameterizedTest, @ExtendWith)."
+          },
+          {
+            "term": "JUnit Vintage",
+            "meaning": "TestEngine giúp chạy tương thích ngược các test case viết bằng JUnit 3 và JUnit 4 trên nền JUnit Platform."
+          }
+        ],
+        "pitfalls": [
+          "Quên khai báo `static` cho method gắn `@BeforeAll` / `@AfterAll` (với vòng đời PER_METHOD mặc định), gây lỗi khởi tạo JUnit.",
+          "Dùng nhầm `@Before` / `@BeforeClass` của JUnit 4 thay vì `@BeforeEach` / `@BeforeAll` của `org.junit.jupiter.api` khiến fixture không được gọi khi chạy với JUnit Jupiter."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "JUnit",
+          "bullets": [
+            "JUnit is a testing framework which allows to create automated tests",
+            "JUnit was developed by Kent Beck and Erich Gamma in late 1995",
+            "Nowadays, it is considered as the practice standard for testing Java applications",
+            {
+              "text": "Two versions:",
+              "subBullets": [
+                "JUnit 4: On February 18, 2006, JUnit 4.0 was released",
+                "Junit 5: Junit 5.0 was released on September 10, 2017"
+              ]
+            }
+          ],
+          "explanation": [
+            "JUnit là chuẩn thực tế (de facto standard) cho kiểm thử tự động trong Java, khởi nguồn từ Kent Beck và Erich Gamma (nhóm tác giả Design Patterns).",
+            "JUnit 5 đánh dấu cuộc tái thiết kế hoàn toàn kiến trúc modular so với JUnit 4 nhằm tận dụng Java 8 (lambda, stream, interface default method) và khả năng mở rộng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Junit 5 architecture",
+          "bullets": [
+            {
+              "text": "JUnit 5 framework is composed of three major components:",
+              "subBullets": [
+                "Platform",
+                "Jupiter",
+                "Vintage"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Old test (JUnit) -> Vintage -> Platform",
+            "New tests (JUnit 5) -> Jupiter -> Platform",
+            "Other tests -> Third party -> Platform",
+            "IDEs/build tools (eclipse, Maven, IntelliJ IDEA, gradle) -> Platform",
+            "Khung nét đứt JUnit 5 bao quanh: Vintage, Jupiter, Platform"
+          ],
+          "diagramNote": "Sơ đồ kiến trúc JUnit 5: Platform làm cầu nối giữa IDEs/build tools (Eclipse, Maven, IntelliJ IDEA, Gradle) với các TestEngine gồm Vintage (JUnit cũ), Jupiter (JUnit 5 mới) và Third party (ngoài JUnit 5).",
+          "explanation": [
+            "Tách riêng `Platform` giúp các công cụ như Maven, Gradle, IntelliJ chỉ cần tích hợp một giao diện thống nhất thay vì viết plugin riêng cho từng phiên bản framework test.",
+            "`Jupiter` phục vụ bộ API và annotation mới của JUnit 5, còn `Vintage` giúp dự án cũ nâng cấp dần lên JUnit 5 mà không phải viết lại ngay toàn bộ test JUnit 4."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Test lifecycle in Junit 5",
+          "bullets": [
+            "Unit test case is composed of 4 stages. To control these test phases, Junit 5 using different annotations."
+          ],
+          "table": {
+            "headers": [
+              "Annotation",
+              "Description",
+              "JUnit 4 equivalence"
+            ],
+            "rows": [
+              [
+                "@Test",
+                "Identify the methods that have to be executed as test cases.",
+                "@Test"
+              ],
+              [
+                "@BeforeEach",
+                "Method executed before each @Test in the current class",
+                "@Before"
+              ],
+              [
+                "@AfterEach",
+                "Method executed after each @Test in the current class",
+                "@After"
+              ],
+              [
+                "@BeforeAll",
+                "Method executed before all @Test in the current class",
+                "@BeforeClass"
+              ],
+              [
+                "@AfterAll",
+                "Method executed after all @Test in the current class",
+                "@AfterClass"
+              ]
+            ]
+          },
+          "explanation": [
+            "JUnit 5 đổi tên các annotation vòng đời cho trực quan hơn so với JUnit 4: `@Before` thành `@BeforeEach` (chạy trước mỗi test) và `@BeforeClass` thành `@BeforeAll` (chạy một lần trước toàn bộ class test).",
+            "Tất cả các annotation vòng đời này thuộc gói `org.junit.jupiter.api`, còn các annotation JUnit 4 nằm ở `org.junit`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "Test lifecycle in Junit 5",
+          "bullets": [
+            "The order of execution of annotations in a Java class:"
+          ],
+          "diagramText": [
+            "Java class (JUnit 5):",
+            "@BeforeAll -> @BeforeEach -> @Test -> @AfterEach -> @BeforeEach -> @Test -> @AfterEach -> ... -> @AfterAll",
+            "Caption: Jupiter annotations to control test lifecycle"
+          ],
+          "diagramNote": "Sơ đồ tuần tự thực thi trong Java class: @BeforeAll chạy đầu tiên một lần, sau đó với mỗi @Test sẽ lặp lại bộ ba @BeforeEach -> @Test -> @AfterEach, cuối cùng @AfterAll chạy một lần sau tất cả.",
+          "explanation": [
+            "Cặp `@BeforeEach` / `@AfterEach` bao quanh từng `@Test` riêng lẻ để đảm bảo các test case độc lập, không để trạng thái thay đổi của test trước làm hỏng test sau.",
+            "Nếu một class có N phương thức `@Test`, `@BeforeAll` và `@AfterAll` chỉ chạy 1 lần, trong khi `@BeforeEach` và `@AfterEach` chạy đúng N lần."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 10"
+          }
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Test lifecycle in Junit 5",
+          "bullets": [
+            "Mapping the annotations to control the test lifecycle with the different parts of a test case:"
+          ],
+          "table": {
+            "caption": "Lưu ý trình bày gốc: cột Stages gộp 2 dòng Setup (optional) và 2 dòng Teardown (optional); cột JUnit 5 và JUnit 4 gộp @Test chung cho Exercise và Verify.",
+            "headers": [
+              "Stages",
+              "JUnit 5",
+              "JUnit 4"
+            ],
+            "rows": [
+              [
+                "Setup (optional)",
+                "@BeforeAll",
+                "@BeforeClass"
+              ],
+              [
+                "Setup (optional)",
+                "@BeforeEach",
+                "@Before"
+              ],
+              [
+                "Exercise",
+                "@Test",
+                "@Test"
+              ],
+              [
+                "Verify",
+                "@Test",
+                "@Test"
+              ],
+              [
+                "Teardown (optional)",
+                "@AfterEach",
+                "@After"
+              ],
+              [
+                "Teardown (optional)",
+                "@AfterAll",
+                "@AfterClass"
+              ]
+            ]
+          },
+          "explanation": [
+            "Cả hai pha cốt lõi Exercise (chạy SUT) và Verify (kiểm tra kết quả bằng assertion) đều nằm bên trong phương thức đánh dấu `@Test`.",
+            "Setup (`@BeforeAll`/`@BeforeEach`) và Teardown (`@AfterEach`/`@AfterAll`) đều là optional — chỉ viết khi test suite cần chuẩn bị hoặc thu dọn fixture dùng chung."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Example of a unit test case",
+          "code": {
+            "lang": "java",
+            "text": "import org.junit.jupiter.api.AfterAll;\nimport org.junit.jupiter.api.AfterEach;\nimport org.junit.jupiter.api.BeforeAll;\nimport org.junit.jupiter.api.BeforeEach;\nimport org.junit.jupiter.api.Test;\n\nclass LifecycleJUnit5Test {\n    @BeforeAll\n    static void setupAll() {\n        System.out.println(\"Setup ALL TESTS in the class\");\n    }\n    @BeforeEach\n    void setup() {\n        System.out.println(\"Setup EACH TEST in the class\");\n    }\n    @Test\n    void testOne() {\n        System.out.println(\"TEST 1\");\n    }\n    @Test\n    void testTwo() {\n        System.out.println(\"TEST 2\");\n    }\n    @AfterEach\n    void teardown() {\n        System.out.println(\"Teardown EACH TEST in the class\");\n    }\n    @AfterAll\n    static void teardownAll() {\n        System.out.println(\"Teardown ALL TESTS in the class\");\n    }\n}"
+          },
+          "explanation": [
+            "Chú ý `setupAll()` và `teardownAll()` đều có từ khóa `static` vì theo mặc định (`Lifecycle.PER_METHOD`) JUnit 5 tạo instance mới của class cho mỗi `@Test`, nên `@BeforeAll`/`@AfterAll` phải gọi ở mức lớp.",
+            "Trong JUnit 5, class test và các method `@Test` không bắt buộc phải khai báo `public` (package-private là đủ), giúp code test gọn hơn so với JUnit 4."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Annotations",
+          "bullets": [
+            "@Disabled: Skip test case",
+            "@DisplayName: Display custom name for the test class or test method",
+            "@Tag: Tag a test method or test class for filtering tests",
+            "@AutoClose: automatically close resources associated with fields.",
+            "@RepeatedTest: repeat a test a specified number of times"
+          ],
+          "explanation": [
+            "`@Disabled` (tương đương `@Ignore` ở JUnit 4) tạm thời vô hiệu hóa test khi đang sửa code hoặc tính năng chưa hoàn thiện mà vẫn báo cáo rõ test bị skip.",
+            "`@DisplayName` cho phép đặt tên mô tả tự nhiên có dấu cách/emoji trong báo cáo IDE; `@Tag` dùng để lọc chạy nhóm test (ví dụ `fast`, `integration`) khi cấu hình Maven/Gradle; `@AutoClose` tự đóng field tài nguyên sau test; `@RepeatedTest(n)` chạy lặp n lần."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 13"
+          }
+        }
+      ]
+    },
+    {
+      "h": "3. Assertions & Special Assertions trong JUnit 5",
+      "text": "Định nghĩa assertion (3 thành phần: expected value, actual value, logic comparator), toàn bộ các assertion chuẩn của org.junit.jupiter.api.Assertions và 4 special assertions: assertAll, assertThrows, assertTimeout, assertTimeoutPreemptively.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 14–19"
+      },
+      "digest": {
+        "keyPoints": [
+          "Assertion (predicate) diễn ra ở pha Verify: so sánh Expected value (từ tài liệu test) với Actual value (từ pha Exercise) qua Logic comparator để trả ra test verdict (pass/fail).",
+          "12 assertion chuẩn phổ biến trong `Assertions`: `fail`, `assertTrue`, `assertFalse`, `assertNull`, `assertNotNull`, `assertEquals`, `assertArrayEquals`, `assertIterableEquals`, `assertLinesMatch`, `assertNotEquals`, `assertSame`, `assertNotSame`.",
+          "`assertEquals` so sánh giá trị/equals(), còn `assertSame` kiểm tra cùng tham chiếu bộ nhớ (`==`).",
+          "Special assertions: `assertAll` (chạy tất cả assertion con trong nhóm và gom báo cáo mọi lỗi cùng lúc), `assertThrows` (xác nhận ngoại lệ được ném và trả về đối tượng Throwable/Exception để kiểm tra tiếp message), `assertTimeout` vs `assertTimeoutPreemptively` (đợi chạy xong mới báo quá giờ vs ngắt thực thi ngay khi vượt timeout)."
+        ],
+        "terms": [
+          {
+            "term": "assertSame vs assertEquals",
+            "meaning": "`assertSame` kiểm tra hai biến có trỏ tới cùng một object (`==`) hay không, trong khi `assertEquals` kiểm tra sự bằng nhau về nội dung (`equals()`)."
+          },
+          {
+            "term": "assertAll",
+            "meaning": "Grouped assertion: thực thi toàn bộ các Executable/lambda được truyền vào thay vì dừng ngay ở assertion đầu tiên bị fail."
+          },
+          {
+            "term": "assertTimeout vs assertTimeoutPreemptively",
+            "meaning": "`assertTimeout` chạy lambda trên cùng thread và chờ hàm kết thúc rồi mới báo vượt thời gian; `assertTimeoutPreemptively` chạy trên thread khác và chủ động hủy ngay khi hết timeout."
+          }
+        ],
+        "pitfalls": [
+          "Đặt message ở vị trí tham số đầu tiên như JUnit 4: trong JUnit 5 tham số message tùy chọn (hoặc `Supplier<String>`) luôn nằm ở tham số CUỐI CÙNG.",
+          "Quên rằng `assertTimeoutPreemptively` chạy trên luồng riêng nên code bên trong sử dụng `ThreadLocal` (ví dụ Spring transaction) có thể không hoạt động như mong đợi."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Assertions",
+          "bullets": [
+            "In verify stage, comparing the outcome (actual value) from exercise stage with the expected result is called assertions.",
+            "An assertion (also known as a predicate) is a boolean statement typically used to reason about software correctness.",
+            {
+              "text": "An assertion is composed of three parts:",
+              "subBullets": [
+                "Expected value: comes from test documents.",
+                "Actual value (real outcome): comes from the exercise stage",
+                "Logic comparator: use to compare these 2 values"
+              ]
+            },
+            "As a result of an assertion, we obtain a test verdict, which, in the end, is going to define if the test has succeeded or failed."
+          ],
+          "explanation": [
+            "Slide chuẩn hóa cấu trúc logic của pha Verify: mỗi lời gọi `assert*` nhận kỳ vọng (`expected`), kết quả thực tế (`actual`) và phép so sánh (bằng nhau, khác nhau, đúng/sai, cùng tham chiếu, ném ngoại lệ) để kết luận đạt hay trượt.",
+            "Thứ tự tham số trong JUnit 5 luôn đặt `expected` trước `actual` (ví dụ `assertEquals(expected, actual)`), giúp thông báo lỗi không bị đảo ngược ý nghĩa."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Assertions in Jupiter JUnit 5",
+          "bullets": [
+            "All JUnit Jupiter assertions are static methods in the Assertions class located in org.junit.jupiter package."
+          ],
+          "table": {
+            "headers": [
+              "Assertion",
+              "Description"
+            ],
+            "rows": [
+              [
+                "fail",
+                "Fails a test with a given message and/or exception"
+              ],
+              [
+                "assertTrue",
+                "Asserts that a supplied condition is true"
+              ],
+              [
+                "assertFalse",
+                "Asserts that a supplied condition is false"
+              ],
+              [
+                "assertNull",
+                "Asserts that a supplied object is null"
+              ],
+              [
+                "assertNotNull",
+                "Asserts that a supplied object is not null"
+              ],
+              [
+                "assertEquals",
+                "Asserts that two supplied objects are equal"
+              ],
+              [
+                "assertArrayEquals",
+                "Asserts that two supplied arrays are equal"
+              ],
+              [
+                "assertIterableEquals",
+                "Asserts that two iterable objects are deeply equal"
+              ],
+              [
+                "assertLinesMatch",
+                "Asserts that two lists of Strings are equals"
+              ],
+              [
+                "assertNotEquals",
+                "Asserts that two supplied objects are not equal"
+              ],
+              [
+                "assertSame",
+                "Asserts that two objects are the same, compared with =="
+              ],
+              [
+                "assertNotSame",
+                "Asserts that two objects are different, compared with !="
+              ]
+            ]
+          },
+          "ocrNote": "Slide gốc ghi Assertions nằm trong gói org.junit.jupiter; thực tế tên đầy đủ của lớp trong JUnit 5 là org.junit.jupiter.api.Assertions.",
+          "explanation": [
+            "Phân biệt rõ nhóm so sánh giá trị (`assertEquals`, `assertArrayEquals`, `assertIterableEquals` — duyệt so sánh từng phần tử kể cả lồng nhau) với nhóm so sánh danh tính tham chiếu (`assertSame` dùng `==` và `assertNotSame` dùng `!=`).",
+            "`fail(...)` hữu ích để đánh dấu test chưa hoàn thành hoặc đặt ở nhánh code lẽ ra không bao giờ được chạy tới (ví dụ sau một lời gọi đáng ra phải ném ngoại lệ)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Special assertions",
+          "bullets": [
+            "Jupiter provides some special assertions:"
+          ],
+          "table": {
+            "headers": [
+              "Assertion",
+              "Description"
+            ],
+            "rows": [
+              [
+                "assertAll",
+                "Group of assertions: this method allows to group different assertions at the same time. In a grouped assertion, all assertions are always executed, and any failures will be reported together"
+              ],
+              [
+                "assertThrows",
+                "Asserting exceptions: this assertion allows to verify if a given exception is raised in a piece of code."
+              ],
+              [
+                "assertTimeout",
+                "Asserting timeouts: this assertion allows us to verify the timeout of a given operation."
+              ],
+              [
+                "assertTimeoutPreemtively",
+                "Asserting timeouts: this assertion allows us to verify the timeout of a given operation. The difference with assertTimeoutPreemptively with respect to assertTimeout is that assertTimeoutPreemptively does not wait until the end of the operation, and the execution is aborted when the expected timeout is exceeded"
+              ]
+            ]
+          },
+          "ocrNote": "Cột Assertion trên slide gốc viết thiếu chữ p thành assertTimeoutPreemtively, trong khi cột Description và Slide 19 viết đúng là assertTimeoutPreemptively.",
+          "explanation": [
+            "`assertAll` giải quyết nhược điểm của nhiều assertion liên tiếp: bình thường assertion 1 fail sẽ dừng ngay method test và giấu các lỗi phía sau, còn `assertAll` chạy hết các lambda để báo cáo đủ mọi sai lệch cùng một lúc.",
+            "`assertTimeout` phù hợp kiểm tra hiệu năng nhưng chờ thao tác chạy xong rồi mới đo thời gian; `assertTimeoutPreemptively` cắt ngang ngay khi vượt quá ngưỡng, tránh test bị treo vô hạn nếu gặp vòng lặp vô tận."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "class StandardAssertionsTest {\n    @Test\n    void standardAssertions() {\n        assertEquals(2, 2);\n        assertTrue(true, \"The optional assertion message is now the last parameter\");\n        assertFalse(false, () -> \"Really \" + \"expensive \" + \"message\" + \".\");\n    }\n}\n\nclass GroupedAssertionsTest {\n    @Test\n    void groupedAssertions() {\n        Address address = new Address(\"John\", \"Smith\");\n        assertAll(\"address\", () -> assertEquals(\"John\", address.getFirstName()), () -> assertEquals(\"User\", address.getLastName()));\n    }\n}"
+          },
+          "explanation": [
+            "`assertFalse(false, () -> \"Really \" + ...)` minh họa lazy evaluation với `Supplier<String>`: chuỗi thông báo lỗi chỉ được nối khi assertion thực sự thất bại, tránh tốn chi phí hiệu năng khi test pass.",
+            "Trong `GroupedAssertionsTest`, đối tượng `Address(\"John\", \"Smith\")` được kiểm tra cả `firstName` (đạt) và `lastName` (fail vì kỳ vọng \"User\" nhưng thực tế là \"Smith\"); nhờ `assertAll`, cả hai lambda đều chạy và lỗi sẽ gom dưới tiêu đề nhóm \"address\"."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "class ExceptionTest {\n    @Test\n    void exceptionTesting() {\n        Throwable exception = assertThrows(IllegalArgumentException.class, () -> { throw new IllegalArgumentException(\"a message\");});\n        assertEquals(\"a message\", exception.getMessage());\n    }\n}\n\nclass TimeoutExceededTest {\n    @Test\n    void timeoutNotExceeded() {\n        assertTimeout(ofMinutes(2), () -> {\n            Thread.sleep(100); });\n    }\n    @Test\n    void timeoutExceeded() {\n        assertTimeout(ofMillis(10), () -> {\n            Thread.sleep(100); });\n    }\n}"
+          },
+          "explanation": [
+            "`assertThrows` nhận kiểu ngoại lệ mong đợi và một `Executable` lambda; nếu đúng ngoại lệ được ném ra, `assertThrows` trả chính đối tượng ngoại lệ đó để test kiểm tra tiếp thông điệp (`exception.getMessage()`).",
+            "Trong `TimeoutExceededTest`, hàm `timeoutExceeded()` yêu cầu tối đa 10ms nhưng tác vụ ngủ 100ms: `assertTimeout` vẫn chờ đủ 100ms cho `Thread.sleep(100)` kết thúc rồi mới đánh trượt và báo vượt 90ms."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "class TimeoutWithResultOrMethodTest {\n    @Test\n    void timeoutNotExceededWithResult() {\n        String actualResult = assertTimeout(ofMinutes(1), () -> { return \"hi there\"; });\n        assertEquals(\"hi there\", actualResult);\n    }\n    @Test\n    void timeoutNotExceededWithMethod() {\n        String actualGreeting = assertTimeout(ofMinutes(1), TimeoutWithResultOrMethodTest::greeting);\n        assertEquals(\"hello world!\", actualGreeting);\n    }\n    private static String greeting() { return \"hello world!\"; }\n}\n\nclass TimeoutWithPreemptiveTerminationTest {\n    @Test void timeoutExceededWithPreemptiveTermination() {\n        assertTimeoutPreemptively(ofMillis(10), () -> { Thread.sleep(100); });\n    }\n}"
+          },
+          "explanation": [
+            "`assertTimeout` với `ThrowingSupplier<T>` (trả về kết quả từ lambda hoặc method reference `::greeting`) cho phép vừa kiểm soát thời gian thực thi vừa lấy giá trị trả về để assert tiếp ở dòng sau.",
+            "Khác với Slide 18, `assertTimeoutPreemptively(ofMillis(10), ...)` sẽ ngắt cưỡng bức ngay sau khoảng 10ms mà không chờ ngủ hết 100ms."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 19"
+          }
+        }
+      ]
+    },
+    {
+      "h": "4. Dynamic Tests (@TestFactory) & Parameterized Tests (@ParameterizedTest)",
+      "text": "Khám phá 2 tính năng nâng cao của JUnit 5: sinh test động tại runtime bằng @TestFactory (DynamicTest.dynamicTest và DynamicTest.stream) và tái sử dụng logic test với dữ liệu tham số hóa (@ParameterizedTest kết hợp @ValueSource, @EnumSource, @MethodSource, @CsvSource, @CsvFileSource, @ArgumentsSource).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 20–33"
+      },
+      "digest": {
+        "keyPoints": [
+          "Dynamic Tests (`@TestFactory`): sinh các `DynamicTest` tại thời điểm chạy (runtime). Method `@TestFactory` bắt buộc trả về `Stream`, `Collection`, `Iterable` hoặc `Iterator` các `DynamicTest` (trả về kiểu khác như `List<String>` sẽ ném ngoại lệ JUnitException).",
+          "Hai cách tạo dynamic test: dùng `DynamicTest.dynamicTest(displayName, executable)` (ví dụ map trên `Stream`) hoặc `DynamicTest.stream(inputGenerator, displayNameGenerator, testExecutor)`.",
+          "Parameterized Tests (`@ParameterizedTest` ở `org.junit.jupiter.params`): chạy lại cùng một logic test cho nhiều bộ tham số khác nhau, yêu cầu ít nhất một argument provider.",
+          "Các provider chính: `@ValueSource` (mảng literal `String`, `int`, `long`, `double`), `@EnumSource` (các hằng số của `Enum`), `@MethodSource` (tên method static trả về `Stream`), `@CsvSource` / `@CsvFileSource` (dữ liệu CSV tự động chuyển đổi sang kiểu nguyên thủy/wrapper tương ứng), và `@ArgumentsSource` (lớp tùy biến implements `ArgumentsProvider`)."
+        ],
+        "terms": [
+          {
+            "term": "@TestFactory",
+            "meaning": "Annotation đánh dấu phương thức nhà máy sinh ra tập các `DynamicTest` tại runtime (lưu ý `@BeforeEach`/`@AfterEach` chỉ chạy quanh method factory chứ không chạy cho từng DynamicTest riêng lẻ)."
+          },
+          {
+            "term": "@ParameterizedTest",
+            "meaning": "Annotation khai báo một test tham số hóa, dùng kèm ít nhất một nguồn dữ liệu như `@ValueSource`, `@EnumSource`, `@MethodSource`, `@CsvSource`, `@CsvFileSource` hoặc `@ArgumentsSource`."
+          },
+          {
+            "term": "ArgumentsProvider",
+            "meaning": "Interface của JUnit Jupiter (`org.junit.jupiter.params.provider.ArgumentsProvider`) với phương thức `provideArguments(ExtensionContext)` trả về `Stream<? extends Arguments>` để tạo nguồn tham số tái sử dụng."
+          }
+        ],
+        "pitfalls": [
+          "Viết method `@TestFactory` trả về `List<String>` hoặc `DynamicTest` đơn lẻ thay vì `Collection`/`Iterable`/`Iterator`/`Stream` của `DynamicTest` sẽ làm JUnit ném lỗi ngay khi thu thập test.",
+          "Trong `@MethodSource`, quên khai báo phương thức cung cấp dữ liệu là `static` (khi class test không dùng `PER_CLASS`) sẽ gây lỗi khi JUnit tìm factory method."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Advanced JUnit Features",
+          "bullets": [
+            "Dynamic tests: Generate tests at runtime",
+            "Parameterized tests: A special kinds of tests in which the data input is injected in the test in order to reuse the same test logic"
+          ],
+          "explanation": [
+            "Khác với `@Test` thông thường vốn được định nghĩa tĩnh lúc biên dịch, `Dynamic tests` tạo danh sách bài kiểm thử linh hoạt khi chạy (ví dụ đọc số lượng mục từ file hoặc dữ liệu sinh động).",
+            "`Parameterized tests` tách dữ liệu đầu vào ra khỏi thân hàm test, giúp tránh lặp code (copy-paste nhiều `@Test` chỉ khác input)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Dynamic Tests",
+          "bullets": [
+            "JUnit 5 allows to generate test at runtime by a factory method that is annotated with @TestFactory",
+            "A @TestFactory method must return a Stream, Collection, Iterable, or Iterator of DynamicTest instances",
+            "In order to create a dynamic test, we can use the static method dynamicTest of the class DynamicTest located in the org.junit.jupiter.api package. Stream (in java.util.stream.Stream) is used to store a given set of input data.",
+            "There is another possibility to create dynamic tests in JUnit 5, using the static method stream of the class DynamicTest. This stream method needs an input generator, a function that generates a display name based on an input value, and a test executor."
+          ],
+          "explanation": [
+            "Lưu ý hợp đồng kiểu trả về của `@TestFactory`: phải là `Stream`, `Collection`, `Iterable` hoặc `Iterator` chứa các `DynamicTest` (hoặc `DynamicNode`); phương thức `@TestFactory` bản thân nó không phải test case mà là nhà máy tạo ra các test case.",
+            "Phương thức `DynamicTest.stream(inputGenerator, displayNameGenerator, testExecutor)` tách bạch 3 thành phần theo phong cách hàm: nguồn sinh input → hàm sinh tên hiển thị → hàm thực thi kiểm thử."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "class CollectionTest {\n    // Warning: this test will raise an exception\n    @TestFactory\n    List<String> dynamicTestsWithInvalidReturnType() {\n        return Arrays.asList(\"Hello\"); }\n    @TestFactory\n    Collection<DynamicTest> dynamicTestsFromCollection() {\n        return Arrays.asList( dynamicTest(\"1st dynamic test\", () -> assertTrue(true)), dynamicTest(\"2nd dynamic test\", () -> assertEquals(4, 2 * 2))); }\n    @TestFactory\n    Iterable<DynamicTest> dynamicTestsFromIterable() {\n        return Arrays.asList( dynamicTest(\"3rd dynamic test\", () -> assertTrue(true)), dynamicTest(\"4th dynamic test\", () -> assertEquals(4, 2 * 2))); }\n    @TestFactory\n    Iterator<DynamicTest> dynamicTestsFromIterator() {\n        return Arrays.asList( dynamicTest(\"5th dynamic test\", () -> assertTrue(true)), dynamicTest(\"6th dynamic test\", () -> assertEquals(4, 2 * 2))).iterator(); }\n}"
+          },
+          "explanation": [
+            "Method đầu tiên `dynamicTestsWithInvalidReturnType()` cố tình trả về `List<String>` để chứng minh JUnit Jupiter sẽ ném ngoại lệ `JUnitException` vì kiểu phần tử không phải `DynamicTest`.",
+            "Ba method sau minh họa ba kiểu trả về hợp lệ được `@TestFactory` hỗ trợ: `Collection<DynamicTest>`, `Iterable<DynamicTest>` và `Iterator<DynamicTest>`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "import static org.junit.jupiter.api.DynamicTest.dynamicTest;\nimport java.util.stream.Stream;\nimport org.junit.jupiter.api.DynamicTest;\nimport org.junit.jupiter.api.TestFactory;\n\nclass DynamicExampleTest {\n    @TestFactory\n    Stream<DynamicTest> dynamicTestsFromStream() {\n        Stream<String> inputStream = Stream.of(\"A\", \"B\", \"C\");\n        return inputStream.map( input -> dynamicTest(\"Display name for input \" + input, () -> { System.out.println(\"Testing \" + input); })); }\n}"
+          },
+          "explanation": [
+            "Ví dụ dùng `Stream.of(\"A\", \"B\", \"C\").map(...)` để chuyển từng chuỗi đầu vào thành một `DynamicTest` tương ứng có tên riêng biệt.",
+            "Vì `Stream` hỗ trợ lazy evaluation và đóng gói luồng dữ liệu lớn, đây là cách rất phổ biến để sinh dynamic test từ tập dữ liệu động."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "class StreamExampleTest {\n    @TestFactory\n    Stream<DynamicTest> streamTest() {\n        // Input data\n        Integer array[] = { 1, 2, 3 };\n        Iterator<Integer> inputGenerator = Arrays.asList(array).iterator();\n\n        // Display names\n        Function<Integer, String> displayNameGenerator = ( input) -> \"Data input:\" + input;\n\n        // Test executor\n        ThrowingConsumer<Integer> testExecutor = (input) -> { System.out.println(input); assertTrue(input % 2 == 0); };\n\n        // Returns a stream of dynamic tests\n        return stream(inputGenerator, displayNameGenerator, testExecutor); }\n}"
+          },
+          "ocrNote": "Trên slide gốc, toán tử -> của biểu thức lambda displayNameGenerator bị ngắt dòng trực quan; đã ghép liền thành -> đúng cú pháp Java.",
+          "explanation": [
+            "Sử dụng `DynamicTest.stream(...)` với `inputGenerator` (duyệt qua `1, 2, 3`), `displayNameGenerator` (tạo tên `Data input:1`, `Data input:2`, `Data input:3`) và `testExecutor` (kiểm tra số chẵn `input % 2 == 0`).",
+            "Khi thực thi, sẽ có 3 dynamic test độc lập xuất hiện trên báo cáo: `Data input:1` (fail), `Data input:2` (pass), `Data input:3` (fail)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "Parameterized Tests",
+          "bullets": [
+            "Parameterized tests are a special kinds of tests in which the data input is injected in the test in order to reuse the same test logic.",
+            {
+              "text": "Steps to create parameterized tests:",
+              "subBullets": [
+                "We need to use the annotation @ParameterizedTest (located in the package org.junit.jupiter.params) to declare a method within a Java class as a parameterized test.",
+                "We need to specify at least one argument provider."
+              ]
+            }
+          ],
+          "explanation": [
+            "Để sử dụng `@ParameterizedTest`, dự án cần phụ thuộc `junit-jupiter-params` (thuộc bộ thư viện Jupiter) và mỗi phương thức test tham số hóa dùng `@ParameterizedTest` thay cho `@Test`.",
+            "Nếu gắn `@ParameterizedTest` mà thiếu annotation nguồn tham số (argument provider), JUnit sẽ báo lỗi cấu hình thiếu nguồn dữ liệu."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 25"
+          }
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "Parameterized Tests",
+          "table": {
+            "headers": [
+              "Arguments provider annotation",
+              "Description"
+            ],
+            "rows": [
+              [
+                "@ValueSource",
+                "Used to specify an array of literal values of String, int, long, or double"
+              ],
+              [
+                "@EnumSource",
+                "Argument source for constants of a specified enumeration (java.lang.Enum)"
+              ],
+              [
+                "@MethodSource",
+                "Provides access to values returned by static methods of the class in which this annotation is declared"
+              ],
+              [
+                "@CsvSource",
+                "Argument source which reads comma-separated values (CSV) from its attribute"
+              ],
+              [
+                "@CsvFileSource",
+                "Argument source which is used to load CSV files from one or more classpath resources"
+              ],
+              [
+                "@ArgumentSource",
+                "Used to specify a custom argument provider (that is, a Java class that implements the interface) org.junit.jupiter.params.provider.ArgumentsProvider)"
+              ]
+            ]
+          },
+          "ocrNote": "Bảng trên slide gốc viết '@ArgumentSource' (thiếu chữ s) và dư dấu ')' sau 'interface)'; tên annotation chuẩn trong JUnit 5 (như ở Slide 32) là '@ArgumentsSource'.",
+          "explanation": [
+            "Bảng tổng hợp 6 bộ cung cấp tham số phổ biến nhất của JUnit Jupiter Params, sắp xếp từ đơn giản (mảng hằng `@ValueSource`, enum `@EnumSource`) tới linh hoạt/phức tạp (`@MethodSource`, `@CsvFileSource`, `@ArgumentsSource`).",
+            "Lưu ý phân biệt giữa nguồn đơn tham số (`@ValueSource`, `@EnumSource`) và nguồn đa tham số truyền nhiều đối số vào một lần gọi test (`@CsvSource`, `@CsvFileSource`, `@MethodSource`/`@ArgumentsSource` với `Arguments.of(...)`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "@ValueSource",
+          "bullets": [
+            "The annotation @ValueSource is used in conjunction with @ParameterizedTest to specify a parameterized test in which the argument source is an array of literal values of String, int, long, or double."
+          ],
+          "code": {
+            "lang": "java",
+            "text": "import static org.junit.jupiter.api.Assertions.assertNotNull;\nimport org.junit.jupiter.params.ParameterizedTest;\nimport org.junit.jupiter.params.provider.ValueSource;\n\nclass ValueSourceStringsParameterizedTest {\n    @ParameterizedTest\n    @ValueSource(strings = { \"Hello\", \"World\" })\n    void testWithStrings(String argument) {\n        System.out.println(\"Parameterized test with (String) parameter: \" + argument);\n        assertNotNull(argument);\n    }\n}"
+          },
+          "explanation": [
+            "`@ValueSource` chỉ truyền được đúng 1 tham số cho mỗi lần thực thi test (trong ví dụ này test chạy 2 lần với `\"Hello\"` rồi `\"World\"`).",
+            "Thuộc tính của `@ValueSource` phải khớp kiểu dữ liệu cần truyền, ví dụ `strings = {...}`, `ints = {...}`, `longs = {...}`, `doubles = {...}`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "@EnumSource",
+          "bullets": [
+            "The annotation @EnumSource allows to specify a parameterized test in which the argument source is a Java enumeration class."
+          ],
+          "code": {
+            "lang": "java",
+            "text": "import static org.junit.jupiter.api.Assertions.assertNotNull;\nimport java.util.concurrent.TimeUnit;\nimport org.junit.jupiter.params.ParameterizedTest;\nimport org.junit.jupiter.params.provider.EnumSource;\n\nclass EnumSourceParameterizedTest {\n    @ParameterizedTest\n    @EnumSource(TimeUnit.class)\n    void testWithEnum(TimeUnit argument) {\n        System.out.println(\"Parameterized test with (TimeUnit) argument: \" + argument);\n        assertNotNull(argument); }\n}"
+          },
+          "explanation": [
+            "`@EnumSource(TimeUnit.class)` tự động duyệt qua mọi hằng số trong enum `TimeUnit` (`NANOSECONDS`, `MICROSECONDS`, `MILLISECONDS`, `SECONDS`, `MINUTES`, `HOURS`, `DAYS`) và gọi test cho từng hằng số.",
+            "Trên thực tế `@EnumSource` còn hỗ trợ thuộc tính `names` và `mode` (`INCLUDE`, `EXCLUDE`) để chọn lọc một tập con hằng số enum thay vì tất cả."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "@MethodSource",
+          "bullets": [
+            "The annotation @MethodSource allows to define the name of the static method in which the arguments for the test are provided as a Java 8 Stream."
+          ],
+          "code": {
+            "lang": "java",
+            "text": "import static org.junit.jupiter.api.Assertions.assertNotNull;\nimport java.util.stream.Stream;\nimport org.junit.jupiter.params.ParameterizedTest;\nimport org.junit.jupiter.params.provider.MethodSource;\n\nclass MethodSourceStringsParameterizedTest {\n    static Stream stringProvider() {\n        return Stream.of(\"hello\", \"world\"); }\n\n    @ParameterizedTest\n    @MethodSource(\"stringProvider\")\n    void testWithStringProvider(String argument) {\n        System.out.println(\"Parameterized test with (String) argument: \" + argument);\n        assertNotNull(argument);\n    }\n}"
+          },
+          "explanation": [
+            "`stringProvider()` phải là `static` (và không nhận tham số), trả về một `Stream` (hoặc `Iterable`/`Iterator`/mảng) chứa các phần tử dữ liệu.",
+            "Nếu cần truyền nhiều tham số cho hàm test cùng lúc, factory method có thể trả về `Stream<Arguments>` với `Arguments.of(arg1, arg2)`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "@CsvSource and @CsvFileSource",
+          "bullets": [
+            "Another way to specify the source of arguments for parameterized tests is using comma-separated values (CSV). This can be done using the annotation @CsvSource",
+            "If the amount of CSV data is big, it might be more convenient using the annotation @CsvFileSource instead. This annotation allows to feed the parameterized test with a CSV file located in the classpath of the project",
+            "The content of the CSV is automatically converted based on a set of rules"
+          ],
+          "table": {
+            "caption": "Bảng quy tắc chuyển đổi kiểu ngầm định của JUnit 5 (slide gốc trình bày bảng 2 cột không có dòng tiêu đề).",
+            "headers": [
+              "Target type",
+              "Implicit conversion example"
+            ],
+            "rows": [
+              [
+                "boolean/Boolean",
+                "\"false\" -> false"
+              ],
+              [
+                "byte/Byte",
+                "\"1\" -> (byte) 1"
+              ],
+              [
+                "char/Character",
+                "\"a\" -> 'a'"
+              ],
+              [
+                "short/Short",
+                "\"2\" -> (short) 2"
+              ],
+              [
+                "int/Integer",
+                "\"3\" -> 3"
+              ],
+              [
+                "long/Long",
+                "\"4\" -> 4L"
+              ],
+              [
+                "float/Float",
+                "\"5.0\" -> 5.0f"
+              ],
+              [
+                "double/Double",
+                "\"6.0\" -> 6.0d"
+              ]
+            ]
+          },
+          "explanation": [
+            "Vì dữ liệu CSV bản chất đều là văn bản, JUnit Jupiter tích hợp sẵn bộ chuyển đổi kiểu (implicit argument conversion) sang các kiểu nguyên thủy và wrapper tương ứng (`boolean`, `byte`, `char`, `short`, `int`, `long`, `float`, `double`).",
+            "`@CsvSource` thích hợp với vài dòng dữ liệu ngắn viết ngay trong code test, còn `@CsvFileSource` tách bộ dữ liệu lớn sang file `.csv` đặt trong `src/test/resources` (classpath)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "Example",
+          "code": {
+            "lang": "java",
+            "text": "class CsvSourceParameterizedTest {\n    @ParameterizedTest\n    @CsvSource({ \"hello, 1\", \"world, 2\", \"'happy, testing', 3\" })\n    void testWithCsvSource(String first, int second) {\n        System.out.println(\"Parameterized test with (String) \" + first + \" and (int) \" + second);\n        assertNotNull(first);\n        assertNotEquals(0, second); }\n}\n\nclass CsvFileSourceParameterizedTest {\n    @ParameterizedTest\n    @CsvFileSource(resources = \"/input.csv\")\n    void testWithCsvFileSource(String first, int second) {\n        System.out.println(\"Yet another parameterized test with (String) \" + first + \" and (int) \" + second);\n        assertNotNull(first);\n        assertNotEquals(0, second); }\n}\n\n/* input.csv:\nHow are you, 4\n“hi, there”, 5\n*/"
+          },
+          "ocrNote": "Trong phần minh họa input.csv trên slide, chuỗi “hi, there” dùng ngoặc kép cong; khi tạo tệp .csv thực tế cần dùng dấu ngoặc kép thẳng chuẩn ASCII (\"hi, there\", 5).",
+          "explanation": [
+            "Chú ý chuỗi `'happy, testing', 3` trong `@CsvSource`: dấu nháy đơn `'...'` giúp bao bọc giá trị có chứa dấu phẩy bên trong để JUnit không tách nhầm `'happy` và `testing'` thành 2 cột khác nhau.",
+            "Cả hai phương thức đều nhận 2 tham số `(String first, int second)`: JUnit tự động ép chuỗi cột thứ 2 (`\"1\"`, `\"2\"`, `\"3\"`, `\"4\"`, `\"5\"`) sang kiểu `int`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 31"
+          }
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "@ArgumentsSource",
+          "bullets": [
+            "@ArgumentsSource aimed to specify the source of arguments for parameterized tests. We can specify a custom (and reusable in different tests) class, which will contain the parameters for the test. This class must implement the interface org.junit.jupiter.params.provider.ArgumentsProvider, must override method provideArguments. This function returns a Stream of Arguments."
+          ],
+          "code": {
+            "lang": "java",
+            "text": "class ArgumentSourceParameterizedTest {\n    @ParameterizedTest\n    @ArgumentsSource(CustomArgumentsProvider1.class)\n    void testWithArgumentsSource(String first, int second) {\n        System.out.println(\"Parameterized test with (String) \" + first + \" and (int) \" + second);\n        assertNotNull(first);\n        assertTrue(second > 0); }\n}"
+          },
+          "ocrNote": "Chữ ArgumentsProvider trên slide gốc bị ngắt dòng tại ArgumentsProvid/er do khung hẹp; đã ghép liền.",
+          "explanation": [
+            "Khác với `@MethodSource` vốn gắn với một method trong class test, `@ArgumentsSource` tách nguồn dữ liệu thành một class độc lập, dễ tái sử dụng cho nhiều lớp kiểm thử khác nhau.",
+            "Tên class test trên slide là `ArgumentSourceParameterizedTest` (không có s) nhưng annotation chuẩn dùng đúng là `@ArgumentsSource`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "@ArgumentsSource",
+          "code": {
+            "lang": "java",
+            "text": "import java.util.stream.Stream;\nimport org.junit.jupiter.api.extension.ExtensionContext;\nimport org.junit.jupiter.params.provider.Arguments;\nimport org.junit.jupiter.params.provider.ArgumentsProvider;\n\npublic class CustomArgumentsProvider1 implements ArgumentsProvider {\n\n    @Override\n    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {\n        System.out.println(\"Arguments provider to test \" + context.getTestMethod().get().getName());\n        return Stream.of(Arguments.of(\"hello\", 1), Arguments.of(\"world\", 2));\n    }\n}"
+          },
+          "explanation": [
+            "`CustomArgumentsProvider1` triển khai `ArgumentsProvider` và override `provideArguments(ExtensionContext context)`.",
+            "Tham số `ExtensionContext` cho phép provider biết ngữ cảnh đang chạy (như tên phương thức test `context.getTestMethod().get().getName()`), từ đó có thể tùy biến dữ liệu trả về qua `Stream.of(Arguments.of(...))`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 33"
+          }
+        }
+      ]
+    },
+    {
+      "h": "5. Mockito — Mocking, Stubbing, Verification & Ví dụ hoàn chỉnh",
+      "text": "Tìm hiểu framework Mockito để cô lập System Under Test (SUT) khỏi các Depended-On Components (DOCs): 3 bước sử dụng (Mocking objects, Setting expectations/Stubbing, Verification) và ví dụ tích hợp JUnit 5 + Mockito kiểm thử LoginController.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 34–44"
+      },
+      "digest": {
+        "keyPoints": [
+          "Mockito là framework mock mã nguồn mở cho Java (phát hành lần đầu 04/2008), dùng để cô lập SUT (System Under Test) khỏi các DOCs (Depended-On Components) như service hoặc repository/DAO kết nối CSDL.",
+          "Quy trình dùng Mockito gồm 3 bước: (1) Mocking objects (`@Mock`, `@InjectMocks` hoặc `Mockito.mock(MyDoc.class)`), (2) Setting expectations / Stubbing (`when(x).thenReturn(y)` / `thenThrow(e)` / `thenAnswer(a)` / `thenCallRealMethod()` hoặc cú pháp `do*().when()`), (3) Verification (`Mockito.verify()` kèm `times(n)`, `never()`, `atLeastOnce()`, `atLeast(n)`, `atMost(n)`, `only()`, `timeout(m)`, và `verifyNoMoreInteractions()`).",
+          "Khi tích hợp Mockito với JUnit 5, phải gắn annotation `@ExtendWith(MockitoExtension.class)` trước lớp test để JUnit 5 tự động khởi tạo `@Mock` và tiêm vào `@InjectMocks`."
+        ],
+        "terms": [
+          {
+            "term": "SUT & DOC",
+            "meaning": "SUT (System Under Test) là đơn vị đang được kiểm thử (ví dụ `LoginController`); DOC (Depended-On Component) là thành phần mà SUT phụ thuộc (ví dụ `LoginService`, `LoginRepository`)."
+          },
+          {
+            "term": "@Mock & @InjectMocks",
+            "meaning": "`@Mock` tạo đối tượng giả cho DOC; `@InjectMocks` tạo thực thể SUT thật và tự động tiêm (inject) các trường `@Mock` vào bên trong nó."
+          },
+          {
+            "term": "Stubbing",
+            "meaning": "Quá trình lập trình kỳ vọng cho đối tượng mock (ví dụ `when(mock.method()).thenReturn(val)`) để định nghĩa giá trị trả về hoặc ngoại lệ khi SUT gọi tới mock."
+          }
+        ],
+        "pitfalls": [
+          "Quên đặt `@ExtendWith(MockitoExtension.class)` trên lớp test JUnit 5 làm các trường `@Mock` và `@InjectMocks` bị `null` (gây `NullPointerException`).",
+          "Nhầm lẫn dùng `@Mock` cho SUT cần test: SUT phải dùng `@InjectMocks` (object thật được tiêm mock), còn DOC mới dùng `@Mock`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "Mockito",
+          "bullets": [
+            "Mockito (http://site.mockito.org/) is a trending open source mock unit testing framework for Java, first released in April 2008.",
+            "Why do we need mock unit in unit test?"
+          ],
+          "explanation": [
+            "Câu hỏi đặt vấn đề 'Why do we need mock unit in unit test?' xuất phát từ nguyên lý Slide 6: unit test phải kiểm thử đơn vị trong trạng thái cô lập.",
+            "Nếu một lớp Controller gọi tới Service và Service gọi xuống cơ sở dữ liệu thật, test chạy chậm, dễ hỏng do dữ liệu DB thay đổi, và không biết lỗi nằm ở Controller hay DB — mock giải quyết triệt để vấn đề đó."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "Mockito",
+          "bullets": [
+            "Mockito is a testing framework that allows mock object creation, stubbing, and verification.",
+            {
+              "text": "Mockito provides an API to isolate the SUT (System Under Test ) and its DOCs (Depended-On Components) . Using Mockito involves three different steps:",
+              "subBullets": [
+                "Mocking objects",
+                "Setting expectations",
+                "Verification"
+              ]
+            }
+          ],
+          "explanation": [
+            "Ba bước chuẩn của Mockito khớp với chu trình Unit test case: bước 1 Mocking objects (Setup), bước 2 Setting expectations/stubbing (Setup kỳ vọng cho DOC), thực thi SUT (Exercise), và bước 3 Verification (Verify kết quả lẫn tương tác với DOC).",
+            "Tách biệt SUT và DOC giúp kiểm thử trọn vẹn từng lớp mà không cần khởi tạo toàn bộ hệ thống hay kết nối thật."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 35"
+          }
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "Mocking object",
+          "bullets": [
+            "A mock object is a dummy implementation for an interface or a class. It allows to define the output of certain method calls. They typically record the interaction with the system and tests can validate that.",
+            {
+              "text": "To create mock object, we can have 2 ways:",
+              "subBullets": [
+                "@Mock annotation on fields",
+                "Using the static mock() method"
+              ]
+            }
+          ],
+          "table": {
+            "headers": [
+              "Mockito API",
+              "Description"
+            ],
+            "rows": [
+              [
+                "@Mock",
+                "This annotation identifies a mock object to be created by Mockito. This is used typically for DOC(s)."
+              ],
+              [
+                "@InjectMocks",
+                "This annotation identifies the object in which the mocks are going to be injected. This is used typically to the unit we want to test, that is, our SUT."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "@Mock\nMyDoc docMock;\n\nMyDoc docMock = Mockito.mock(MyDoc.class)"
+          },
+          "explanation": [
+            "Có 2 cách tạo mock: dùng `@Mock` khai báo field (gọn hơn khi kết hợp `@ExtendWith(MockitoExtension.class)`) hoặc gọi tường minh `Mockito.mock(MyDoc.class)` bên trong phương thức test.",
+            "`@InjectMocks` tự động khởi tạo SUT và bơm các trường `@Mock` vào SUT qua constructor, setter hoặc trực tiếp vào field (như trường `public LoginService loginService` ở Slide 40)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 36"
+          }
+        },
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "Setting expectations",
+          "bullets": [
+            "The differential aspect of mocks object with respect to other test doubles (such as stub) is that mock objects can be programmed with custom expectations according to the needs of the unit test.",
+            "This process in the Mockito is known as stubbing methods, in which these methods belong to the mocks."
+          ],
+          "table": {
+            "headers": [
+              "Mockito API",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Mockito.when(x).thenReturn(y) / Mockito.doReturn(y).when(x)",
+                "These methods allow us to specify the value (y) that should be returned by the stubbed method (x) of a given mock object."
+              ],
+              [
+                "Mockito.when(x).thenThrow(e) / Mockito.doThrow(e).when(x)",
+                "These methods allow us to specify the exception (e) that should be thrown when calling a stubbed method (x) of a given mock object."
+              ],
+              [
+                "Mockito.when(x).thenAnswer(a) / Mockito.doAnswer(a).when(x)",
+                "Unlike returning a hardcoded value, a dynamic user defined logic (Answer a) is executed when a given method (x) of the mock is invoked."
+              ],
+              [
+                "Mockito.when(x).thenCallRealMethod() / Mockito.doCallRealMethod().when(x)",
+                "This method allows us the real implementation of a method instead the mocked one."
+              ]
+            ]
+          },
+          "explanation": [
+            "Mặc định một mock object chưa stub sẽ trả giá trị mặc định (0, false, null, collection rỗng). Stubbing (`when(...).thenReturn(...)` hoặc `thenThrow(...)`) cho phép ép DOC trả đúng tình huống cần thử nghiệm (kể cả lỗi/ngoại lệ hiếm gặp).",
+            "Dạng `doThrow(e).when(mock).voidMethod()` bắt buộc phải dùng thay cho `when(...).thenThrow(...)` khi phương thức của mock có kiểu trả về là `void` (hoặc với Spy object)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 37"
+          }
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "Verification",
+          "bullets": [
+            "Mockito provides a powerful API to carry out different types of verifications."
+          ],
+          "table": {
+            "headers": [
+              "Mockito API",
+              "Description"
+            ],
+            "rows": [
+              [
+                "Mockito.verify()",
+                "This method verifies the invocation of mock objects. This verification can be optionally enhanced using the following methods: times(n): The stubbed method is invoked exactly n times. never(): The stubbed method is never called. atLeastOnce(): The stubbed method is invoked at least once. atLeast(n): The stubbed method is called at least n times. atMost(n): The stubbed method is called at the most n times. only(): A mock fails if any other method is called on the mock object. timeout(m): This method is called in m milliseconds at the most."
+              ],
+              [
+                "Mockito.verifyZeroInteractions() / Mockito.verifyNoMoreInteractions()",
+                "These two methods verify that a stubbed method has no interactions. Internally, they use the same implementation."
+              ]
+            ]
+          },
+          "explanation": [
+            "Không chỉ kiểm tra giá trị trả về bằng `assertEquals`, `Mockito.verify(mock).method(...)` kiểm tra xem SUT có thực sự tương tác đúng số lần với DOC hay không (mặc định `verify(mock)` tương đương `verify(mock, times(1))`).",
+            "`verifyNoMoreInteractions(mock)` đảm bảo ngoài những lệnh gọi đã `verify(...)` trước đó, SUT không âm thầm gọi thêm bất kỳ hàm nào khác trên mock; ở các bản Mockito mới hơn `verifyZeroInteractions` đã deprecated và gộp dùng `verifyNoInteractions` / `verifyNoMoreInteractions`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 38"
+          }
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "Example Mockito and JUnit 5",
+          "paragraphs": [
+            "We suppose that a user interacts with a system made up by three classes:"
+          ],
+          "bullets": [
+            "LoginController: The class which receives the request from the user, returning a response as a result. This request is dispatched to the LoginService component.",
+            "LoginService: This class implements the functionality of the use case. To that aim, it needs to confirm whether or not the user is authenticated in the system. To that, it needs to read the persistence layer, implemented in the LoginRepository class.",
+            "LoginRepository: This class allows to access the persistence layer of the system, typically implemented by means of a database. This class can also be called Data Access Object (DAO)."
+          ],
+          "explanation": [
+            "Kiến trúc 3 tầng chuẩn (Controller → Service → Repository/DAO): khi unit test lớp `LoginController` (SUT), thành phần phụ thuộc trực tiếp của nó là `LoginService` (DOC).",
+            "Thay vì gọi xuống `LoginService` và `LoginRepository` thật vốn đòi hỏi kết nối database, ta chỉ cần mock `LoginService` để cô lập hoàn toàn `LoginController`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 39"
+          }
+        },
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "LoginController",
+          "code": {
+            "lang": "java",
+            "text": "public class LoginController {\n    public LoginService loginService = new LoginService();\n\n    public String login(UserForm userForm) {\n        System.out.println(\"LoginController.login \" + userForm);\n        try {\n            if (userForm == null) { return \"ERROR\"; }\n            else if (loginService.login(userForm)) { return \"OK\"; }\n            else { return \"KO\"; }\n        } catch (Exception e) { return \"ERROR\"; }\n    }\n\n    public void logout(UserForm userForm) {\n        System.out.println(\"LoginController.logout \" + userForm);\n        loginService.logout(userForm);\n    }\n}"
+          },
+          "explanation": [
+            "Hàm `login(UserForm userForm)` có 4 nhánh hành vi cần test: `userForm == null` → `\"ERROR\"` (không gọi `loginService`), `loginService.login` trả `true` → `\"OK\"`, trả `false` → `\"KO\"`, và khi `loginService.login` ném `Exception` → bắt ngoại lệ trả `\"ERROR\"`.",
+            "Trường `loginService` được khởi tạo sẵn `new LoginService()`, nhưng khi chạy test với `@InjectMocks`, Mockito sẽ thay thế trường này bằng đối tượng `@Mock LoginService`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 40"
+          }
+        },
+        {
+          "slideNumber": "Slide 41",
+          "pageNumber": 41,
+          "title": "UserForm",
+          "code": {
+            "lang": "java",
+            "text": "public class UserForm {\n    public String username;\n    public String password;\n\n    public UserForm(String username, String password) {\n        this.username = username;\n        this.password = password;\n    }\n\n    // Getters and setters\n    @Override\n    public String toString() {\n        return \"UserForm [username=\" + username + \", password=\" + password + \"]\";\n    }\n}"
+          },
+          "explanation": [
+            "`UserForm` là lớp mô hình dữ liệu đầu vào (DTO) đóng gói cặp `username` và `password` được truyền từ người dùng vào `LoginController`.",
+            "Phương thức `toString()` giúp lệnh `System.out.println(\"LoginController.login \" + userForm)` trên Slide 40 in ra thông tin đọc được khi chạy test."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 41"
+          }
+        },
+        {
+          "slideNumber": "Slide 42",
+          "pageNumber": 42,
+          "title": "Test LoginController using JUnit 5 and Mockito",
+          "code": {
+            "lang": "java",
+            "text": "@ExtendWith(MockitoExtension.class)\nclass LoginControllerLoginTest {\n    // Mocking objects\n    @InjectMocks\n    LoginController loginController;\n\n    @Mock\n    LoginService loginService;\n    // Test data\n    UserForm userForm = new UserForm(\"foo\", \"bar\");\n    @Test\n    void testLoginOk() {\n        // Setting expectations (stubbing methods)\n        when(loginService.login(userForm)).thenReturn(true);\n        // Exercise SUT\n        String reseponseLogin = loginController.login(userForm);\n        // Verification\n        assertEquals(\"OK\", reseponseLogin);\n        verify(loginService).login(userForm);\n        verifyNoMoreInteractions(loginService);\n    }\n}"
+          },
+          "ocrNote": "Slide gốc đặt tên biến là reseponseLogin (gõ dư chữ e trong response); đã giữ nguyên văn để khớp với tài liệu gốc.",
+          "explanation": [
+            "Ví dụ minh họa đầy đủ 3 bước Mockito kết hợp JUnit 5: `@InjectMocks` gắn cho `loginController` (SUT), `@Mock` gắn cho `loginService` (DOC), stub `when(loginService.login(userForm)).thenReturn(true)`.",
+            "Ở bước Verification, test vừa kiểm tra giá trị trả về bằng `assertEquals(\"OK\", reseponseLogin)`, vừa kiểm tra tương tác bằng `verify(loginService).login(userForm)` và `verifyNoMoreInteractions(loginService)` (đảm bảo `logout` không bị gọi nhầm)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 42"
+          }
+        },
+        {
+          "slideNumber": "Slide 43",
+          "pageNumber": 43,
+          "title": "Notes",
+          "bullets": [
+            "Data in test case includes: input data and expected result",
+            "Define before the class when use Mockito"
+          ],
+          "code": {
+            "lang": "java",
+            "text": "@ExtendWith(MockitoExtension.class)"
+          },
+          "explanation": [
+            "Lưu ý 1 nhấn mạnh lại khái niệm test data đầy đủ: không chỉ có input (`userForm`) mà luôn phải đi kèm expected result (`\"OK\"`) để làm cơ sở cho assertion.",
+            "Lưu ý 2 nhắc quên `@ExtendWith(MockitoExtension.class)` trên đầu test class là lỗi rất phổ biến khi làm lab/thi trên JUnit 5 + Mockito (trong JUnit 4 trước đây dùng `@RunWith(MockitoJUnitRunner.class)`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 43"
+          }
+        },
+        {
+          "slideNumber": "Slide 44",
+          "pageNumber": 44,
+          "title": "Summary",
+          "bullets": [
+            "Test case",
+            "JUnit",
+            "Mockito"
+          ],
+          "explanation": [
+            "Tổng kết toàn bộ Lecture 4–5 qua 3 trụ cột: nắm quy trình 4 pha của Test case (Setup, Exercise, Verify, Teardown), làm chủ JUnit 5 (kiến trúc, lifecycle, assertions, dynamic & parameterized tests) và sử dụng Mockito để cô lập SUT khỏi DOC.",
+            "Bộ kỹ năng này là nền tảng bắt buộc cho các bài thực hành kiểm thử tự động trong dự án Java và đề thi SE1."
+          ],
+          "source": {
+            "file": "Resources/Lecture 4_5.pdf",
+            "loc": "Slide 44"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l04-c01", "front": "4 pha của một unit test case?", "back": "Setup, Exercise, Verify, Teardown.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 6, 11" } },
-    { "id": "se1-l04-c02", "front": "Ba thành phần của JUnit 5?", "back": "Platform, Jupiter, Vintage.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 8" } },
-    { "id": "se1-l04-c03", "front": "assertTimeout khác assertTimeoutPreemptively?", "back": "assertTimeout chờ thao tác xong dù vượt hạn; assertTimeoutPreemptively hủy thực thi ngay khi quá hạn.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 16" } },
-    { "id": "se1-l04-c04", "front": "@BeforeAll và @AfterAll có yêu cầu gì?", "back": "Phải là static method (tương đương @BeforeClass/@AfterClass của JUnit 4).", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 12" } },
-    { "id": "se1-l04-c05", "front": "@Mock và @InjectMocks khác nhau?", "back": "@Mock tạo mock cho DOC; @InjectMocks đánh dấu SUT được inject các @Mock.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 36" } },
-    { "id": "se1-l04-c06", "front": "@TestFactory phải trả về kiểu gì?", "back": "Stream, Collection, Iterable hoặc Iterator của DynamicTest; trả List<String> sẽ ném exception.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 20–22" } }
+    {
+      "id": "se1-l04-c01",
+      "front": "Bốn mức kiểm thử trong kim tự tháp (Slide 4) và phân nhóm Verification vs Validation?",
+      "back": "Từ đáy lên đỉnh: Unit testing, Integration testing, System testing (thuộc Development testing / verification); đỉnh là Acceptance testing (thuộc User testing / validation).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "se1-l04-c02",
+      "front": "Bốn pha thực thi tuần tự trong một unit test case (Slide 6)?",
+      "back": "1. Setup (khởi tạo test fixture) → 2. Exercise (chạy unit với input để lấy actual value) → 3. Verify (so sánh với expected value) → 4. Teardown (dọn dẹp đưa về trạng thái ban đầu).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 6"
+      }
+    },
+    {
+      "id": "se1-l04-c03",
+      "front": "Ba thành phần kiến trúc chính của JUnit 5 (Slide 8)?",
+      "back": "Platform (khởi chạy test trên JVM và kết nối IDE/Maven/Gradle), Jupiter (mô hình lập trình & extension mới cho JUnit 5), và Vintage (chạy test JUnit 3/4 cũ).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l04-c04",
+      "front": "Bảng quy đổi annotation vòng đời từ JUnit 5 sang JUnit 4 (Slides 9, 11)?",
+      "back": "@BeforeAll ↔ @BeforeClass | @BeforeEach ↔ @Before | @AfterEach ↔ @After | @AfterAll ↔ @AfterClass | @Test ↔ @Test.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 9, 11"
+      }
+    },
+    {
+      "id": "se1-l04-c05",
+      "front": "Thứ tự chạy vòng đời JUnit 5 cho một class có 2 phương thức @Test (Slides 10, 12)?",
+      "back": "@BeforeAll (static) → [@BeforeEach → @Test 1 → @AfterEach] → [@BeforeEach → @Test 2 → @AfterEach] → @AfterAll (static).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 10, 12"
+      }
+    },
+    {
+      "id": "se1-l04-c06",
+      "front": "Ý nghĩa của @Disabled, @DisplayName, @Tag, @AutoClose, @RepeatedTest (Slide 13)?",
+      "back": "@Disabled: bỏ qua test; @DisplayName: tên hiển thị tùy chỉnh; @Tag: gắn nhãn để lọc test; @AutoClose: tự đóng tài nguyên field; @RepeatedTest: chạy lặp test N lần.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "se1-l04-c07",
+      "front": "Phân biệt `assertEquals` và `assertSame` trong JUnit Jupiter (Slide 15)?",
+      "back": "`assertEquals` kiểm tra 2 đối tượng bằng nhau về giá trị (`equals()`), còn `assertSame` kiểm tra có trỏ tới đúng cùng một instance trong bộ nhớ (`==`) hay không.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "se1-l04-c08",
+      "front": "Công dụng của `assertAll` và `assertThrows` (Slides 16–18)?",
+      "back": "`assertAll` thực thi toàn bộ nhóm các assertion lambda và báo gộp mọi lỗi cùng lúc; `assertThrows(Ex.class, executable)` xác nhận ngoại lệ được ném và trả về đối tượng ngoại lệ đó.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 16–18"
+      }
+    },
+    {
+      "id": "se1-l04-c09",
+      "front": "Sự khác biệt giữa `assertTimeout` và `assertTimeoutPreemptively` (Slides 16, 18–19)?",
+      "back": "`assertTimeout` chờ thao tác kết thúc hoàn toàn rồi mới kiểm tra vượt giờ; `assertTimeoutPreemptively` ngắt thực thi ngay lập tức khi vượt quá thời gian timeout.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 16, 18–19"
+      }
+    },
+    {
+      "id": "se1-l04-c10",
+      "front": "Phương thức `@TestFactory` cho Dynamic Tests bắt buộc trả về những kiểu nào (Slides 21–22)?",
+      "back": "Phải trả về `Stream`, `Collection`, `Iterable` hoặc `Iterator` chứa các đối tượng `DynamicTest` (nếu trả về kiểu khác như `List<String>` sẽ ném ngoại lệ).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 21–22"
+      }
+    },
+    {
+      "id": "se1-l04-c11",
+      "front": "6 annotation cung cấp dữ liệu cho `@ParameterizedTest` (Slides 25–33)?",
+      "back": "@ValueSource (mảng literal), @EnumSource (enum), @MethodSource (method static trả về Stream), @CsvSource (chuỗi CSV nội tuyến), @CsvFileSource (tệp CSV trên classpath), @ArgumentsSource (class implements ArgumentsProvider).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 25–33"
+      }
+    },
+    {
+      "id": "se1-l04-c12",
+      "front": "3 bước sử dụng Mockito để cô lập SUT khỏi DOCs (Slide 35)?",
+      "back": "1. Mocking objects (@Mock / Mockito.mock(), @InjectMocks) → 2. Setting expectations / Stubbing (when(...).thenReturn(...) / thenThrow(...)) → 3. Verification (Mockito.verify(), verifyNoMoreInteractions()).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 35"
+      }
+    },
+    {
+      "id": "se1-l04-c13",
+      "front": "Phân biệt `@Mock` và `@InjectMocks` trong Mockito (Slides 36, 42)?",
+      "back": "`@Mock` đánh dấu đối tượng giả cho DOC (như `LoginService`); `@InjectMocks` đánh dấu SUT thật (như `LoginController`) để Mockito tự tiêm các `@Mock` vào bên trong nó.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 36, 42"
+      }
+    },
+    {
+      "id": "se1-l04-c14",
+      "front": "Annotation bắt buộc gắn trước test class JUnit 5 khi dùng `@Mock` và `@InjectMocks` (Slides 42–43)?",
+      "back": "`@ExtendWith(MockitoExtension.class)` để JUnit 5 kích hoạt extension khởi tạo mock và thực hiện inject trước khi chạy các `@Test`.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 42–43"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l04-q01", "stem": "Annotation JUnit 5 nào tương đương @Before của JUnit 4?", "options": ["@BeforeAll", "@BeforeEach", "@Test", "@Setup"], "answer": 1, "explanation": "@BeforeEach = @Before; @BeforeAll = @BeforeClass.", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 9–12" } },
-    { "id": "se1-l04-q02", "stem": "Annotation nào dùng với lớp tùy biến implement ArgumentsProvider?", "options": ["@ValueSource", "@MethodSource", "@ArgumentsSource", "@CsvSource"], "answer": 2, "explanation": "@ArgumentsSource dùng lớp ArgumentsProvider tự viết (provideArguments).", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slides 25–33" } },
-    { "id": "se1-l04-q03", "stem": "Acceptance testing thuộc nhóm nào?", "options": ["Development testing (verification)", "User testing (validation)", "Unit testing", "Integration testing"], "answer": 1, "explanation": "Slide 4: Acceptance là user testing (validation).", "source": { "file": "Resources/Lecture 4_5.pdf", "loc": "Slide 4" } }
+    {
+      "id": "se1-l04-q01",
+      "stem": "Theo kim tự tháp kiểm thử ở Slide 4, mức kiểm thử nào thuộc nhóm User testing (validation)?",
+      "options": [
+        "Unit testing",
+        "Integration testing",
+        "System testing",
+        "Acceptance testing"
+      ],
+      "answer": 3,
+      "explanation": "Slide 4: Acceptance testing nằm ở đỉnh kim tự tháp thuộc User testing (validation), còn Unit, Integration và System testing thuộc Development testing (verification).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "se1-l04-q02",
+      "stem": "Một class test JUnit 5 có 1 phương thức `@BeforeAll`, 1 `@BeforeEach`, 2 phương thức `@Test`, 1 `@AfterEach` và 1 `@AfterAll`. Tổng số lần `@BeforeEach` và `@BeforeAll` được gọi lần lượt là bao nhiêu?",
+      "options": [
+        "@BeforeEach chạy 1 lần, @BeforeAll chạy 2 lần",
+        "@BeforeEach chạy 2 lần, @BeforeAll chạy 1 lần",
+        "Cả hai đều chạy 2 lần",
+        "Cả hai đều chạy 1 lần"
+      ],
+      "answer": 1,
+      "explanation": "Slide 10 & Slide 12: @BeforeAll chạy duy nhất 1 lần trước toàn bộ class test, còn @BeforeEach chạy trước mỗi @Test (tức 2 lần cho 2 test).",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 10, 12"
+      }
+    },
+    {
+      "id": "se1-l04-q03",
+      "stem": "Thành phần nào trong kiến trúc JUnit 5 đảm nhiệm việc chạy lại các test case viết theo JUnit 3 hoặc JUnit 4 cũ?",
+      "options": [
+        "JUnit Jupiter",
+        "JUnit Platform",
+        "JUnit Vintage",
+        "MockitoExtension"
+      ],
+      "answer": 2,
+      "explanation": "Slide 8: Sơ đồ kiến trúc JUnit 5 cho thấy 'Old test (JUnit)' chạy thông qua thành phần Vintage để kết nối xuống Platform.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l04-q04",
+      "stem": "Điều gì xảy ra khi chạy `GroupedAssertionsTest` ở Slide 17 (`Address(\"John\", \"Smith\")`, `assertAll(\"address\", () -> assertEquals(\"John\", address.getFirstName()), () -> assertEquals(\"User\", address.getLastName()))`)?",
+      "options": [
+        "Assertion thứ nhất pass nên assertion thứ hai không chạy",
+        "Cả hai assertion đều được thực thi và báo lỗi cho getLastName()",
+        "Chương trình ném lỗi biên dịch vì dùng lambda trong assertAll",
+        "assertAll luôn bỏ qua mọi lỗi bên trong lambda"
+      ],
+      "answer": 1,
+      "explanation": "Slide 16–17: Trong `assertAll`, mọi assertion bên trong luôn được chạy toàn bộ và tất cả lỗi (nếu có) sẽ được báo cáo cùng nhau.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 16–17"
+      }
+    },
+    {
+      "id": "se1-l04-q05",
+      "stem": "Khi thực thi `assertTimeoutPreemptively(ofMillis(10), () -> { Thread.sleep(100); })` (Slide 19), hành vi nào diễn ra?",
+      "options": [
+        "Chờ đủ 100ms cho Thread.sleep chạy xong rồi mới báo pass",
+        "Chờ đủ 100ms cho Thread.sleep chạy xong rồi mới báo fail",
+        "Hủy thực thi ngay khi vượt quá ngưỡng 10ms mà không chờ hết 100ms",
+        "Tự động bỏ qua test như @Disabled"
+      ],
+      "answer": 2,
+      "explanation": "Slide 16 & Slide 19: Khác với `assertTimeout` (chờ kết thúc thao tác), `assertTimeoutPreemptively` ngắt thực thi ngay khi vượt quá thời gian timeout kỳ vọng.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 16, 19"
+      }
+    },
+    {
+      "id": "se1-l04-q06",
+      "stem": "Vì sao phương thức `List<String> dynamicTestsWithInvalidReturnType()` gắn `@TestFactory` ở Slide 22 lại ném ngoại lệ khi chạy?",
+      "options": [
+        "Vì @TestFactory không hỗ trợ List",
+        "Vì @TestFactory bắt buộc phải trả về Stream, Collection, Iterable hoặc Iterator các đối tượng DynamicTest",
+        "Vì thiếu annotation @Test đi kèm @TestFactory",
+        "Vì Arrays.asList(\"Hello\") trả về null"
+      ],
+      "answer": 1,
+      "explanation": "Slides 21–22: Phương thức `@TestFactory` phải trả về `Stream`, `Collection`, `Iterable` hoặc `Iterator` của `DynamicTest`; trả về `List<String>` là không hợp lệ.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 21–22"
+      }
+    },
+    {
+      "id": "se1-l04-q07",
+      "stem": "Với `@ParameterizedTest` + `@CsvSource({ \"hello, 1\", \"world, 2\", \"'happy, testing', 3\" })` (Slide 31), có bao nhiêu lần gọi `testWithCsvSource(String first, int second)` và giá trị ở lần thứ 3 là gì?",
+      "options": [
+        "4 lần; lần 3 có first = \"'happy\"",
+        "3 lần; lần 3 có first = \"happy, testing\" và second = 3",
+        "2 lần vì dòng 3 bị lỗi dấu phẩy trong chuỗi",
+        "3 lần; lần 3 có second mang kiểu String \"3\""
+      ],
+      "answer": 1,
+      "explanation": "Slides 30–31: Mảng có 3 chuỗi CSV nên test chạy 3 lần; dấu nháy đơn `'happy, testing'` giữ nguyên dấu phẩy trong `first`, còn `\"3\"` được tự động chuyển đổi sang `int 3`.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 30–31"
+      }
+    },
+    {
+      "id": "se1-l04-q08",
+      "stem": "Khi tự tạo nguồn tham số tái sử dụng với `@ArgumentsSource`, lớp provider cần implement interface nào của JUnit 5 (Slides 32–33)?",
+      "options": [
+        "java.util.Iterator",
+        "org.junit.jupiter.params.provider.ArgumentsProvider",
+        "org.junit.jupiter.api.extension.BeforeEachCallback",
+        "org.mockito.stubbing.Answer"
+      ],
+      "answer": 1,
+      "explanation": "Slides 32–33: Custom provider phải implement `org.junit.jupiter.params.provider.ArgumentsProvider` và override `provideArguments(ExtensionContext)` trả về `Stream<? extends Arguments>`.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 32–33"
+      }
+    },
+    {
+      "id": "se1-l04-q09",
+      "stem": "Trong `LoginControllerLoginTest` (Slide 42), vì sao dùng `@InjectMocks` cho `LoginController` và `@Mock` cho `LoginService`?",
+      "options": [
+        "Vì LoginService là SUT cần kiểm thử còn LoginController là DAO",
+        "Vì LoginController là SUT được test thật và cần tiêm đối tượng giả (mock) LoginService (DOC) vào để cô lập",
+        "Vì Mockito chỉ chạy được nếu cả SUT lẫn DOC đều là mock",
+        "Vì UserForm không thể khởi tạo bằng từ khóa new"
+      ],
+      "answer": 1,
+      "explanation": "Slides 35–36, 39, 42: `@InjectMocks` dùng cho SUT (`LoginController`), còn `@Mock` dùng cho DOC (`LoginService`) để Mockito tạo mock và tiêm vào controller.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 35–36, 42"
+      }
+    },
+    {
+      "id": "se1-l04-q10",
+      "stem": "Lệnh `verify(loginService).login(userForm);` và `verifyNoMoreInteractions(loginService);` ở Slide 42 có ý nghĩa gì?",
+      "options": [
+        "Giả lập cho loginService.login trả về true",
+        "Kiểm tra loginService.login(userForm) được gọi đúng 1 lần và không có lời gọi nào khác tới loginService",
+        "Ngắt kết nối database sau khi chạy test",
+        "Tự động khởi tạo lại các trường @Mock cho test kế tiếp"
+      ],
+      "answer": 1,
+      "explanation": "Slides 38, 42: `verify(mock).method(...)` mặc định xác minh phương thức được gọi đúng 1 lần (`times(1)`), và `verifyNoMoreInteractions(mock)` khẳng định không còn tương tác nào khác phát sinh trên mock.",
+      "source": {
+        "file": "Resources/Lecture 4_5.pdf",
+        "loc": "Slides 38, 42"
+      }
+    }
   ]
 }

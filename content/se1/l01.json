@@ -1,24 +1,1439 @@
 {
-  "id": "se1-l01", "order": 1,
+  "id": "se1-l01",
+  "order": 1,
   "title": "Lecture 1: Review of OOP",
-  "summary": [
-    { "h": "Procedural vs OOP", "text": "Procedural programming dùng danh sách thủ tục để chỉ máy làm từng bước; OOP dùng tập đối tượng tương tác với nhau. Thêm hình Amoeba (phát .mp3, xoay quanh một đầu) vào code thủ tục phải sửa và test lại các thủ tục cũ; trong OOP chỉ thêm/sửa lớp Amoeba. Lợi ích OOP: dữ liệu an toàn hơn, dễ bảo trì, dễ mở rộng, tái sử dụng qua inheritance và polymorphism." },
-    { "h": "Encapsulation", "text": "Giữ instance variable ẩn (thường private) và cung cấp accessor public set<Property>/get<Property>; khi yêu cầu đổi (ví dụ size > 0) chỉ cần sửa setSize()." },
-    { "h": "Inheritance và type hierarchy", "text": "Đưa thuộc tính chung (address, name, phone) của Programmer và Manager lên superclass Employee. Lợi ích: lớp nhỏ gọn, dễ sửa thuộc tính chung, mở rộng, tái sử dụng, loại trùng lặp. Một subtype có thể kế thừa nhiều supertype nhưng chỉ một supertype là class, còn lại là interface. IS-A dựa trên inheritance/interface (Horse IS-A Animal); HAS-A dựa trên composition (Horse HAS-A Hat)." },
-    { "h": "Polymorphism và reference variable", "text": "Polymorphism là nhiều dạng: một đối tượng có hành vi khác nhau tùy ngữ cảnh. Kiểu khai báo của reference variable quyết định method gọi được lúc compile; biến có thể trỏ tới đối tượng cùng kiểu hoặc bất kỳ subtype. Dynamic method dispatching chọn cài đặt theo kiểu thực tế (runtime type) của đối tượng khi method bị override." },
-    { "h": "Liskov Substitution Principle", "text": "Đối tượng của superclass có thể được thay bằng đối tượng của subclass mà không làm sai chương trình. Ba quy tắc: Signature rule (subtype có đủ method của supertype; kiểu trả về cùng hoặc là subtype; ném ít exception hơn hoặc hẹp hơn); Methods rule (subtype có thể làm yếu precondition và làm mạnh postcondition); Properties rule (subtype phải bảo toàn các invariant của supertype)." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 1.pdf",
+    "totalPages": 36,
+    "extractedPages": 36,
+    "ocrNotes": [
+      "Slide 6: Hình chụp 3 lớp Square/Circle/Triangle bị xếp chồng che khuất phần đuôi một số dòng comment trong Square và Circle (đã đánh dấu [?cần kiểm tra]); đề bài ghi .flac nhưng hình minh họa ghi AIF file.",
+      "Slide 14: Cột P2 code trên slide gốc ghi nhầm tên lớp là 'Public class BadOO' thay vì BetterOO (giữ nguyên văn trên slide).",
+      "Slide 31: Slide gốc viết 'Signature compatition' (lỗi chính tả từ 'compatibility', giữ nguyên văn)."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 1.pdf",
+      "loc": "Slides 1–36 (đầy đủ 36/36 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 1.pdf", "loc": "Slides 1–36" }],
+  "summary": [
+    {
+      "h": "Giới thiệu bài giảng, Mục lục & Tài liệu tham khảo",
+      "text": "Giới thiệu môn học 61FIT3SE1 - Software Engineering 1, nội dung ôn tập OOP gồm 4 trụ cột/chủ đề (Procedural vs OOP, Encapsulation, Inheritance, Polymorphism) và 3 tài liệu tham khảo chính.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 1–3"
+      },
+      "digest": {
+        "keyPoints": [
+          "Lecture 1 thuộc môn 61FIT3SE1 - Software Engineering 1, hệ thống lại kiến thức OOP nền tảng bằng Java trước khi học Exception, Iteration, Unit Test và thiết kế phần mềm.",
+          "4 nội dung chính trong Outline: (1) OOP và Procedural Programming, (2) Encapsulation, (3) Inheritance, (4) Polymorphism (kèm Liskov Substitution Principle).",
+          "Giáo trình tham khảo cốt lõi cho chương này là Head First Java (ch. 2), OCP Java SE8 Programmer II Exam Guide (ch. 2) và Guttag & Liskov - Program Development in Java (ch. 7.9)."
+        ],
+        "terms": [
+          {
+            "term": "OOP (Object-Oriented Programming)",
+            "meaning": "Lập trình hướng đối tượng — mô hình hóa chương trình bằng tập hợp các đối tượng tương tác với nhau, xoay quanh đóng gói, kế thừa và đa hình."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 1: Review of OOP",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 1",
+            "Review of OOP"
+          ],
+          "explanation": [
+            "Slide mở đầu giới thiệu tên bài giảng số 1: \"Review of OOP\" của học phần 61FIT3SE1 - Software Engineering 1.",
+            "Mục tiêu của bài là ôn tập lại tư duy hướng đối tượng và nâng tầm lên góc nhìn thiết kế phần mềm (đặc biệt là nguyên lý thay thế Liskov cho kế thừa/đa hình)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Outline",
+          "bullets": [
+            "OOP and Procedural Programming",
+            "Encapsulation",
+            "Inheritance",
+            "Polymorphism"
+          ],
+          "explanation": [
+            "Outline chia bài giảng thành 4 phần tuần tự: so sánh lập trình thủ tục với OOP, tính đóng gói (Encapsulation), tính kế thừa (Inheritance) và tính đa hình (Polymorphism).",
+            "Khi ôn tập, bạn nên đi theo đúng mạch này để hiểu vì sao mỗi cơ chế của OOP ra đời nhằm giảm chi phí sửa đổi và kiểm thử lại phần mềm."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "References",
+          "bullets": [
+            "Kathy, Bert & Trisha, Head First Java, chapter 2",
+            "Kathy, Bert & ElisaBeth, OCP Java SE8 programmer II Exam Guide, chapter 2",
+            "Guttag, Liskov, Program development in Java, chapter 7.9"
+          ],
+          "explanation": [
+            "Slide liệt kê 3 tài liệu gốc được dùng để biên soạn bài giảng: ví dụ hình học/Amoeba lấy từ Head First Java (chương 2), các quy tắc reference variable/OOP lấy từ OCP Java SE8 Exam Guide, còn phần Substitution Principle lấy từ sách của Liskov & Guttag (mục 7.9).",
+            "Đặc biệt phần Substitution Principle (Slides 29–33) của Liskov & Guttag là trọng tâm lý thuyết hay được hỏi sâu trong môn SE1."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 3"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Lập trình thủ tục vs Lập trình hướng đối tượng (Procedural vs OOP)",
+      "text": "So sánh trực tiếp lập trình thủ tục (P1) và OOP (P2) qua bài toán GUI các hình (Square, Circle, Triangle) khi có thay đổi yêu cầu thêm hình Amoeba và đổi tâm xoay.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 4–10"
+      },
+      "digest": {
+        "keyPoints": [
+          "Procedural programming dùng danh sách các thủ tục (functions, routines, subroutines) chỉ thị máy tính thực hiện từng bước.",
+          "OOP dùng tập hợp các đối tượng tương tác với nhau để đạt hành vi mong muốn của chương trình.",
+          "Khi thêm yêu cầu hình Amoeba (phát file .mp3 thay vì .flac) và đổi cách xoay (quanh điểm một đầu như kim đồng hồ thay vì tâm hình chữ nhật bao): P1 phải sửa cả playSound() lẫn chữ ký rotate(shapeNum, xPt, yPt) và kiểm thử lại toàn bộ code cũ; P2 chỉ thêm lớp Amoeba hoặc sửa riêng trong Amoeba mà không chạm vào code các hình đã test.",
+          "4 lợi ích chính của OOP: bảo mật dữ liệu hơn (more secure in data), dễ bảo trì (maintain), dễ mở rộng (extend) và tăng tái sử dụng mã nguồn qua inheritance và polymorphism."
+        ],
+        "terms": [
+          {
+            "term": "Procedural programming",
+            "meaning": "Mô hình lập trình dùng danh sách thủ tục/hàm thực thi tuần tự từng bước để xử lý dữ liệu."
+          },
+          {
+            "term": "OOP",
+            "meaning": "Mô hình lập trình sử dụng tập hợp đối tượng (gồm trạng thái và hành vi) tương tác với nhau."
+          }
+        ],
+        "pitfalls": [
+          "Khi trả lời vì sao OOP thắng thế ở tình huống Amoeba, cần nhấn mạnh khía cạnh kiểm thử: P1 phải chạm vào code đã test trước đó nên phải test lại toàn bộ (regression test rộng), còn P2 cô lập thay đổi trong lớp mới/lớp Amoeba."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "OOP and Procedural Programming",
+          "paragraphs": [
+            "OOP and Procedural Programming"
+          ],
+          "explanation": [
+            "Slide chuyển mục mở đầu Phần 1: đối chiếu tư duy Lập trình thủ tục (Procedural Programming) và Lập trình hướng đối tượng (OOP).",
+            "Trọng tâm phần này không chỉ là định nghĩa lý thuyết mà dùng một tình huống thay đổi yêu cầu thực tế (requirement change) để chứng minh lợi thế bảo trì của OOP."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "OOP and Procedural Programming",
+          "bullets": [
+            "Procedural programming uses a list of procedures to tell the computer what to do step-by-step. The procedures are the functions, routines, or subroutines that consist of the computational steps required to be carried.",
+            "OOP uses a set of objects that interacts with each other to achieve the program’s intended behavior."
+          ],
+          "explanation": [
+            "Định nghĩa rõ điểm khác biệt về đơn vị tổ chức chương trình: Procedural xoay quanh chuỗi các hàm/thủ tục (functions/routines/subroutines) chạy từng bước, còn OOP xoay quanh các đối tượng tương tác qua thông điệp (gọi phương thức).",
+            "Trong bài toán lớn, tách dữ liệu và hàm rời nhau kiểu thủ tục khiến một thay đổi nhỏ dễ lan ra nhiều hàm xử lý."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "OOP and Procedural Programming — Bài toán các hình trên GUI",
+          "bullets": [
+            "Requirement: there will be shapes on GUI, a square, a circle, and a trigangle. When the user clicks on a shape, the shape will rotate clockwise 360 degree and play a .flac song file specific to that shape."
+          ],
+          "table": {
+            "headers": [
+              "Procedural programming : P1",
+              "OOP: P2"
+            ],
+            "rows": [
+              [
+                "Write procedures: rotate(shapeNum) and playSound(shapeNum)",
+                "3 classes: Square, Circle, Triangle"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// Procedural programming : P1\nrotate(shapeNum) {\n// make the shape rotate 360º\n}\nplaySound(shapeNum) {\n// use shapeNum to lookup which\n// Flac sound to play, and play it\n}"
+          },
+          "diagramText": [
+            "OOP: P2 — 3 class boxes xếp chồng nhau:",
+            "  [Square]",
+            "    rotate() {",
+            "      // code to rotate a s[?cần kiểm tra]",
+            "    }",
+            "    playSound() {",
+            "      // code to play the A[?cần kiểm tra]",
+            "      // for a square",
+            "    }",
+            "  [Circle]",
+            "    rotate() {",
+            "      // code to rotate a c[?cần kiểm tra]",
+            "    }",
+            "    playSound() {",
+            "      // code to play the A[?cần kiểm tra]",
+            "      // for a circle",
+            "    }",
+            "  [Triangle]",
+            "    rotate() {",
+            "      // code to rotate a triangle",
+            "    }",
+            "    playSound() {",
+            "      // code to play the AIF file",
+            "      // for a triangle",
+            "    }"
+          ],
+          "diagramNote": "Cột P1 viết 2 thủ tục chung dùng tham số shapeNum để rẽ nhánh, còn cột P2 tạo 3 lớp riêng biệt (Square, Circle, Triangle) mà mỗi lớp tự cài đặt rotate() và playSound().",
+          "ocrNote": "Slide gốc viết nhầm 'trigangle' (triangle). Ảnh 3 hộp lớp ở cột OOP bị xếp chồng nên phần đuôi chữ ở hộp Square và Circle bị che khuất (đã đánh dấu [?cần kiểm tra]); hình mẫu ghi 'AIF file' thay vì '.flac'.",
+          "explanation": [
+            "Thiết lập bài toán khởi điểm giữa 2 lập trình viên P1 (thủ tục) và P2 (OOP): giao diện có 3 hình Square, Circle, Triangle; khi click sẽ xoay 360 độ theo chiều kim đồng hồ và phát file âm thanh riêng.",
+            "Lúc ban đầu khi yêu cầu chưa đổi, cách viết 2 thủ tục `rotate(shapeNum)` và `playSound(shapeNum)` của P1 trông có vẻ ngắn gọn hơn việc tạo 3 lớp của P2 — nhưng sự khác biệt sẽ bộc lộ ở 2 slide tiếp theo."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 6"
+          }
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "OOP and Procedural Programming — Thay đổi yêu cầu: Thêm Amoeba",
+          "paragraphs": [
+            "There is a requirement change: There will be an amoeba shape on the screen, with the others. When user clicks on the amoeba, it will rotate like others, and play .mp3 sound file."
+          ],
+          "table": {
+            "headers": [
+              "Procedural programming : P1",
+              "OOP: P2"
+            ],
+            "rows": [
+              [
+                "The rotate procedure would still work; But playSound would have to change.",
+                "new class: Amoeba"
+              ],
+              [
+                "Touch previously tested code so need to change code test and test all code again.",
+                "Don’t have to touch code he’d already tested and delivered. Only test new added code."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "playSound(shapeNum) {\n// if the shape is not an amoeba\n// use shapeNum to lookup which\n// Flac sound to play, and play it\n// else\n// play amoeba .mp3 sound}"
+          },
+          "diagramText": [
+            "Bên phải đề bài: hình vẽ đường viền hình học bất định của Amoeba.",
+            "Trong cột OOP: P2 — hộp lớp [Amoeba]:",
+            "  rotate() {",
+            "    // code to rotate an amoeba",
+            "  }",
+            "  playSound() {",
+            "    // code to play the new",
+            "    // .mp3 file for an amoeba",
+            "  }"
+          ],
+          "diagramNote": "So sánh tác động khi thêm hình Amoeba phát file .mp3: P1 phải chèn if/else vào hàm playSound() cũ đang chạy ổn định, còn P2 chỉ tạo thêm lớp Amoeba mới.",
+          "explanation": [
+            "Yêu cầu thay đổi lần 1: thêm hình Amoeba xoay giống các hình khác nhưng phát file `.mp3` thay vì `.flac`.",
+            "P1 buộc phải mở hàm `playSound(shapeNum)` đã viết và kiểm thử xong để thêm nhánh `if/else`, dẫn tới rủi ro làm hỏng chức năng của các hình cũ và phải test lại toàn bộ.",
+            "P2 chỉ viết thêm lớp `Amoeba` độc lập, hoàn toàn không động vào các lớp `Square`, `Circle`, `Triangle` đã bàn giao — chỉ cần test phần code mới thêm."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "OOP and Procedural Programming — Thay đổi tâm xoay của Amoeba",
+          "bullets": [
+            "There is a mistake in requirement analysis. That’s not how the amoeba is supposed to rotate.",
+            {
+              "text": "Turns out, both programmers had written their rotate code like this:",
+              "subBullets": [
+                "determine the rectangle that surrounds the shape.",
+                "calculate the center of that rectangle, and rotate the shape around that point."
+              ]
+            },
+            "But the amoeba shape was supposed to rotate around a point on one end, like a clock hand."
+          ],
+          "diagramText": [
+            "Hình 1 (Tam giác trong khung chữ nhật): tâm xoay 'o' nằm ở giao điểm 2 đường nét đứt tại chính giữa hình chữ nhật bao.",
+            "Hình 2 (Amoeba ban đầu): tâm xoay 'o' nằm ở tâm hình chữ nhật bao → mũi tên chỉ sang Hình 3.",
+            "Hình 3 (Amoeba sau khi sửa): tâm xoay 'o' nằm lệch về một đầu của hình amoeba (quay như kim đồng hồ)."
+          ],
+          "diagramNote": "Minh họa nhầm lẫn phân tích yêu cầu: cách xoay mặc định tính tâm của hình chữ nhật bao quanh hình, trong khi Amoeba phải xoay quanh một điểm ở một đầu.",
+          "explanation": [
+            "Yêu cầu thay đổi lần 2 (do sai sót lúc phân tích yêu cầu): cả P1 và P2 ban đầu đều xoay mọi hình quanh tâm của hình chữ nhật bao quanh (bounding rectangle).",
+            "Thực tế, hình Amoeba phải xoay quanh một điểm ở một đầu (giống kim đồng hồ), nghĩa là `Amoeba` cần thêm trạng thái tọa độ điểm xoay riêng (`xPoint`, `yPoint`) và cách tính `rotate()` khác hẳn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "OOP and Procedural Programming — Tác động khi sửa logic rotate",
+          "table": {
+            "headers": [
+              "Procedural programming : P1",
+              "OOP: P2"
+            ],
+            "rows": [
+              [
+                "Add rotation point arguments to the rotate procedure.",
+                "modified the rotate method, but only in the Amoeba class."
+              ],
+              [
+                "A lot of code was affected. So need to test all code again.",
+                "Don’t touch the tested, working, compiled code for the other parts of the program. Only test new added code."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "rotate(shapeNum, xPt, yPt) {\n// if the shape is not an amoeba,\n// calculate the center point\n// based on a rectangle,\n// then rotate\n// else\n// use the xPt and yPt as\n// the rotation point offset\n// and then rotate\n}"
+          },
+          "diagramText": [
+            "Cột OOP: P2 — hộp lớp [Amoeba] sau khi cập nhật:",
+            "  int xPoint",
+            "  int yPoint",
+            "  rotate() {",
+            "    // code to rotate an amoeba",
+            "    // using amoeba's x and y",
+            "  }",
+            "  playSound() {",
+            "    // code to play the new",
+            "    // .mp3 file for an amoeba",
+            "  }"
+          ],
+          "diagramNote": "P1 phải đổi chữ ký hàm rotate(shapeNum, xPt, yPt) làm ảnh hưởng hàng loạt lời gọi cũ, trong khi P2 chỉ thêm xPoint, yPoint và sửa rotate() nội bộ lớp Amoeba.",
+          "explanation": [
+            "Hậu quả rất rõ rệt ở lần sửa thứ hai: với P1, việc thêm 2 tham số `xPt, yPt` vào hàm `rotate(...)` làm thay đổi chữ ký hàm, khiến mọi nơi từng gọi `rotate(shapeNum)` đều bị ảnh hưởng và phải kiểm thử lại toàn hệ thống.",
+            "Với P2, hai trường `int xPoint`, `int yPoint` và logic xoay mới được đóng gói gọn bên trong lớp `Amoeba`, các lớp còn lại không cần biên dịch hay test lại."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "OOP and Procedural Programming — Benefit",
+          "paragraphs": [
+            "Benefit:"
+          ],
+          "bullets": [
+            "OOP are more secure in data.",
+            "OOP can maintain code more easily.",
+            "OOP can extend code more easily.",
+            "OOP increases reuse of code by applying inheritance and polymorphism."
+          ],
+          "explanation": [
+            "Slide tổng kết 4 lợi ích cốt lõi của OOP rút ra từ ví dụ trên: dữ liệu an toàn hơn (nhờ đóng gói), bảo trì dễ hơn (sửa cục bộ), mở rộng dễ hơn (thêm lớp mới không phá lớp cũ) và tái sử dụng mã hiệu quả hơn nhờ kế thừa và đa hình.",
+            "Đây là 4 ý hay xuất hiện trong câu hỏi lý thuyết ngắn về ưu điểm của OOP so với lập trình thủ tục."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 10"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Đóng gói dữ liệu (Encapsulation & Accessor Methods)",
+      "text": "Bảo vệ instance variable bằng access modifier (thường là private) và cung cấp các accessor public theo chuẩn get<Property>/set<Property> để dễ dàng thay đổi ràng buộc dữ liệu.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 11–15"
+      },
+      "digest": {
+        "keyPoints": [
+          "Nếu để thuộc tính public (BadOO), bất kỳ code bên ngoài nào cũng có thể gán giá trị không hợp lệ (ví dụ b.size = -5).",
+          "Khi yêu cầu thay đổi (size > 0, nếu size <= 0 thì không gán), mã nguồn dùng BadOO khiến hàng loạt lập trình viên khác phải tự sửa code của họ; còn BetterOO chỉ cần thêm kiểm tra bên trong hàm setSize().",
+          "Quy tắc Encapsulation: giữ instance variable ẩn (thường là private) và bắt buộc caller tương tác qua các accessor method public theo quy ước đặt tên set<Property> và get<Property>."
+        ],
+        "terms": [
+          {
+            "term": "Encapsulation (Đóng gói)",
+            "meaning": "Ẩn các biến thực thể (instance variables) bằng access modifier (như private) và chỉ cho phép truy cập/cập nhật gián tiếp qua các phương thức public."
+          },
+          {
+            "term": "Accessor methods",
+            "meaning": "Các phương thức public cho phép đọc hoặc gán giá trị của biến thực thể, theo quy ước tên get<Property> và set<Property>."
+          }
+        ],
+        "pitfalls": [
+          "Lưu ý trên slide 12 và 14 dùng 'Public class' (chữ P viết hoa) và 'setSize(newSize)' (thiếu kiểu int) ở mức minh họa nhanh — khi viết code Java thật phải dùng 'public class' và ghi rõ kiểu tham số 'int newSize'."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Encapsulation",
+          "paragraphs": [
+            "Encapsulation"
+          ],
+          "explanation": [
+            "Slide chuyển sang phần 2: Tính đóng gói (Encapsulation).",
+            "Nội dung giải thích lý do tại sao không nên để trường dữ liệu ở chế độ `public` dù mới học lập trình ta thấy truy cập trực tiếp có vẻ tiện hơn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Get, Set method and Encapsulation",
+          "bullets": [
+            "Imagine you wrote the code for a class and another dozen programmers from your company all wrote programs that used your class."
+          ],
+          "table": {
+            "headers": [
+              "P1 code",
+              "P2 code"
+            ],
+            "rows": [
+              [
+                "Public class BadOO — công khai trực tiếp public int size, weight",
+                "Public class BetterOO — ẩn private int size, weight và mở public void setSize(newSize)"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// P1 code\nPublic class BadOO{\n    public int size;\n    public int weight;\n    ...\n}\n\n// P2 code\nPublic class BetterOO{\n    private int size;\n    private int weight;\n    ...\n    public void setSize(newSize){\n        size = newSize;\n    }\n}"
+          },
+          "ocrNote": "Slide gốc viết 'Public' hoa chữ P và thiếu kiểu dữ liệu cho tham số 'newSize' trong setSize(newSize) (giữ nguyên văn).",
+          "explanation": [
+            "Đặt bối cảnh thực tế: lớp bạn viết được hàng chục lập trình viên khác trong công ty gọi sử dụng.",
+            "P1 (`BadOO`) mở `public int size` cho phép truy cập thẳng; P2 (`BetterOO`) đặt `private int size` và cung cấp hàm `setSize(...)` làm cổng giao tiếp duy nhất."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Encapsulation — Cách code khác sử dụng P1 và P2",
+          "table": {
+            "headers": [
+              "Other programmers that use P1 code",
+              "Other programmers that use P2 code"
+            ],
+            "rows": [
+              [
+                "ExploitBaddOO: gán trực tiếp b.size = -5;",
+                "ExploitBetterOO: gọi qua phương thức b.setSize(-5);"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// Other programmers that use P1 code\npublic class ExploitBaddOO{\n  public static void main(String[] args){\n      BadOO b = new BadOO();\n      b.size = -5;\n  }\n}\n\n// Other programmers that use P2 code\npublic class ExploitBetterOO{\n  public static void main(String[] args){\n      BetterOO b = new BetterOO();\n      b.setSize(-5);\n  }\n}"
+          },
+          "explanation": [
+            "Ở thời điểm ban đầu chưa có ràng buộc `size > 0`, cả `b.size = -5;` lẫn `b.setSize(-5);` đều làm giá trị `size` bị âm.",
+            "Điểm khác biệt cốt lõi là `ExploitBetterOO` chỉ gọi vào biên giao diện (hàm `setSize`), không phụ thuộc trực tiếp vào cách lưu trữ biến `size` bên trong."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Encapsulation — Khi yêu cầu thay đổi (size > 0)",
+          "bullets": [
+            {
+              "text": "However, requirement changes:",
+              "subBullets": [
+                "Require size > 0, if size <= 0 : not set size."
+              ]
+            }
+          ],
+          "table": {
+            "headers": [
+              "P1 code",
+              "P2 code"
+            ],
+            "rows": [
+              [
+                "Public class BadOO { public int size; //require: size>0 ... }",
+                "Public class BadOO { private int size; //require: size>0 ... public void setSize(newSize){ size = newSize; } }"
+              ],
+              [
+                "And now you’re in trouble. Everyone need to change their code. OOP is not flexibility and maintainability???",
+                "You only need to change setSize() method. OOP is flexibility and maintainability."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// P1 code\nPublic class BadOO{\n    public int size; //require: size>0\n    public int weight;\n    ...\n}\n\n// P2 code\nPublic class BadOO{\n    private int size; //require: size>0\n    private int weight;\n    ...\n    public void setSize(newSize){\n        size = newSize;\n    }\n}"
+          },
+          "ocrNote": "Slide gốc trong cột P2 code ghi nhầm tên lớp là 'Public class BadOO' (thực chất đang tiếp tục minh họa cho BetterOO ở Slide 12, giữ nguyên văn).",
+          "explanation": [
+            "Khi xuất hiện quy tắc mới \"size phải > 0, nếu <= 0 thì không gán\", lớp `BadOO` không thể tự kiểm soát được vì các lập trình viên khác đang gán thẳng `b.size = -5` — muốn đổi phải sửa code ở tất cả mọi người.",
+            "Ngược lại, với thiết kế có `private` và `setSize()`, ta chỉ cần thêm `if (newSize > 0) size = newSize;` tại duy nhất 1 chỗ trong `setSize()` mà không phá vỡ bất kỳ lời gọi nào bên ngoài."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Encapsulation — Quy tắc chuẩn",
+          "bullets": [
+            "Keep instance variables hidden (with an access modifier, often private).",
+            "Make public accessor methods, and force calling code to use those methods rather than directly accessing the instance variable. These so-called accessor methods allow users of your class to set a variable’s value or get a variable’s value.",
+            "For these accessor methods, use the most common naming convention of set<Property> and get<Property>."
+          ],
+          "explanation": [
+            "Tổng kết 3 quy tắc vàng của Encapsulation: (1) ẩn biến instance (thường dùng `private`), (2) tạo accessor method `public` và ép bên ngoài dùng chúng thay vì đụng thẳng biến, (3) đặt tên theo chuẩn `set<Property>` và `get<Property>`.",
+            "Cần phân biệt với quy ước sau này của JavaBeans/Spring: các framework (Spring, Hibernate, Jackson) cũng dựa trên đúng chuẩn getter/setter này để đọc/ghi thuộc tính."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 15"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Kế thừa, Phân cấp kiểu & Quan hệ IS-A / HAS-A (Inheritance & Type Hierarchy)",
+      "text": "Tách thuộc tính/hành vi chung lên superclass (Employee), 5 lợi ích kế thừa, quy tắc đơn kế thừa class / đa kế thừa interface trong Java, sơ đồ List & Exceptions và phân biệt IS-A với HAS-A.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 16–25"
+      },
+      "digest": {
+        "keyPoints": [
+          "Khi Programmer và Manager lặp lại các thuộc tính chung (address, name, phone), ta rút chung lên lớp cha Employee rồi cho cả hai extends Employee.",
+          "5 lợi ích của Inheritance: lớp nhỏ gọn dễ đọc, dễ sửa thuộc tính/hành vi chung, dễ mở rộng (extensibility), tái sử dụng code và loại bỏ trùng lặp.",
+          "Trong Java, thuật ngữ super-type/sub-type áp dụng cho cả class và interface (từ Java 8 interface có thể có concrete/default method). Một sub-type có thể kế thừa nhiều super-type nhưng chỉ DUY NHẤT một super-type là class, các super-type còn lại phải là interface.",
+          "IS-A dựa trên inheritance hoặc implements interface (Horse IS-A Animal); HAS-A dựa trên sử dụng/composition thông qua thuộc tính (Horse HAS-A Hat)."
+        ],
+        "terms": [
+          {
+            "term": "Superclass / Subclass",
+            "meaning": "Lớp cha ở tầng trên (superclass) chứa đặc điểm chung và lớp con ở tầng dưới (subclass) kế thừa và mở rộng."
+          },
+          {
+            "term": "Super-type / Sub-type",
+            "meaning": "Khái niệm tổng quát trong Java bao gồm cả class và interface trong cây phân cấp kiểu (type hierarchy)."
+          },
+          {
+            "term": "IS-A vs HAS-A",
+            "meaning": "IS-A biểu diễn quan hệ kế thừa/cài đặt kiểu ('là một loại của'); HAS-A biểu diễn quan hệ sở hữu/sử dụng qua trường thành viên ('có một')."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm lẫn số lượng supertype: Java cấm đa kế thừa class, nhưng MỘT lớp vẫn có thể có nhiều supertype (1 class cha + nhiều interface).",
+          "Trên sơ đồ UML (Slide 23), mũi tên nét liền đầu tam giác rỗng là kế thừa cùng loại (class extends class hoặc interface extends interface), còn mũi tên nét đứt đầu tam giác rỗng là class implements interface."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Inheritance",
+          "paragraphs": [
+            "Inheritance"
+          ],
+          "explanation": [
+            "Slide chuyển sang phần 3: Tính kế thừa (Inheritance).",
+            "Phần này đi từ bài toán quản lý nhân sự bị trùng lặp thuộc tính đến mô hình cây phân cấp kiểu (Type Hierarchy) trong Java."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Inheritance — Bài toán Programmer và Manager",
+          "bullets": [
+            "Imagine you need to code an app to control an organization. You have positions: Programmer and Manager. Both of these positions have a common set of properties, including name, address, phone number. We have 2 classes here:"
+          ],
+          "table": {
+            "headers": [
+              "Programmer class",
+              "Manager class"
+            ],
+            "rows": [
+              [
+                "Chứa private String address, name, phone",
+                "Chứa private String address, name, phone"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// Programmer class\nPublic class Programmer{\n    private String address;\n    private String name;\n    private String phone;\n}\n\n// Manager class\nPublic class Manager{\n    private String address;\n    private String name;\n    private String phone;\n}"
+          },
+          "ocrNote": "Slide gốc dùng 'Public class' (chữ P viết hoa, giữ nguyên văn).",
+          "explanation": [
+            "Ví dụ khởi đầu thiết kế hệ thống quản lý nhân sự với 2 vị trí `Programmer` và `Manager`.",
+            "Cả hai lớp đều khai báo lặp lại nguyên xi 3 thuộc tính chung: `address`, `name`, `phone`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 17"
+          }
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Inheritance — Bổ sung thuộc tính và hành vi riêng",
+          "bullets": [
+            "These positions also have different properties. A programmer may be concerned with project programming languages, whereas a manager may be concerned with project status reports."
+          ],
+          "table": {
+            "headers": [
+              "Programmer class",
+              "Manager class"
+            ],
+            "rows": [
+              [
+                "Thêm private String[] languages; và void writeCode(){}",
+                "Thêm void reportProjectStatus(){}"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// Programmer class\nPublic class Programmer{\n    private String address;\n    private String name;\n    private String phone;\n    private String[] languages;\n    void writeCode(){}\n}\n\n// Manager class\nPublic class Manager{\n    private String address;\n    private String name;\n    private String phone;\n    void reportProjectStatus(){}\n}"
+          },
+          "explanation": [
+            "Bên cạnh phần chung, mỗi lớp có đặc thù riêng: `Programmer` có mảng `languages` và phương thức `writeCode()`, còn `Manager` có `reportProjectStatus()`.",
+            "Tuy nhiên 3 trường chung vẫn bị sao chép y nguyên ở cả hai lớp, tạo ra code trùng lặp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Problem with the design",
+          "diagramText": [
+            "? (Biểu tượng dấu hỏi chấm lớn đặt ở trung tâm slide)"
+          ],
+          "diagramNote": "Slide câu hỏi mở để sinh viên tự chỉ ra nhược điểm trùng lặp dữ liệu (code duplication) và khó bảo trì trong thiết kế ở Slide 18.",
+          "explanation": [
+            "Slide đặt câu hỏi thảo luận: thiết kế ở Slide 18 có vấn đề gì? Lỗi cốt lõi là trùng lặp mã nguồn (code duplication) khi ba thuộc tính `address`, `name`, `phone` phải lặp lại ở cả `Programmer` và `Manager`.",
+            "Hệ quả khi bảo trì và mở rộng: nếu công ty đổi kiểu dữ liệu `phone` hay thêm trường `email` cho mọi nhân viên (hoặc thêm lớp `Tester`, `Designer`), ta phải sửa lặp lại ở mọi lớp con dễ gây thiếu sót và mâu thuẫn."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Inheritance — Tách lớp cha Employee",
+          "bullets": [
+            "Pull out the common properties into a new position (a new class, called parent class or superclass)."
+          ],
+          "table": {
+            "headers": [
+              "Programmer class",
+              "Manager class",
+              "Employee class"
+            ],
+            "rows": [
+              [
+                "extends Employee (giữ languages, writeCode)",
+                "extends Employee (giữ reportProjectStatus)",
+                "Chứa chung address, name, phone"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "// Programmer class\nPublic class Programmer extends Employee{\n    private String[] languages;\n    void writeCode(){}\n}\n\n// Manager class\nPublic class Manager extends Employee{\n    void reportProjectStatus(){}\n}\n\n// Employee class\nPublic class Employee{\n    private String address;\n    private String name;\n    private String phone;}"
+          },
+          "explanation": [
+            "Giải pháp chuẩn: rút toàn bộ thuộc tính chung (`address`, `name`, `phone`) lên một lớp cha (parent class / superclass) mới tên là `Employee`.",
+            "Hai lớp con `Programmer` và `Manager` dùng từ khóa `extends Employee` để kế thừa phần chung và chỉ khai báo thêm những gì đặc thù riêng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Inheritance — Benefits",
+          "table": {
+            "headers": [
+              "Benefits"
+            ],
+            "rows": [
+              [
+                "Smaller class definition, increase program readability"
+              ],
+              [
+                "Ease of modification to common properties and behavior"
+              ],
+              [
+                "Extensibility"
+              ],
+              [
+                "Enable to reuse code"
+              ],
+              [
+                "Eliminate duplicates"
+              ]
+            ]
+          },
+          "explanation": [
+            "Bảng tổng kết đúng 5 lợi ích của Inheritance: định nghĩa lớp gọn hơn và dễ đọc hơn, dễ chỉnh sửa thuộc tính/hành vi chung tại 1 chỗ, dễ mở rộng (thêm vị trí nhân viên mới), tái sử dụng code và loại bỏ trùng lặp.",
+            "Cần nhớ chính xác 5 ý này để phân biệt với 4 lợi ích chung của OOP ở Slide 10."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "Inheritance — Super-types, Sub-types & Type Hierarchy",
+          "bullets": [
+            "In OOP, classes are organized hierarchically to prevent duplication and reduce redundancy.",
+            "The top-level class is called the superclass, while the lower-level classes are called subclasses.",
+            "In Java, the term “super-types” and “sub-types” refer to both classes and interfaces (because it is possible to inherit concrete methods from interfaces in Java 8). Sub-type can inherit more than one super-types BUT only one super type can be a class, others must be interfaces.",
+            "Types in Java exist within a hierarchical system, known as an inheritance tree or type hierarchy."
+          ],
+          "explanation": [
+            "Làm rõ thuật ngữ chuẩn của Java: `superclass`/`subclass` dùng cho lớp, còn `super-type`/`sub-type` bao trùm cả class lẫn interface (vì từ Java 8, interface có thể chứa concrete method dạng `default`/`static`).",
+            "Điểm hay ra thi: một sub-type được phép kế thừa nhiều super-type, nhưng **chỉ tối đa 1 super-type là class**, tất cả super-type còn lại bắt buộc phải là interface."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Type hierarchy : List",
+          "diagramText": [
+            "<<interface>> Collection",
+            "  ├── (extends, nét liền △) ── Queue",
+            "  ├── (implements, nét đứt △) ── AbstractCollection",
+            "  │     └── (extends, nét liền △) ── AbstractList",
+            "  │           ├── (extends, nét liền △) ── ArrayList",
+            "  │           └── (extends, nét liền △) ── Vector",
+            "  └── (extends, nét liền △) ── List",
+            "        ├── (implements, nét đứt △) ── AbstractList",
+            "        ├── (implements, nét đứt △) ── ArrayList",
+            "        ├── (implements, nét đứt △) ── Vector",
+            "        └── (implements, nét đứt △) ── LinkedList"
+          ],
+          "diagramNote": "Sơ đồ phân cấp kiểu của Collection/List trong Java: đường liền nét đầu tam giác rỗng biểu diễn kế thừa (extends), đường nét đứt đầu tam giác rỗng biểu diễn cài đặt interface (implements).",
+          "explanation": [
+            "Ví dụ thực tế về cây phân cấp kiểu (`type hierarchy`) trong Java Collections Framework với gốc là `<<interface>> Collection`.",
+            "Quan sát ví dụ đa super-type ở `ArrayList`: nó vừa kế thừa 1 class (`AbstractList`), vừa cài đặt interface `List` (và gián tiếp qua `AbstractList` kế thừa `AbstractCollection` cài đặt `Collection`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 23"
+          }
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "Type hierarchy : Exceptions",
+          "diagramText": [
+            "package: java.lang",
+            "Throwable",
+            "  ├── Error",
+            "  └── Exception",
+            "        ├── RuntimeException",
+            "        │     └── [ ] ... [ ]  (Unchecked exceptions)",
+            "        └── [ ] ... [ ]  (Checked exceptions)"
+          ],
+          "diagramNote": "Sơ đồ phân cấp các lớp ngoại lệ trong gói java.lang: mọi ngoại lệ đều kế thừa Throwable; chia làm Error và Exception; dưới Exception tách thành nhánh RuntimeException (Unchecked) và các lớp con khác (Checked).",
+          "explanation": [
+            "Slide giới thiệu trước cây phân cấp ngoại lệ (sẽ học kỹ ở Lecture 2) để minh họa thêm một ví dụ `type hierarchy` kinh điển trong `java.lang`.",
+            "Nhìn sơ đồ ta thấy ngay ranh giới: `RuntimeException` và các lớp con là `Unchecked exceptions`, còn các lớp kế thừa trực tiếp `Exception` (không qua `RuntimeException`) là `Checked exceptions`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 24"
+          }
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "IS-A and Has-A Relationships",
+          "bullets": [
+            "Is-A: The concept of IS-A is based on inheritance (or interface implementation). IS-A is a way of saying, “This thing is a type of that thing.”",
+            "Has-A: HAS-A relationships are based on use, rather than inheritance."
+          ],
+          "table": {
+            "headers": [
+              "Code",
+              "Explanation"
+            ],
+            "rows": [
+              [
+                "Horse extends Animal và chứa private Hat myHat;",
+                "A Horse Is-A Animal | A Horse Has-A Hat"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "public class Animal {}\n\npublic class Horse extends Animal {\n    private Hat myHat;\n}"
+          },
+          "explanation": [
+            "Phân biệt 2 quan hệ thiết kế cơ bản: **IS-A** dựa trên kế thừa (`extends`) hoặc cài đặt (`implements`), thể hiện \"Horse là một loại Animal\".",
+            "**HAS-A** dựa trên quan hệ sử dụng/hợp thành (composition — khai báo trường `private Hat myHat;`), thể hiện \"Horse có một Hat\". Cần tránh lạm dụng kế thừa khi bản chất chỉ là HAS-A."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 25"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Đa hình, Biến tham chiếu & Nguyên lý thay thế Liskov (Polymorphism & LSP)",
+      "text": "Cơ chế truy cập đối tượng qua reference variable và 3 quy tắc bắt buộc của Liskov Substitution Principle: Signature Rule, Methods Rule, Properties Rule.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 26–33"
+      },
+      "digest": {
+        "keyPoints": [
+          "Polymorphism ('many forms') là khả năng một đối tượng thể hiện hành vi khác nhau tùy ngữ cảnh; mọi truy cập đối tượng trong Java đều đi qua reference variable.",
+          "Kiểu khai báo (declared type) của biến tham chiếu quyết định các method gọi được lúc compile; nó có thể trỏ tới đối tượng cùng kiểu hoặc bất kỳ subtype (kể cả class cài đặt interface nếu biến có kiểu interface).",
+          "Substitution Principle (LSP): đối tượng của superclass phải thay thế được bằng đối tượng của subclass mà không làm sai tính đúng đắn của chương trình.",
+          "3 quy tắc của LSP: (1) Signature Rule (đủ method, return type cùng kiểu hoặc subtype, ném ít/hẹp exception hơn — do Java compiler kiểm tra); (2) Methods Rule (Pre_super >= pre_sub — làm yếu precondition; Post_sub >= Post_super — làm mạnh postcondition); (3) Properties Rule (bảo toàn mọi bất biến/tính chất chứng minh được của supertype)."
+        ],
+        "terms": [
+          {
+            "term": "Reference variable",
+            "meaning": "Biến tham chiếu dùng để trỏ tới đối tượng; kiểu khai báo của biến không đổi nhưng đối tượng nó trỏ tới có thể đổi (trừ khi biến là final)."
+          },
+          {
+            "term": "Substitution Principle (LSP)",
+            "meaning": "Nguyên lý thay thế: subtype phải hỗ trợ lập luận dựa trên đặc tả của supertype thông qua Signature Rule, Methods Rule và Properties Rule."
+          },
+          {
+            "term": "Precondition / Postcondition",
+            "meaning": "Precondition (requires) là điều kiện caller phải đảm bảo trước khi gọi; Postcondition (effects) là điều kiện hàm đảm bảo sau khi chạy xong."
+          }
+        ],
+        "pitfalls": [
+          "Rất hay nhầm chiều của Methods Rule: subtype được **làm yếu precondition** (nhận đầu vào rộng hơn: Pre_super >= pre_sub) và **làm mạnh postcondition** (đảm bảo đầu ra chặt hơn: Post_sub >= Post_super).",
+          "Trong 3 quy tắc LSP, chỉ Signature Rule được trình biên dịch Java tự động kiểm tra; Methods Rule và Properties Rule là trách nhiệm thiết kế/đặc tả của lập trình viên."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "Polymorphism",
+          "paragraphs": [
+            "Polymorphism"
+          ],
+          "explanation": [
+            "Slide chuyển sang phần 4: Tính đa hình (Polymorphism).",
+            "Đây là phần trọng tâm kết nối cú pháp Java (`reference variable`, `dynamic dispatch`) với nguyên lý thiết kế hình thức của Liskov."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 26"
+          }
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "Polymorphism",
+          "bullets": [
+            "The word \"polymorphism\" means \"many forms\".",
+            "Polymorphism is the ability of an object to exhibit different behaviors depending on the context.",
+            "What is the “depending on the context” in Java?"
+          ],
+          "explanation": [
+            "Giới thiệu định nghĩa \"đa hình\" (many forms): cùng một đối tượng hoặc lời gọi có thể thể hiện hành vi khác nhau tùy ngữ cảnh.",
+            "Câu hỏi gợi mở ở cuối slide dẫn sang Slide 28: trong Java, \"ngữ cảnh\" ở đây chính là kiểu biến tham chiếu (compile-time) kết hợp với kiểu đối tượng thực tế (runtime)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 27"
+          }
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "Reference variable",
+          "bullets": [
+            "The only way to access an object is through a reference variable",
+            "A reference variable can be of only one type, and once declared, that type can never be changed (although the object it references can change).",
+            "A reference is a variable, so it can be reassigned to other objects (unless the reference is declared final).",
+            "A reference variable’s type determines the methods that can be invoked on the object the variable is referencing.",
+            "A reference variable can refer to any object of the same type as the declared reference – (can refer to any subtype of the declared type)",
+            "A reference variable can be declared as a class type or an interface type. If the variable is declared as an interface type, it can reference any object of any class that implements the interface"
+          ],
+          "explanation": [
+            "Nắm chắc 6 tính chất của biến tham chiếu trong Java: kiểu khai báo của biến cố định suốt vòng đời biến, nhưng biến có thể gán lại sang đối tượng khác (trừ `final`), và có thể trỏ tới bất kỳ subtype nào (hoặc lớp cài đặt interface).",
+            "Lưu ý gạch đầu dòng thứ 4 (rất hay ra đề): chính **kiểu khai báo** của reference variable quyết định danh sách các phương thức hợp lệ có thể gọi trên biến đó tại thời điểm biên dịch."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 28"
+          }
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Substitution Principle",
+          "bullets": [
+            "An objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program."
+          ],
+          "table": {
+            "headers": [
+              "Code",
+              "Explanation"
+            ],
+            "rows": [
+              [
+                "Animal và Horse extends Animal (cùng có functionA)",
+                "Animal ani = new Animal(); int c = 1/ani.functionA(9); (hợp lệ: 1/1 = 1) vs Animal ani = new Horse(); int c = 1/ani.functionA(9); (lỗi chia 0!)"
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "public class Animal {\n    int x; // require x > 0\n    // requires: a < 10\n    public int functionA(int a){\n        return (10-a);\n    }\n}\n\npublic class Horse extends Animal {\n    public int functionA(int a){\n        return (9-a);\n    }\n}\n\n// Explanation:\nAnimal ani = new Animal();\nint c = 1/ani.functionA(9);\n\nAnimal ani = new Horse();\nint c = 1/ani.functionA(9);"
+          },
+          "ocrNote": "Slide gốc viết 'An objects' (giữ nguyên văn).",
+          "explanation": [
+            "Đưa ra phản ví dụ minh họa vi phạm Nguyên lý thay thế (Substitution Principle): với `Animal`, `requires: a < 10` đảm bảo `10 - a > 0`, nên `1 / ani.functionA(9)` cho kết quả `1/1 = 1` an toàn.",
+            "Khi thay đối tượng bằng `new Horse()`, hàm `Horse.functionA(9)` trả về `9 - 9 = 0`, làm phép chia `1 / 0` ném lỗi `ArithmeticException` dù lời gọi vẫn thỏa mãn đặc tả của `Animal` — tức `Horse` đã phá vỡ tính đúng đắn khi thay thế `Animal`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 29"
+          }
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "Substitution Principle — Ba quy tắc bắt buộc",
+          "paragraphs": [
+            "The substitution principle requires that the subtype specification support reasoning based on the supertype specification. Three properties must be supported:"
+          ],
+          "bullets": [
+            "Signature Rule",
+            "Methods Rule",
+            "Properties Rule"
+          ],
+          "explanation": [
+            "Để lớp con thay thế được lớp cha một cách an toàn dựa trên đặc tả của lớp cha, thiết kế phải thỏa mãn đồng thời 3 quy tắc: **Signature Rule**, **Methods Rule** và **Properties Rule**.",
+            "Ba quy tắc này là khung chuẩn của Barbara Liskov dùng để kiểm tra một quan hệ kế thừa có đúng chuẩn LSP hay không."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 30"
+          }
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "Signature Rule",
+          "paragraphs": [
+            "The subtype objects must have all the methods of the supertype, and the signatures of the subtype methods(Overriding) must be compatible with the signatures of the corresponding supertype methods (Overridden methods)."
+          ],
+          "bullets": [
+            {
+              "text": "Signature compatition:",
+              "subBullets": [
+                "Return type: same type or one of the subtypes",
+                "Exception: a subtype method can have fewer exceptions than the corresponding supertype method"
+              ]
+            },
+            "The signature rule guarantees that every call that is type correct according to the supertype’s definition is also type correct for the subtype. This requirement is enforced by the Java compiler."
+          ],
+          "ocrNote": "Slide gốc viết nhầm 'compatition' thay vì 'compatibility' (giữ nguyên văn).",
+          "explanation": [
+            "Quy tắc 1 (**Signature Rule**) yêu cầu lớp con có đủ mọi phương thức của lớp cha và chữ ký khi ghi đè (`override`) phải tương thích: kiểu trả về giống hoặc là subtype (covariant return type), và danh sách checked exception được phép ném phải ít hơn hoặc hẹp hơn (không được thêm exception mới ngoài hợp đồng của cha).",
+            "Điểm quan trọng: Signature Rule được **trình biên dịch Java (Java compiler) cưỡng chế tự động** — nếu vi phạm sẽ báo lỗi biên dịch ngay."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 31"
+          }
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "Methods rule",
+          "paragraphs": [
+            "A subtype method can weaken the precondition and can strengthen the postcondition. The precondition is what must be guaranteed to hold by the caller in order to make the call. The postcondition is what is guaranteed to hold right after the call (assuming that the precondition held when the call was made)."
+          ],
+          "bullets": [
+            "Precondition rule:  Presuper >= presub",
+            "Postcondition rule: Postsub >= Postsuper"
+          ],
+          "table": {
+            "headers": [
+              "Code",
+              "Explanation"
+            ],
+            "rows": [
+              [
+                "Animal.functionA(int a) với requires: a <= 10 & a >=2 và effects: output >=0 & output <=8",
+                "The precondition refers to the input parameters of function. It depends on the problem, the requirement."
+              ],
+              [
+                "return (10-a);",
+                "The postcondition refers to the output of function. It depends on the algorithm."
+              ]
+            ]
+          },
+          "code": {
+            "lang": "java",
+            "text": "public class Animal {\n    // requires: a <= 10 & a >=2\n    public int functionA(int a){\n        // effects: output >=0 & output <=8\n        return (10-a);\n    }\n}"
+          },
+          "explanation": [
+            "Quy tắc 2 (**Methods Rule**): hàm ở subtype được phép **làm yếu precondition** (`Pre_super >= pre_sub`, tức chấp nhận miền đầu vào rộng hơn hoặc bằng cha) để mọi đầu vào hợp lệ của cha đều hợp lệ với con.",
+            "Đồng thời, hàm ở subtype có thể **làm mạnh postcondition** (`Post_sub >= Post_super`, tức đầu ra thỏa điều kiện chặt hơn hoặc bằng cha) để bất kỳ kỳ vọng nào của caller vào kết quả lớp cha cũng đều được lớp con đáp ứng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 32"
+          }
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "Properties rule",
+          "paragraphs": [
+            "(Parent’s restriction on B) & (Child’s restriction on B):",
+            "(B>10)              & (B > 5 & B < 20) --> (B > 10 & B < 20)"
+          ],
+          "bullets": [
+            "The subtype must preserve all properties that can be proved about supertype objects.",
+            "Example: A supertype named Parent and an attribute B. ( B > 10)\nA subtype of Parent named Child. (B > 5 & B < 20)\nThe following is the correct restriction on B in a subtype:"
+          ],
+          "explanation": [
+            "Quy tắc 3 (**Properties Rule**): mọi tính chất/bất biến (invariant) chứng minh được đúng trên đối tượng `Parent` thì cũng phải giữ nguyên khi đối tượng đó là `Child`.",
+            "Trong ví dụ: nếu `Parent` có bất biến `B > 10`, thì `Child` không được tự ý nới lỏng thành `B > 5 & B < 20` (vì khi `B = 7` sẽ phá tính chất `B > 10` của cha). Ràng buộc đúng ở `Child` là phép hội (AND) cả hai điều kiện: `B > 10 & B < 20`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 33"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Điều phối phương thức động, Lợi ích đa hình & Tổng kết",
+      "text": "Cơ chế Dynamic Method Dispatching ở runtime của Java, 4 lợi ích của đa hình và tổng kết toàn Lecture 1.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 34–36"
+      },
+      "digest": {
+        "keyPoints": [
+          "Dynamic method dispatching là cơ chế runtime của Java chọn phiên bản phương thức bị override theo kiểu thực tế (actual/runtime type) của đối tượng chứ không theo kiểu khai báo (declared/compile-time type).",
+          "Đây chính là cách Java hiện thực hóa runtime polymorphism.",
+          "4 lợi ích của Polymorphism: tăng tái sử dụng code, cải thiện khả năng đọc và bảo trì, hỗ trợ dynamic binding theo lớp thực tế lúc runtime, và cho phép viết code tổng quát (generic code) xử lý đối tượng thuộc nhiều kiểu qua một kiểu chung."
+        ],
+        "terms": [
+          {
+            "term": "Dynamic method dispatching",
+            "meaning": "Cơ chế chạy lúc runtime giúp xác định đúng phiên bản phương thức đã bị override để thực thi dựa trên kiểu thực tế (actual type) của đối tượng."
+          },
+          {
+            "term": "Declared type vs Actual type",
+            "meaning": "Declared type là kiểu của biến tham chiếu lúc compile (quyết định gọi được method nào); Actual type là kiểu thực sự của đối tượng được cấp phát qua new lúc runtime (quyết định code override nào chạy)."
+          }
+        ],
+        "pitfalls": [
+          "Phân biệt rõ lúc compile và lúc runtime: compile kiểm tra method có tồn tại trên Declared type không; runtime thực thi bản override trên Actual type."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "Java’s dynamic method dispatching",
+          "bullets": [
+            "A run-time mechanism to find the right version of an overridden method to execute",
+            "It is how Java implements runtime polymorphism",
+            "The implementation from the actual type (runtime type) of the variable will be chosen.",
+            "actual type (runtime type) vs declared type (compile time type)?"
+          ],
+          "explanation": [
+            "Giải thích cơ chế đứng sau đa hình lúc chạy (runtime polymorphism): khi một phương thức bị ghi đè (`overridden`) được gọi qua biến kiểu cha (ví dụ `Animal a = new Horse(); a.eat();`), JVM sẽ dùng **dynamic method dispatching** để chọn đúng cài đặt của kiểu thực tế (`actual/runtime type` là `Horse`).",
+            "Ghi nhớ cặp đối lập ở cuối slide: **Declared type** (compile-time) kiểm soát xem hàm đó có được phép gọi hay không, còn **Actual type** (runtime) quyết định thân hàm nào thực sự được chạy."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 34"
+          }
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "Benefits of Polymorphism",
+          "bullets": [
+            "Increases code reusability by allowing objects of different classes to be treated as objects of a common class.",
+            "Improves readability and maintainability of code by reducing the amount of code that needs to be written and maintained.",
+            "Supports dynamic binding, enabling the correct method to be called at runtime, based on the actual class of the object.",
+            "Enables objects to be treated as a single type, making it easier to write generic code that can handle objects of different types."
+          ],
+          "explanation": [
+            "Tổng hợp 4 lợi ích của Polymorphism trong thiết kế phần mềm: tăng tái sử dụng nhờ xem các lớp khác nhau qua lớp/interface chung, giảm lượng code bảo trì, hỗ trợ dynamic binding lúc runtime, và viết được các thuật toán/hàm tổng quát xử lý nhiều kiểu dữ liệu cùng lúc.",
+            "Liên hệ lại bài toán Shapes (Slides 6–9): nếu có mảng `Shape[]`, một vòng lặp `for (Shape s : shapes) s.rotate();` xử lý được cả `Square`, `Circle`, `Triangle`, `Amoeba` mà không cần `if/else`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 35"
+          }
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "Summary",
+          "bullets": [
+            "OOP and Procedural Programming",
+            "Encapsulation",
+            "Inheritance",
+            "Polymorphism"
+          ],
+          "explanation": [
+            "Slide tổng kết khép lại Lecture 1 với 4 chủ đề đã ôn tập: đối chiếu OOP và Procedural, Encapsulation, Inheritance và Polymorphism.",
+            "Trước khi chuyển sang Lecture 2 (Exceptions), hãy đảm bảo bạn nhớ rõ 3 quy tắc của Liskov Substitution Principle và phân biệt được Declared type vs Actual type."
+          ],
+          "source": {
+            "file": "Resources/Lecture 1.pdf",
+            "loc": "Slide 36"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l01-c01", "front": "Lợi ích của OOP so với procedural?", "back": "Dữ liệu an toàn hơn, dễ bảo trì, dễ mở rộng, tái sử dụng code qua inheritance và polymorphism.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 10" } },
-    { "id": "se1-l01-c02", "front": "IS-A và HAS-A khác nhau thế nào?", "back": "IS-A dựa trên inheritance hoặc cài đặt interface (Horse IS-A Animal). HAS-A dựa trên sử dụng/composition (Horse HAS-A Hat).", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 25" } },
-    { "id": "se1-l01-c03", "front": "Dynamic method dispatching là gì?", "back": "Cơ chế runtime chọn phiên bản method bị override theo kiểu thực tế (runtime type) của đối tượng, không theo kiểu khai báo.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 34" } },
-    { "id": "se1-l01-c04", "front": "Ba quy tắc của Liskov Substitution Principle?", "back": "Signature rule, Methods rule (làm yếu precondition, làm mạnh postcondition), Properties rule (bảo toàn invariant).", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slides 30–33" } },
-    { "id": "se1-l01-c05", "front": "Subtype có thể có bao nhiêu supertype là class?", "back": "Nhiều supertype nhưng chỉ một là class, các supertype còn lại phải là interface.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 22" } }
+    {
+      "id": "se1-l01-c01",
+      "front": "4 lợi ích của OOP so với Procedural Programming?",
+      "back": "Dữ liệu an toàn hơn (more secure in data), dễ bảo trì code hơn, dễ mở rộng hơn, và tăng tái sử dụng code qua inheritance và polymorphism.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 10"
+      }
+    },
+    {
+      "id": "se1-l01-c02",
+      "front": "IS-A và HAS-A khác nhau thế nào?",
+      "back": "IS-A dựa trên inheritance hoặc cài đặt interface (A Horse IS-A Animal). HAS-A dựa trên sử dụng/composition thông qua thuộc tính (A Horse HAS-A Hat).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 25"
+      }
+    },
+    {
+      "id": "se1-l01-c03",
+      "front": "Dynamic method dispatching là gì?",
+      "back": "Cơ chế runtime của Java chọn phiên bản method bị override theo actual type (runtime type) của đối tượng thay vì declared type (compile-time type).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 34"
+      }
+    },
+    {
+      "id": "se1-l01-c04",
+      "front": "Ba quy tắc của Liskov Substitution Principle?",
+      "back": "Signature Rule (trình biên dịch Java kiểm tra), Methods Rule (làm yếu precondition, làm mạnh postcondition), Properties Rule (bảo toàn mọi invariant của supertype).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 30–33"
+      }
+    },
+    {
+      "id": "se1-l01-c05",
+      "front": "Một subtype trong Java có thể kế thừa bao nhiêu supertype là class?",
+      "back": "Subtype có thể kế thừa nhiều supertype nhưng chỉ DUY NHẤT một supertype có thể là class, các supertype còn lại phải là interface.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l01-c06",
+      "front": "Trong bài toán Shapes + Amoeba, vì sao P2 (OOP) dễ sửa hơn P1 (Procedural)?",
+      "back": "P1 phải sửa thẳng vào code cũ đã test (playSound, rotate(shapeNum, xPt, yPt)) và test lại toàn bộ; P2 chỉ thêm/sửa riêng trong lớp Amoeba mà không đụng vào code các hình đã kiểm thử.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 7, 9"
+      }
+    },
+    {
+      "id": "se1-l01-c07",
+      "front": "Quy tắc cài đặt Encapsulation chuẩn trong Java?",
+      "back": "Ẩn instance variables (thường dùng private), tạo public accessor methods theo quy ước tên set<Property> và get<Property>, và buộc caller truy cập qua các method này.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 15"
+      }
+    },
+    {
+      "id": "se1-l01-c08",
+      "front": "5 lợi ích của Inheritance (Slide 21)?",
+      "back": "1) Lớp nhỏ gọn, dễ đọc hơn; 2) Dễ sửa đổi thuộc tính/hành vi chung; 3) Khả năng mở rộng (extensibility); 4) Tái sử dụng code; 5) Loại bỏ trùng lặp (eliminate duplicates).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 21"
+      }
+    },
+    {
+      "id": "se1-l01-c09",
+      "front": "Reference variable: yếu tố nào quyết định method gọi được lúc compile?",
+      "back": "Chính kiểu khai báo (declared type) của reference variable quyết định các method được phép gọi; biến vẫn có thể trỏ tới bất kỳ subtype nào (hoặc lớp implement interface nếu là kiểu interface).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 28"
+      }
+    },
+    {
+      "id": "se1-l01-c10",
+      "front": "Signature Rule của LSP quy định gì về return type và exception?",
+      "back": "Subtype phải có đủ method của supertype; return type cùng kiểu hoặc là subtype; exception của subtype method phải ít hơn (hoặc hẹp hơn) supertype method.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 31"
+      }
+    },
+    {
+      "id": "se1-l01-c11",
+      "front": "Công thức Methods Rule của LSP?",
+      "back": "Precondition rule: Pre_super >= pre_sub (làm yếu precondition). Postcondition rule: Post_sub >= Post_super (làm mạnh postcondition).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 32"
+      }
+    },
+    {
+      "id": "se1-l01-c12",
+      "front": "Properties Rule: Parent có (B > 10), Child muốn (B > 5 & B < 20) thì ràng buộc đúng ở Child là gì?",
+      "back": "Phải bảo toàn bất biến của Parent bằng phép AND: (B > 10) & (B > 5 & B < 20) --> (B > 10 & B < 20).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 33"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l01-q01", "stem": "Theo Signature rule của LSP, method override ở subtype phải thế nào về exception?", "options": ["Ném nhiều exception hơn", "Ném ít (hoặc hẹp hơn) exception so với supertype", "Không được ném exception", "Tùy ý"], "answer": 1, "explanation": "Slide 31: exception được ném phải ít hơn (hoặc hẹp hơn) method của supertype.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 31" } },
-    { "id": "se1-l01-q02", "stem": "Methods rule cho phép subtype method làm gì với precondition và postcondition?", "options": ["Làm mạnh precondition, làm yếu postcondition", "Làm yếu precondition, làm mạnh postcondition", "Giữ nguyên cả hai bắt buộc", "Bỏ cả hai"], "answer": 1, "explanation": "Slide 32: weaken precondition và strengthen postcondition.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 32" } },
-    { "id": "se1-l01-q03", "stem": "Method nào được gọi khi Animal a = new Horse(); a.eat() và Horse override eat()?", "options": ["Animal.eat() vì kiểu khai báo", "Horse.eat() vì kiểu runtime", "Lỗi biên dịch", "Cả hai"], "answer": 1, "explanation": "Dynamic dispatch chọn theo actual (runtime) type.", "source": { "file": "Resources/Lecture 1.pdf", "loc": "Slide 34" } }
+    {
+      "id": "se1-l01-q01",
+      "stem": "Theo Signature Rule của LSP, method override ở subtype phải thế nào về exception?",
+      "options": [
+        "Ném nhiều exception hơn",
+        "Ném ít (hoặc hẹp hơn) exception so với supertype",
+        "Không được ném exception",
+        "Tùy ý"
+      ],
+      "answer": 1,
+      "explanation": "Slide 31: a subtype method can have fewer exceptions than the corresponding supertype method.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 31"
+      }
+    },
+    {
+      "id": "se1-l01-q02",
+      "stem": "Methods Rule cho phép subtype method làm gì với precondition và postcondition?",
+      "options": [
+        "Làm mạnh precondition, làm yếu postcondition",
+        "Làm yếu precondition, làm mạnh postcondition",
+        "Giữ nguyên cả hai bắt buộc",
+        "Bỏ cả hai"
+      ],
+      "answer": 1,
+      "explanation": "Slide 32: weaken the precondition (Pre_super >= pre_sub) và strengthen the postcondition (Post_sub >= Post_super).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 32"
+      }
+    },
+    {
+      "id": "se1-l01-q03",
+      "stem": "Method nào được gọi khi Animal a = new Horse(); a.eat() và Horse override eat()?",
+      "options": [
+        "Animal.eat() vì kiểu khai báo",
+        "Horse.eat() vì kiểu runtime",
+        "Lỗi biên dịch",
+        "Cả hai"
+      ],
+      "answer": 1,
+      "explanation": "Slide 34: Dynamic method dispatching chọn cài đặt theo actual type (runtime type) của đối tượng.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 34"
+      }
+    },
+    {
+      "id": "se1-l01-q04",
+      "stem": "Trong tình huống thêm hình Amoeba ở Slide 7–9, bất lợi chính của Procedural Programming (P1) là gì?",
+      "options": [
+        "Không thể phát file .mp3 trong lập trình thủ tục",
+        "Phải chạm vào code đã kiểm thử (playSound, rotate) và phải test lại toàn bộ code",
+        "Không truyền được tham số vào hàm",
+        "Bắt buộc phải tạo thêm 3 lớp mới"
+      ],
+      "answer": 1,
+      "explanation": "Slides 7 & 9: P1 phải sửa trực tiếp các thủ tục đã kiểm thử trước đó nên nhiều code bị ảnh hưởng và phải test lại tất cả.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slides 7, 9"
+      }
+    },
+    {
+      "id": "se1-l01-q05",
+      "stem": "Khi yêu cầu đổi thành 'size > 0, nếu <= 0 thì không gán', thiết kế BetterOO (private size + setSize) có lợi thế gì so với BadOO (public size)?",
+      "options": [
+        "Trình biên dịch tự chặn gán số âm mà không cần sửa code",
+        "Chỉ cần sửa duy nhất logic kiểm tra trong method setSize() mà không bắt mọi người dùng lớp phải sửa code của họ",
+        "Không cần viết method getSize() nữa",
+        "Tự động chuyển size thành kiểu double"
+      ],
+      "answer": 1,
+      "explanation": "Slide 14: You only need to change setSize() method. OOP is flexibility and maintainability.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 14"
+      }
+    },
+    {
+      "id": "se1-l01-q06",
+      "stem": "Phát biểu nào ĐÚNG về super-type và sub-type trong Java (Slide 22)?",
+      "options": [
+        "Một class có thể extends nhiều class cha cùng lúc",
+        "Super-type chỉ dùng cho class, không áp dụng cho interface",
+        "Một sub-type có thể kế thừa nhiều super-type nhưng chỉ 1 super-type là class, các super-type khác phải là interface",
+        "Từ Java 8 interface không thể có concrete method"
+      ],
+      "answer": 2,
+      "explanation": "Slide 22: Sub-type can inherit more than one super-types BUT only one super type can be a class, others must be interfaces.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l01-q07",
+      "stem": "Cho class Horse extends Animal { private Hat myHat; }. Quan hệ nào sau đây ĐÚNG?",
+      "options": [
+        "Horse HAS-A Animal và Horse IS-A Hat",
+        "Horse IS-A Animal và Horse HAS-A Hat",
+        "Animal IS-A Horse và Hat HAS-A Horse",
+        "Cả hai đều là IS-A"
+      ],
+      "answer": 1,
+      "explanation": "Slide 25: A Horse Is-A Animal (kế thừa); A Horse Has-A Hat (thuộc tính sử dụng).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 25"
+      }
+    },
+    {
+      "id": "se1-l01-q08",
+      "stem": "Trong Slide 29, vì sao lớp Horse (trả về 9-a trong functionA) vi phạm Substitution Principle khi thay cho Animal (trả về 10-a, requires a < 10)?",
+      "options": [
+        "Vì Horse thiếu từ khóa extends",
+        "Vì với a = 9 (thỏa precondition a < 10 của Animal), 1 / ani.functionA(9) bị chia cho 0 khi ani là Horse",
+        "Vì kiểu trả về của Horse.functionA khác kiểu int",
+        "Vì Horse không khai báo biến x"
+      ],
+      "answer": 1,
+      "explanation": "Slide 29: Với Animal, a=9 cho 1/(10-9)=1; khi thay bằng Horse, 9-9=0 khiến 1/ani.functionA(9) gây lỗi runtime.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "se1-l01-q09",
+      "stem": "Quy tắc nào trong Liskov Substitution Principle được trình biên dịch Java (Java compiler) cưỡng chế tự động?",
+      "options": [
+        "Signature Rule",
+        "Methods Rule",
+        "Properties Rule",
+        "Cả 3 quy tắc đều do compiler kiểm tra"
+      ],
+      "answer": 0,
+      "explanation": "Slide 31: The signature rule ... This requirement is enforced by the Java compiler.",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 31"
+      }
+    },
+    {
+      "id": "se1-l01-q10",
+      "stem": "Theo Properties Rule (Slide 33), nếu Parent có bất biến (B > 10) và Child có thêm điều kiện (B > 5 & B < 20), ràng buộc đúng trên B ở Child là gì?",
+      "options": [
+        "B > 5 & B < 20",
+        "B > 5",
+        "B > 10 & B < 20",
+        "B < 20"
+      ],
+      "answer": 2,
+      "explanation": "Slide 33: (Parent's restriction on B) & (Child's restriction on B): (B>10) & (B > 5 & B < 20) --> (B > 10 & B < 20).",
+      "source": {
+        "file": "Resources/Lecture 1.pdf",
+        "loc": "Slide 33"
+      }
+    }
   ]
 }

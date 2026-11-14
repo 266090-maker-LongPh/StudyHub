@@ -1,27 +1,3402 @@
 {
-  "id": "se1-l10-11", "order": 9,
+  "id": "se1-l10-11",
+  "order": 9,
   "title": "Lecture 10–11: Design và ví dụ KEngine",
-  "summary": [
-    { "h": "Nguyên tắc và các bước", "text": "Hai nguyên tắc: decomposition by abstraction và iterative refinement (top-down). Mỗi vòng lặp: chọn một abstraction A, xác định helper abstraction cần để cài đặt A, viết/cập nhật design specification cho A, dừng khi mọi abstraction đều có đặc tả. Iteration 0: abstraction ban đầu (phần mềm và khái niệm hiển nhiên). Iteration 1: abstraction mức cao nhất từ đặc tả. Iteration 2+: lặp tới khi không có abstraction mới. Design notebook ghi mọi quyết định thiết kế (đặc tả, bản phác cài đặt, ngữ cảnh dùng) kèm class, sequence, activity diagram." },
-    { "h": "KEngine: yêu cầu", "text": "Dựa trên Liskov & Guttag mục 12.4. Entity: Document, Word (Keyword, NonKeyword), Query, Match. Quan hệ: appears-in (association class có frequency), hasKeyword (aggregation Query–Keyword), hasMatch (composition Query–Match), refers-to (Match → Document). Use case: Add Documents, Search for document, Query, QueryMore." },
-    { "h": "KEngine: thiết kế", "text": "Iteration 0: Engine, Doc, Query với các method Engine(), queryFirst(String), queryMore(String), findDoc(String), addDocs(String), ném NotPossibleException. Iteration 1: thêm WordTable (lưu từ quan trọng/không quan trọng và số lần xuất hiện), TitleTable (tra cứu theo title), Comm (getDocs từ URL). Iteration 2: TitleTable dùng Hashtable; Query dùng WordTable, keys, matches (Vector); DocCnt (implements Comparable) và Sorting.quickSort; Helpers.canon chuẩn hóa từ về dạng chuẩn; WordTable.addDoc trả Hashtable từ→tần suất." },
-    { "h": "Ví dụ chạy (Lecture 11)", "text": "Dữ liệu: d1 (t1: W1=6, W2=12), d2 (t2: W1=10), d3 (t3: W2=4). addDocs tạo TitleTable <t1,d1>,<t2,d2>,<t3,d3> và WordTable w1→[<d1,6>,<d2,10>], w2→[<d1,12>,<d3,4>]. queryFirst(w1) → matches sắp giảm dần [<d2,10>,<d1,6>]. queryMore(w2) giữ tài liệu có cả w1 và w2, cộng tần suất → [<d1,18>]. findDoc(t1) → d1." }
-  ],
+  "audit": {
+    "sourceFile": "Resources/Lecture 10.pdf & Resources/Lecture 11.pdf (19 slides, 1 trang dài)",
+    "totalPages": 121,
+    "extractedPages": 121,
+    "ocrNotes": [
+      "Lecture 10.pdf gồm 102 trang PDF có text layer (Slides 1–102); Lecture 11.pdf là PDF ảnh 1 trang dài (960×13680 px) gồm 19 slide 960×720 px (pageNumber: 1, loc: Slide 1..19).",
+      "Mâu thuẫn/lỗi chính tả nguyên văn trên slide được giữ nguyên khi trích: 'Iterative refinement(top-down)' thiếu khoảng trắng (L10 Slide 3); 'queryfirst' viết thường f trên các sơ đồ lớp (L10 Slides 30, 36, 40, 69, 70, 102; L11 Slides 3, 19) nhưng là 'queryFirst' ở đặc tả & sequence diagram (L10 Slides 32, 41, 54); 'appears-in' ghi nhận Keyword–Document ở L10 Slide 14 nhưng vẽ giữa Document–Word ở Slides 15–17; tiêu đề 'Engine.queryFirst (1.1)' bị lặp ở Slide 47 và 'Engine.queryFirst (1.6)' bị lặp ở Slide 50; 'functin' trên L10 Slide 66; thuộc tính '- t: TitleTable' trên Slide 70 khác '- tt: TitleTable' trên Slide 71; 'getCount: int' thiếu ngoặc '()' trên Slide 91; 'Query.addDoc(Doc, Hashtable)' trên Slide 96 khác 'addDoc(Hashtable, Doc)' trên Slides 97–98 và vẫn ghi 'addDoc(Doc)' ở Slide 102; 'Walk throught' trên L11 Slide 9; '<d2,10>' bị gạch ngang trên L11 Slide 16 để biểu diễn loại khỏi kết quả lọc."
+    ]
+  },
   "sources": [
-    { "file": "Resources/Lecture 10.pdf", "loc": "Slides 1–102" },
-    { "file": "Resources/Lecture 11.pdf", "loc": "Slides 1–19 (PDF ảnh 1 trang)" }
+    {
+      "file": "Resources/Lecture 10.pdf",
+      "loc": "Slides 1–102 (đầy đủ 102/102 slides)"
+    },
+    {
+      "file": "Resources/Lecture 11.pdf",
+      "loc": "Slides 1–19 (đầy đủ 19/19 slides, PDF ảnh 1 trang dài)"
+    }
+  ],
+  "summary": [
+    {
+      "h": "Quy trình Thiết kế (Design Process) & Tài liệu Thiết kế (Design Document)",
+      "text": "Giới thiệu hai nguyên tắc cốt lõi của thiết kế phần mềm hướng đối tượng (Decomposition by abstraction và Iterative refinement top-down), các bước lặp trong từng vòng thiết kế, tổng quan các vòng Iteration 0–2+ và cấu trúc Design Document (Design Notebook).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 1–9"
+      },
+      "digest": {
+        "keyPoints": [
+          "Quy trình thiết kế dựa trên 2 nguyên tắc: Decomposition by abstraction (phân rã hàm và sáng tạo/sử dụng abstraction cho các hàm con) và Iterative refinement top-down (chia hoạt động thiết kế thành các vòng lặp, bắt đầu từ mức cao và tinh chỉnh dần).",
+          "Trong mỗi iteration: chọn một abstraction A → xác định các helper abstraction cần thiết để cài đặt A và hỗ trợ phân rã → viết/cập nhật đặc tả thiết kế cho A → dừng khi mọi abstraction đều đã có đặc tả thiết kế.",
+          "Lộ trình 3 giai đoạn: Iteration 0 (initial abstractions từ đặc tả yêu cầu ban đầu), Iteration 1 (top-level abstractions từ việc phân tích đặc tả của các initial abstraction), và Subsequent abstractions (Iteration 2+ lặp cho tới khi không phát sinh abstraction mới).",
+          "Design document (Design notebook) ghi lại mọi quyết định thiết kế: mỗi abstraction có 1 mục gồm design specification, implementation sketch (nếu cần), context of use/comment, kèm các sơ đồ Class, Sequence, Activity diagram."
+        ],
+        "terms": [
+          {
+            "term": "Decomposition by abstraction",
+            "meaning": "Phân rã chức năng lớn thành các chức năng con và phát minh hoặc tái sử dụng abstraction (lớp/kiểu dữ liệu trừu tượng) để đảm nhận chúng."
+          },
+          {
+            "term": "Iterative refinement (top-down)",
+            "meaning": "Chia thiết kế thành nhiều vòng lặp từ mức tổng quát cao xuống chi tiết, tinh chỉnh dần qua từng bước."
+          },
+          {
+            "term": "Design document / Design notebook",
+            "meaning": "Tài liệu lưu toàn bộ quyết định thiết kế gồm đặc tả, phác thảo cài đặt, ngữ cảnh sử dụng và các biểu đồ UML (Class, Sequence, Activity)."
+          }
+        ],
+        "pitfalls": [
+          "Nhầm thứ tự dừng của vòng lặp thiết kế: điều kiện dừng là khi mọi abstraction đã có đặc tả thiết kế xác định (Slide 4) / không còn abstraction mới nào được phát hiện (Slide 5), chứ không phải khi viết xong code.",
+          "Slide 7 minh họa rõ tại Iteration 1: chỉ phân tích các method và field của A0 (ví dụ a1: Object, m1(Object)) để phát hiện A1, A2 ở tầng dưới; còn Iteration 2 mới đi sâu vào A1 (m3()) để phát hiện A3, A4."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 10 — Design",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 10",
+            "Design"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide mở đầu giới thiệu chủ đề Lecture 10: **Design** (Thiết kế phần mềm) trong học phần 61FIT3SE1 - Software Engineering 1.",
+            "Bài này nối tiếp pha Requirement Analysis và UML Class Diagrams (Lecture 9), hướng dẫn cách biến đặc tả yêu cầu thành thiết kế kiến trúc/lớp hoàn chỉnh trước khi lập trình."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 2,
+          "title": "Outline",
+          "bullets": [
+            "Design process",
+            "Design notebook",
+            "Example"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Slide liệt kê 3 nội dung chính của bài học: (1) Quy trình thiết kế (Design process), (2) Sổ tay/tài liệu thiết kế (Design notebook), và (3) Ví dụ thực hành đầy đủ (Example — hệ thống tìm kiếm KEngine).",
+            "Phần Example chiếm tỷ trọng lớn nhất (từ Slide 10 đến Slide 102 và tiếp sang Lecture 11), minh họa từng vòng lặp thiết kế từ đầu đến cuối."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 3,
+          "title": "Design process",
+          "bullets": [
+            {
+              "text": "Two principles",
+              "subBullets": [
+                "Decomposition by abstraction",
+                "Iterative refinement"
+              ]
+            },
+            {
+              "text": "Decomposition by abstraction:",
+              "subBullets": [
+                "Decompose functions",
+                "Invent or use abstractions to accommodate the sub-functions"
+              ]
+            },
+            {
+              "text": "Iterative refinement(top-down):",
+              "subBullets": [
+                "Divide design activities into iterations",
+                "Start high-level, incrementally refine"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Slide trình bày **2 nguyên tắc nền tảng** của quy trình thiết kế theo phương pháp Liskov & Guttag: **Decomposition by abstraction** (phân rã nhờ trừu tượng hóa) và **Iterative refinement** (tinh chỉnh lặp theo hướng top-down).",
+            "Thay vì chia nhỏ code hỗn loạn, ta tách một bài toán phức tạp thành các hàm con rồi thiết kế/dùng các abstraction (lớp) phù hợp để gánh vác từng hàm con đó.",
+            "Mẹo nhớ thi trắc nghiệm: hướng tiếp cận ở đây là **top-down** — khởi đầu ở mức trừu tượng cao rồi bổ sung chi tiết qua từng iteration."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 4,
+          "title": "Iterative steps",
+          "bullets": [
+            {
+              "text": "In each iteration:",
+              "subBullets": [
+                "Select an abstraction (A)",
+                "Identify helper abstractions needed to: Implement A; Facilitate decomposition",
+                "Write/update design specification for A",
+                "Stop if design specifications of all abstractions have been determined"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "Slide quy định đúng 4 bước lặp trong mỗi vòng thiết kế: chọn một abstraction `A`, tìm các helper abstraction để cài đặt `A` và hỗ trợ phân rã, viết hoặc cập nhật đặc tả thiết kế cho `A`, và kiểm tra điều kiện dừng.",
+            "Cần chú ý hai mục đích của helper abstraction: vừa giúp **implement A** (lưu dữ liệu, thực thi thuật toán), vừa giúp **facilitate decomposition** (giữ cho `A` gọn gàng, đơn nhiệm)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 5,
+          "title": "Design process overview",
+          "bullets": [
+            {
+              "text": "Iteration 0: initial abstractions",
+              "subBullets": [
+                "Identify some initial abstractions, including the software and other obvious concepts",
+                "These concepts can be identified from initial design spec. of the software operations"
+              ]
+            },
+            {
+              "text": "Iteration 1: top-level abstractions",
+              "subBullets": [
+                "Start analysing the design spec. of each initial abstraction to identify new abstractions"
+              ]
+            },
+            {
+              "text": "Subsequent abstractions:",
+              "subBullets": [
+                "Repeat the analysis for each new abstraction until no further abstraction are identified."
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Slide khái quát hóa các vòng lặp thành 3 tầng rõ rệt: **Iteration 0** xác định phần mềm chính và các khái niệm hiển nhiên ngay từ yêu cầu; **Iteration 1** phân tích đặc tả của các abstraction ban đầu để tìm ra các abstraction mức đỉnh (top-level).",
+            "Từ **Iteration 2 trở đi (Subsequent abstractions)**, tiếp tục phân tích từng abstraction mới sinh ra cho đến khi không còn abstraction nào cần tách thêm nữa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 6,
+          "title": "Illustration: Initial abstractions",
+          "bullets": [
+            "Iteration 0"
+          ],
+          "diagramText": [
+            "(Program) [A0]: methods m1() (khoanh nét đứt), m2(), ...",
+            "m1() ──● A1 (lớp chưa có chi tiết)",
+            "m1() ──● A2 (lớp chưa có chi tiết)"
+          ],
+          "diagramNote": "Minh họa Iteration 0: từ đặc tả thao tác m1() của chương trình chính A0, xác định ra hai initial abstraction hiển nhiên A1 và A2.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Hình minh họa trực quan Iteration 0: chương trình tổng thể được biểu diễn là lớp `A0` với các thao tác chính `m1()`, `m2()`, ...",
+            "Ngay khi đọc mô tả của `m1()`, nhà thiết kế nhận ra hai khái niệm đầu tiên `A1` và `A2` (lúc này bên trong `A1`, `A2` vẫn còn trống vì chưa phân rã sâu)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 7,
+          "title": "Top-level abstractions",
+          "bullets": [
+            "Iteration 1"
+          ],
+          "diagramText": [
+            "A0: field a1: Object; methods m1(Object) (khoanh nét đứt), m2(), ...",
+            "a1 và m1(Object) liên kết tới A1 (m3(), m4(), ...) và A2 (m5(), m6(), ...)",
+            "Giữa A1 và A2 có '...' thể hiện các top-level abstraction khác phát sinh từ A0"
+          ],
+          "diagramNote": "Minh họa Iteration 1: phân tích biểu diễn và thao tác của A0 (như a1: Object, m1(Object)) để xác định các phương thức m3(), m4() cho A1 và m5(), m6() cho A2.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "Tại **Iteration 1**, ta đi sâu phân tích đặc tả của `A0` (`a1: Object`, `m1(Object)`), từ đó tìm ra các thuộc tính và phương thức cụ thể mà `A1` (`m3()`, `m4()`) và `A2` (`m5()`, `m6()`) phải cung cấp.",
+            "Điểm quan trọng: Iteration 1 tập trung vào các abstraction mức cao nhất phục vụ trực tiếp chương trình `A0`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 8,
+          "title": "Subsequent abstractions",
+          "bullets": [
+            "Iteration 2,…"
+          ],
+          "diagramText": [
+            "A1: methods m3() (khoanh nét đứt), m4(), ...",
+            "m3() sử dụng các helper abstraction mới: A3 (m7(), m8(), ...) và A4 (m9(), m10(), ...)"
+          ],
+          "diagramNote": "Minh họa Iteration 2 trở đi: khi phân tích chi tiết phương thức m3() của A1, tiếp tục phát hiện các abstraction bậc thấp hơn là A3 và A4.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "Tại **Iteration 2,…**, quá trình phân rã lặp lại trên từng abstraction vừa xuất hiện ở Iteration 1 — ở đây chọn `A1` và xem xét phương thức `m3()`.",
+            "Để `m3()` hoạt động rõ ràng và hiệu quả, nhà thiết kế tiếp tục phát sinh các helper abstraction `A3` (`m7()`, `m8()`) và `A4` (`m9()`, `m10()`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 9,
+          "title": "Design document",
+          "bullets": [
+            "Documents all the design decisions",
+            {
+              "text": "A section for each abstraction, containing:",
+              "subBullets": [
+                "Design specification",
+                "Implementation sketch (if needed)",
+                "Context of use, comment,…"
+              ]
+            },
+            {
+              "text": "Includes diagrams:",
+              "subBullets": [
+                "Class diagram",
+                "Sequence diagram",
+                "Activity diagram, …"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Slide định nghĩa nội dung của **Design document** (còn gọi là Design notebook ở Slide 2): nơi ghi chép toàn bộ các quyết định thiết kế của dự án.",
+            "Mỗi abstraction được dành một mục riêng gồm 3 phần: (1) Design specification (đặc tả hành vi/dữ liệu), (2) Implementation sketch (phác thảo cách cài đặt nếu phức tạp), và (3) Context of use, comment (ngữ cảnh dùng, ghi chú); đi kèm các sơ đồ Class, Sequence, Activity."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "KEngine: Phân tích Yêu cầu, Thực thể, Quan hệ & Use Case",
+      "text": "Khởi đầu ví dụ KEngine (chương 12.4 sách Guttag & Liskov): xác định 6 thực thể, 4 mối quan hệ phân tích, sơ đồ lớp phân tích tăng dần (Class diagram 1–4) và Use Case diagram cho Actor User.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 10–19"
+      },
+      "digest": {
+        "keyPoints": [
+          "Quy trình phát triển KEngine theo 4 bước: Requirement analysis → Design → Code → Test; yêu cầu gốc lấy từ Chapter 12.4 sách Guttag & Liskov.",
+          "6 thực thể miền (entities): Document (title, url, body/cachedURL), Word (label), Keyword, NonKeyword, Query, Match (sumFreq).",
+          "4 mối quan hệ miền: appears-in(Keyword, Document): frequency (association class), hasKeyword(Query, Keyword) (aggregation), hasMatch(Query, Match) (composition), refers-to(Match, Document) (association 0..* đến 1..1).",
+          "Use case của Actor User gồm 4 chức năng: Add Documents, Search for document, Query, QueryMore."
+        ],
+        "terms": [
+          {
+            "term": "appears-in",
+            "meaning": "Association class mang thuộc tính frequency biểu diễn số lần xuất hiện của một từ trong tài liệu (Slides 14–17)."
+          },
+          {
+            "term": "hasMatch (Composition)",
+            "meaning": "Quan hệ hợp thành (hình thoi đặc) giữa Query (whole) và 1..* Match (part): Match chỉ tồn tại gắn với Query."
+          },
+          {
+            "term": "hasKeyword (Aggregation)",
+            "meaning": "Quan hệ tụ hợp (hình thoi rỗng) giữa Query và * Keyword: các từ khóa vẫn tồn tại độc lập với Query."
+          }
+        ],
+        "pitfalls": [
+          "Lỗi không nhất quán ngay trên slide gốc: Slide 14 viết appears-in(Keyword, Document), nhưng sơ đồ Class diagram (2)–(4) ở Slides 15–17 lại nối association class appears-in vào giữa Document (1..*) và Word (1..*)! Ngoài ra, Slide 13 ghi Document có (title, url, body) còn Slides 15–17 đổi thành (title, url, cachedURL).",
+          "Phân biệt kỹ ký hiệu UML: Query–Match là Composition (thoi đặc, hasMatch), Query–Keyword là Aggregation (thoi rỗng, hasKeyword), còn NonKeyword và Keyword kế thừa (generalization) từ Word."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 10,
+          "title": "Example for Kengine in textbook",
+          "paragraphs": [
+            "Requirement analysis",
+            "Design",
+            "Code",
+            "Test"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "Slide mở đầu phần ví dụ xuyên suốt của môn học: xây dựng công cụ tìm kiếm từ khóa **KEngine** dựa theo sách giáo trình.",
+            "Lộ trình phát triển chuẩn gồm 4 pha nối tiếp: Requirement analysis (phân tích yêu cầu) → Design (thiết kế) → Code (cài đặt) → Test (kiểm thử)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 11,
+          "title": "Example for Kengine",
+          "paragraphs": [
+            "Requirement analysis:",
+            "The requirement is in chapter 12.4 of the textbook by Guttag & Liskov"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Slide chỉ rõ nguồn gốc bản đặc tả yêu cầu của hệ thống KEngine nằm ở **Chapter 12.4** của giáo trình chuẩn *Program Development in Java* (Barbara Liskov & John Guttag).",
+            "Giai đoạn Requirement analysis chuyển các đoạn mô tả bằng văn xuôi trong sách thành danh sách thực thể, mối quan hệ và Use Case."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 12,
+          "title": "Kengine entities",
+          "paragraphs": [
+            "Document: title, url, body",
+            "Word: label",
+            "Keyword",
+            "NonKeyword",
+            "Query",
+            "Match: document, sum-freq"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "Từ đặc tả yêu cầu, ta trích xuất được **6 thực thể (entities)** cốt lõi của bài toán KEngine: `Document`, `Word`, `Keyword`, `NonKeyword`, `Query`, và `Match`.",
+            "Trong đó `Document` có 3 thuộc tính (`title`, `url`, `body`), `Word` có `label`, còn `Match` giữ thông tin tài liệu khớp (`document`) và tổng tần suất xuất hiện (`sum-freq`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 13,
+          "title": "Class diagram (1)",
+          "diagramText": [
+            "Document [attributes: title, url, body]",
+            "Word [attributes: label]",
+            "NonKeyword []",
+            "Keyword []",
+            "Match [attributes: sumFreq]",
+            "Query []"
+          ],
+          "diagramNote": "Bước 1 dựng sơ đồ lớp phân tích: đặt 6 lớp thực thể (Document, Word, NonKeyword, Keyword, Match, Query) cùng các thuộc tính cơ bản lên sơ đồ, chưa vẽ quan hệ.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Slide minh họa bước đầu tiên khi vẽ Analysis Class Diagram: biến 6 entity ở Slide 12 thành 6 hộp lớp UML tách rời.",
+            "Chú ý `document` của `Match` ở Slide 12 tạm chưa đưa vào hộp `Match` (vì sẽ được biểu diễn bằng đường liên kết `refers-to` tới `Document` ở các bước sau), chỉ giữ `sumFreq`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 14,
+          "title": "Kengine entities relationships",
+          "paragraphs": [
+            "appears-in(Keyword,Document): frequency",
+            "hasKeyword(Query,Keyword)",
+            "hasMatch(Query, Match)",
+            "refers-to(Match, Document)"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "Slide liệt kê **4 mối quan hệ nghiệp vụ** giữa các thực thể của KEngine: `appears-in` (một từ khóa xuất hiện trong một tài liệu với tần suất `frequency`), `hasKeyword` (truy vấn chứa từ khóa), `hasMatch` (truy vấn có các kết quả khớp), và `refers-to` (mỗi Match trỏ tới một Document).",
+            "Lưu ý cho kỳ thi: `appears-in` là quan hệ nhiều–nhiều có thuộc tính riêng (`frequency`), nên trong UML sẽ được mô hình hóa thành **Association Class**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 15,
+          "title": "Class diagram (2)",
+          "diagramText": [
+            "Document (title, url, cachedURL) 1..* ──── 1..* Word (label)",
+            "  └── (nét đứt) Association Class: appears-in (frequency)",
+            "NonKeyword ──▷ Word (Generalization)",
+            "Keyword ──▷ Word (Generalization)",
+            "Match (sumFreq), Query (chưa nối)"
+          ],
+          "diagramNote": "Bước 2 bổ sung quan hệ tổng quát hóa (NonKeyword, Keyword kế thừa Word) và liên kết nhiều–nhiều (1..* – 1..*) giữa Document và Word gắn association class appears-in (frequency).",
+          "ocrNote": "Trên slide này thuộc tính thứ 3 của Document đổi từ 'body' (Slide 13) thành 'cachedURL', và appears-in nối với Word thay vì Keyword như văn bản Slide 14.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "Sơ đồ lớp được cập nhật với 2 nhóm quan hệ đầu tiên: quan hệ kế thừa (tam giác rỗng nét liền) từ `NonKeyword` và `Keyword` lên lớp cha `Word`, và liên kết `1..* — 1..*` giữa `Document` và `Word` có gắn association class `appears-in` chứa `frequency`.",
+            "Lưu ý điểm không nhất quán nhỏ trong tài liệu môn học: text ở Slide 14 ghi `appears-in(Keyword, Document)` nhưng sơ đồ ở Slides 15–17 nối `appears-in` vào `Word` (lớp cha của `Keyword` và `NonKeyword`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 16,
+          "title": "Class diagram (3)",
+          "diagramText": [
+            "Document (title, url, cachedURL) 1..* ──── 1..* Word (label) + appears-in (frequency)",
+            "NonKeyword ──▷ Word; Keyword ──▷ Word",
+            "Match (sumFreq) 1..* ────◆ Query (hasMatch ◀, Composition)",
+            "Query ◇──── * Keyword (hasKeyword ▶, Aggregation)"
+          ],
+          "diagramNote": "Bước 3 thêm hai quan hệ toàn thể–bộ phận của Query: Composition (thoi đặc) với 1..* Match mang tên hasMatch, và Aggregation (thoi rỗng) với * Keyword mang tên hasKeyword.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "Slide bổ sung quan hệ cho lớp `Query`: `Query` chứa các `Match` theo quan hệ **Composition** (hình thoi đặc, bội số `1..*`, `hasMatch`) vì một kết quả khớp sinh ra riêng cho câu truy vấn đó và mất đi khi truy vấn bị hủy.",
+            "Ngược lại, `Query` liên kết với `Keyword` qua **Aggregation** (hình thoi rỗng, bội số `*`, `hasKeyword`) vì các từ khóa vẫn tồn tại trong kho văn bản độc lập với câu truy vấn."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 17,
+          "title": "Class diagram (4)",
+          "diagramText": [
+            "Document (title, url, cachedURL) 1..* ──── 1..* Word (label) + appears-in (frequency)",
+            "NonKeyword ──▷ Word; Keyword ──▷ Word",
+            "Match (sumFreq) 1..* ────◆ Query (hasMatch ◀) ◇──── * Keyword (hasKeyword ▶)",
+            "Match (0..*) ──── (1..1) Document (refers-to ▲)"
+          ],
+          "diagramNote": "Bước 4 hoàn thiện Analysis Class Diagram bằng cách thêm liên kết refers-to giữa Match (0..*) và Document (1..1).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "Sơ đồ lớp phân tích hoàn chỉnh sau khi thêm liên kết `refers-to` từ `Match` (`0..*`) tới `Document` (`1..1`): mỗi `Match` luôn tham chiếu tới đúng 1 `Document`, còn một `Document` có thể xuất hiện trong `0` hoặc nhiều `Match` của các truy vấn khác nhau.",
+            "Đây chính là bức tranh mô hình miền (domain model) hoàn chỉnh trước khi bước sang giai đoạn Design (Iteration 0)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 18,
+          "title": "Use Case Diagram",
+          "paragraphs": [
+            "Actor: user",
+            "Features:",
+            "    Add documents",
+            "    Search for documents: title or query (query or query more)"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "Slide tóm tắt tác nhân và chức năng nghiệp vụ của KEngine dưới góc nhìn Use Case: chỉ có một actor duy nhất là `user`.",
+            "Các tính năng chính gồm nạp thêm tài liệu (`Add documents`) và tìm kiếm tài liệu theo tiêu đề (`title`) hoặc theo từ khóa (`query` và lọc thêm `query more`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 19,
+          "title": "Use Case Diagram",
+          "diagramText": [
+            "Actor: User",
+            "  ├── Add Documents",
+            "  ├── Search for document",
+            "  ├── Query",
+            "  └── QueryMore"
+          ],
+          "diagramNote": "Biểu đồ Use Case với một actor là User kết nối trực tiếp tới 4 hình elip Use Case: Add Documents, Search for document, Query, QueryMore.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Biểu đồ Use Case trực quan hóa 4 ca sử dụng chính mà `User` tương tác với KEngine: `Add Documents`, `Search for document` (tìm theo tiêu đề), `Query` (truy vấn từ khóa đầu tiên), và `QueryMore` (bổ sung từ khóa để thu hẹp kết quả).",
+            "4 use case này kết hợp với thao tác khởi động hệ thống (`StartEngine` / `Engine()`) sẽ trở thành 5 phương thức của lớp `Engine` trong Design Iteration 0."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Design Iteration 0: Initial Abstractions của KEngine",
+      "text": "Chuyển đổi đặc tả yêu cầu thành đặc tả thiết kế ban đầu (Iteration 0): xác định 3 initial abstraction (Engine, Doc, Query), 5 phương thức của Engine kèm ngoại lệ NotPossibleException, đặc tả Java (@overview/@effects) và Initial Design Class Diagram.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 20–36"
+      },
+      "digest": {
+        "keyPoints": [
+          "Quy tắc chuẩn bị Iteration 0 (Slide 21): chuyển yêu cầu thành đặc tả thiết kế ban đầu bằng cách tạo hàm từ các feature, dùng initial abstraction làm kiểu trả về khi cần, định nghĩa Exception phù hợp cho lỗi/ràng buộc, và dựng sơ đồ lớp ban đầu với các mũi tên dependency.",
+          "Từ 5 thao tác (StartEngine/Engine(), queryFirst(String), queryMore(String), findDoc(String), addDocs(String)), phân tích từng thao tác cho thấy cần 3 initial data abstractions: Engine, Doc, Query (Slide 29).",
+          "Mọi phương thức của Engine đều có thể ném ngoại lệ NotPossibleException khi đầu vào không hợp lệ (không phải word, thuộc NonKeyword, chưa có query trước đó, không tìm thấy title, URL lỗi hoặc trùng, không đọc được file uninteresting words).",
+          "Initial Design Class Diagram (Slide 36) gồm 3 lớp với phụ thuộc: Engine → Query, Engine → Doc, và Query → Doc."
+        ],
+        "terms": [
+          {
+            "term": "NotPossibleException",
+            "meaning": "Ngoại lệ (exception) dùng chung trong các phương thức của Engine khi điều kiện tiên quyết hoặc dữ liệu đầu vào không thỏa mãn yêu cầu nghiệp vụ."
+          },
+          {
+            "term": "Initial abstractions (Iteration 0)",
+            "meaning": "3 lớp trừu tượng khởi đầu của KEngine: Engine (hệ thống chính), Doc (tài liệu văn bản), Query (truy vấn và kết quả khớp)."
+          }
+        ],
+        "pitfalls": [
+          "Chú ý sự đổi tên qua từng bước phân tích: 'query(String)' được đổi tên thành 'queryfirst(String)' / 'queryFirst(String)' ở Slide 26 khi bổ sung 'QueryMore'; 'startEngine()' đổi thành constructor 'Engine()' ở Slide 28.",
+          "Slide 30 viết 'queryfirst(String): Query' (chữ f thường), trong khi đặc tả Java Slide 32 viết 'Query queryFirst(String w)' (chữ F hoa) — khi đọc đề thi cần hiểu cả hai chỉ cùng một phương thức."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 20,
+          "title": "Example for Kengine Design — Design Iteration 0",
+          "paragraphs": [
+            "Design Iteration 0",
+            "Initial abstraction"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 20"
+          },
+          "explanation": [
+            "Slide đánh dấu bước chuyển từ pha phân tích yêu cầu sang pha thiết kế với **Design Iteration 0: Initial abstraction**.",
+            "Mục tiêu của Iteration 0 là xác định các lớp trừu tượng hiển nhiên ở bề mặt giao tiếp với người dùng trước khi đi sâu cài đặt bên trong."
+          ]
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 21,
+          "title": "Preparation",
+          "bullets": [
+            {
+              "text": "Transform requirement specification into initial design specification",
+              "subBullets": [
+                "Create functions based on features of the program",
+                "Use initial abstractions as return type where required",
+                "Create suitable Exception based on error and restriction"
+              ]
+            },
+            {
+              "text": "Construct initial design class diagram:",
+              "subBullets": [
+                "Associations with dependency indicators"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 21"
+          },
+          "explanation": [
+            "Slide hướng dẫn 4 việc cần làm ở bước chuẩn bị Iteration 0: tạo các phương thức cho lớp chính dựa trên feature, dùng các initial abstraction làm kiểu trả về, thiết kế Exception cho các tình huống lỗi/giới hạn, và vẽ sơ đồ lớp thiết kế ban đầu kèm mũi tên phụ thuộc (dependency).",
+            "Đây là khung phương pháp chuẩn áp dụng cho mọi bài tập thiết kế theo giáo trình Liskov & Guttag."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 22,
+          "title": "KEngine: initial design overview",
+          "bullets": [
+            "Create functions:"
+          ],
+          "diagramText": [
+            "Engine:",
+            "  startEngine()",
+            "  query(String)",
+            "  queryMore(String)",
+            "  findDoc(String)",
+            "  addDocs(String)"
+          ],
+          "diagramNote": "Lớp Engine khởi đầu gồm 5 hàm tương ứng với các feature: startEngine(), query(String), queryMore(String), findDoc(String), addDocs(String) (chưa có kiểu trả về).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 22"
+          },
+          "explanation": [
+            "Bước đầu tiên là đặt chương trình chính thành lớp `Engine` và ánh xạ 4 Use Case cùng thao tác khởi động thành 5 hàm ban đầu: `startEngine()`, `query(String)`, `queryMore(String)`, `findDoc(String)`, `addDocs(String)`.",
+            "Ở bước này các hàm mới chỉ có tên và tham số `String` đầu vào, chưa xác định kiểu trả về cụ thể."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 23,
+          "title": "Initial abstraction",
+          "bullets": [
+            "Which abstractions can we initially identify from Engine's requirement spec?"
+          ],
+          "diagramText": [
+            "Engine [startEngine(), query(String), queryMore(String), findDoc(String), addDocs(String)] ──● [?]",
+            "Engine ──● [?]"
+          ],
+          "diagramNote": "Sơ đồ đặt câu hỏi: từ đặc tả yêu cầu của Engine, ta xác định được những initial abstraction (?) nào ngoài Engine?",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 23"
+          },
+          "explanation": [
+            "Slide đặt câu hỏi dẫn dắt cho 5 slide tiếp theo (Slides 24–28): đọc kỹ từng yêu cầu của `Engine` để tìm các abstraction ban đầu (dấu `?`) mà `Engine` phải trả về hoặc làm việc cùng.",
+            "Cũng ở bước này, ta quyết định khái niệm nào cần tạo abstraction mới (như `Doc`, `Query`) và khái niệm nào có thể dùng kiểu có sẵn của Java (như `String`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "pageNumber": 24,
+          "title": "addDocuments",
+          "bullets": [
+            "The first thing the user must do is identify some documents of interest. Let’s assume that this is done by presenting a URL of a site containing documents",
+            {
+              "text": "addDocuments(String u)",
+              "subBullets": [
+                "need an abstraction to represent Document → creates abstraction Doc",
+                "URL is String input for function"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 24"
+          },
+          "explanation": [
+            "Phân tích chức năng `addDocuments(String u)`: tài liệu (Document) có cấu trúc phức tạp (tiêu đề, nội dung, đường dẫn) nên cần tạo abstraction `Doc` để đại diện.",
+            "Trong khi đó URL chỉ là một chuỗi văn bản đơn giản truyền vào làm tham số nên dùng thẳng kiểu `String` sẵn có của Java."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "pageNumber": 25,
+          "title": "query",
+          "bullets": [
+            "In consultation with the customer, we determine that a query begins by the user presenting a single word, which we will refer to as a keyword. The system responds to a query by presenting information about what documents contain the keyword. This information is ordered by how many times the keyword occurs in the documents. The system does not present the actual documents, but rather provides information so that the user can examine the matching documents further if desired.",
+            {
+              "text": "Query(String w)",
+              "subBullets": [
+                "need an abstraction to hold a keyword and to store matches -> create abstraction Query",
+                "may use String for Keyword & NonKeyword"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 25"
+          },
+          "explanation": [
+            "Phân tích chức năng `query`: người dùng nhập 1 từ khóa (`String`), hệ thống không in toàn bộ nội dung tài liệu mà trả về thông tin các tài liệu khớp được sắp theo tần suất xuất hiện để người dùng xem tiếp nếu muốn.",
+            "Vì vậy cần tạo abstraction `Query` để lưu từ khóa truy vấn cùng danh sách các kết quả khớp (`matches`), còn `Keyword` và `NonKeyword` chỉ là từ đơn nên dùng `String`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 26",
+          "pageNumber": 26,
+          "title": "querymore",
+          "bullets": [
+            "The customer also requests the ability to “refine” a query by providing another keyword; the matching documents must contain all the keywords.",
+            {
+              "text": "QueryMore(String w)",
+              "subBullets": [
+                "need an abstraction to hold a keyword and to store matches -> use abstraction Query",
+                "may use String for Keyword & NonKeyword",
+                "Change name of query function to queryfirst"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 26"
+          },
+          "explanation": [
+            "Phân tích `querymore`: cho phép thu hẹp truy vấn hiện tại bằng thêm một từ khóa sao cho các tài liệu kết quả phải chứa **tất cả** các từ khóa đã nhập.",
+            "Thao tác này tái sử dụng chính abstraction `Query` đã tạo ở bước trước, đồng thời hàm `query` được đổi tên thành `queryfirst` để phân biệt rõ giữa truy vấn mới và truy vấn bổ sung."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "pageNumber": 27,
+          "title": "findDoc",
+          "bullets": [
+            "The customer indicates that a user should be able to search the collection for a document with a particular title.",
+            {
+              "text": "findDoc(String t)",
+              "subBullets": [
+                "needs an abstraction to represent Document → uses abstraction Doc",
+                "Can use String to represent title"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 27"
+          },
+          "explanation": [
+            "Phân tích `findDoc(String t)`: người dùng tra cứu trực tiếp một tài liệu theo tiêu đề `t` (`String`).",
+            "Hàm này sử dụng lại abstraction `Doc` (kiểu trả về) đã được định nghĩa ở bước phân tích `addDocuments`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 28",
+          "pageNumber": 28,
+          "title": "StartEngine",
+          "bullets": [
+            {
+              "text": "The customer expects the search engine to know what the uninteresting words are without any user intervention; thus, it must have access to some storage, such as a file, that lists the uninteresting words",
+              "subBullets": [
+                "Change to constructor Engine()",
+                "needs to load uninteresting words"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 28"
+          },
+          "explanation": [
+            "Phân tích thao tác khởi tạo: hệ thống phải tự động nạp danh sách các từ không quan trọng (`uninteresting words`, ví dụ stop-words lưu trong file) mà không cần người dùng nhập tay.",
+            "Do đó `startEngine()` được chuyển thành hàm khởi tạo (constructor) `Engine()` để thực hiện việc nạp danh sách này ngay khi tạo đối tượng `Engine`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "pageNumber": 29,
+          "title": "Initial data abstractions",
+          "bullets": [
+            "Engine",
+            "Doc",
+            "Query"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 29"
+          },
+          "explanation": [
+            "Tổng hợp kết quả của Iteration 0: có đúng **3 initial data abstractions** là `Engine`, `Doc`, và `Query`.",
+            "Các thực thể khác trong pha phân tích như `Word`, `Keyword`, `NonKeyword` tạm được biểu diễn bằng `String`, còn `Match` được gộp vào trách nhiệm của `Query` ở tầng đầu."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "pageNumber": 30,
+          "title": "Engine",
+          "diagramText": [
+            "Engine",
+            "─────────────────────────",
+            "Engine()",
+            "queryfirst(String): Query",
+            "queryMore(String): Query",
+            "findDoc(String): Doc",
+            "addDocs(String): Query"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Engine với constructor Engine() và kiểu trả về cho 4 phương thức: Query hoặc Doc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 30"
+          },
+          "explanation": [
+            "Slide cập nhật chữ ký đầy đủ (tên hàm, tham số và kiểu trả về) của lớp `Engine`: `Engine()`, `queryfirst(String): Query`, `queryMore(String): Query`, `findDoc(String): Doc`, và `addDocs(String): Query`.",
+            "Chú ý `addDocs(String)` cũng trả về `Query` vì nếu đang có một truy vấn dở dang khi nạp tài liệu mới, kết quả truy vấn đó cần được cập nhật."
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "pageNumber": 31,
+          "title": "Initial design spec",
+          "code": {
+            "lang": "java",
+            "text": "/**\n@overview ...\n*/\nclass Engine {\n/**\n@effects\n* If uninteresting words not retrievable\nthrows NotPossibleException\nelse\n* creates NonKeyword and initialises app. state\n* appropriately\n*/\nEngine() throws NotPossibleException"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 31"
+          },
+          "explanation": [
+            "Slide viết đặc tả thiết kế ban đầu cho constructor `Engine()` theo cú pháp Javadoc mở rộng (`@overview`, `@effects`).",
+            "Nếu không đọc được nguồn chứa các từ không quan trọng (`uninteresting words`), constructor sẽ ném `NotPossibleException`; ngược lại, nó khởi tạo tập `NonKeyword` và trạng thái ban đầu của ứng dụng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "pageNumber": 32,
+          "title": "Initial design spec",
+          "code": {
+            "lang": "java",
+            "text": "/** * @effects\nIf WORD(w) = false or w in NonKeyword\n* throws NotPossibleException\n* else\n* sets Keyword = {w}, performs the new query, and returns the result\n*/\nQuery queryFirst(String w) throws NotPossibleException\n\n/**\n* @effects\n* If WORD(w) = false or w in NonKeyword or Key = {}\n* throws NotPossibleException\n* else\n* add w to Keyword and returns the query result\n*/\nQuery queryMore(String w) throws NotPossibleException"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 32"
+          },
+          "explanation": [
+            "Đặc tả hai phương thức truy vấn trong `Engine`: `queryFirst(String w)` yêu cầu `w` phải là một từ hợp lệ (`WORD(w) = true`) và không nằm trong `NonKeyword`, nếu không sẽ ném `NotPossibleException`; khi hợp lệ thì đặt tập từ khóa `Keyword = {w}` và trả về `Query`.",
+            "`queryMore(String w)` có thêm điều kiện thứ ba: `Key = {}` (tức chưa có truy vấn nào được thực hiện trước đó) cũng sẽ ném `NotPossibleException`; ngược lại thì thêm `w` vào tập từ khóa và trả về kết quả đã lọc."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "pageNumber": 33,
+          "title": "Initial design spec",
+          "code": {
+            "lang": "java",
+            "text": "/**\n@effects\n* If t not in Title throws NotPossibleException\n* else returns the document with title t\n*/\nDoc findDoc (String t) throws NotPossibleException\n/**\n* @effects\n* If u is not a URL for a site containing documents or u in URL\n* throws NotPossibleException\n* else adds the new documents to Doc.\n* If no query was in progress\n* returns the empty query result\n* else\n* returns query result that includes any new matching documents\n*/\nQuery addDocs(String u) throws NotPossibleException }"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 33"
+          },
+          "explanation": [
+            "Đặc tả hai phương thức còn lại của `Engine`: `findDoc(String t)` ném `NotPossibleException` nếu không có tài liệu nào mang tiêu đề `t`, ngược lại trả về đối tượng `Doc` đó.",
+            "`addDocs(String u)` kiểm tra `u` phải là URL hợp lệ và chưa từng được nạp (`u in URL` thì ném `NotPossibleException`); sau khi nạp tài liệu, nếu chưa có query nào đang chạy thì trả về `Query` rỗng, còn nếu đang có query thì trả về kết quả `Query` đã cập nhật thêm các tài liệu mới khớp từ khóa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "pageNumber": 34,
+          "title": "Doc",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @overview\n * A textual document contains a title and some text content.\n */\nclass Doc { }"
+          },
+          "diagramText": [
+            "Hộp lớp UML: Doc (rỗng thuộc tính và phương thức)"
+          ],
+          "diagramNote": "Slide hiển thị song song đặc tả Javadoc @overview cho class Doc và hộp lớp UML Doc còn trống.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 34"
+          },
+          "explanation": [
+            "Ở cuối Iteration 0, lớp `Doc` mới chỉ được viết `@overview` mô tả bản chất (một tài liệu văn bản gồm tiêu đề và nội dung text).",
+            "Các phương thức chi tiết của `Doc` (như `Doc(String)`, `body()`, `title()`, `words()`) sẽ dần được phát hiện ở Iteration 1 và Iteration 2."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "pageNumber": 35,
+          "title": "Query",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @overview\n * A query consists of keywords that are of interest.\n */\nclass Query { }"
+          },
+          "diagramText": [
+            "Hộp lớp UML: Query (rỗng thuộc tính và phương thức)"
+          ],
+          "diagramNote": "Slide hiển thị song song đặc tả Javadoc @overview cho class Query và hộp lớp UML Query còn trống.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 35"
+          },
+          "explanation": [
+            "Tương tự `Doc`, lớp `Query` ở Iteration 0 chỉ mới có đoạn `@overview` nói rằng truy vấn bao gồm các từ khóa được quan tâm.",
+            "Các thao tác cụ thể của `Query` (`Query(...)`, `size()`, `fetch()`, `addKey()`, `addDoc()`, `keys()`) sẽ xuất hiện khi phân rã `Engine` ở Iteration 1."
+          ]
+        },
+        {
+          "slideNumber": "Slide 36",
+          "pageNumber": 36,
+          "title": "Initial design class diagram",
+          "diagramText": [
+            "Engine [Engine(), queryfirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query]",
+            "  ├──► Query",
+            "  └──► Doc",
+            "Query ──► Doc"
+          ],
+          "diagramNote": "Sơ đồ lớp thiết kế ban đầu (kết thúc Iteration 0): gồm 3 lớp Engine, Query, Doc với mũi tên phụ thuộc từ Engine tới Query (mũi tên được khoanh tròn xanh), từ Engine tới Doc, và từ Query tới Doc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 36"
+          },
+          "explanation": [
+            "Đây là sản phẩm tổng kết của **Iteration 0**: sơ đồ lớp thiết kế ban đầu gồm 3 abstraction `Engine`, `Query`, `Doc`.",
+            "Mũi tên từ `Engine` tới `Query` (được khoanh xanh) và tới `Doc` xuất phát từ kiểu trả về của các phương thức trên `Engine`, còn mũi tên từ `Query` tới `Doc` phản ánh việc kết quả của `Query` chứa các đối tượng `Doc`."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Design Iteration 1: Phân rã Engine.queryFirst & Engine.queryMore",
+      "text": "Bắt đầu Design Iteration 1: nguyên tắc phân tích top-level abstraction, vẽ Activity diagram cho Engine.queryFirst, từng bước phân rã để phát hiện WordTable, cập nhật Doc và Query, và kiểm chứng lại bằng Sequence diagram cho queryFirst và queryMore.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 37–55"
+      },
+      "digest": {
+        "keyPoints": [
+          "Các bước Iteration 1 (Slides 38–39): phân rã từng hàm của Engine → phân tích các sub-task (ưu tiên phần quan trọng nhất) để tìm abstraction mới → xác định phép toán cho từng abstraction → kiểm chứng bằng Sequence diagram → cập nhật Class diagram, rep và đặc tả (data & procedural).",
+          "Phân tích Engine.queryFirst phát hiện WordTable (WordTable(), isInteresting(String): boolean, addDoc(Doc)) để quản lý chung cả từ quan trọng và không quan trọng; Doc cần Doc(String) và body(): String; Query cần Query(WordTable, String), size(): int và fetch(int): Doc.",
+          "Phân tích Engine.queryMore bổ sung cho Query hai phương thức: addKey(String) (thêm từ khóa mới vào truy vấn) và keys(): String[] (trả về danh sách từ khóa).",
+          "Sequence diagram (Slides 54–55) kiểm chứng luồng: User gọi Engine → Engine hỏi WordTable.isInteresting(w) → rẽ nhánh alt [b=true] tạo/cập nhật Query hoặc [else] ném NotPossibleException."
+        ],
+        "terms": [
+          {
+            "term": "WordTable",
+            "meaning": "Iteration abstraction lưu trữ cả từ quan trọng lẫn từ không quan trọng cùng số lần xuất hiện, cung cấp isInteresting(String) và addDoc(Doc)."
+          },
+          {
+            "term": "fetch(int) & size()",
+            "meaning": "Hai phương thức trên Query cho phép duyệt lấy từng tài liệu khớp theo chỉ số nguyên (0 <= i < size) mà không lộ cấu trúc lưu trữ bên trong."
+          }
+        ],
+        "pitfalls": [
+          "Trong bộ slide gốc, Slide 47 ghi nhầm tiêu đề là 'Engine.queryFirst (1.1)' (lẽ ra là 1.5), Slide 48 ghi '(1.6)', Slide 49 ghi '(1.5)', Slide 50 lại ghi '(1.6)' — khi đối chiếu nên dựa vào nội dung highlight vàng và số trang PDF thay vì số thứ tự trong tiêu đề.",
+          "Chú ý kiểu tham số hàm tạo Query trong Sequence diagram Slide 54 là `Query(wt, w)` khớp với chữ ký `Query(WordTable, String)` ở Slide 51."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 37",
+          "pageNumber": 37,
+          "title": "Example for Kengine Design — Design Iteration 1",
+          "paragraphs": [
+            "Design Iteration 1",
+            "Top-level abstractions"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 37"
+          },
+          "explanation": [
+            "Slide mở đầu **Design Iteration 1** nhằm xác định các lớp trừu tượng mức đỉnh (top-level abstractions) hỗ trợ trực tiếp cho `Engine`.",
+            "Ở vòng này, ta lần lượt mổ xẻ từng phương thức công khai của `Engine` đã đặc tả ở Iteration 0."
+          ]
+        },
+        {
+          "slideNumber": "Slide 38",
+          "pageNumber": 38,
+          "title": "Top-level data abstraction (1)",
+          "bullets": [
+            "Find all the top-level abstractions",
+            {
+              "text": "Start decomposition with Engine:",
+              "subBullets": [
+                "decompose each function",
+                "analyse the sub-tasks (most significant ones first) to identify other data abstractions",
+                "identify operations of each data abstraction"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 38"
+          },
+          "explanation": [
+            "Slide nêu nửa đầu quy trình làm việc của Iteration 1: bắt đầu từ `Engine`, tách từng phương thức thành các bước nhỏ (sub-task).",
+            "Với các sub-task quan trọng nhất (như kiểm tra từ khóa, tra tiêu đề, tải tài liệu), ta tìm xem cần thêm data abstraction nào và abstraction đó cần các operation (method) gì."
+          ]
+        },
+        {
+          "slideNumber": "Slide 39",
+          "pageNumber": 39,
+          "title": "Top-level data abstraction (2)",
+          "bullets": [
+            "Validate using sequence diagram",
+            "Update the design class diagram",
+            "Write/update the representation (rep) of each data abstraction",
+            {
+              "text": "Write/update the specification of each abstraction:",
+              "subBullets": [
+                "data &",
+                "procedural"
+              ]
+            }
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 39"
+          },
+          "explanation": [
+            "Slide nêu nửa sau quy trình của Iteration 1: sau khi tìm ra các lớp và phương thức mới, phải dùng **Sequence diagram** để kiểm chứng tương tác xem có khớp không.",
+            "Cuối cùng mới cập nhật Design Class Diagram, viết/sửa phần biểu diễn dữ liệu (`rep` — representation) và cập nhật đặc tả mức dữ liệu (data spec) cũng như từng phương thức (procedural spec)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 40",
+          "pageNumber": 40,
+          "title": "KEngine: top-level design overview",
+          "bullets": [
+            "Which abstractions can we identify/refine from the design spec. of previous iteration?"
+          ],
+          "diagramText": [
+            "Engine [Engine(), queryfirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query]",
+            "  ├──► Query",
+            "  └──► Doc",
+            "Query ──► Doc"
+          ],
+          "diagramNote": "Hiển thị lại sơ đồ lớp kết thúc Iteration 0 làm điểm xuất phát cho việc phân rã ở Iteration 1.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 40"
+          },
+          "explanation": [
+            "Slide nhắc lại trạng thái hiện tại sau Iteration 0: chỉ mới có `Engine`, `Query` (rỗng) và `Doc` (rỗng).",
+            "Câu hỏi trọng tâm của Iteration 1: khi phân tích 4 hàm nghiệp vụ của `Engine`, ta sẽ phát hiện thêm những lớp mới nào và bổ sung phương thức gì cho `Doc` và `Query`?"
+          ]
+        },
+        {
+          "slideNumber": "Slide 41",
+          "pageNumber": 41,
+          "title": "Engine.queryFirst",
+          "paragraphs": [
+            "Engine.queryFirst"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 41"
+          },
+          "explanation": [
+            "Slide tiêu đề chuyển sang phân rã phương thức đầu tiên của `Engine`: `Engine.queryFirst`.",
+            "Đây là hàm phức tạp và trung tâm nhất nên được chọn phân tích trước tiên (Slides 42–51)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 42",
+          "pageNumber": 42,
+          "title": "Engine.queryFirst Activity diagram",
+          "diagramText": [
+            "(●) → [Check input word] → [Create a new query] → [Object: Query] → [Find matching documents] → [Determine kwd frequencies] → [Sort the matching documents] → (◉)"
+          ],
+          "diagramNote": "Activity diagram mô tả luồng xử lý của Engine.queryFirst: kiểm tra từ đầu vào → tạo truy vấn mới (sinh object node Query) → tìm các tài liệu khớp → xác định tần suất từ khóa → sắp xếp các tài liệu khớp → kết thúc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 42"
+          },
+          "explanation": [
+            "Activity diagram giúp phác họa thuật toán tổng quát của `Engine.queryFirst` trước khi viết chi tiết từng bước bằng lời.",
+            "Chú ý nút hình chữ nhật `[Query]` nằm giữa luồng chính là **Object Node** biểu diễn đối tượng `Query` được tạo ra và truyền qua các bước tìm kiếm/sắp xếp tiếp theo."
+          ]
+        },
+        {
+          "slideNumber": "Slide 43",
+          "pageNumber": 43,
+          "title": "Engine.queryFirst (1.1)",
+          "bullets": [
+            "Check that the input string w is a word",
+            "Check that w is an interesting word",
+            "Start a new query with w as the keyword",
+            "For each document, determine if it is a match",
+            "For each document, determine the freq of w",
+            "Sort the matches by freq of w",
+            "Return the query and matches"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 43"
+          },
+          "explanation": [
+            "Slide chuyển Activity diagram thành **7 bước xử lý tuần tự** chi tiết của `Engine.queryFirst`.",
+            "Trong các slide 44–51 kế tiếp, giảng viên sẽ bôi vàng từng nhóm bước để suy ra yêu cầu thiết kế và abstraction tương ứng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 44",
+          "pageNumber": 44,
+          "title": "Engine.queryFirst (1.2)",
+          "bullets": [
+            "[Highlighted] Check that the input string w is a word",
+            "[Highlighted] Check that w is an interesting word",
+            "Start a new query with w as the keyword",
+            "For each document, determine if it is a match",
+            "For each document, determine the freq of w",
+            "Sort the matches by freq of w",
+            "Return the query and matches"
+          ],
+          "diagramText": [
+            "Callout giải thích cho 2 dòng bôi vàng:",
+            "• needs to know the uninteresting words",
+            "• needs to maintain both interesting and uninteresting words easily → record both types of words in the same abstraction (WordTable)"
+          ],
+          "diagramNote": "Hai bước kiểm tra w là từ hợp lệ và là từ đáng quan tâm được bôi vàng, dẫn tới quyết định gộp cả từ quan trọng và không quan trọng vào một abstraction mới là WordTable.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 44"
+          },
+          "explanation": [
+            "Phân tích 2 bước đầu: để biết `w` có phải từ khóa đáng quan tâm hay không, hệ thống phải biết tập các từ không quan trọng (`uninteresting words`) lẫn các từ quan trọng (`interesting words`).",
+            "Thay vì tách rời thành 2 bảng dễ gây rắc rối đồng bộ, quyết định thiết kế ở đây là **lưu cả 2 loại từ vào cùng một abstraction mang tên `WordTable`**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 45",
+          "pageNumber": 45,
+          "title": "Engine.queryFirst (1.3)",
+          "bullets": [
+            "Iteration abstraction",
+            "Stores words",
+            "Has operations to check and maintain the words set"
+          ],
+          "diagramText": [
+            "WordTable",
+            "─────────────────────────",
+            "WordTable()",
+            "▷ isInteresting(String): boolean",
+            "▷ addDoc(Doc)"
+          ],
+          "diagramNote": "Định nghĩa lớp mới WordTable gồm constructor WordTable() và 2 phương thức mới (đánh dấu tam giác xanh): isInteresting(String): boolean và addDoc(Doc).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 45"
+          },
+          "explanation": [
+            "Slide chính thức định nghĩa lớp `WordTable` (thuộc loại abstraction quản lý tập hợp/tra cứu): lưu các từ và cung cấp thao tác kiểm tra lẫn cập nhật.",
+            "Cụ thể `WordTable` có `isInteresting(String): boolean` (kiểm tra một từ có phải từ khóa hợp lệ/quan trọng không) và `addDoc(Doc)` (nạp các từ của một tài liệu mới vào bảng từ)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 46",
+          "pageNumber": 46,
+          "title": "Engine.queryFirst (1.4)",
+          "bullets": [
+            "Check that the input string w is a word",
+            "Check that w is an interesting word",
+            "[Highlighted] Start a new query with w as the keyword",
+            "For each document, determine if it is a match",
+            "For each document, determine the freq of w",
+            "Sort the matches by freq of w",
+            "Return the query and matches"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• needs to record first keyword in Query"
+          ],
+          "diagramNote": "Bước 'Start a new query with w as the keyword' được bôi vàng, chỉ ra Query cần lưu giữ từ khóa đầu tiên.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 46"
+          },
+          "explanation": [
+            "Phân tích bước 3: khi bắt đầu truy vấn mới với từ khóa `w`, đối tượng `Query` phải ghi nhận lại từ khóa đầu tiên này.",
+            "Điều này dẫn đến việc `Query` cần có constructor nhận `w` (và `WordTable` để tra cứu tài liệu, xem Slide 51) và cơ chế lưu trữ các từ khóa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 47",
+          "pageNumber": 47,
+          "title": "Engine.queryFirst (1.1)",
+          "bullets": [
+            "Check that the input string w is a word",
+            "Check that w is an interesting word",
+            "Start a new query with w as the keyword",
+            "[Highlighted] For each document, determine if it is a match",
+            "For each document, determine the freq of w",
+            "Sort the matches by freq of w",
+            "Return the query and matches"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• Same document is scanned many times (for different queries)",
+            "• Need a fast look up method to find w in doc → record the words of each document when it is processed"
+          ],
+          "diagramNote": "Bước 'For each document, determine if it is a match' được bôi vàng: vì cùng một tài liệu bị tìm kiếm nhiều lần qua các truy vấn khác nhau, cần ghi lại các từ của tài liệu ngay khi nạp để tra cứu nhanh.",
+          "ocrNote": "Tiêu đề trên slide gốc bị đánh số lặp là 'Engine.queryFirst (1.1)' (nội dung thực chất là bước kế tiếp sau 1.4).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 47"
+          },
+          "explanation": [
+            "Phân tích bước 4 cho thấy một bài học quan trọng về **hiệu năng thiết kế**: nếu mỗi lần có truy vấn lại quét lại toàn bộ nội dung văn bản của mọi `Document` thì rất chậm vì cùng một tài liệu bị tìm rất nhiều lần.",
+            "Giải pháp: ngay khi xử lý (nạp) một tài liệu vào hệ thống, ta lập tức lập chỉ mục/ghi nhận danh sách các từ của tài liệu đó (bởi `WordTable`) để các truy vấn sau tra cứu tức thì."
+          ]
+        },
+        {
+          "slideNumber": "Slide 48",
+          "pageNumber": 48,
+          "title": "Engine.queryFirst (1.6)",
+          "bullets": [
+            "Check that the input string w is a word",
+            "Check that w is an interesting word",
+            "Start a new query with w as the keyword",
+            "For each document, determine if it is a match",
+            "[Highlighted] For each document, determine the freq of w",
+            "Sort the matches by freq of w",
+            "Return the query and matches"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• freqs are likely to be re-used many times (for different queries) → record freqs of words when scanning documents"
+          ],
+          "diagramNote": "Bước 'For each document, determine the freq of w' được bôi vàng: tần suất từ được dùng lại nhiều lần nên cần lưu sẵn luôn lúc quét tài liệu.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 48"
+          },
+          "explanation": [
+            "Tương tự bước 4, khi xét bước 5 (tính tần suất xuất hiện `freq` của `w` trong tài liệu), nhận thấy giá trị tần suất này cũng sẽ được tái sử dụng qua nhiều câu truy vấn khác nhau.",
+            "Vì vậy ngay lúc quét tài liệu lần đầu (`WordTable.addDoc`), hệ thống tính và lưu sẵn **tần suất của từng từ quan trọng** trong tài liệu."
+          ]
+        },
+        {
+          "slideNumber": "Slide 49",
+          "pageNumber": 49,
+          "title": "Engine.queryFirst (1.5)",
+          "bullets": [
+            "Check that the input string w is a word",
+            "Check that w is an interesting word",
+            "Start a new query with w as the keyword",
+            "[Highlighted] For each document, determine if it is a match",
+            "For each document, determine the freq of w",
+            "[Highlighted] Sort the matches by freq of w",
+            "[Highlighted] Return the query and matches"
+          ],
+          "diagramText": [
+            "Callout giải thích:",
+            "• need to know Doc’s body → create body() in Doc",
+            "• need to record the query matches and their freqs: → records matches and their freqs in Query",
+            "• need a simple way of retrieving each match: → create methods size() and fetch(int) in Query"
+          ],
+          "diagramNote": "Các bước khớp tài liệu, sắp xếp và trả kết quả dẫn tới 3 quyết định: thêm body() vào Doc, lưu danh sách kết quả + tần suất trong Query, và thêm size(), fetch(int) vào Query.",
+          "ocrNote": "Số hiệu tiêu đề slide gốc ghi '(1.5)' dù đứng sau Slide 48 '(1.6)'.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 49"
+          },
+          "explanation": [
+            "Slide tổng hợp các yêu cầu còn lại của `queryFirst`: (1) Để đọc nội dung tài liệu khi lập chỉ mục từ, `Doc` cần phương thức `body()`; (2) `Query` phải lưu giữ tập tài liệu khớp kèm tần suất và sắp xếp sẵn; (3) Cần giao diện đơn giản để người dùng lấy từng kết quả nên tạo cặp hàm `size()` và `fetch(int)` trên `Query`.",
+            "Cách thiết kế `size()` + `fetch(int)` giúp che giấu cấu trúc lưu trữ nội bộ của `Query` (Information Hiding)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 50",
+          "pageNumber": 50,
+          "title": "Engine.queryFirst (1.6)",
+          "bullets": [
+            "Doc class"
+          ],
+          "diagramText": [
+            "Doc",
+            "─────────────────────────",
+            "Doc(String)",
+            "body(): String"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Doc: bổ sung constructor Doc(String) và phương thức body(): String.",
+          "ocrNote": "Số hiệu tiêu đề slide gốc lặp lại '(1.6)'.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 50"
+          },
+          "explanation": [
+            "Slide cập nhật hình ảnh hộp lớp `Doc` sau các quyết định vừa rồi: gồm hàm tạo `Doc(String)` và phương thức trả về phần nội dung văn bản `body(): String`.",
+            "Ở bước tiếp theo (phân tích `findDoc`), `Doc` sẽ được bổ sung thêm `title(): String`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 51",
+          "pageNumber": 51,
+          "title": "Engine.queryFirst (1.7)",
+          "bullets": [
+            "Query class: size() and fetch()"
+          ],
+          "diagramText": [
+            "Query",
+            "─────────────────────────",
+            "Query(WordTable, String)",
+            "size(): int",
+            "fetch(int): Doc"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Query: bổ sung constructor Query(WordTable, String), phương thức size(): int và fetch(int): Doc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 51"
+          },
+          "explanation": [
+            "Slide cập nhật hộp lớp `Query` với 3 thành viên đầu tiên: hàm tạo `Query(WordTable, String)` nhận bảng từ và từ khóa đầu tiên, `size(): int` trả về số tài liệu khớp, và `fetch(int): Doc` lấy tài liệu khớp ở vị trí thứ `i`.",
+            "Chú ý vì cần tra cứu các tài liệu khớp ngay lúc khởi tạo từ `w`, `Query` nhận `WordTable` ngay trong tham số constructor."
+          ]
+        },
+        {
+          "slideNumber": "Slide 52",
+          "pageNumber": 52,
+          "title": "Engine.queryMore",
+          "paragraphs": [
+            "Engine.queryMore"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 52"
+          },
+          "explanation": [
+            "Slide phân đoạn chuyển sang phân rã phương thức thứ hai của `Engine`: `Engine.queryMore`.",
+            "Nhờ nền tảng của `queryFirst`, việc phân rã `queryMore` chỉ mất một slide phân tích (Slide 53)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 53",
+          "pageNumber": 53,
+          "title": "Engine.queryMore",
+          "bullets": [
+            "[Highlighted] Add a new keyword to an existing query",
+            "Repeats the check for the new keyword to filter the existing matches(if any)"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• to record subsequent keywords in Query: → create addKey() method to add a new keyword to Query",
+            "• (together with 1.4) → create keys() in Query to observe the keywords"
+          ],
+          "diagramNote": "Bước thêm từ khóa mới vào truy vấn hiện tại dẫn tới bổ sung addKey() và keys() vào lớp Query.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 53"
+          },
+          "explanation": [
+            "Khi phân tích `Engine.queryMore`: hệ thống thêm một từ khóa mới vào `Query` đang tồn tại rồi lọc lại tập kết quả hiện có.",
+            "Điều này đòi hỏi bổ sung thêm 2 phương thức vào `Query`: `addKey(String)` (bộ biến đổi — mutator để thêm từ khóa mới và cập nhật kết quả) và `keys()` (bộ quan sát — observer để xem tất cả từ khóa hiện tại của truy vấn)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 54",
+          "pageNumber": 54,
+          "title": "Engine.queryFirst Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :WordTable, :Query, :NotPossibleException",
+            "1. User ── queryFirst(w) ──► :Engine",
+            "2. :Engine ── b = isInteresting(w) ──► :WordTable",
+            "3. alt [b=true]:",
+            "     :Engine ── Query(wt, w) ──► (create) :Query",
+            "   [else]:",
+            "     :Engine ── NotPossibleException() ──► (create) :NotPossibleException"
+          ],
+          "diagramNote": "Sequence diagram kiểm chứng Engine.queryFirst: Engine gọi WordTable.isInteresting(w), nếu b=true thì khởi tạo đối tượng :Query(wt, w), ngược lại khởi tạo :NotPossibleException.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 54"
+          },
+          "explanation": [
+            "Đúng theo bước 'Validate using sequence diagram' (Slide 39), slide này vẽ Sequence diagram cho `Engine.queryFirst(w)` để kiểm tra các thông điệp trao đổi giữa `:Engine`, `:WordTable` và `:Query`.",
+            "Khối `alt` tách rõ 2 kịch bản: nếu `isInteresting(w)` trả về `true` thì tạo `:Query(wt, w)`; nếu `false` thì ném ngoại lệ `NotPossibleException()`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 55",
+          "pageNumber": 55,
+          "title": "Engine.queryMore Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :WordTable, :Query, :NotPossibleException",
+            "1. User ── queryMore(w) ──► :Engine",
+            "2. :Engine ── b = isInteresting(w) ──► :WordTable",
+            "3. alt [b=true]:",
+            "     :Engine ── addKey(w) ──► :Query",
+            "   [else]:",
+            "     :Engine ── NotPossibleException() ──► (create) :NotPossibleException"
+          ],
+          "diagramNote": "Sequence diagram kiểm chứng Engine.queryMore: tương tự queryFirst ở bước kiểm tra isInteresting(w), nhưng nhánh [b=true] gửi thông điệp addKey(w) tới :Query đang tồn tại.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 55"
+          },
+          "explanation": [
+            "Sequence diagram của `Engine.queryMore(w)` rất giống `queryFirst(w)` ở bước kiểm tra tính hợp lệ của từ thông qua `WordTable.isInteresting(w)`.",
+            "Điểm khác biệt cốt lõi nằm trong nhánh `[b=true]`: thay vì tạo mới đối tượng `:Query`, `:Engine` gọi `addKey(w)` trên đối tượng `:Query` hiện hành."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Design Iteration 1 (tiếp): Phân rã findDoc, addDocs & Đặc tả Iteration 1",
+      "text": "Hoàn tất Design Iteration 1: phân rã Engine.findDoc (phát hiện TitleTable và Doc.title()), phân rã Engine.addDocs (phát hiện Comm.getDocs() và Query.addDoc(Doc)), vẽ Design Class Diagram tổng thể Iteration 1, xác định thuộc tính của Engine và viết đặc tả Java cho cả 5 lớp.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 56–78"
+      },
+      "digest": {
+        "keyPoints": [
+          "Phân rã Engine.findDoc (Slides 56–60): bổ sung title(): String cho Doc và tạo abstraction TitleTable (TitleTable(), addDoc(Doc), lookUp(String): Doc) để tra cứu nhanh tài liệu theo tiêu đề.",
+          "Phân rã Engine.addDocs (Slides 61–67): tạo lớp Comm (static getDocs(String): Iterator) để lấy tài liệu từ URL từ xa; dùng TitleTable.addDoc và WordTable.addDoc để lưu tài liệu; bổ sung addDoc(Doc) cho Query (và Query() tạo query rỗng) để cập nhật truy vấn đang chạy.",
+          "Design class diagram kết thúc Iteration 1 (Slide 69) gồm 6 lớp: Engine, Comm, TitleTable, Query, WordTable, Doc.",
+          "Đặc tả đầy đủ mức thiết kế (Slides 70–78): Engine giữ wt (WordTable), tt (TitleTable), q (Query), urls (String[]); viết Javadoc chi tiết (@overview, @requires, @modifies, @effects) và ngoại lệ (NotPossibleException, IndexOutOfBoundException, DuplicateException) cho Engine, WordTable, Query, TitleTable, Comm."
+        ],
+        "terms": [
+          {
+            "term": "TitleTable",
+            "meaning": "Iteration abstraction lưu trữ các cặp (tiêu đề, Doc) giúp Engine.findDoc tra cứu nhanh tài liệu theo tiêu đề; addDoc ném DuplicateException nếu trùng tiêu đề."
+          },
+          {
+            "term": "Comm",
+            "meaning": "Module giao tiếp chịu trách nhiệm lấy tài liệu từ trang web từ xa qua URL bằng phương thức tĩnh getDocs(String u): Iterator."
+          },
+          {
+            "term": "DuplicateException",
+            "meaning": "Ngoại lệ do TitleTable.addDoc(Doc d) ném ra khi trong bảng đã tồn tại một tài liệu có cùng tiêu đề với d."
+          }
+        ],
+        "pitfalls": [
+          "Mâu thuẫn nhỏ giữa Slide 70 và Slide 71: sơ đồ lớp Engine ở Slide 70 ghi tên trường là '- t: TitleTable', trong khi code đặc tả ở Slide 71 viết 'private TitleTable tt;'.",
+          "Trong Sequence diagram Slide 67 (`Engine.addDocs`), nhánh `alt [query = null]` gọi `Query()` tạo truy vấn rỗng rồi khi `[else]` gọi `addDoc()` trên `:Query` — sau này ở Iteration 2 (Slide 97) chữ ký `addDoc` sẽ được cập nhật thêm `Hashtable h`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 56",
+          "pageNumber": 56,
+          "title": "Engine.findDoc",
+          "paragraphs": [
+            "Engine.findDoc"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 56"
+          },
+          "explanation": [
+            "Slide phân đoạn chuyển sang phân rã phương thức thứ ba của `Engine`: `Engine.findDoc`.",
+            "Chức năng này phục vụ Use Case 'Search for document' bằng tiêu đề (Slides 57–60)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 57",
+          "pageNumber": 57,
+          "title": "Engine.findDoc",
+          "bullets": [
+            "[Highlighted] For each document, determine if its title matches the given title",
+            "Return the first matching document"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• document has title → create method title() in Doc",
+            "• document titles are re-used many times to determine matches",
+            "• needs a fast method to look up document matching a title → records documents and their titles in TitleTable"
+          ],
+          "diagramNote": "Bước so khớp tiêu đề tài liệu dẫn đến việc thêm title() vào Doc và tạo abstraction TitleTable để tra cứu nhanh theo tiêu đề.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 57"
+          },
+          "explanation": [
+            "Tương tự lý do lập chỉ mục từ cho `WordTable`, việc duyệt từng tài liệu để so sánh tiêu đề lặp đi lặp lại rất tốn kém vì tiêu đề tài liệu được dùng tra cứu nhiều lần.",
+            "Do đó ta tạo phương thức `title()` cho `Doc` và đưa toàn bộ việc lập chỉ mục/tra cứu nhanh theo tiêu đề sang một abstraction mới mang tên **`TitleTable`**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 58",
+          "pageNumber": 58,
+          "title": "Engine.findDoc",
+          "bullets": [
+            "Doc class"
+          ],
+          "diagramText": [
+            "Doc",
+            "─────────────────────────",
+            "Doc(String)",
+            "▷ title(): String",
+            "body(): String"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Doc: thêm phương thức mới title(): String (đánh dấu tam giác xanh) bên cạnh Doc(String) và body(): String.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 58"
+          },
+          "explanation": [
+            "Slide cập nhật giao diện lớp `Doc` với phương thức quan sát mới `title(): String`.",
+            "Nhờ có `title()`, `TitleTable` có thể lấy tiêu đề của mỗi đối tượng `Doc` khi thêm vào kho."
+          ]
+        },
+        {
+          "slideNumber": "Slide 59",
+          "pageNumber": 59,
+          "title": "Engine.findDoc",
+          "bullets": [
+            "TitleTable class",
+            "Iteration abstraction",
+            "Stores documents",
+            "Has operations to add and look up documents"
+          ],
+          "diagramText": [
+            "TitleTable",
+            "─────────────────────────",
+            "TitleTable()",
+            "▷ addDoc(Doc)",
+            "▷ lookUp(String): Doc"
+          ],
+          "diagramNote": "Định nghĩa lớp mới TitleTable gồm TitleTable(), addDoc(Doc) và lookUp(String): Doc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 59"
+          },
+          "explanation": [
+            "Slide giới thiệu lớp `TitleTable` với 2 phép toán chính: `addDoc(Doc)` để đưa tài liệu mới vào bảng chỉ mục tiêu đề và `lookUp(String): Doc` để tìm nhanh tài liệu theo chuỗi tiêu đề.",
+            "Cấu trúc dữ liệu cụ thể bên trong `TitleTable` (sẽ là `Hashtable`) được giữ kín ở Iteration 1 và chỉ tinh chỉnh ở Iteration 2."
+          ]
+        },
+        {
+          "slideNumber": "Slide 60",
+          "pageNumber": 60,
+          "title": "Engine.findDoc Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :TitleTable",
+            "1. User ── findDoc(s): Doc ──► :Engine",
+            "2. :Engine ── lookUp(s): Doc ──► :TitleTable"
+          ],
+          "diagramNote": "Sequence diagram kiểm chứng Engine.findDoc: Engine ủy quyền trực tiếp việc tìm kiếm cho TitleTable bằng thông điệp lookUp(s): Doc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 60"
+          },
+          "explanation": [
+            "Sequence diagram của `Engine.findDoc(s)` cực kỳ ngắn gọn: `:Engine` nhận lời gọi từ `User` và ủy quyền trực tiếp cho `:TitleTable` thông qua `lookUp(s): Doc`.",
+            "Đây là minh họa điển hình cho việc phân chia trách nhiệm rõ ràng: `Engine` đóng vai trò mặt tiền điều phối (facade), còn logic tra cứu nằm trong `TitleTable`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 61",
+          "pageNumber": 61,
+          "title": "Engine.addDocs",
+          "paragraphs": [
+            "Engine.addDocs"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 61"
+          },
+          "explanation": [
+            "Slide phân đoạn chuyển sang phân rã phương thức thứ tư (cuối cùng) của `Engine`: `Engine.addDocs`.",
+            "Phương thức này chịu trách nhiệm tải tài liệu từ URL bên ngoài và cập nhật đồng bộ `WordTable`, `TitleTable` cũng như `Query` hiện hành (Slides 62–67)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 62",
+          "pageNumber": 62,
+          "title": "Engine.addDocs (1.1)",
+          "bullets": [
+            "[Highlighted] Contact the site with the given URL",
+            "[Highlighted] Retrieve documents from the site",
+            "Add documents to the collection",
+            "Update an existing query (if one is in progress) or creates an empty query object",
+            "Returns the query object"
+          ],
+          "diagramText": [
+            "Callout giải thích cho 2 dòng bôi vàng:",
+            "• needs to get documents from a remote web site → create a getDocs() method that returns an Iterator object for the documents"
+          ],
+          "diagramNote": "Hai bước kết nối và lấy tài liệu từ URL bôi vàng dẫn đến việc tạo hàm getDocs() trả về Iterator các tài liệu.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 62"
+          },
+          "explanation": [
+            "Hai bước đầu của `addDocs` liên quan tới giao tiếp mạng để truy cập URL và tải tài liệu về.",
+            "Để tách biệt phần giao tiếp mạng ra khỏi logic nghiệp vụ tìm kiếm, ta cần một phương thức `getDocs()` trả về một đối tượng `Iterator` giúp duyệt tuần tự các tài liệu lấy được."
+          ]
+        },
+        {
+          "slideNumber": "Slide 63",
+          "pageNumber": 63,
+          "title": "Engine.addDocs (1.2)",
+          "bullets": [
+            "New class: Comm",
+            "Added Comm.getDocs"
+          ],
+          "diagramText": [
+            "Comm",
+            "─────────────────────────",
+            "▷ getDocs(): Iterator"
+          ],
+          "diagramNote": "Tạo lớp mới Comm chứa phương thức getDocs(): Iterator (đánh dấu tam giác xanh).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 63"
+          },
+          "explanation": [
+            "Slide định nghĩa lớp mới **`Comm`** (Communication module) chuyên lo việc đọc dữ liệu từ các trang web từ xa thông qua `getDocs()`.",
+            "Nhờ tách riêng `Comm`, nếu sau này đổi giao thức HTTP hay nguồn dữ liệu, chỉ cần sửa `Comm` mà không ảnh hưởng đến `Engine`, `WordTable` hay `Query`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 64",
+          "pageNumber": 64,
+          "title": "Engine.addDocs (1.3)",
+          "bullets": [
+            "Contact the site with the given URL",
+            "Retrieve documents from the site",
+            "[Highlighted] Add documents to the collection",
+            "Update an existing query (if one is in progress) or creates an empty query object",
+            "Returns the query object"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• need to add each document to TitleTable & WordTable",
+            "  → use method TitleTable.addDoc",
+            "  → use method WordTable.addDoc"
+          ],
+          "diagramNote": "Bước 'Add documents to the collection' dẫn tới việc gọi đồng thời TitleTable.addDoc và WordTable.addDoc cho từng tài liệu.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 64"
+          },
+          "explanation": [
+            "Bước 3 của `addDocs` yêu cầu đưa từng tài liệu vừa tải được vào kho của hệ thống.",
+            "Kho dữ liệu trong thiết kế hiện tại gồm hai bảng chỉ mục là `TitleTable` (theo tiêu đề) và `WordTable` (theo từ khóa), nên `Engine` sẽ tái sử dụng ngay `TitleTable.addDoc` và `WordTable.addDoc` đã định nghĩa ở các bước trước."
+          ]
+        },
+        {
+          "slideNumber": "Slide 65",
+          "pageNumber": 65,
+          "title": "Engine.addDocs (1.4)",
+          "bullets": [
+            "Contact the site with the given URL",
+            "Retrieve documents from the site",
+            "Add documents to the collection",
+            "[Highlighted] Update an existing query (if one is in progress) or creates an empty query object",
+            "Returns the query object"
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• creates addDoc() method to add a new document to Query"
+          ],
+          "diagramNote": "Bước cập nhật truy vấn đang chạy khi có tài liệu mới dẫn tới tạo phương thức addDoc() trên lớp Query.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 65"
+          },
+          "explanation": [
+            "Phân tích bước 4 của `addDocs`: nếu người dùng đã chạy một truy vấn trước đó và nay nạp thêm tài liệu mới, kết quả truy vấn đang có phải tự động bổ sung những tài liệu mới thỏa mãn từ khóa.",
+            "Vì vậy `Query` cần thêm phương thức `addDoc(Doc)` (cùng constructor `Query()` để tạo truy vấn rỗng khi chưa có query nào trước đó)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 66",
+          "pageNumber": 66,
+          "title": "Engine.addDocs",
+          "bullets": [
+            "Update Query Class",
+            "Add addDoc() functin"
+          ],
+          "diagramText": [
+            "Query",
+            "─────────────────────────",
+            "Query(WordTable, String)",
+            "keys(): String[]",
+            "size(): int",
+            "fetch(int): Doc",
+            "addKey(String)",
+            "▷ addDoc(Doc)"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Query với 6 phương thức hiện có, đánh dấu tam giác xanh vào addDoc(Doc) mới thêm.",
+          "ocrNote": "Slide gốc viết sai chính tả 'functin' thay vì 'function'.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 66"
+          },
+          "explanation": [
+            "Slide tổng hợp các phương thức của lớp `Query` sau khi hoàn thành phân tích cả `queryFirst`, `queryMore` và `addDocs`.",
+            "Lúc này `Query` đã có `Query(WordTable, String)`, `keys(): String[]`, `size(): int`, `fetch(int): Doc`, `addKey(String)`, và mới nhất là `addDoc(Doc)`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 67",
+          "pageNumber": 67,
+          "title": "Engine.addDocs Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :WordTable, :TitleTable, :Comm, :Query",
+            "1. User ── addDocs(url): Query ──► :Engine",
+            "2. :Engine ── Iterator dit = getDocs(url) ──► :Comm",
+            "3. loop [dit.hasNext()]:",
+            "     :Engine ── addDoc() ──► :WordTable",
+            "     :Engine ── addDoc() ──► :TitleTable",
+            "     alt [query = null]:",
+            "       :Engine ── Query() ──► (create) :Query",
+            "     [else]:",
+            "       :Engine ── addDoc() ──► :Query"
+          ],
+          "diagramNote": "Sequence diagram kiểm chứng Engine.addDocs: gọi Comm.getDocs(url) lấy Iterator dit, lặp qua từng tài liệu để gọi WordTable.addDoc() và TitleTable.addDoc(), sau đó rẽ nhánh alt tạo mới :Query() nếu query=null hoặc gọi addDoc() cập nhật :Query.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 67"
+          },
+          "explanation": [
+            "Sequence diagram của `Engine.addDocs` thể hiện rõ vòng lặp `loop [dit.hasNext()]` duyệt từng tài liệu do `:Comm` trả về.",
+            "Chú ý bên trong khối `alt`: nếu chưa có truy vấn (`query = null`), `:Engine` gọi `Query()` tạo đối tượng rỗng; nếu đã có (`else`), `:Engine` gọi `addDoc()` để kiểm tra xem tài liệu mới có khớp truy vấn hiện tại không (sau này ở Iteration 2, Slide 97 sẽ sửa lại truyền thêm `Hashtable h` vào `addDoc(h,d)`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 68",
+          "pageNumber": 68,
+          "title": "Design class diagram & specification",
+          "paragraphs": [
+            "Design class diagram & specification"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 68"
+          },
+          "explanation": [
+            "Slide chuyển mục sang hai bước cuối của Iteration 1 (theo quy trình ở Slide 39): hoàn thiện **Design Class Diagram** và viết **đặc tả thiết kế (specification)** cho tất cả các lớp vừa tìm ra.",
+            "Sau khi đã mô hình hóa xong tương tác động bằng loạt Sequence Diagram (`queryFirst`, `queryMore`, `findDoc`, `addDocs`) ở Slides 53–67, phần tiếp theo (Slides 69–78) sẽ tổng hợp lại cấu trúc lớp và hợp đồng (pre/post-condition, exceptions) trước khi bước vào Iteration 2."
+          ]
+        },
+        {
+          "slideNumber": "Slide 69",
+          "pageNumber": 69,
+          "title": "Design class diagram",
+          "diagramText": [
+            "Engine [Engine(), queryfirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query]",
+            "  ├──► Comm [getDocs(): Iterator] ──► Doc",
+            "  ├──► TitleTable [TitleTable(), addDoc(Doc), lookUp(String): Doc] ──► Doc",
+            "  ├──► Query [Query(WordTable, String), keys(): String[], size(): int, fetch(int): Doc, addKey(String), addDoc(Doc)] ──► Doc",
+            "  ├──► WordTable [WordTable(), isInteresting(String): boolean, addDoc(Doc)] ──► Doc",
+            "  └── (nét đứt) ──► Doc [Doc(String), title(): String, body(): String]"
+          ],
+          "diagramNote": "Sơ đồ lớp thiết kế hoàn chỉnh của Iteration 1 gồm 6 lớp: Engine làm trung tâm điều phối Comm, TitleTable, Query, WordTable (liên kết nét liền) và phụ thuộc Doc (nét đứt); cả 4 lớp helper đều nối tới Doc.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 69"
+          },
+          "explanation": [
+            "Sơ đồ lớp cuối Iteration 1 đã mở rộng từ 3 lớp lên **6 lớp**: `Engine`, `Comm`, `TitleTable`, `Query`, `WordTable`, và `Doc`.",
+            "Nhìn vào cấu trúc phụ thuộc (dependency), `Doc` là lớp dữ liệu nền tảng được cả 5 lớp còn lại sử dụng; riêng `Engine` phụ thuộc tạm thời (nét đứt) vào `Doc` khi nhận và chuyển tiếp đối tượng `Doc` trong vòng lặp `addDocs` và kết quả `findDoc`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 70",
+          "pageNumber": 70,
+          "title": "Engine attributes",
+          "bullets": [
+            {
+              "text": "Determined from:",
+              "subBullets": [
+                "specifications of the methods",
+                "associations with other abstractions"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Engine",
+            "─────────────────────────",
+            "▷ - wt: WordTable",
+            "▷ - t: TitleTable",
+            "▷ - q: Query",
+            "▷ - urls: String[]",
+            "─────────────────────────",
+            "Engine()",
+            "queryfirst(String): Query",
+            "queryMore(String): Query",
+            "findDoc(String): Doc",
+            "addDocs(String): Query"
+          ],
+          "diagramNote": "Xác định 4 thuộc tính private của lớp Engine: - wt: WordTable, - t: TitleTable, - q: Query, - urls: String[].",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 70"
+          },
+          "explanation": [
+            "Slide giải thích cách suy ra các thuộc tính (representation / fields) của một lớp: dựa vào **đặc tả của các phương thức** và **các liên kết với abstraction khác**.",
+            "Cụ thể `Engine` cần giữ 3 tham chiếu tới các thành phần con (`wt: WordTable`, `t: TitleTable`, `q: Query`) và một mảng lưu các URL đã từng nạp (`urls: String[]`) để kiểm tra trùng URL trong `addDocs`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 71",
+          "pageNumber": 71,
+          "title": "Engine specification",
+          "code": {
+            "lang": "java",
+            "text": "class Engine {\n  @DomainConstraint(type=\"WordTable\",optional=false)\n  private WordTable wt;\n  @DomainConstraint(type=\"TitleTable\",optional=false)\n  private TitleTable tt;\n  @DomainConstraint(type=\"Query\")\n  private Query q;\n\n  private String[] urls;\n  ///// END version 1.0\n  ……\n} // end Engine"
+          },
+          "ocrNote": "Thuộc tính TitleTable ở đây đặt tên 'tt', khác với '- t: TitleTable' trên sơ đồ Slide 70.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 71"
+          },
+          "explanation": [
+            "Slide viết đặc tả phần dữ liệu (representation) cho lớp `Engine` kèm annotation `@DomainConstraint` quy định kiểu và ràng buộc không được null (`optional=false`) cho `wt` và `tt`.",
+            "Trong khi đó `q` không có `optional=false` vì khi mới khởi động `Engine()` chưa có truy vấn nào nên `q` có thể mang giá trị `null`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 72",
+          "pageNumber": 72,
+          "title": "WordTable specification (1.1)",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @overview Keeps track of interesting and uninteresting words.\n * Uninteresting words are obtained from a private file.\n * Records number of times each interesting word occurs in a document.\n * @version (iteration) 1.0\n */\nclass WordTable {\n\n  /**\n   * @effects\n   * If uninteresting-word file cannot be read\n   * throws NotPossibleException\n   * else initialises this to contain all words in the file\n   */\n  WordTable() throws NotPossibleException"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 72"
+          },
+          "explanation": [
+            "Đặc tả lớp `WordTable` phiên bản Iteration 1.0: lớp này quản lý cả từ quan trọng lẫn từ không quan trọng (đọc từ một file riêng), đồng thời lưu số lần xuất hiện của mỗi từ quan trọng trong từng tài liệu.",
+            "Constructor `WordTable()` có trách nhiệm đọc file từ không quan trọng và sẽ ném `NotPossibleException` nếu đọc file thất bại."
+          ]
+        },
+        {
+          "slideNumber": "Slide 73",
+          "pageNumber": 73,
+          "title": "WordTable specification (1.2)",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @effects\n * If w is null or a nonword or an uninteresting word\n * returns false\n * else returns true\n */\nboolean isInteresting(String w)\n\n/**\n * @requires d is not null\n * @modifies this\n * @effects adds to this interesting words of d\n * with their numbers of occurrences\n */\nvoid addDoc(Doc d)\n} // end WordTable"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 73"
+          },
+          "explanation": [
+            "Đặc tả 2 phương thức của `WordTable`: `isInteresting(String w)` trả về `false` nếu `w` là `null`, không phải từ hợp lệ (`nonword`), hoặc thuộc tập từ không quan trọng.",
+            "`addDoc(Doc d)` có tiền điều kiện `@requires d is not null`, làm thay đổi trạng thái đối tượng (`@modifies this`) bằng cách trích các từ quan trọng của `d` kèm số lần xuất hiện vào bảng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 74",
+          "pageNumber": 74,
+          "title": "Query specification (1.1)",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @overview\n * Provides information about the keywords of a query and\n * the documents that match those keywords.\n * Documents are accessed using indexes between 0 and size.\n * Documents are ordered by the number of matches they\n * contain, with document 0th containing the most matches.\n * @version (iteration) 1.0\n */\nclass Query {\n  /**\n   * @effects returns an empty query\n   */\n  Query()\n  /**\n   * @requires wt and w are not null\n   * @effects initialises this to contain w\n   */\n  Query(WordTable wt, String w)"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 74"
+          },
+          "explanation": [
+            "Đặc tả lớp `Query` Iteration 1.0: lưu danh sách từ khóa truy vấn và các tài liệu khớp được truy cập qua chỉ số từ `0` đến `size - 1`, sắp xếp giảm dần theo tổng số lần khớp (tài liệu thứ `0th` khớp nhiều nhất).",
+            "`Query` cung cấp 2 constructor: `Query()` tạo truy vấn rỗng (dùng khi gọi `addDocs` mà chưa có truy vấn nào) và `Query(WordTable wt, String w)` khởi tạo truy vấn với từ khóa đầu tiên `w`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 75",
+          "pageNumber": 75,
+          "title": "Query specification (1.2)",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @effects\n * If 0 <= i < size\n * returns the ith matching document\n * else\n * throws IndexOutOfBoundException\n */\nDoc fetch (int i) throws IndexOutOfBoundException\n\n/**\n * @effects returns the keywords of this\n */\nString[] keys()"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 75"
+          },
+          "explanation": [
+            "`Query.fetch(int i)` trả về tài liệu khớp ở vị trí `i` nếu `0 <= i < size`, ngược lại ném `IndexOutOfBoundException` (lưu ý viết đúng tên class ngoại lệ như trên slide).",
+            "`Query.keys()` là hàm quan sát trả về mảng `String[]` chứa tất cả các từ khóa hiện có trong đối tượng `Query`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 76",
+          "pageNumber": 76,
+          "title": "Query specification (1.3)",
+          "code": {
+            "lang": "java",
+            "text": "/** Query (3)\n * @requires w is not null\n * @modifies this\n * @effects\n * If this is empty or w is already a keyword in this\n * throws NotPossibleException\n * else modifies this to contain w and all keywords already in this\n */\nvoid addKey(String w) throws NotPossibleException\n\n/**\n * @requires d is not null\n * @modifies this\n * @effects\n * If this is not empty and d contains all the keywords of this\n * adds d to this as a query result\n * else do nothing\n */\nvoid addDoc(Doc d)\n} // end Query"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 76"
+          },
+          "explanation": [
+            "`Query.addKey(String w)` ném `NotPossibleException` nếu truy vấn hiện đang rỗng hoặc `w` đã tồn tại trong danh sách từ khóa; ngược lại thêm `w` vào và cập nhật kết quả khớp chung của tất cả từ khóa.",
+            "`Query.addDoc(Doc d)` kiểm tra nếu truy vấn không rỗng và `d` chứa **tất cả** các từ khóa của truy vấn thì đưa `d` vào kết quả; ngược lại không làm gì."
+          ]
+        },
+        {
+          "slideNumber": "Slide 77",
+          "pageNumber": 77,
+          "title": "TitleTable specification",
+          "code": {
+            "lang": "java",
+            "text": "class TitleTable {\n  /**\n   * @effects Initialises this to be empty\n   */\n  TitleTable()\n\n  /**\n   * @requires d is not null\n   * @modifies this\n   * @effects\n   * If a document with d's title already in this\n   * throws DuplicateException\n   * else adds d with its title to this\n   */\n  void addDoc(Doc d) throws DuplicateException\n\n  /**\n   * @effects\n   * If t is null or there is no document with title t in this\n   * throws NotPossibleException\n   * else returns the document with title t\n   */\n  Doc lookUp(String t) throws NotPossibleException\n}"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 77"
+          },
+          "explanation": [
+            "Đặc tả `TitleTable`: `addDoc(Doc d)` kiểm tra tính duy nhất của tiêu đề tài liệu — nếu tiêu đề của `d` đã tồn tại trong bảng sẽ ném `DuplicateException`.",
+            "`lookUp(String t)` trả về `Doc` tương ứng nếu tìm thấy, hoặc ném `NotPossibleException` nếu `t` là `null` hay không tồn tại trong bảng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 78",
+          "pageNumber": 78,
+          "title": "Comm specification",
+          "code": {
+            "lang": "java",
+            "text": "/**\n * @overview\n * Represents the communication module responsible for obtaining\n * documents from remote sites.\n * @version (iteration) 1.0\n */\npublic class Comm {\n  /**\n   * @effects\n   * If u isn't a valid URL or the site it names fails to respond\n   * throws NotPossibleException\n   * else returns a generator for documents from site u\n   * (as strings)\n   */\n  static Iterator getDocs (String u) throws NotPossibleException\n} // end Comm"
+          },
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 78"
+          },
+          "explanation": [
+            "Đặc tả `Comm`: phương thức `getDocs(String u)` là phương thức tĩnh (`static`), nhận chuỗi URL `u` và trả về một `Iterator` sinh ra các tài liệu (ở dạng chuỗi / generator) từ trang đích.",
+            "Nếu `u` không phải URL hợp lệ hoặc trang web không phản hồi, phương thức ném `NotPossibleException`."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Design Iteration 2: Tinh chỉnh TitleTable, Query, DocCnt, Sorting, WordTable & Helpers",
+      "text": "Phân tích sâu bên trong các abstraction của Iteration 1 (Iteration 2 — Refinement): chọn Hashtable cho TitleTable; bổ sung WordTable.lookUp(String): Vector, Query.keys, Query.matches (Vector), lớp DocCnt (implements Comparable), lớp Sorting.quickSort(Vector); sửa đổi WordTable.addDoc trả Hashtable và Query.addDoc nhận Hashtable; bổ sung Doc.words(): Iterator, WordTable.table và Helpers.canon(String): String.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 79–102"
+      },
+      "digest": {
+        "keyPoints": [
+          "TitleTable (Slides 81–83): dùng Doc.title() khi addDoc và chọn java.util.Hashtable (- docs: Hashtable) làm cấu trúc dữ liệu để tra cứu nhanh theo tiêu đề.",
+          "Query & WordTable (Slides 84–95): WordTable thêm lookUp(String): Vector (trả về danh sách DocCnt); Query thêm thuộc tính - k: WordTable, - keys: String[], - matches: Vector (cấu trúc có chỉ số hỗ trợ fetch(int)).",
+          "Sắp xếp kết quả (Slides 90–95): tạo lớp DocCnt (chứa - d: Doc, - cnt: int / freqCount; implements Comparable) để giữ tài liệu và tổng tần suất; tạo lớp Sorting với quickSort(Vector) để sắp xếp matches; minh họa bằng Sequence diagram cho Query(wt, w) và AddKey.",
+          "Tối ưu hóa addDoc (Slides 96–101): cập nhật WordTable.addDoc(Doc) trả về Hashtable ánh xạ từ khóa → tần suất để Query.addDoc tái sử dụng mà không phải quét lại tài liệu; thêm Doc.words(): Iterator để duyệt từ trong Doc; thêm WordTable.table (Hashtable ánh xạ keyword → Vector<DocCnt>); tạo Helpers.canon(String): String để chuẩn hóa từ (ví dụ Student ~ student)."
+        ],
+        "terms": [
+          {
+            "term": "DocCnt",
+            "meaning": "Abstraction đóng gói một cặp (Doc d, int cnt/freqCount) và cài đặt interface Comparable để Sorting.quickSort có thể sắp xếp danh sách kết quả khớp theo tổng tần suất."
+          },
+          {
+            "term": "Sorting.quickSort(Vector)",
+            "meaning": "Lớp tiện ích cung cấp thuật toán sắp xếp nhanh trên Vector chứa các đối tượng Comparable (DocCnt)."
+          },
+          {
+            "term": "Helpers.canon(String)",
+            "meaning": "Phương thức chuẩn hóa từ về dạng chuẩn chung (ví dụ chuyển về chữ thường: Student → student) dùng chung cho WordTable, TitleTable, Doc và Engine."
+          }
+        ],
+        "pitfalls": [
+          "Chú ý sự không nhất quán chữ ký hàm `Query.addDoc` trên các slide cuối Iteration 2: Slide 96 đề xuất đổi `Query.addDoc(Doc)` thành `Query.addDoc(Doc, Hashtable)`, nhưng Sequence diagram Slide 97 gọi `addDoc(h,d)` và sơ đồ lớp Slide 98 viết `addDoc(Hashtable, Doc)`, trong khi sơ đồ lớp tổng kết Slide 102 (và Lecture 11) vẫn ghi `addDoc(Doc)`.",
+          "Trên Slide 91, phương thức `getCount` trong hộp lớp `DocCnt` bị viết thiếu ngoặc `()` (`getCount: int`); ngoài ra `DocCnt` ở Slide 91 dùng tên trường `d, cnt` còn ở Slide 102 ghi `Doc d, int freqCount`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 79",
+          "pageNumber": 79,
+          "title": "Example for Kengine Design — Design Iteration 2",
+          "paragraphs": [
+            "Design Iteration 2",
+            "Refinement"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 79"
+          },
+          "explanation": [
+            "Slide mở đầu **Design Iteration 2: Refinement** (tinh chỉnh thiết kế).",
+            "Sau Iteration 1, giao diện các lớp mức đỉnh đã có nhưng cách lưu trữ bên trong và các lớp trợ giúp bậc thấp hơn vẫn chưa rõ — đó là nhiệm vụ của Iteration 2."
+          ]
+        },
+        {
+          "slideNumber": "Slide 80",
+          "pageNumber": 80,
+          "title": "Design iteration 2",
+          "bullets": [
+            "Specification is complete but not clear",
+            "Need refine the design"
+          ],
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 80"
+          },
+          "explanation": [
+            "Slide nêu lý do phải thực hiện Iteration 2: đặc tả ở Iteration 1 đã đầy đủ về mặt chức năng nhưng chưa đủ rõ ràng để lập trình viên cài đặt trực tiếp.",
+            "Cụ thể, ta phải chọn cấu trúc dữ liệu (`rep`) và phân rã thuật toán của `TitleTable`, `Query`, và `WordTable`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 81",
+          "pageNumber": 81,
+          "title": "TitleTable",
+          "bullets": [
+            {
+              "text": "addDoc:",
+              "subBullets": [
+                "[Highlighted] Extracts title from document"
+              ]
+            },
+            {
+              "text": "Lookup:",
+              "subBullets": [
+                "Finds a document given its title"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• Use Doc.title() method"
+          ],
+          "diagramNote": "Khi phân rã TitleTable.addDoc, thao tác trích tiêu đề từ tài liệu sử dụng trực tiếp phương thức Doc.title().",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 81"
+          },
+          "explanation": [
+            "Bắt đầu tinh chỉnh lớp `TitleTable`: trong `addDoc(Doc d)`, để lấy tiêu đề làm khóa lưu trữ, `TitleTable` gọi `Doc.title()` đã định nghĩa ở Iteration 1.",
+            "Đây là ví dụ về việc tái sử dụng phương thức quan sát đã có sẵn thay vì truy cập trực tiếp trường nội bộ của `Doc`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 82",
+          "pageNumber": 82,
+          "title": "TitleTable",
+          "bullets": [
+            {
+              "text": "addDoc:",
+              "subBullets": [
+                "Extracts title from document"
+              ]
+            },
+            {
+              "text": "Lookup:",
+              "subBullets": [
+                "[Highlighted] Finds a document given its title"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• document titles are re-used many times",
+            "• requires a data structure that maps Docs to strings → uses java.util.Hashtable as the rep of TitleTable"
+          ],
+          "diagramNote": "Thao tác Lookup cần tra cứu nhanh nhiều lần theo chuỗi tiêu đề nên chọn java.util.Hashtable làm biểu diễn nội bộ (rep) của TitleTable.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 82"
+          },
+          "explanation": [
+            "Phân tích `TitleTable.lookUp`: vì người dùng tìm theo tiêu đề nhiều lần nên cần cấu trúc ánh xạ trực tiếp từ chuỗi tiêu đề sang đối tượng `Doc` với tốc độ O(1) trung bình.",
+            "Quyết định chọn `java.util.Hashtable` có sẵn trong thư viện chuẩn Java làm `rep` cho `TitleTable`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 83",
+          "pageNumber": 83,
+          "title": "TitleTable",
+          "diagramText": [
+            "TitleTable",
+            "─────────────────────────",
+            "▷ - docs: Hashtable",
+            "─────────────────────────",
+            "TitleTable()",
+            "addDoc(Doc)",
+            "lookUp(String): Doc"
+          ],
+          "diagramNote": "Cập nhật hộp lớp TitleTable: bổ sung thuộc tính private - docs: Hashtable (đánh dấu tam giác xanh).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 83"
+          },
+          "explanation": [
+            "Slide cập nhật sơ đồ lớp của `TitleTable` sau bước tinh chỉnh: thêm trường ẩn `- docs: Hashtable`.",
+            "Như vậy `TitleTable` đã hoàn tất phần thiết kế dữ liệu nội bộ để sẵn sàng viết code."
+          ]
+        },
+        {
+          "slideNumber": "Slide 84",
+          "pageNumber": 84,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "Query(WordTable, String):",
+              "subBullets": [
+                "[Highlighted] Find all the documents that contain the keyword with its count",
+                "Keep track of the keyword",
+                "Sort the documents based on the number of occurrences of keywords"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• Creates WordTable.lookup method"
+          ],
+          "diagramNote": "Bước tìm tất cả tài liệu chứa từ khóa kèm số lần xuất hiện dẫn tới việc tạo phương thức WordTable.lookup.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 84"
+          },
+          "explanation": [
+            "Chuyển sang tinh chỉnh `Query`, bắt đầu từ constructor `Query(WordTable, String)`: bước 1 cần lấy toàn bộ danh sách tài liệu có chứa từ khóa cùng số lần xuất hiện của nó.",
+            "Vì dữ liệu này được lưu trong `WordTable`, ta phải bổ sung phương thức `lookUp(String)` cho `WordTable` (giống như `TitleTable.lookUp`)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 85",
+          "pageNumber": 85,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "Query(WordTable, String):",
+              "subBullets": [
+                "Find all the documents that contain the keyword with its count",
+                "[Highlighted] Keep track of the keyword",
+                "Sort the documents based on the number of occurrences of keywords"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• Creates String[] keys in Query to store keywords"
+          ],
+          "diagramNote": "Bước theo dõi từ khóa dẫn tới việc thêm thuộc tính String[] keys vào lớp Query.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 85"
+          },
+          "explanation": [
+            "Bước 2 của constructor `Query` cần ghi nhớ từ khóa của truy vấn để phục vụ `keys()` và kiểm tra trùng khi gọi `addKey`.",
+            "Quyết định tạo mảng `String[] keys` làm trường dữ liệu bên trong `Query`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 86",
+          "pageNumber": 86,
+          "title": "Query & WordTable",
+          "diagramText": [
+            "WordTable:",
+            "  WordTable()",
+            "  isInteresting(String): boolean",
+            "  ▷ lookUp(String): Vector",
+            "  addDoc(Doc)",
+            "",
+            "Query:",
+            "  ▷ - k: WordTable",
+            "  ▷ - keys: String[]",
+            "  ─────────────────────────",
+            "  Query(WordTable, String)",
+            "  keys(): String[]",
+            "  size(): int",
+            "  fetch(int): Doc",
+            "  addKey(String)",
+            "  addDoc(Doc)"
+          ],
+          "diagramNote": "Cập nhật WordTable (thêm lookUp(String): Vector) và Query (thêm thuộc tính private - k: WordTable và - keys: String[]).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 86"
+          },
+          "explanation": [
+            "Slide cập nhật hình ảnh hai lớp sau 2 quyết định vừa rồi: `WordTable` có thêm `lookUp(String): Vector`, còn `Query` giữ thêm `- k: WordTable` (để sau này `addKey` tra cứu thêm từ khóa mới) và `- keys: String[]`.",
+            "Chú ý `WordTable.lookUp` trả về `Vector` vì một từ khóa có thể xuất hiện trong nhiều tài liệu."
+          ]
+        },
+        {
+          "slideNumber": "Slide 87",
+          "pageNumber": 87,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "fetch(int):",
+              "subBullets": [
+                "[Highlighted] Retrieves the ith document from the current matches"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• → needs an index-based collection to store documents (e.g. Vector)"
+          ],
+          "diagramNote": "Vì fetch(int) truy xuất phần tử thứ i nên Query cần dùng cấu trúc tập hợp truy cập theo chỉ số như Vector.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 87"
+          },
+          "explanation": [
+            "Phân tích hàm `Query.fetch(int)`: vì hàm này lấy tài liệu khớp ở vị trí chỉ số `i`, danh sách các `matches` trong `Query` phải là một tập hợp cho phép truy cập theo chỉ số (index-based collection).",
+            "Do đó chọn `java.util.Vector` làm cấu trúc dữ liệu lưu `matches` trong `Query`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 88",
+          "pageNumber": 88,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "addKey(String):",
+              "subBullets": [
+                "[Highlighted] Check the new keyword for duplicacy",
+                "Find documents containing the new keyword",
+                "Find the new documents that are in the query",
+                "Sort the matches by the sums of the frequencies"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• → performed by checking the Query.keys array"
+          ],
+          "diagramNote": "Bước kiểm tra trùng lặp từ khóa mới trong addKey(String) thực hiện bằng cách duyệt mảng Query.keys.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 88"
+          },
+          "explanation": [
+            "Phân rã `Query.addKey(String)` thành 4 bước nhỏ: (1) kiểm tra trùng từ khóa, (2) tìm tài liệu chứa từ khóa mới, (3) giao với danh sách tài liệu đang khớp trong truy vấn, và (4) sắp xếp lại theo tổng tần suất.",
+            "Bước (1) kiểm tra trùng từ khóa được thực hiện trực tiếp trên mảng `Query.keys` vừa thiết kế."
+          ]
+        },
+        {
+          "slideNumber": "Slide 89",
+          "pageNumber": 89,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "addKey(String):",
+              "subBullets": [
+                "Check the new keyword for duplicacy",
+                "[Highlighted] Find documents containing the new keyword",
+                "Find the new documents that are in the query",
+                "Sort the matches by the sums of the frequencies"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• → uses WordTable.lookup method"
+          ],
+          "diagramNote": "Bước tìm các tài liệu chứa từ khóa mới dùng lại phương thức WordTable.lookup (trên đối tượng k: WordTable của Query).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 89"
+          },
+          "explanation": [
+            "Bước (2) của `addKey(String)` gọi ngay `WordTable.lookUp` (thông qua trường `k: WordTable` mà `Query` giữ sẵn từ lúc khởi tạo).",
+            "Đây là lý do ở Slide 86 ta phải lưu tham chiếu `- k: WordTable` trong lớp `Query`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 90",
+          "pageNumber": 90,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "addKey(String):",
+              "subBullets": [
+                "Check the new keyword for duplicacy",
+                "Find documents containing the new keyword",
+                "[Highlighted] Find the new documents that are in the query",
+                "[Highlighted] Sort the matches by the sums of the frequencies"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout 1 (cho dòng 'Find the new documents...'):",
+            "• Needs a fast way to look up document (use fetch())",
+            "",
+            "Callout 2 (cho dòng 'Sort the matches...'):",
+            "• needs to maintain the sum of frequencies for each match",
+            "• needs to sort matches by this sum",
+            "  → creates DocCnt abstraction for matches",
+            "  → uses Vector to store matches (DocCnt objects)",
+            "  → uses quick-sort to sort this vector"
+          ],
+          "diagramNote": "Hai bước cuối của addKey dẫn đến việc tạo lớp DocCnt lưu cặp (Doc, tổng tần suất), lưu các DocCnt trong Vector của Query, và dùng thuật toán quick-sort để sắp xếp.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 90"
+          },
+          "explanation": [
+            "Bước (3) giao tập tài liệu mới với các kết quả đang có trong `Query`, tận dụng hàm `fetch()` để lấy nhanh các tài liệu đang khớp.",
+            "Bước (4) đặt ra nhu cầu lưu cặp `(Doc, tổng tần suất)` cho mỗi kết quả khớp và sắp xếp giảm dần theo tổng tần suất → dẫn tới sáng tạo abstraction **`DocCnt`**, lưu các đối tượng `DocCnt` vào `Vector matches`, và tách thuật toán sắp xếp bằng **quick-sort**."
+          ]
+        },
+        {
+          "slideNumber": "Slide 91",
+          "pageNumber": 91,
+          "title": "Query",
+          "bullets": [
+            "Create DocCnt class"
+          ],
+          "diagramText": [
+            "«interface» Comparable",
+            "─────────────────────────",
+            "compareTo(Object o)",
+            "        △",
+            "        ┆ (nét đứt thực thi - implements)",
+            "DocCnt",
+            "─────────────────────────",
+            "- d: Doc",
+            "- cnt: int",
+            "─────────────────────────",
+            "DocCnt(Doc, int)",
+            "getDoc(): Doc",
+            "getCount: int"
+          ],
+          "diagramNote": "Tạo lớp mới DocCnt cài đặt interface Comparable (mũi tên nét đứt tam giác rỗng) để có thể so sánh khi sắp xếp.",
+          "ocrNote": "Trên hình slide gốc, phương thức 'getCount: int' bị thiếu dấu ngoặc tròn '()'.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 91"
+          },
+          "explanation": [
+            "Slide định nghĩa lớp `DocCnt` chứa đối tượng tài liệu (`- d: Doc`) và số đếm tần suất (`- cnt: int`), cùng các hàm `DocCnt(Doc, int)`, `getDoc(): Doc`, và `getCount`.",
+            "Quan trọng: `DocCnt` cài đặt interface chuẩn `Comparable` của Java (`compareTo(Object o)`) để thuật toán sắp xếp dùng chung có thể so sánh hai `DocCnt` với nhau theo tần suất."
+          ]
+        },
+        {
+          "slideNumber": "Slide 92",
+          "pageNumber": 92,
+          "title": "Query",
+          "diagramText": [
+            "Query",
+            "─────────────────────────",
+            "- k: WordTable",
+            "▷ - matches: Vector",
+            "- keys: String[]",
+            "─────────────────────────",
+            "Query(WordTable, String)",
+            "keys(): String[]",
+            "size(): int",
+            "fetch(int): Doc",
+            "addKey(String)",
+            "addDoc(Doc)"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Query: thêm thuộc tính private - matches: Vector (đánh dấu tam giác xanh).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 92"
+          },
+          "explanation": [
+            "Slide bổ sung trường `- matches: Vector` (chứa các phần tử `DocCnt` đã sắp xếp) vào biểu diễn nội bộ của lớp `Query`.",
+            "Đến đây `Query` đã xác định đủ cả 3 thuộc tính nội bộ: `k` (bảng từ), `matches` (danh sách kết quả khớp), và `keys` (các từ khóa đang truy vấn)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 93",
+          "pageNumber": 93,
+          "title": "Query",
+          "bullets": [
+            "Create Sorting class",
+            "Sorting.quickSort(Vector)"
+          ],
+          "diagramText": [
+            "Sorting",
+            "─────────────────────────",
+            "(no fields)",
+            "─────────────────────────",
+            "quickSort(Vector)"
+          ],
+          "diagramNote": "Tạo lớp tiện ích Sorting chứa phương thức quickSort(Vector).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 93"
+          },
+          "explanation": [
+            "Thay vì nhúng code thuật toán quicksort vào thẳng bên trong lớp `Query`, nhà thiết kế tách nó thành một helper abstraction riêng là **`Sorting`** với phương thức `quickSort(Vector)`.",
+            "Vì `DocCnt` đã implement `Comparable`, `Sorting.quickSort(Vector)` có thể tái sử dụng để sắp xếp bất kỳ `Vector` nào chứa các phần tử `Comparable`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 94",
+          "pageNumber": 94,
+          "title": "Query",
+          "bullets": [
+            "Query(WordTable, String):"
+          ],
+          "diagramText": [
+            "Frame: sd Query(WordTable wt, String w)",
+            "Participants: :Query, :WordTable, :Sorting",
+            "1. :Query ── Vector dcs = lookUp(w) ──► :WordTable",
+            "2. :Query ── m.addAll(dcs) ──► :Query (self-call)",
+            "3. :Query ── quickSort(m) ──► :Sorting"
+          ],
+          "diagramNote": "Sequence diagram cho constructor Query(WordTable wt, String w): gọi WordTable.lookUp(w) lấy Vector dcs, nạp vào m bằng m.addAll(dcs), rồi gọi Sorting.quickSort(m) sắp xếp.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 94"
+          },
+          "explanation": [
+            "Sequence diagram mô tả luồng thực thi chi tiết bên trong constructor `Query(wt, w)`: đầu tiên `:Query` gọi `lookUp(w)` sang `:WordTable` để lấy về `Vector dcs` các cặp `<Doc, count>`.",
+            "Sau đó `:Query` tự gọi `m.addAll(dcs)` để sao chép các phần tử vào vector `matches` (`m`) của riêng mình (tránh làm hỏng vector gốc trong `WordTable`), rồi gọi `quickSort(m)` sang `:Sorting`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 95",
+          "pageNumber": 95,
+          "title": "AddKey",
+          "bullets": [
+            "AddKey"
+          ],
+          "diagramText": [
+            "Participants: : Actor0, Query, WordTable, Sort",
+            "1. : Actor0 ── 1: addKey(word) ──► Query",
+            "2. Query ── 1.1: lookup(word) ──► WordTable ──► (return to Query)",
+            "3. Query ── 1.2: quicksort() ──► Sort ──► (return to Query)",
+            "4. Query ──► (return to : Actor0)"
+          ],
+          "diagramNote": "Sequence diagram cho Query.addKey(word): gọi WordTable.lookup(word), lọc và cộng dồn tần suất, rồi gọi Sort.quicksort() trước khi trả về.",
+          "ocrNote": "Trên sơ đồ này các đối tượng dùng tên Sort / lookup / quicksort khác nhẹ chữ hoa-thường so với Sorting / lookUp / quickSort ở Slide 94.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 95"
+          },
+          "explanation": [
+            "Sequence diagram minh họa luồng tương tác của `Query.addKey(word)`: `Query` gọi `lookup(word)` sang `WordTable` để lấy danh sách `DocCnt` cho từ khóa mới.",
+            "Sau khi giữ lại các tài liệu có trong cả tập khớp cũ và tập mới (cộng dồn tần suất), `Query` gọi `quicksort()` trên lớp sắp xếp (`Sort`/`Sorting`) để xếp hạng lại kết quả."
+          ]
+        },
+        {
+          "slideNumber": "Slide 96",
+          "pageNumber": 96,
+          "title": "Query",
+          "bullets": [
+            {
+              "text": "addDoc(Doc):",
+              "subBullets": [
+                "[Highlighted] Check each current keyword in the document",
+                "If so, add doc to matches",
+                "Update sorting of matches"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• needs to know the document keywords and their frequencies, but can be provided by WordTable.addDoc :",
+            "  → updates WordTable.addDoc to return a Hashtable mapping keywords to their frequencies",
+            "  → modify Query.addDoc(Doc) to become Query.addDoc(Doc, Hashtable)"
+          ],
+          "diagramNote": "Để Query.addDoc không phải phân tích lại văn bản từ đầu, cập nhật WordTable.addDoc trả về Hashtable (từ khóa → tần suất/DocCnt) và đổi Query.addDoc nhận thêm Hashtable này.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 96"
+          },
+          "explanation": [
+            "Phân tích `Query.addDoc(Doc)` phát hiện một tối ưu thiết kế rất hay: ngay trước khi gọi `Query.addDoc`, `Engine.addDocs` đã gọi `WordTable.addDoc(d)` — nơi vốn đã quét toàn bộ từ và tần suất của tài liệu `d`.",
+            "Vì thế thay vì để `Query` mất công quét lại `d`, ta sửa `WordTable.addDoc` trả về một `Hashtable` ánh xạ từng từ khóa của `d` sang tần suất/đối tượng `DocCnt`, rồi truyền thẳng bảng đó sang `Query.addDoc`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 97",
+          "pageNumber": 97,
+          "title": "WordTable",
+          "bullets": [
+            "Update Engine.addDocs sequence diagram"
+          ],
+          "diagramText": [
+            "Participants: User, :Engine, :WordTable, :TitleTable, :Comm, :Query",
+            "loop [dit.hasNext()] Doc d = dit.next():",
+            "  :Engine ── Hashtable h = addDoc(d) ──► :WordTable",
+            "  :Engine ── addDoc(d) ──► :TitleTable",
+            "  alt [query = null]:",
+            "    :Engine ── Query() ──► (create) :Query",
+            "  [else]:",
+            "    :Engine ── addDoc(h,d) ──► :Query"
+          ],
+          "diagramNote": "Cập nhật Sequence diagram Engine.addDocs (gạch chân đỏ các chỗ sửa): nhận Doc d = dit.next(), lấy Hashtable h = WordTable.addDoc(d), và truyền addDoc(h,d) vào :Query.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 97"
+          },
+          "explanation": [
+            "Slide cập nhật Sequence diagram của `Engine.addDocs` (từ Slide 67) theo quyết định ở Slide 96: `WordTable.addDoc(d)` trả về `Hashtable h`, và `:Engine` truyền `h` cùng `d` vào lời gọi `addDoc(h,d)` trên `:Query`.",
+            "Lưu ý chi tiết hay gây nhầm (được ghi nhận trong issues): Slide 96 viết `Query.addDoc(Doc, Hashtable)` nhưng Slide 97 gọi `addDoc(h,d)` và Slide 98 viết `addDoc(Hashtable, Doc)`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 98",
+          "pageNumber": 98,
+          "title": "Query & WordTable",
+          "diagramText": [
+            "WordTable:",
+            "  WordTable()",
+            "  isInteresting(String): boolean",
+            "  lookUp(String): Vector",
+            "  ▷ addDoc(Doc): Hashtable",
+            "",
+            "Query:",
+            "  - k: WordTable",
+            "  - matches: Vector",
+            "  - keys: String[]",
+            "  ─────────────────────────",
+            "  Query(WordTable, String)",
+            "  keys(): String[]",
+            "  size(): int",
+            "  fetch(int): Doc",
+            "  addKey(String)",
+            "  ▷ addDoc(Hashtable, Doc)"
+          ],
+          "diagramNote": "Cập nhật sơ đồ lớp WordTable (addDoc trả về Hashtable) và Query (addDoc nhận Hashtable, Doc).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 98"
+          },
+          "explanation": [
+            "Slide cập nhật chữ ký trên hộp lớp của `WordTable` (`addDoc(Doc): Hashtable`) và `Query` (`addDoc(Hashtable, Doc)`).",
+            "Tam giác xanh chỉ ra đúng hai phương thức vừa được cập nhật giao diện sau khi tối ưu hóa luồng `Engine.addDocs`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 99",
+          "pageNumber": 99,
+          "title": "WordTable",
+          "bullets": [
+            {
+              "text": "addDoc(Doc):",
+              "subBullets": [
+                "[Highlighted] For each word in doc, if it is interesting then creates a DocCnt object from doc and maps it to word",
+                "Also adds the mapping <word,DocCnt> to a hash table that is returned as the result"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Callout giải thích cho dòng bôi vàng:",
+            "• needs access to an iterator method of Doc that iterates over all words → creates Doc.words(): Iterator method",
+            "• needs to record for each keyword a set of DocCnt objects → adds WordTable.table to map keyword to Vector of DocCnts",
+            "• needs to consider canonical word forms, e.g. student ~ Student → creates Helpers.canon method to convert words to a common format (e.g. lower case)"
+          ],
+          "diagramNote": "Phân tích WordTable.addDoc(Doc) sinh ra 3 quyết định cuối cùng: thêm Doc.words(): Iterator, thêm bảng băm WordTable.table, và tạo Helpers.canon để chuẩn hóa chữ hoa/thường của từ.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 99"
+          },
+          "explanation": [
+            "Slide đi sâu vào bên trong `WordTable.addDoc(Doc)`: để duyệt lần lượt mọi từ của tài liệu, `Doc` cần có phương thức `words(): Iterator` (áp dụng mẫu Iterator abstraction để che giấu cách tách từ).",
+            "Để lưu chỉ mục ngược từ khóa → danh sách tài liệu, `WordTable` dùng bảng băm `table` ánh xạ mỗi keyword tới một `Vector` các `DocCnt`.",
+            "Đồng thời, để xem các biến thể chữ hoa/thường như `student` và `Student` là cùng một từ khóa, ta tạo phương thức chuẩn hóa `Helpers.canon`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 100",
+          "pageNumber": 100,
+          "title": "WordTable",
+          "bullets": [
+            "Update Doc and WordTable"
+          ],
+          "diagramText": [
+            "Doc:",
+            "  Doc(String)",
+            "  title(): String",
+            "  body(): String",
+            "  ▷ words(): Iterator",
+            "",
+            "WordTable:",
+            "  ▷ - table: Hashtable",
+            "  ─────────────────────────",
+            "  WordTable()",
+            "  isInteresting(String): boolean",
+            "  lookUp(String): Vector",
+            "  addDoc(Doc): Hashtable"
+          ],
+          "diagramNote": "Cập nhật hộp lớp Doc (thêm words(): Iterator) và WordTable (thêm thuộc tính private - table: Hashtable).",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 100"
+          },
+          "explanation": [
+            "Slide ghi nhận hai cập nhật trực tiếp lên `Doc` và `WordTable`: `Doc` có đủ 3 hàm giao tiếp (`title()`, `body()`, `words()`), còn `WordTable` có trường ẩn `- table: Hashtable`.",
+            "Như vậy cả hai lớp `TitleTable` và `WordTable` đều sử dụng `Hashtable` làm cấu trúc tra cứu cốt lõi."
+          ]
+        },
+        {
+          "slideNumber": "Slide 101",
+          "pageNumber": 101,
+          "title": "WordTable",
+          "bullets": [
+            "Create Helpers class"
+          ],
+          "diagramText": [
+            "Helpers",
+            "─────────────────────────",
+            "(no fields)",
+            "─────────────────────────",
+            "canon(String): String"
+          ],
+          "diagramNote": "Tạo lớp tiện ích Helpers với phương thức canon(String): String.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 101"
+          },
+          "explanation": [
+            "Slide định nghĩa lớp tiện ích **`Helpers`** với phương thức `canon(String): String` chuyên chuyển chuỗi đầu vào về dạng chuẩn (canonical form, ví dụ chữ thường toàn bộ).",
+            "Các lớp như `WordTable`, `TitleTable`, `Doc` hay `Engine` có thể gọi chung `Helpers.canon` để đảm bảo so sánh từ khóa/tiêu đề nhất quán."
+          ]
+        },
+        {
+          "slideNumber": "Slide 102",
+          "pageNumber": 102,
+          "title": "Design class diagram",
+          "diagramText": [
+            "Engine [Engine(), queryfirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query]",
+            "  ├──► Comm [getDocs(): Iterator] ──► Doc",
+            "  ├──► TitleTable [Hashtable docs; TitleTable(), addDoc(Doc), lookUp(String): Doc] ──► Doc, Helpers",
+            "  ├──► Query [Query(), Query(WordTable, String), keys(): String[], size(): int, fetch(int): Doc, addKey(String), addDoc(Doc)] ──► Sorting, WordTable, DocCnt, (nét đứt) Doc",
+            "  ├──► WordTable [Hashtable table; WordTable(), isInteresting(String): boolean, lookUp(String): Vector, addDoc(Doc): Hashtable] ──► Doc, DocCnt, Helpers",
+            "  ├── (nét đứt) ──► Doc [Doc(String), title(): String, body(): String, words(): Iterator] ──► Helpers",
+            "  └──► Helpers [canon(String): String]",
+            "Sorting [quickSort(Vector)] ──► Comparable",
+            "DocCnt [Doc d, int freqCount] ──(nét đứt tam giác rỗng)──▷ Comparable; DocCnt ──(nét đứt)──► Doc"
+          ],
+          "diagramNote": "Sơ đồ lớp thiết kế hoàn chỉnh cuối Lecture 10 gồm 10 thành phần: Engine, Comm, TitleTable, Query, WordTable, Doc, Sorting, Comparable, DocCnt, Helpers cùng đầy đủ các mối quan hệ sử dụng, phụ thuộc và thực thi interface.",
+          "ocrNote": "Trên sơ đồ tổng kết Slide 102, phương thức Query.addDoc vẫn ghi chữ ký 'addDoc(Doc)' (không kèm Hashtable như Slide 98); ngoài ra DocCnt ghi thuộc tính 'Doc d, int freqCount'.",
+          "source": {
+            "file": "Resources/Lecture 10.pdf",
+            "loc": "Slide 102"
+          },
+          "explanation": [
+            "Đây là **Design Class Diagram hoàn chỉnh** kết thúc quá trình thiết kế KEngine qua các vòng Iteration 0, 1 và 2 (10 hộp lớp/interface: `Engine`, `Comm`, `TitleTable`, `Doc`, `Query`, `WordTable`, `Helpers`, `Sorting`, `Comparable`, `DocCnt`).",
+            "Chú ý cấu trúc phân tầng rõ ràng: `Engine` điều phối cấp cao; `TitleTable`, `WordTable`, `Query`, `Comm` lo nghiệp vụ; `Doc`, `DocCnt`, `Comparable`, `Sorting`, `Helpers` là các lớp dữ liệu và tiện ích nền tảng."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Lecture 11: Tổng quan Thiết kế & Các Biểu đồ Tuần tự (Sequence Diagrams) KEngine",
+      "text": "Mở đầu Lecture 11 (Implement Example): nhắc lại Design Class Diagram hoàn chỉnh của KEngine và tổng hợp 5 Sequence Diagram cho các kịch bản Engine.addDocs, Engine.queryFirst, Query(WordTable, String), Engine.queryMore, và Engine.findDoc trước khi chạy ví dụ minh họa từng bước.",
+      "source": {
+        "file": "Resources/Lecture 11.pdf",
+        "loc": "Slides 1–8"
+      },
+      "digest": {
+        "keyPoints": [
+          "Lecture 11 (19 slides, PDF ảnh 1 trang dài) tập trung vào 'Implement Example': ôn lại Design class diagram tổng thể (Slide 3) và 5 Sequence diagram cốt lõi (Slides 4–8) của KEngine.",
+          "5 Sequence diagram chuẩn: Engine.addDocs (Slide 4), Engine.queryFirst (Slide 5), Query(WordTable wt, String w) (Slide 6), Engine.queryMore (Slide 7), và Engine.findDoc (Slide 8).",
+          "So với Lecture 10 Slide 54, Sequence diagram `queryFirst` và `queryMore` ở Lecture 11 giữ nguyên logic kiểm tra `isInteresting(w)` với khối `alt [b=true] / [else]` ném `NotPossibleException`; riêng `sd Query(WordTable wt, String w)` mô tả chi tiết bên trong quá trình tạo `Query`."
+        ],
+        "terms": [
+          {
+            "term": "sd Query(WordTable wt, String w)",
+            "meaning": "Biểu đồ tuần tự nội bộ của hàm tạo Query: gọi WordTable.lookUp(w) lấy Vector dcs, gọi m.addAll(dcs), và gọi Sorting.quickSort(m)."
+          }
+        ],
+        "pitfalls": [
+          "Lecture 11.pdf là file PDF ảnh chỉ có 1 trang duy nhất rất dài (960×13680 px) ghép 19 slide theo chiều dọc, nên `pageNumber` là 1 cho mọi slide và nguồn đối chiếu theo `Slide 1`..`Slide 19`.",
+          "Chú ý Slide 4 của Lecture 11 (`Engine.addDocs Sequence diagram`) vẫn dùng `addDoc(h,d)` trên `:Query` sau khi nhận `Hashtable h = addDoc(d)` từ `:WordTable`, trong khi Design Class Diagram ở Slide 3 và Slide 19 vẫn ghi `addDoc(Doc)`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 11 — Implement Example",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 11",
+            "Implement Example"
+          ],
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 1"
+          },
+          "explanation": [
+            "Slide tiêu đề của Lecture 11: **Implement Example**, nối tiếp ngay sau bài thiết kế KEngine của Lecture 10.",
+            "Nội dung bài này dùng một bộ dữ liệu mẫu cụ thể (`d1`, `d2`, `d3`) để chạy thử (walk-through) toàn bộ các sơ đồ thiết kế vừa xây dựng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 1,
+          "title": "Outline",
+          "bullets": [
+            "Example"
+          ],
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 2"
+          },
+          "explanation": [
+            "Slide Outline ngắn gọn nêu duy nhất một mục: **Example** — thực hành chạy kiểm chứng thiết kế KEngine qua từng bước gọi hàm.",
+            "Lưu ý Lecture 11.pdf được xuất dạng PDF ảnh 1 trang dài gồm 19 slide xếp dọc."
+          ]
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 1,
+          "title": "Design class diagram",
+          "diagramText": [
+            "Engine [Engine(), queryfirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query]",
+            "  ├──► Comm [getDocs(): Iterator] ──► Doc",
+            "  ├──► TitleTable [Hashtable docs; TitleTable(), addDoc(Doc), lookUp(String): Doc] ──► Doc, Helpers",
+            "  ├──► Query [Query(), Query(WordTable, String), keys(): String[], size(): int, fetch(int): Doc, addKey(String), addDoc(Doc)] ──► Sorting, WordTable, DocCnt, (nét đứt) Doc",
+            "  ├──► WordTable [Hashtable table; WordTable(), isInteresting(String): boolean, lookUp(String): Vector, addDoc(Doc): Hashtable] ──► Doc, DocCnt, Helpers",
+            "  ├── (nét đứt) ──► Doc [Doc(String), title(): String, body(): String, words(): Iterator] ──► Helpers",
+            "  └──► Helpers [canon(String): String]",
+            "Sorting [quickSort(Vector)] ──► Comparable",
+            "DocCnt [Doc d, int freqCount] ──(nét đứt tam giác rỗng)──▷ Comparable; DocCnt ──(nét đứt)──► Doc"
+          ],
+          "diagramNote": "Nhắc lại toàn bộ Design Class Diagram hoàn chỉnh 10 thành phần từ cuối Lecture 10 làm bản đồ tham chiếu khi chạy ví dụ.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 3"
+          },
+          "explanation": [
+            "Slide mở lại đúng **Design Class Diagram** hoàn chỉnh của KEngine (giống hệt Slide 102 của Lecture 10) để người học đối chiếu tên lớp, thuộc tính và chữ ký phương thức.",
+            "Chú ý vẫn giữ nguyên cách viết `queryfirst(String): Query` và `addDoc(Doc)` như trong sơ đồ gốc."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 1,
+          "title": "Engine.addDocs Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :WordTable, :TitleTable, :Comm, :Query",
+            "1. User ── addDocs(url): Query ──► :Engine",
+            "2. :Engine ── Iterator dit = getDocs(url) ──► :Comm",
+            "3. loop [dit.hasNext()] Doc d = dit.next():",
+            "     :Engine ── Hashtable h = addDoc(d) ──► :WordTable",
+            "     :Engine ── addDoc(d) ──► :TitleTable",
+            "     alt [query = null]:",
+            "       :Engine ── Query() ──► (create) :Query",
+            "     [else]:",
+            "       :Engine ── addDoc(h,d) ──► :Query"
+          ],
+          "diagramNote": "Sequence diagram của Engine.addDocs (giống Slide 97 Lecture 10) dùng làm khung mô phỏng cho bước AddDocs() ở Slides 11–12.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 4"
+          },
+          "explanation": [
+            "Slide trình bày lại Sequence diagram hoàn chỉnh của `Engine.addDocs(url)` (với `Hashtable h = addDoc(d)` và `addDoc(h,d)`).",
+            "Các bước nạp 3 tài liệu `d1`, `d2`, `d3` ở Slides 11–12 sẽ điền trực tiếp dữ liệu thật vào sơ đồ này."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 1,
+          "title": "Engine.queryFirst Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :WordTable, :Query, :NotPossibleException",
+            "1. User ── queryFirst(w) ──► :Engine",
+            "2. :Engine ── b = isInteresting(w) ──► :WordTable",
+            "3. alt [b=true]:",
+            "     :Engine ── Query(wt, w) ──► (create) :Query",
+            "   [else]:",
+            "     :Engine ── NotPossibleException() ──► (create) :NotPossibleException"
+          ],
+          "diagramNote": "Sequence diagram của Engine.queryFirst(w) với rẽ nhánh alt kiểm tra b = isInteresting(w).",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 5"
+          },
+          "explanation": [
+            "Slide nhắc lại Sequence diagram cho `Engine.queryFirst(w)`: kiểm tra `isInteresting(w)` trước, chỉ khi `b = true` mới gọi constructor `Query(wt, w)`.",
+            "Nếu `w` không phải từ hợp lệ hoặc nằm trong tập `NonKeyword`, `Engine` lập tức ném `NotPossibleException`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 1,
+          "title": "Query",
+          "bullets": [
+            "Query(WordTable, String):"
+          ],
+          "diagramText": [
+            "Frame: sd Query(WordTable wt, String w)",
+            "Participants: :Query, :WordTable, :Sorting",
+            "1. :Query ── Vector dcs = lookUp(w) ──► :WordTable",
+            "2. :Query ── m.addAll(dcs) ──► :Query",
+            "3. :Query ── quickSort(m) ──► :Sorting"
+          ],
+          "diagramNote": "Sequence diagram nội bộ cho constructor Query(WordTable wt, String w): tra cứu WordTable, sao chép danh sách DocCnt vào vector m, và sắp xếp nhanh bằng Sorting.quickSort(m).",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 6"
+          },
+          "explanation": [
+            "Slide nhắc lại sơ đồ tuần tự `sd Query(WordTable wt, String w)` mô tả chi tiết các bước xảy ra bên trong hàm tạo `Query` ngay sau khi được `Engine.queryFirst` gọi.",
+            "Đây là sơ đồ sẽ được dùng ở Slide 14 để minh họa việc sắp xếp `<d1,6>` và `<d2,10>` thành `<d2,10>`, `<d1,6>`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 1,
+          "title": "Engine.queryMore Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :WordTable, :Query, :NotPossibleException",
+            "1. User ── queryMore(w) ──► :Engine",
+            "2. :Engine ── b = isInteresting(w) ──► :WordTable",
+            "3. alt [b=true]:",
+            "     :Engine ── addKey(w) ──► :Query",
+            "   [else]:",
+            "     :Engine ── NotPossibleException() ──► (create) :NotPossibleException"
+          ],
+          "diagramNote": "Sequence diagram của Engine.queryMore(w): kiểm tra isInteresting(w), nếu true thì gọi addKey(w) trên :Query hiện tại.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 7"
+          },
+          "explanation": [
+            "Slide nhắc lại Sequence diagram của `Engine.queryMore(w)`: gọi `isInteresting(w)` sang `:WordTable`, nếu `b = true` thì gọi `addKey(w)` lên `:Query`.",
+            "Sơ đồ này sẽ được minh họa từng bước tại Slides 15–17 với ví dụ gọi `queryMore(w2)`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 1,
+          "title": "Engine.findDoc Sequence diagram",
+          "diagramText": [
+            "Participants: User (actor), :Engine, :TitleTable",
+            "1. User ── findDoc(s): Doc ──► :Engine",
+            "2. :Engine ── lookUp(s): Doc ──► :TitleTable"
+          ],
+          "diagramNote": "Sequence diagram của Engine.findDoc(s): ủy quyền tra cứu sang TitleTable.lookUp(s): Doc.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 8"
+          },
+          "explanation": [
+            "Slide nhắc lại Sequence diagram đơn giản nhất trong 5 thao tác: `Engine.findDoc(s)` chuyển tiếp yêu cầu sang `TitleTable.lookUp(s)` để nhận lại đối tượng `Doc`.",
+            "Sơ đồ này sẽ được minh họa với tham số `t1` ở Slide 18."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Lecture 11 (tiếp): Minh họa Chạy Từng Bước Ví dụ KEngine (Walk-through)",
+      "text": "Chạy mô phỏng từng bước (walk-through) trên bộ 3 tài liệu mẫu d1 (t1: W1=6, W2=12), d2 (t2: W1=10), d3 (t3: W2=4) qua lần lượt các lệnh AddDocs(), queryFirst(w1), queryMore(w2) và findDoc(t1).",
+      "source": {
+        "file": "Resources/Lecture 11.pdf",
+        "loc": "Slides 9–19"
+      },
+      "digest": {
+        "keyPoints": [
+          "Dữ liệu đầu vào mẫu (Slide 9): Doc d1 (tiêu đề t1; W1 xuất hiện 6 lần, w2 xuất hiện 12 lần), Doc d2 (tiêu đề t2; W1=10), Doc d3 (tiêu đề t3; W2=4).",
+          "AddDocs() (Slides 10–12): nạp 3 đối tượng Doc vào TitleTable (<t1,d1>, <t2,d2>, <t3,d3>) và lập chỉ mục ngược vào WordTable (<w1,[<d1,6>, <d2,10>]> và <w2,[<d1,12>, <d3,4>]>).",
+          "queryFirst(w1) (Slides 13–14): gọi Query(wt, w1) → WordTable.lookUp(w1) trả về [<d1,6>, <d2,10>] → Sorting.quickSort(m) sắp giảm dần thành [<d2,10>, <d1,6>].",
+          "queryMore(w2) (Slides 15–17): gọi addKey(w2) → kiểm tra với các entry trong WordTable → loại <d2,10> (vì d2 không có w2) và cộng tần suất cho d1 (6 + 12 = 18) → kết quả còn [<d1,18>].",
+          "findDoc(t1) (Slide 18): TitleTable.lookUp(t1) tra trong bảng [<t1,d1>, <t2,d2>, <t3,d3>] và trả về d1."
+        ],
+        "terms": [
+          {
+            "term": "Walk-through",
+            "meaning": "Kỹ thuật chạy tay mô phỏng từng thông điệp và trạng thái dữ liệu qua các sơ đồ thiết kế để kiểm tra tính đúng đắn trước khi viết code."
+          }
+        ],
+        "pitfalls": [
+          "Đề thi rất hay hỏi thứ tự phần tử trả về sau `queryFirst(w1)`: kết quả là `[<d2,10>, <d1,6>]` (giảm dần theo tần suất, tức `d2` đứng ở vị trí `fetch(0)` trước `d1`), KHÔNG phải `[<d1,6>, <d2,10>]`.",
+          "Khi gọi `queryMore(w2)`, điều kiện là tài liệu phải chứa **cả hai** từ khóa `w1` và `w2` (phép giao AND), nên `d2` bị gạch bỏ và `d3` (chỉ có `w2`) không được thêm vào; tần suất của `d1` được cộng dồn thành `6 + 12 = 18`."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 1,
+          "title": "Walk throught the design using example",
+          "bullets": [
+            {
+              "text": "Doc d1: t1",
+              "subBullets": [
+                "(W1, 6), (w2,12)"
+              ]
+            },
+            {
+              "text": "Doc d2: t2",
+              "subBullets": [
+                "(W1, 10)"
+              ]
+            },
+            {
+              "text": "Doc d3: t3",
+              "subBullets": [
+                "(W2, 4)"
+              ]
+            }
+          ],
+          "ocrNote": "Tiêu đề trên slide gốc viết sai chính tả 'Walk throught' và viết lẫn chữ hoa/thường 'W1', 'w2', 'W2' (chúng được chuẩn hóa về 'w1', 'w2' khi vào WordTable ở Slide 10).",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 9"
+          },
+          "explanation": [
+            "Slide thiết lập bộ dữ liệu mẫu gồm 3 tài liệu để kiểm tra toàn bộ thiết kế KEngine: `d1` (tiêu đề `t1`, chứa từ `w1` 6 lần và `w2` 12 lần), `d2` (tiêu đề `t2`, chứa `w1` 10 lần), và `d3` (tiêu đề `t3`, chứa `w2` 4 lần).",
+            "Chú ý cách viết hoa `W1`, `W2` vs chữ thường `w2` trên slide đồng thời nhắc lại vai trò chuẩn hóa của `Helpers.canon` trước khi đưa vào `WordTable`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 1,
+          "title": "AddDocs()",
+          "bullets": [
+            "Create 3 Doc objects: d1, d2, d3",
+            {
+              "text": "Doc objects are added to TitleTable:",
+              "subBullets": [
+                "<t1,d1>, <t2,d2>, <t3,d3>"
+              ]
+            },
+            {
+              "text": "Doc objects are added to WordTable:",
+              "subBullets": [
+                "<w1,<d1,6>>, <w2,<d1,12>>",
+                "<w1,<d2,10>>",
+                "<w2,<d3,4>>"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Nội dung hộp WordTable sau khi gộp theo từ khóa:",
+            "<w1,[<d1,6>, <d2,10>]>",
+            "<w2,[<d1,12>, <d3,4>]>"
+          ],
+          "diagramNote": "Khung xanh ở dưới slide thể hiện cấu trúc cuối cùng trong WordTable.table: mỗi từ khóa ánh xạ tới một Vector các cặp <Doc, freq>.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 10"
+          },
+          "explanation": [
+            "Slide mô tả kết quả dữ liệu sau khi gọi `AddDocs()`: `TitleTable` lưu 3 cặp `<tiêu đề, Doc>` là `<t1,d1>`, `<t2,d2>`, `<t3,d3>`.",
+            "Trong khi đó `WordTable` nhận từng cặp `<từ, <Doc, count>>` theo mỗi tài liệu rồi gộp vào `Hashtable` sao cho mỗi từ khóa trỏ tới danh sách `Vector<DocCnt>`: `w1 → [<d1,6>, <d2,10>]` và `w2 → [<d1,12>, <d3,4>]`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 1,
+          "title": "AddDocs()",
+          "diagramText": [
+            "Sequence diagram Engine.addDocs với bóng thoại chú thích tại lời gọi Hashtable h = addDoc(d) sang :WordTable:",
+            "<w1,<d1,6>>",
+            "<w2,<d1,12>>",
+            "<w1,<d2,10>>",
+            "<w2,<d3,4>>"
+          ],
+          "diagramNote": "Bóng thoại xanh trỏ vào mũi tên WordTable.addDoc(d), minh họa các mục từ khóa và tần suất được nạp vào WordTable qua 3 vòng lặp của d1, d2, d3.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 11"
+          },
+          "explanation": [
+            "Slide gắn trực tiếp dữ liệu chạy tay lên Sequence diagram của `Engine.addDocs` tại bước gọi `WordTable.addDoc(d)`.",
+            "Qua 3 lần lặp ứng với `d1`, `d2`, `d3`, bốn bản ghi `<w1,<d1,6>>`, `<w2,<d1,12>>`, `<w1,<d2,10>>`, `<w2,<d3,4>>` lần lượt được đẩy vào `WordTable`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 1,
+          "title": "AddDocs()",
+          "diagramText": [
+            "Sequence diagram Engine.addDocs với bóng thoại chú thích tại lời gọi addDoc(d) sang :TitleTable:",
+            "<t1,d1>",
+            "<t2,d2>",
+            "<t3,d3>"
+          ],
+          "diagramNote": "Bóng thoại xanh trỏ vào mũi tên TitleTable.addDoc(d), minh họa 3 cặp <title, Doc> được lưu vào TitleTable.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 12"
+          },
+          "explanation": [
+            "Tiếp theo trong cùng vòng lặp `AddDocs()`, mỗi tài liệu được gọi tiếp sang `TitleTable.addDoc(d)`.",
+            "Bóng thoại chỉ rõ trạng thái bảng `TitleTable` sau 3 vòng lặp chứa đầy đủ `<t1,d1>`, `<t2,d2>`, `<t3,d3>`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 1,
+          "title": "queryFirst(w1)",
+          "diagramText": [
+            "Sequence diagram Engine.queryFirst với bóng thoại lớn: Query(wt,w1) trỏ vào thông điệp Query(wt, w) trong alt [b=true]",
+            "Bên dưới thông điệp Query(wt, w) có khung tham chiếu: ref Query(wt,w)"
+          ],
+          "diagramNote": "Minh họa bước gọi queryFirst(w1): sau khi WordTable.isInteresting(w1) trả về true, Engine gọi constructor Query(wt, w1) (khung ref trỏ tới sd Query ở Slide 14).",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 13"
+          },
+          "explanation": [
+            "Slide mô phỏng kịch bản người dùng gọi `queryFirst(w1)`: đầu tiên `Engine` hỏi `WordTable.isInteresting(w1)` và nhận về `true`.",
+            "Khung `ref Query(wt,w)` kèm bóng thoại `Query(wt,w1)` báo hiệu quá trình thực thi đi tiếp vào sơ đồ tuần tự chi tiết của constructor `Query` (được phóng to ở Slide 14)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 1,
+          "title": "queryFirst(w1)",
+          "diagramText": [
+            "Frame: sd Query(WordTable wt, String w)",
+            "1. :Query ── Vector dcs = lookUp(w) ──► :WordTable",
+            "   [Bóng thoại 1]: <d1,6> / <d2,10>",
+            "2. :Query ── m.addAll(dcs) ──► :Query",
+            "3. :Query ── quickSort(m) ──► :Sorting",
+            "   [Bóng thoại 2]: <d2,10> / <d1,6>"
+          ],
+          "diagramNote": "Minh họa Query(wt, w1): lookUp(w1) trả về [<d1,6>, <d2,10>], sau đó Sorting.quickSort(m) sắp xếp giảm dần theo tần suất thành [<d2,10>, <d1,6>].",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 14"
+          },
+          "explanation": [
+            "Slide cho thấy kết quả biến đổi dữ liệu bên trong `Query(wt, w1)`: `lookUp(w1)` trả về 2 tài liệu chứa `w1` theo thứ tự nạp là `<d1,6>` rồi `<d2,10>`.",
+            "Sau khi gọi `Sorting.quickSort(m)`, vector `matches` được sắp xếp **giảm dần** theo số lần xuất hiện nên `<d2,10>` (tần suất 10) đứng trước `<d1,6>` (tần suất 6)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 1,
+          "title": "queryMore(w2)",
+          "diagramText": [
+            "Sequence diagram Engine.queryMore với 3 bóng thoại:",
+            "- Bóng thoại trên :WordTable: <w1,<d1,6>>, <w2,<d1,12>>, <w1,<d2,10>>, <w2,<d3,4>>",
+            "- Bóng thoại trên :Query (trạng thái trước khi lọc): <d1,6>, <d2,10>",
+            "- Bóng thoại trỏ vào addKey(w): addKey(w2)"
+          ],
+          "diagramNote": "Bước 1 của queryMore(w2): Engine gọi addKey(w2) lên đối tượng :Query hiện đang giữ kết quả [<d1,6>, <d2,10>].",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 15"
+          },
+          "explanation": [
+            "Người dùng tiếp tục thu hẹp kết quả bằng cách gọi `queryMore(w2)` (tìm tài liệu chứa cả `w1` và `w2`).",
+            "Slide chụp lại trạng thái ngay trước khi lọc: `:Query` đang giữ kết quả của `w1` là `[<d1,6>, <d2,10>]`, còn `:Engine` gửi lệnh `addKey(w2)` tới `:Query`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 1,
+          "title": "queryMore(w2)",
+          "diagramText": [
+            "Sequence diagram Engine.queryMore cập nhật bóng thoại trên :Query:",
+            "<d1,6>",
+            "<d2,10> (bị gạch ngang)",
+            "<d1,12> (in đậm)"
+          ],
+          "diagramNote": "Bước 2 của queryMore(w2): tra WordTable.lookUp(w2) được [<d1,12>, <d3,4>]; d2 không chứa w2 nên <d2,10> bị gạch bỏ; d1 có mặt trong cả hai nên ghi nhận thêm <d1,12>.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 16"
+          },
+          "explanation": [
+            "Slide minh họa quá trình giao hai tập kết quả trong `addKey(w2)`: danh sách tài liệu của `w2` trong `WordTable` là `[<d1,12>, <d3,4>]`.",
+            "Vì `d2` không chứa `w2` nên `<d2,10>` bị gạch ngang (loại bỏ), còn `d3` dù có `w2` nhưng không có `w1` trong truy vấn trước đó nên cũng không được thêm vào; chỉ có `d1` thỏa mãn cả hai từ khóa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 1,
+          "title": "queryMore(w2)",
+          "diagramText": [
+            "Sequence diagram Engine.queryMore cập nhật bóng thoại cuối trên :Query:",
+            "<d1,18>"
+          ],
+          "diagramNote": "Bước 3 của queryMore(w2): cộng dồn tần suất của d1 cho hai từ khóa (6 + 12 = 18), kết quả cuối cùng trong Query là [<d1,18>].",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 17"
+          },
+          "explanation": [
+            "Hoàn tất `queryMore(w2)`: tần suất xuất hiện của `d1` đối với `w1` (`6`) và `w2` (`12`) được cộng dồn thành `sumFreq = 18`.",
+            "Như vậy tập kết quả `matches` của `:Query` bây giờ chỉ còn một phần tử duy nhất là `<d1,18>`."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 1,
+          "title": "findDoc(t1)",
+          "diagramText": [
+            "Sequence diagram Engine.findDoc với 4 bóng thoại:",
+            "- Trên findDoc(s): Doc → findDoc(t1)",
+            "- Trên :TitleTable → <t1,d1>, <t2,d2>, <t3,d3>",
+            "- Trên lookUp(s): Doc → lookUp(t1)",
+            "- Trả về cho :Engine / User → d1"
+          ],
+          "diagramNote": "Minh họa findDoc(t1): Engine gọi TitleTable.lookUp(t1), tra trong bảng [<t1,d1>, <t2,d2>, <t3,d3>] và trả về đối tượng d1.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 18"
+          },
+          "explanation": [
+            "Sau khi đã xác định `d1` qua câu truy vấn, người dùng gọi `findDoc(t1)` để lấy đối tượng tài liệu đầy đủ có tiêu đề `t1`.",
+            "`Engine` chuyển tiếp `lookUp(t1)` tới `TitleTable` và nhận ngay kết quả `d1` trả về."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 1,
+          "title": "Design class diagram",
+          "diagramText": [
+            "Engine [Engine(), queryfirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query]",
+            "  ├──► Comm [getDocs(): Iterator] ──► Doc",
+            "  ├──► TitleTable [Hashtable docs; TitleTable(), addDoc(Doc), lookUp(String): Doc] ──► Doc, Helpers",
+            "  ├──► Query [Query(), Query(WordTable, String), keys(): String[], size(): int, fetch(int): Doc, addKey(String), addDoc(Doc)] ──► Sorting, WordTable, DocCnt, (nét đứt) Doc",
+            "  ├──► WordTable [Hashtable table; WordTable(), isInteresting(String): boolean, lookUp(String): Vector, addDoc(Doc): Hashtable] ──► Doc, DocCnt, Helpers",
+            "  ├── (nét đứt) ──► Doc [Doc(String), title(): String, body(): String, words(): Iterator] ──► Helpers",
+            "  └──► Helpers [canon(String): String]",
+            "Sorting [quickSort(Vector)] ──► Comparable",
+            "DocCnt [Doc d, int freqCount] ──(nét đứt tam giác rỗng)──▷ Comparable; DocCnt ──(nét đứt)──► Doc"
+          ],
+          "diagramNote": "Slide kết thúc Lecture 11 hiển thị lại Design Class Diagram hoàn chỉnh của KEngine để đối chiếu tổng thể sau khi chạy xong ví dụ.",
+          "source": {
+            "file": "Resources/Lecture 11.pdf",
+            "loc": "Slide 19"
+          },
+          "explanation": [
+            "Slide khép lại ví dụ KEngine bằng việc đặt lại toàn bộ **Design Class Diagram** 10 thành phần lên màn hình.",
+            "Nhờ chạy tay qua các kịch bản `AddDocs`, `queryFirst`, `queryMore`, `findDoc` ở Slides 9–18, sinh viên thấy rõ từng mũi tên phụ thuộc và từng phương thức trên sơ đồ lớp thực sự phối hợp với nhau như thế nào khi chạy chương trình."
+          ]
+        }
+      ]
+    }
   ],
   "cards": [
-    { "id": "se1-l10-c01", "front": "Hai nguyên tắc của quy trình design?", "back": "Decomposition by abstraction và iterative refinement (top-down).", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slide 3" } },
-    { "id": "se1-l10-c02", "front": "WordTable trong KEngine để làm gì?", "back": "Lưu các từ quan trọng và không quan trọng cùng số lần xuất hiện trong tài liệu, phục vụ truy vấn.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 41–51" } },
-    { "id": "se1-l10-c03", "front": "TitleTable trong KEngine?", "back": "Tra cứu nhanh Doc theo title (lookUp), dùng Hashtable ở Iteration 2; addDoc ném DuplicateException.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 56–60, 81–83" } },
-    { "id": "se1-l10-c04", "front": "Helpers.canon làm gì?", "back": "Chuyển từ về dạng chuẩn chung (ví dụ Student → student).", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 99–101" } },
-    { "id": "se1-l10-c05", "front": "queryMore(w2) xử lý matches thế nào trong ví dụ?", "back": "Chỉ giữ tài liệu có cả w1 và w2, cộng tần suất (d1: 6 + 12 = 18) và loại d2.", "source": { "file": "Resources/Lecture 11.pdf", "loc": "Slides 15–17" } },
-    { "id": "se1-l10-c06", "front": "Design notebook gồm gì?", "back": "Một phần cho mỗi abstraction: design specification, bản phác cài đặt nếu cần, ngữ cảnh dùng, ghi chú; kèm class, sequence, activity diagram.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slide 9" } }
+    {
+      "id": "se1-l10-c01",
+      "front": "Hai nguyên tắc cốt lõi của quy trình thiết kế (Design process)?",
+      "back": "1) Decomposition by abstraction (phân rã chức năng và tạo/dùng abstraction cho các hàm con); 2) Iterative refinement top-down (chia hoạt động thiết kế thành các iteration, bắt đầu ở mức cao và tinh chỉnh dần).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "se1-l10-c02",
+      "front": "Bốn bước lặp trong mỗi iteration thiết kế và điều kiện dừng?",
+      "back": "Chọn abstraction A → xác định helper abstraction để implement A và facilitate decomposition → viết/cập nhật design specification cho A → dừng khi mọi abstraction đều đã có đặc tả thiết kế (không phát sinh abstraction mới).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 4–5"
+      }
+    },
+    {
+      "id": "se1-l10-c03",
+      "front": "Design document (Design notebook) gồm những gì?",
+      "back": "Mỗi abstraction có một mục gồm: design specification, implementation sketch (nếu cần), context of use & comment; kèm các sơ đồ UML: Class diagram, Sequence diagram, Activity diagram...",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 9"
+      }
+    },
+    {
+      "id": "se1-l10-c04",
+      "front": "4 mối quan hệ phân tích của KEngine và ký hiệu UML tương ứng?",
+      "back": "appears-in(Keyword/Word, Document): association class chứa frequency; hasKeyword(Query, Keyword): Aggregation (thoi rỗng); hasMatch(Query, Match): Composition (thoi đặc); refers-to(Match 0..*, Document 1..1): Association.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 14–17"
+      }
+    },
+    {
+      "id": "se1-l10-c05",
+      "front": "Kết quả Iteration 0 của KEngine: có những initial data abstractions và phương thức Engine nào?",
+      "back": "3 abstraction: Engine, Doc, Query. Engine có 5 thao tác (đều throws NotPossibleException): Engine(), queryFirst(String): Query, queryMore(String): Query, findDoc(String): Doc, addDocs(String): Query.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 29–33"
+      }
+    },
+    {
+      "id": "se1-l10-c06",
+      "front": "Vì sao WordTable lưu cả interesting words và uninteresting words cùng tần suất?",
+      "back": "Để dễ quản lý cả hai loại từ trong cùng một abstraction (qua isInteresting(String)) và tránh phải quét lại tài liệu nhiều lần qua nhiều truy vấn khác nhau (lưu sẵn tần suất khi addDoc).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 44–48"
+      }
+    },
+    {
+      "id": "se1-l10-c07",
+      "front": "TitleTable trong KEngine làm nhiệm vụ gì và dùng cấu trúc dữ liệu nào?",
+      "back": "Lưu và tra cứu nhanh Doc theo title (TitleTable(), addDoc(Doc) throws DuplicateException, lookUp(String): Doc throws NotPossibleException). Iteration 2 chọn java.util.Hashtable (- docs: Hashtable) làm rep.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 57–59, 77, 81–83"
+      }
+    },
+    {
+      "id": "se1-l10-c08",
+      "front": "Vai trò của lớp Comm trong KEngine?",
+      "back": "Module giao tiếp chịu trách nhiệm lấy tài liệu từ trang web từ xa qua phương thức tĩnh static Iterator getDocs(String u) throws NotPossibleException.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 62–63, 78"
+      }
+    },
+    {
+      "id": "se1-l10-c09",
+      "front": "Vì sao Query cần phương thức size() và fetch(int), và dùng Vector cho matches?",
+      "back": "Để cung cấp cách lấy từng tài liệu khớp đơn giản mà không lộ rep nội bộ; fetch(int) truy xuất theo chỉ số nên matches cần một index-based collection như Vector (chứa các DocCnt).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 49, 51, 87, 92"
+      }
+    },
+    {
+      "id": "se1-l10-c10",
+      "front": "Lớp DocCnt và Sorting phối hợp với nhau như thế nào?",
+      "back": "DocCnt đóng gói (Doc d, int cnt/freqCount) và cài đặt interface Comparable (compareTo(Object o)) để Sorting.quickSort(Vector) có thể sắp xếp danh sách kết quả matches theo tần suất giảm dần.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 90–94"
+      }
+    },
+    {
+      "id": "se1-l10-c11",
+      "front": "Vì sao ở Iteration 2, WordTable.addDoc(Doc) được đổi sang trả về Hashtable?",
+      "back": "Để cung cấp sẵn bảng ánh xạ từ khóa → tần suất của tài liệu vừa nạp cho Query.addDoc, giúp Query không phải quét lại nội dung tài liệu đó lần nữa.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 96–98"
+      }
+    },
+    {
+      "id": "se1-l10-c12",
+      "front": "Helpers.canon(String) và Doc.words() được thêm vào để làm gì?",
+      "back": "Doc.words(): Iterator duyệt tất cả các từ trong tài liệu cho WordTable.addDoc; Helpers.canon(String): String chuẩn hóa các biến thể từ (ví dụ Student ~ student về chữ thường) về một dạng chuẩn chung.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 99–101"
+      }
+    },
+    {
+      "id": "se1-l10-c13",
+      "front": "Trong ví dụ Lecture 11, queryFirst(w1) trả về matches như thế nào?",
+      "back": "WordTable.lookUp(w1) trả về [<d1,6>, <d2,10>], sau đó Sorting.quickSort(m) sắp giảm dần theo tần suất thành [<d2,10>, <d1,6>].",
+      "source": {
+        "file": "Resources/Lecture 11.pdf",
+        "loc": "Slides 13–14"
+      }
+    },
+    {
+      "id": "se1-l10-c14",
+      "front": "Trong ví dụ Lecture 11, queryMore(w2) xử lý matches thế nào?",
+      "back": "Giữ lại tài liệu có cả w1 và w2: gạch bỏ <d2,10> (vì d2 không chứa w2), bỏ qua d3 (không có w1), cộng tần suất d1 (6 + 12 = 18) → kết quả còn [<d1,18>].",
+      "source": {
+        "file": "Resources/Lecture 11.pdf",
+        "loc": "Slides 15–17"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l10-q01", "stem": "Trong ví dụ Lecture 11, queryFirst(w1) trả danh sách matches thế nào?", "options": ["[<d1,6>,<d2,10>]", "[<d2,10>,<d1,6>] (giảm dần theo tần suất)", "[<d3,4>]", "[<d1,18>]"], "answer": 1, "explanation": "Query sắp xếp bằng Sorting.quickSort theo tần suất giảm dần.", "source": { "file": "Resources/Lecture 11.pdf", "loc": "Slides 13–14" } },
-    { "id": "se1-l10-q02", "stem": "Trong quy trình design, bước nào thực hiện ở mỗi iteration?", "options": ["Chọn abstraction, xác định helper abstraction, viết/cập nhật đặc tả, dừng khi mọi abstraction đã có đặc tả", "Chỉ viết code", "Chỉ vẽ sequence diagram", "Chỉ test"], "answer": 0, "explanation": "Slide 4 liệt kê các bước lặp.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slide 4" } },
-    { "id": "se1-l10-q03", "stem": "Quan hệ giữa Query và Match trong phân tích KEngine?", "options": ["Aggregation", "Composition (hasMatch)", "Dependency", "Generalization"], "answer": 1, "explanation": "Slides 14–17: hasMatch là composition giữa Query và Match.", "source": { "file": "Resources/Lecture 10.pdf", "loc": "Slides 14–17" } }
+    {
+      "id": "se1-l10-q01",
+      "stem": "Hai nguyên tắc cốt lõi của quy trình thiết kế (Design process) trong Lecture 10 là gì?",
+      "options": [
+        "Bottom-up coding và waterfall testing",
+        "Decomposition by abstraction và iterative refinement (top-down)",
+        "Encapsulation và polymorphism",
+        "Prototyping và agile sprint"
+      ],
+      "answer": 1,
+      "explanation": "Slide 3 (Lecture 10): Two principles gồm Decomposition by abstraction và Iterative refinement (top-down).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "se1-l10-q02",
+      "stem": "Trong mô hình phân tích KEngine (Slides 14–17), quan hệ giữa Query và Match (hasMatch) thuộc loại quan hệ UML nào?",
+      "options": [
+        "Aggregation (hình thoi rỗng)",
+        "Composition (hình thoi đặc)",
+        "Generalization (tam giác rỗng)",
+        "Dependency (mũi tên nét đứt)"
+      ],
+      "answer": 1,
+      "explanation": "Slides 16–17: Query liên kết với 1..* Match bằng hình thoi đặc (Composition) mang tên hasMatch; còn Query–Keyword là Aggregation (thoi rỗng).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 16–17"
+      }
+    },
+    {
+      "id": "se1-l10-q03",
+      "stem": "Khi hoàn tất Design Iteration 0 của KEngine, có những initial data abstractions nào?",
+      "options": [
+        "Engine, WordTable, TitleTable",
+        "Engine, Doc, Query",
+        "Document, Keyword, NonKeyword, Match",
+        "Engine, Comm, Helpers, Sorting"
+      ],
+      "answer": 1,
+      "explanation": "Slide 29: Initial data abstractions gồm Engine, Doc, Query.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 29"
+      }
+    },
+    {
+      "id": "se1-l10-q04",
+      "stem": "Theo đặc tả Iteration 0 (Slide 32), khi nào Engine.queryMore(String w) ném NotPossibleException?",
+      "options": [
+        "Chỉ khi w là null",
+        "Khi WORD(w) = false, hoặc w thuộc NonKeyword, hoặc tập Key = {} (chưa có query trước đó)",
+        "Khi không tìm thấy tài liệu nào chứa w",
+        "Khi URL không phản hồi"
+      ],
+      "answer": 1,
+      "explanation": "Slide 32: @effects của queryMore nêu 'If WORD(w) = false or w in NonKeyword or Key = {} throws NotPossibleException'.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 32"
+      }
+    },
+    {
+      "id": "se1-l10-q05",
+      "stem": "Theo đặc tả TitleTable (Slide 77), điều gì xảy ra khi gọi TitleTable.addDoc(Doc d) với một tài liệu có tiêu đề đã tồn tại trong bảng?",
+      "options": [
+        "Ghi đè tài liệu cũ bằng d",
+        "Bỏ qua không làm gì",
+        "Ném DuplicateException",
+        "Ném IndexOutOfBoundException"
+      ],
+      "answer": 2,
+      "explanation": "Slide 77: 'If a document with d's title already in this throws DuplicateException'.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 77"
+      }
+    },
+    {
+      "id": "se1-l10-q06",
+      "stem": "Trong Iteration 2, vì sao lớp TitleTable và WordTable chọn java.util.Hashtable làm rep lưu trữ nội bộ?",
+      "options": [
+        "Vì Hashtable tự động sắp xếp theo thứ tự giảm dần",
+        "Vì cần ánh xạ khóa (tiêu đề / từ khóa) tới giá trị (Doc / Vector<DocCnt>) để tra cứu nhanh nhiều lần",
+        "Vì Hashtable cho phép lưu giá trị null làm khóa",
+        "Vì Vector không lưu được đối tượng Doc"
+      ],
+      "answer": 1,
+      "explanation": "Slides 82 và 99: tiêu đề và từ khóa được tra cứu lại rất nhiều lần nên dùng Hashtable để ánh xạ trực tiếp tới Doc hoặc Vector các DocCnt.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 82–83, 99–100"
+      }
+    },
+    {
+      "id": "se1-l10-q07",
+      "stem": "Lớp DocCnt phải cài đặt (implement) interface nào để Sorting.quickSort(Vector) sắp xếp được danh sách matches?",
+      "options": [
+        "Iterator",
+        "Serializable",
+        "Comparable",
+        "Comparator"
+      ],
+      "answer": 2,
+      "explanation": "Slide 91 (và Slide 102, Lecture 11 Slide 3): DocCnt cài đặt interface Comparable (compareTo(Object o)).",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slide 91"
+      }
+    },
+    {
+      "id": "se1-l10-q08",
+      "stem": "Phương thức Helpers.canon(String) được tạo ra ở cuối Iteration 2 nhằm giải quyết vấn đề gì?",
+      "options": [
+        "Kết nối tới URL từ xa để tải tài liệu",
+        "Chuyển các từ về dạng chuẩn chung (ví dụ chữ thường: Student ~ student)",
+        "Sắp xếp nhanh các đối tượng DocCnt",
+        "Kiểm tra chỉ số hợp lệ trong Query.fetch(int)"
+      ],
+      "answer": 1,
+      "explanation": "Slide 99–101: 'needs to consider canonical word forms, e.g. student ~ Student → creates Helpers.canon method to convert words to a common format (e.g. lower case)'.",
+      "source": {
+        "file": "Resources/Lecture 10.pdf",
+        "loc": "Slides 99–101"
+      }
+    },
+    {
+      "id": "se1-l10-q09",
+      "stem": "Trong ví dụ Lecture 11 (d1: W1=6, W2=12; d2: W1=10; d3: W2=4), sau khi gọi queryFirst(w1), thứ tự trong Query.matches là gì?",
+      "options": [
+        "[<d1,6>, <d2,10>]",
+        "[<d2,10>, <d1,6>]",
+        "[<d2,10>, <d1,6>, <d3,4>]",
+        "[<d1,18>]"
+      ],
+      "answer": 1,
+      "explanation": "Lecture 11 Slides 13–14: WordTable.lookUp(w1) trả về [<d1,6>, <d2,10>], sau đó Sorting.quickSort(m) sắp giảm dần theo tần suất nên kết quả là [<d2,10>, <d1,6>].",
+      "source": {
+        "file": "Resources/Lecture 11.pdf",
+        "loc": "Slides 13–14"
+      }
+    },
+    {
+      "id": "se1-l10-q10",
+      "stem": "Tiếp tục ví dụ Lecture 11, ngay sau queryFirst(w1), khi người dùng gọi queryMore(w2), kết quả còn lại trong Query.matches là gì?",
+      "options": [
+        "[<d1,12>, <d3,4>]",
+        "[<d1,18>, <d2,10>, <d3,4>]",
+        "[<d1,18>]",
+        "[<d1,6>, <d2,10>]"
+      ],
+      "answer": 2,
+      "explanation": "Lecture 11 Slides 15–17: queryMore(w2) chỉ giữ tài liệu chứa cả w1 và w2 là d1 (gạch bỏ d2), đồng thời cộng dồn tần suất 6 + 12 = 18 → [<d1,18>].",
+      "source": {
+        "file": "Resources/Lecture 11.pdf",
+        "loc": "Slides 15–17"
+      }
+    }
   ]
 }

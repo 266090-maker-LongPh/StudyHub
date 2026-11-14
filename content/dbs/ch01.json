@@ -1,26 +1,2091 @@
 {
-  "id": "dbs-ch01", "order": 1,
+  "id": "dbs-ch01",
+  "order": 1,
   "title": "Chương 1: The Database Environment and Development Process",
-  "summary": [
-    { "h": "Data, Information, Metadata", "text": "Database là tập hợp dữ liệu có tổ chức, liên quan logic với nhau. Data là biểu diễn lưu trữ của đối tượng/sự kiện có ý nghĩa (structured: số, text, ngày; unstructured: ảnh, video, tài liệu). Information là dữ liệu đã xử lý để tăng hiểu biết cho người dùng. Metadata mô tả thuộc tính và ngữ cảnh của dữ liệu: kiểu dữ liệu, kích thước field, giá trị cho phép (min/max), mô tả, nguồn." },
-    { "h": "File processing truyền thống và 5 nhược điểm", "text": "1) Program-data dependence (mỗi chương trình tự giữ metadata cho từng file). 2) Duplication of data (data redundancy; nguy cơ inconsistency, mất data integrity). 3) Limited data sharing. 4) Lengthy development times. 5) Excessive program maintenance (chiếm 80% ngân sách hệ thống thông tin)." },
-    { "h": "Database approach và DBMS", "text": "Kho dữ liệu dùng chung, quản lý bởi một tác nhân điều khiển và cần DBMS. DBMS là hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới database. Ưu điểm gồm 10 mục (program-data independence, planned data redundancy, improved data consistency, sharing, productivity, enforcement of standards, data quality, accessibility, reduced maintenance, decision support). Chi phí/rủi ro gồm 5 mục (personnel mới, chi phí cài đặt/quản lý, chi phí chuyển đổi, backup/recovery tường minh, xung đột tổ chức)." },
-    { "h": "9 thành phần của database environment", "text": "CASE tools, Repository (kho metadata), DBMS, Database, Application programs, User interface, Data/Database administrators, System developers, End users." },
-    { "h": "SDLC, Prototyping, Agile", "text": "SDLC có 6 pha: Planning, Analysis, Logical Design, Physical Design, Implementation, Maintenance. Prototyping (RAD): làm conceptual data modeling sơ lược, định nghĩa database trong lúc làm prototype đầu tiên, lặp lại. Agile nhấn mạnh con người, phần mềm chạy được, hợp tác với khách hàng, đáp ứng thay đổi (ví dụ XP, Scrum, DSDM, FDD)." },
-    { "h": "Three-schema architecture", "text": "External schema (user views) ⊂ Conceptual schema (mô hình E-R) → Internal schema gồm logical schema (Chương 4) và physical schema (Chương 5)." }
+  "audit": {
+    "sourceFile": "hoffer_mdm12e_pp_ch01.pdf",
+    "totalPages": 55,
+    "extractedPages": 55,
+    "ocrNotes": []
+  },
+  "sources": [
+    {
+      "file": "hoffer_mdm12e_pp_ch01.pdf",
+      "loc": "Slides 1–55 (đầy đủ 55/55 slides)"
+    }
   ],
-  "sources": [{ "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 1–55" }],
+  "summary": [
+    {
+      "h": "Giới thiệu chương & Mục tiêu học tập (Objectives)",
+      "text": "Giới thiệu tên chương, giáo trình Modern Database Management (12th Edition) và 10 mục tiêu học tập cốt lõi của Chương 1.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 1–2"
+      },
+      "digest": {
+        "keyPoints": [
+          "Chương 1 đặt nền tảng về môi trường cơ sở dữ liệu (Database Environment) và quy trình phát triển hệ thống CSDL.",
+          "10 mục tiêu trọng tâm gồm: định nghĩa thuật ngữ (database, data, information, metadata), hạn chế của xử lý file truyền thống, ưu điểm và chi phí/rủi ro của tiếp cận CSDL.",
+          "Bao quát thêm các thành phần môi trường CSDL, phân loại ứng dụng CSDL, vòng đời phát triển SDLC, prototyping/agile, vai trò nhân sự và kiến trúc 3 lược đồ (three-schema architecture)."
+        ],
+        "terms": [
+          {
+            "term": "Modern Database Management (12th Edition)",
+            "meaning": "Giáo trình gốc của slide do Jeff Hoffer, Ramesh Venkataraman và Heikki Topi biên soạn (Pearson Education, 2016)."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "title": "CHAPTER 1: THE DATABASE ENVIRONMENT AND DEVELOPMENT PROCESS",
+          "paragraphs": [
+            "CHAPTER 1: THE DATABASE ENVIRONMENT AND DEVELOPMENT PROCESS",
+            "Modern Database Management (12th Edition) — Jeff Hoffer, Ramesh Venkataraman, Heikki Topi"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 1"
+          },
+          "pageNumber": 1,
+          "explanation": [
+            "Slide mở đầu giới thiệu tên Chương 1: \"The Database Environment and Development Process\" trích từ giáo trình chuẩn Modern Database Management (ấn bản thứ 12) của nhóm tác giả Hoffer, Venkataraman và Topi.",
+            "Chương này đóng vai trò nền móng cho toàn môn DBS: giải thích lý do tổ chức cần chuyển từ lưu trữ file rời rạc sang Hệ quản trị Cơ sở dữ liệu (DBMS) và trình bày lộ trình phát triển một CSDL từ khâu lập kế hoạch đến vận hành."
+          ]
+        },
+        {
+          "slideNumber": "Slide 2",
+          "title": "OBJECTIVES",
+          "bullets": [
+            "Define terms",
+            "Name limitations of conventional file processing",
+            "Explain advantages of databases",
+            "Identify costs and risks of databases",
+            "List components of database environment",
+            "Identify categories of database applications",
+            "Describe database system development life cycle",
+            "Explain prototyping and agile development approaches",
+            "Explain roles of individuals",
+            "Explain the three-schema architecture for databases"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 2"
+          },
+          "pageNumber": 2,
+          "explanation": [
+            "Slide liệt kê đúng 10 mục tiêu học tập (Learning Objectives) mà bạn cần nắm vững sau khi học xong Chương 1.",
+            "Khi ôn thi trắc nghiệm hoặc tự luận, có thể dùng danh sách 10 gạch đầu dòng này làm checklist tự kiểm tra: thuật ngữ nền tảng → nhược điểm file → ưu/nhược điểm CSDL → thành phần môi trường → loại ứng dụng → SDLC vs Prototyping/Agile → nhân sự → kiến trúc 3 lược đồ."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Các định nghĩa cốt lõi: Database, Data, Information, Metadata",
+      "text": "Định nghĩa Database, Data (Structured vs Unstructured), Information và Metadata cùng ví dụ Class Roster (Figure 1-1a, 1-1b, Table 1-1).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 3–6"
+      },
+      "digest": {
+        "keyPoints": [
+          "Database là tập hợp dữ liệu có tổ chức và liên quan logic với nhau.",
+          "Data là biểu diễn lưu trữ của các đối tượng/sự kiện có ý nghĩa, gồm dữ liệu có cấu trúc (số, chữ, ngày) và phi cấu trúc (ảnh, video, tài liệu).",
+          "Information là dữ liệu đã được xử lý (nhờ ngữ cảnh, biểu đồ tổng hợp) nhằm làm tăng hiểu biết cho người dùng để ra quyết định.",
+          "Metadata là dữ liệu mô tả đặc tính và ngữ cảnh của dữ liệu người dùng: kiểu dữ liệu (Type), độ dài (Length), miền giá trị Min/Max, mô tả (Description) và nguồn gốc (Source)."
+        ],
+        "terms": [
+          {
+            "term": "Database",
+            "meaning": "Organized collection of logically related data."
+          },
+          {
+            "term": "Data",
+            "meaning": "Stored representations of meaningful objects and events (Structured: numbers, text, dates; Unstructured: images, video, documents)."
+          },
+          {
+            "term": "Information",
+            "meaning": "Data processed to increase knowledge in the person using the data."
+          },
+          {
+            "term": "Metadata",
+            "meaning": "Data that describes the properties and context of user data."
+          }
+        ],
+        "pitfalls": [
+          "Đừng nhầm Data thô với Metadata: ví dụ GPA = 3.4 là Data; còn quy định GPA có kiểu Decimal, độ dài 3, Min = 0.0, Max = 4.0, Source = Academic Unit là Metadata."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 3",
+          "title": "DEFINITIONS",
+          "bullets": [
+            "Databases are used to store, manipulate, and retrieve data in nearly every type of organization, including business, health care, education, government, and libraries.",
+            "Database: organized collection of logically related data",
+            {
+              "text": "Data: stored representations of meaningful objects and events",
+              "subBullets": [
+                "Structured: numbers, text, dates",
+                "Unstructured: images, video, documents"
+              ]
+            },
+            "Information: data processed to increase knowledge in the person using the data",
+            "Metadata: data that describes the properties and context of user data"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 3"
+          },
+          "pageNumber": 3,
+          "explanation": [
+            "Phân biệt 4 khái niệm cốt lõi hay bị hỏi nhầm nhất: Database (tập hợp dữ liệu có tổ chức, liên quan logic), Data (biểu diễn thô đã lưu của sự kiện/đối tượng), Information (dữ liệu đã xử lý giúp người dùng tăng hiểu biết ra quyết định), và Metadata (dữ liệu mô tả cấu trúc/ngữ cảnh của dữ liệu người dùng).",
+            "Chú ý phân loại Data thành 2 nhóm: Structured (số, chữ, ngày tháng — phù hợp bảng quan hệ truyền thống) và Unstructured (hình ảnh, video, tài liệu tự do)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 4",
+          "title": "Figure 1-1a Data in context",
+          "paragraphs": [
+            "Context helps users understand data"
+          ],
+          "table": {
+            "caption": "Class Roster — Course: MGT 500 Business Policy | Semester: Spring 2015 | Section: 2",
+            "headers": [
+              "Name",
+              "ID",
+              "Major",
+              "GPA"
+            ],
+            "rows": [
+              [
+                "Baker, Kenneth D.",
+                "324917628",
+                "MGT",
+                "2.9"
+              ],
+              [
+                "Doyle, Joan E.",
+                "476193248",
+                "MKT",
+                "3.4"
+              ],
+              [
+                "Finkle, Clive R.",
+                "548429344",
+                "PRM",
+                "2.8"
+              ],
+              [
+                "Lewis, John C.",
+                "551742186",
+                "MGT",
+                "3.7"
+              ],
+              [
+                "McFerran, Debra R.",
+                "409723145",
+                "IS",
+                "2.9"
+              ],
+              [
+                "Sisneros, Michael",
+                "392416582",
+                "ACCT",
+                "3.3"
+              ]
+            ]
+          },
+          "diagramNote": "Bảng danh sách lớp minh họa rằng khi dữ liệu thô được đặt vào ngữ cảnh (tên môn MGT 500, học kỳ Spring 2015, nhóm lớp Section 2 và tiêu đề cột Name, ID, Major, GPA), người đọc mới hiểu được ý nghĩa của các giá trị.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 4"
+          },
+          "pageNumber": 4,
+          "explanation": [
+            "Figure 1-1a minh họa sự khác nhau giữa \"dữ liệu thô\" và \"dữ liệu đặt trong ngữ cảnh (Data in context)\". Nếu chỉ thấy con số \"324917628\" hoặc \"3.4\", người đọc không thể hiểu nó là gì.",
+            "Nhờ có tiêu đề bảng (MGT 500 Business Policy, Spring 2015, Section 2) và tên các cột (Name, ID, Major, GPA), dữ liệu lập tức mang ý nghĩa thực tiễn về danh sách lớp — chính ngữ cảnh (context) giúp chuyển hóa Data thành Information."
+          ]
+        },
+        {
+          "slideNumber": "Slide 5",
+          "title": "Figure 1-1b Summarized data",
+          "paragraphs": [
+            "Graphical displays turn data into useful information that managers can use for decision making and interpretation"
+          ],
+          "diagramText": [
+            "Pie Chart — Percent Enrollment by Major (2015): ACCT (25%), MGT (20%), MKT (15%), IS (15%), OTHER (15%), FIN (10%)",
+            "Line Chart — Enrollment Projections (Number of Students by Year, 2010–2015): solid line = actual (2010–2014), dotted line = estimated (2014–2015, ~300 students)"
+          ],
+          "diagramNote": "Hình gồm 1 biểu đồ tròn thể hiện tỷ lệ sinh viên đăng ký theo chuyên ngành năm 2015 và 1 biểu đồ đường thể hiện số lượng sinh viên thực tế (2010–2014) cùng dự báo ước tính (2014–2015).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 5"
+          },
+          "pageNumber": 5,
+          "explanation": [
+            "Figure 1-1b tiếp tục chứng minh quá trình chuyển Data thành Information thông qua tổng hợp và trực quan hóa (Graphical displays).",
+            "Biểu đồ tròn giúp nhà quản lý nhận ra ngay tỷ trọng ngành học chiếm nhiều nhất (ACCT 25%, MGT 20%), còn biểu đồ đường cho thấy xu hướng tăng trưởng thực tế 2010–2014 và dự báo 2015 (~300 sinh viên) để ra quyết định phân bổ giảng đường/giảng viên."
+          ]
+        },
+        {
+          "slideNumber": "Slide 6",
+          "title": "TABLE 1-1 Example Metadata for Class Roster",
+          "paragraphs": [
+            "Descriptions of the properties or characteristics of the data, including data types, field sizes, allowable values, and data context"
+          ],
+          "table": {
+            "caption": "TABLE 1-1 Example Metadata for Class Roster (Data Item → Metadata)",
+            "headers": [
+              "Name",
+              "Type",
+              "Length",
+              "Min",
+              "Max",
+              "Description",
+              "Source"
+            ],
+            "rows": [
+              [
+                "Course",
+                "Alphanumeric",
+                "30",
+                "",
+                "",
+                "Course ID and name",
+                "Academic Unit"
+              ],
+              [
+                "Section",
+                "Integer",
+                "1",
+                "1",
+                "9",
+                "Section number",
+                "Registrar"
+              ],
+              [
+                "Semester",
+                "Alphanumeric",
+                "10",
+                "",
+                "",
+                "Semester and year",
+                "Registrar"
+              ],
+              [
+                "Name",
+                "Alphanumeric",
+                "30",
+                "",
+                "",
+                "Student name",
+                "Student IS"
+              ],
+              [
+                "ID",
+                "Integer",
+                "9",
+                "",
+                "",
+                "Student ID (SSN)",
+                "Student IS"
+              ],
+              [
+                "Major",
+                "Alphanumeric",
+                "4",
+                "",
+                "",
+                "Student major",
+                "Student IS"
+              ],
+              [
+                "GPA",
+                "Decimal",
+                "3",
+                "0.0",
+                "4.0",
+                "Student grade point average",
+                "Academic Unit"
+              ]
+            ]
+          },
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 6"
+          },
+          "pageNumber": 6,
+          "explanation": [
+            "Table 1-1 cung cấp ví dụ cụ thể về Metadata cho bảng Class Roster ở Slide 4: mọi cột dữ liệu (Course, Section, Semester, Name, ID, Major, GPA) đều được mô tả chi tiết kiểu dữ liệu (Type), độ dài (Length), miền giá trị Min/Max, mô tả (Description) và đơn vị nguồn (Source).",
+            "Điểm hay ra thi: giá trị cụ thể như \"GPA = 3.4\" là Data, còn quy tắc \"GPA có kiểu Decimal, Length 3, Min 0.0, Max 4.0, do Academic Unit quản lý\" là Metadata giúp DBMS kiểm tra tính hợp lệ khi nhập liệu."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Xử lý file truyền thống và 5 nhược điểm (Traditional File Processing)",
+      "text": "Ví dụ hệ thống xử lý file cũ tại Pine Valley Furniture Company và phân tích chi tiết 5 nhược điểm: phụ thuộc chương trình–dữ liệu, trùng lặp dữ liệu, chia sẻ hạn chế, thời gian phát triển lâu và bảo trì quá mức.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 7–11"
+      },
+      "digest": {
+        "keyPoints": [
+          "Trong hệ thống xử lý file truyền thống, mỗi phòng ban (Orders, Accounting, Payroll) có hệ thống và tập tin riêng (Customer Master File bị nhân đôi ở hai nơi).",
+          "5 nhược điểm cốt lõi: (1) Program-Data Dependence, (2) Duplication of Data, (3) Limited Data Sharing, (4) Lengthy Development Times, (5) Excessive Program Maintenance (chiếm 80% ngân sách hệ thống thông tin).",
+          "Program-data dependence buộc mỗi chương trình phải tự giữ code định nghĩa metadata và các thủ tục đọc/chèn/sửa/xóa file riêng với định dạng không chuẩn hóa.",
+          "Data redundancy ngoài việc tốn dung lượng và khó bảo trì còn gây ra vấn đề lớn nhất (biggest problem): thay đổi dữ liệu ở 1 file làm phát sinh mâu thuẫn (inconsistency) và tổn hại tính toàn vẹn dữ liệu (data integrity)."
+        ],
+        "terms": [
+          {
+            "term": "Program-Data Dependence",
+            "meaning": "Sự phụ thuộc chặt chẽ giữa code chương trình ứng dụng và định dạng/metadata của từng file dữ liệu mà nó sử dụng."
+          },
+          {
+            "term": "Data Redundancy",
+            "meaning": "Sự trùng lặp dữ liệu khi nhiều hệ thống/chương trình giữ các bản sao riêng biệt của cùng một dữ liệu."
+          },
+          {
+            "term": "Data Integrity",
+            "meaning": "Tính nhất quán, chính xác và đáng tin cậy của dữ liệu trong toàn hệ thống."
+          }
+        ],
+        "pitfalls": [
+          "Đề thi thường hỏi 'biggest problem' của Data Redundancy là gì — đáp án đúng là thay đổi ở một file có thể gây inconsistency và làm mất data integrity (chứ không chỉ tốn dung lượng).",
+          "Con số cần nhớ từ Slide 9: bảo trì chương trình quá mức (Excessive Program Maintenance) chiếm 80% ngân sách hệ thống thông tin (80% of information systems budget)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 7",
+          "title": "USING TRADITIONAL MANAGEMENT METHOD",
+          "diagramText": [
+            "Orders Department: Program A, Program B, Program C ↔ Order Filling System ↔ [Customer Master File | Inventory Master File | Back Order File]",
+            "Accounting Department: Program A, Program B ↔ Invoicing System ↔ [Inventory Pricing File | Customer Master File]",
+            "Payroll Department: Program A, Program B ↔ Payroll System ↔ [Employee Master File]"
+          ],
+          "diagramNote": "Sơ đồ mô tả 3 phòng ban (Orders, Accounting, Payroll) vận hành độc lập; mỗi hệ thống truy cập các tệp dữ liệu riêng biệt thay vì dùng chung một CSDL.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 7"
+          },
+          "pageNumber": 7,
+          "explanation": [
+            "Slide mô tả mô hình quản lý truyền thống (Traditional File Processing) trước khi có DBMS: từng phòng ban (Orders, Accounting, Payroll) sở hữu phần mềm và tập tin riêng tách biệt.",
+            "Ví dụ Orders có Order Filling System đọc trực tiếp 3 file master riêng, còn Accounting và Payroll chạy các chương trình hoàn toàn độc lập, không có kho dùng chung ở giữa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 8",
+          "title": "FIGURE 1-2 Old file processing systems at Pine Valley Furniture Company",
+          "paragraphs": [
+            "Duplicate Data",
+            "FIGURE 1-2 Old file processing systems at Pine Valley Furniture Company"
+          ],
+          "diagramText": [
+            "Orders Department (Order Filling System) → Customer Master File",
+            "Accounting Department (Invoicing System) → Customer Master File",
+            "Khoanh đỏ kết nối 2 tệp Customer Master File giống nhau tồn tại tách biệt = Duplicate Data"
+          ],
+          "diagramNote": "Slide làm nổi bật trực tiếp sự trùng lặp dữ liệu (Duplicate Data) giữa tệp Customer Master File của bộ phận Orders và bộ phận Accounting.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 8"
+          },
+          "pageNumber": 8,
+          "explanation": [
+            "Figure 1-2 phóng to vấn đề tại công ty mẫu Pine Valley Furniture Company: cả Order Filling System (phòng Orders) và Invoicing System (phòng Accounting) đều tự lưu một tệp \"Customer Master File\" riêng.",
+            "Vòng tròn khoanh đỏ \"Duplicate Data\" chỉ ra hệ quả trực tiếp: cùng thông tin về 1 khách hàng bị nhân đôi ở hai phòng ban tách rời, dẫn tới nguy cơ lệch dữ liệu khi cập nhật."
+          ]
+        },
+        {
+          "slideNumber": "Slide 9",
+          "title": "DISADVANTAGES OF FILE PROCESSING",
+          "bullets": [
+            {
+              "text": "Program-Data Dependence",
+              "subBullets": [
+                "All programs maintain metadata for each file they use"
+              ]
+            },
+            {
+              "text": "Duplication of Data",
+              "subBullets": [
+                "Different systems/programs have separate copies of the same data"
+              ]
+            },
+            {
+              "text": "Limited Data Sharing",
+              "subBullets": [
+                "No centralized control of data"
+              ]
+            },
+            {
+              "text": "Lengthy Development Times",
+              "subBullets": [
+                "Programmers must design their own file formats"
+              ]
+            },
+            {
+              "text": "Excessive Program Maintenance",
+              "subBullets": [
+                "80% of information systems budget"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 9"
+          },
+          "pageNumber": 9,
+          "explanation": [
+            "Slide tổng kết đúng 5 nhược điểm kinh điển của xử lý file truyền thống (Program-Data Dependence, Duplication of Data, Limited Data Sharing, Lengthy Development Times, Excessive Program Maintenance).",
+            "Lưu ý chi tiết rất hay hỏi trong đề trắc nghiệm: chi phí bảo trì chương trình quá mức (Excessive Program Maintenance) ngốn tới 80% ngân sách hệ thống thông tin (IS budget) do lập trình viên phải sửa hàng loạt file code mỗi khi đổi cấu trúc tệp."
+          ]
+        },
+        {
+          "slideNumber": "Slide 10",
+          "title": "PROBLEMS WITH DATA DEPENDENCY",
+          "bullets": [
+            "Each application programmer must maintain his/her own data",
+            "Each application program needs to include code for the metadata of each file",
+            "Each application program must have its own processing routines for reading, inserting, updating, and deleting data",
+            "Lack of coordination and central control",
+            "Non-standard file formats"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 10"
+          },
+          "pageNumber": 10,
+          "explanation": [
+            "Giải thích sâu về \"Data Dependency\" (Phụ thuộc chương trình – dữ liệu): mỗi chương trình ứng dụng phải tự khai báo metadata của file và tự viết mã nguồn cho các thao tác đọc, chèn, sửa, xóa.",
+            "Vì thiếu điều phối trung tâm và dùng định dạng tệp không chuẩn hóa, chỉ cần đổi độ dài trường Mã khách hàng trong file là mọi chương trình đụng tới file đó đều bị lỗi và phải viết lại."
+          ]
+        },
+        {
+          "slideNumber": "Slide 11",
+          "title": "PROBLEMS WITH DATA REDUNDANCY",
+          "bullets": [
+            "Waste of space to have duplicate data",
+            "Causes more maintenance headaches",
+            {
+              "text": "The biggest problem:",
+              "subBullets": [
+                "Data changes in one file could cause inconsistencies",
+                "Compromises in data integrity"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 11"
+          },
+          "pageNumber": 11,
+          "explanation": [
+            "Phân tích chi tiết vấn đề của \"Data Redundancy\" (Trùng lặp/dư thừa dữ liệu): ngoài việc lãng phí dung lượng đĩa và tăng gánh nặng bảo trì nhiều bản sao...",
+            "Đề thi rất hay hỏi cụm từ \"The biggest problem\": vấn đề lớn nhất của Data Redundancy là khi sửa dữ liệu ở 1 file nhưng quên sửa ở file còn lại → gây ra mâu thuẫn dữ liệu (inconsistencies) và làm tổn hại tính toàn vẹn dữ liệu (data integrity)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Cách tiếp cận CSDL & Các thành phần mô hình dữ liệu (Database Approach & E-R)",
+      "text": "Giải pháp Database Approach với DBMS trung tâm và các khái niệm nền tảng của mô hình dữ liệu: Data model (Enterprise vs Project), Entities, Relationships (1:M, M:N, 1:1) và Relational Databases.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 12–20"
+      },
+      "digest": {
+        "keyPoints": [
+          "Database Approach giải quyết nhược điểm xử lý file bằng kho lưu trữ dùng chung tập trung, quản lý bởi một tác nhân điều khiển thông qua DBMS.",
+          "DBMS quản lý tài nguyên dữ liệu giống như cách hệ điều hành (OS) quản lý tài nguyên phần cứng.",
+          "Enterprise Data Model biểu diễn thực thể và mối quan hệ ở mức tổng quát cao toàn tổ chức; Project Data Model đi vào chi tiết (gồm khóa chính và thuộc tính) khớp với cấu trúc CSDL/data warehouse.",
+          "Ví dụ Pine Valley minh họa: mối quan hệ nhiều-nhiều (M:N) giữa ORDER và PRODUCT được biểu diễn qua thực thể kết hợp ORDER LINE thành hai mối quan hệ 1:M (ORDER → ORDER LINE và PRODUCT → ORDER LINE)."
+        ],
+        "terms": [
+          {
+            "term": "Enterprise Data Model",
+            "meaning": "Mô hình dữ liệu mức cao thể hiện các entity và relationship cho toàn tổ chức."
+          },
+          {
+            "term": "Project Data Model",
+            "meaning": "Góc nhìn chi tiết hơn (có thuộc tính, khóa chính/ngoại), khớp với cấu trúc database hoặc data warehouse."
+          },
+          {
+            "term": "Entity",
+            "meaning": "Dạng danh từ mô tả người, địa điểm, đối tượng, sự kiện hoặc khái niệm; được cấu tạo từ các thuộc tính (attributes)."
+          },
+          {
+            "term": "Relational Database",
+            "meaning": "Công nghệ CSDL sử dụng các bảng (relations) để biểu diễn entity và khóa chính/khóa ngoại (primary/foreign keys) để biểu diễn relationship."
+          }
+        ],
+        "pitfalls": [
+          "CUSTOMER – ORDER là 1:M; ORDER – ORDER LINE là 1:M; PRODUCT – ORDER LINE là 1:M → suy ra gián tiếp giữa ORDER và PRODUCT là quan hệ Many-to-Many (M:N)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 12",
+          "title": "SOLUTION: THE DATABASE APPROACH",
+          "bullets": [
+            "Central repository of shared data",
+            "Data is managed by a controlling agent",
+            "Stored in a standardized, convenient form"
+          ],
+          "paragraphs": [
+            "Requires a Database Management System (DBMS)"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 12"
+          },
+          "pageNumber": 12,
+          "explanation": [
+            "Giới thiệu giải pháp khắc phục toàn bộ 5 nhược điểm trên: Tiếp cận CSDL (The Database Approach).",
+            "Cốt lõi gồm 3 yếu tố: (1) Tập hợp dữ liệu chia sẻ tại một kho trung tâm (Central repository), (2) Được quản lý bởi một tác nhân điều khiển trung tâm thông qua Hệ quản trị CSDL (DBMS), và (3) Lưu trữ ở định dạng chuẩn hóa, thống nhất."
+          ]
+        },
+        {
+          "slideNumber": "Slide 13",
+          "title": "DATABASE MANAGEMENT SYSTEM",
+          "bullets": [
+            "A software system that is used to create, maintain, and provide controlled access to user databases"
+          ],
+          "diagramText": [
+            "[Order Filing System] \\",
+            "[Invoicing System]    —→ [DBMS] —— [Central database: Contains employee, order, inventory, pricing, and customer data]",
+            "[Payroll System]      /"
+          ],
+          "paragraphs": [
+            "DBMS manages data resources like an operating system manages hardware resources"
+          ],
+          "diagramNote": "Sơ đồ cho thấy cả 3 hệ thống ứng dụng (Order Filing, Invoicing, Payroll) cùng đi qua một DBMS duy nhất để truy cập Central database.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 13"
+          },
+          "pageNumber": 13,
+          "explanation": [
+            "Định nghĩa vai trò của DBMS như lớp trung gian duy nhất đứng giữa toàn bộ các ứng dụng phòng ban (Order Filing, Invoicing, Payroll) và Central Database.",
+            "Hãy ghi nhớ phép ẩn dụ quan trọng trên slide: \"DBMS quản lý tài nguyên dữ liệu giống như cách Hệ điều hành (Operating System) quản lý tài nguyên phần cứng\" — ứng dụng không cần tự đọc/ghi trực tiếp xuống ổ đĩa."
+          ]
+        },
+        {
+          "slideNumber": "Slide 14",
+          "title": "ELEMENTS OF THE DATABASE APPROACH",
+          "bullets": [
+            {
+              "text": "Data models",
+              "subBullets": [
+                "Graphical diagram capturing nature and relationship of data",
+                "Enterprise Data Model–high-level entities and relationships for the organization",
+                "Project Data Model–more detailed view, matching data structure in database or data warehouse"
+              ]
+            },
+            {
+              "text": "Entities",
+              "subBullets": [
+                "Noun form describing a person, place, object, event, or concept",
+                "Composed of attributes"
+              ]
+            },
+            {
+              "text": "Relationships",
+              "subBullets": [
+                "Between entities",
+                "Usually one-to-many (1:M) or many-to-many (M:N), but could also be one-to-one (1:1)"
+              ]
+            },
+            {
+              "text": "Relational Databases",
+              "subBullets": [
+                "Database technology involving tables (relations) representing entities and primary/foreign keys representing relationships"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 14"
+          },
+          "pageNumber": 14,
+          "explanation": [
+            "Slide phân rã 4 thành phần khái niệm tạo nên Database Approach: Data models (sơ đồ đồ họa, chia làm Enterprise mức tổng thể & Project mức chi tiết), Entities (dạng danh từ đại diện cho đối tượng/sự kiện gồm nhiều attributes), Relationships (liên kết giữa các thực thể: 1:M, M:N, 1:1), và Relational Databases (dùng bảng + Primary/Foreign key để hiện thực hóa)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 15",
+          "title": "Figure 1-3 Comparison of enterprise and project level data models",
+          "diagramText": [
+            "Segment of an enterprise data model: CUSTOMER (Places / Is Placed By) →< ORDER (Contains / Is Contained In) >—< PRODUCT",
+            "Segment of a project-level data model:",
+            "• CUSTOMER: Customer ID (PK), Customer Name",
+            "• ORDER: Order ID (PK), Customer ID, Order Date",
+            "• PRODUCT: Product ID (PK), Standard Price",
+            "• ORDER LINE (associative entity): Quantity",
+            "Quan hệ: CUSTOMER (Places / Is Placed By) 1:M ORDER; ORDER (Contains / Is Contained In) 1:M ORDER LINE; PRODUCT (Has / Is For) 1:M ORDER LINE"
+          ],
+          "diagramNote": "So sánh trực quan Enterprise model (chỉ gồm thực thể và mối quan hệ M:N ở mức cao) với Project-level model (chi tiết tới từng thuộc tính, khóa chính gạch chân và thực thể kết hợp ORDER LINE).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 15"
+          },
+          "pageNumber": 15,
+          "explanation": [
+            "Figure 1-3 so sánh trực quan cùng một bài toán đặt hàng ở hai cấp độ mô hình dữ liệu. Ở trên (Enterprise model) chỉ ghi 3 thực thể và quan hệ trực tiếp M:N giữa ORDER và PRODUCT.",
+            "Ở dưới (Project-level model), mô hình đi vào chi tiết từng thuộc tính, đánh dấu khóa chính (gạch chân) và tách quan hệ M:N thành thực thể kết hợp (associative entity) tên là ORDER LINE chứa Quantity để sẵn sàng cài đặt trong CSDL quan hệ."
+          ]
+        },
+        {
+          "slideNumber": "Slide 16",
+          "title": "Project-level Model: CUSTOMER – ORDER (1:M)",
+          "paragraphs": [
+            "One customer may place many orders, but each order is placed by a single customer",
+            "→ One-to-many relationship"
+          ],
+          "diagramNote": "Slide khoanh nổi bật cặp thực thể CUSTOMER và ORDER trong Figure 1-3 (Places / Is Placed By).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 16"
+          },
+          "pageNumber": 16,
+          "explanation": [
+            "Slide tách riêng cặp thực thể CUSTOMER – ORDER trong Figure 1-3 để hướng dẫn cách đọc bản số (cardinality) từ sơ đồ ER.",
+            "Đọc theo 2 chiều: một khách hàng có thể đặt nhiều đơn hàng (may place many orders), nhưng một đơn hàng cụ thể chỉ do duy nhất một khách hàng đặt (placed by a single customer) → quan hệ Một-Nhiều (1:M)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 17",
+          "title": "Project-level Model: ORDER – ORDER LINE (1:M)",
+          "paragraphs": [
+            "One order has many order lines; each order line is associated with a single order",
+            "→ One-to-many relationship"
+          ],
+          "diagramNote": "Slide khoanh nổi bật cặp thực thể ORDER và ORDER LINE trong Figure 1-3 (Contains / Is Contained In).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 17"
+          },
+          "pageNumber": 17,
+          "explanation": [
+            "Tách riêng cặp ORDER – ORDER LINE: một đơn hàng chứa nhiều dòng sản phẩm chi tiết (order lines), nhưng mỗi dòng order line chỉ thuộc về một đơn hàng duy nhất → quan hệ Một-Nhiều (1:M)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 18",
+          "title": "Project-level Model: PRODUCT – ORDER LINE (1:M)",
+          "paragraphs": [
+            "One product can be in many order lines, each order line refers to a single product",
+            "→ One-to-many relationship"
+          ],
+          "diagramNote": "Slide khoanh nổi bật cặp thực thể PRODUCT và ORDER LINE trong Figure 1-3 (Has / Is For).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 18"
+          },
+          "pageNumber": 18,
+          "explanation": [
+            "Tách riêng cặp PRODUCT – ORDER LINE: một sản phẩm có thể xuất hiện trong nhiều dòng đơn hàng khác nhau theo thời gian, nhưng mỗi dòng order line chỉ tham chiếu đúng một mặt hàng cụ thể → quan hệ Một-Nhiều (1:M)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 19",
+          "title": "Project-level Model: ORDER – PRODUCT (M:N)",
+          "paragraphs": [
+            "Therefore, one order involves many products and one product is involved in many orders",
+            "→ Many-to-many relationship"
+          ],
+          "diagramNote": "Slide khoanh tổng hợp hai đầu CUSTOMER/ORDER và PRODUCT nối qua ORDER LINE để kết luận mối quan hệ nhiều–nhiều (M:N) giữa ORDER và PRODUCT.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 19"
+          },
+          "pageNumber": 19,
+          "explanation": [
+            "Slide ghép 3 kết quả từ Slides 16–18 lại để rút ra kết luận logic: vì 1 ORDER gồm nhiều ORDER LINE (trỏ tới nhiều PRODUCT) và 1 PRODUCT nằm trên nhiều ORDER LINE (thuộc nhiều ORDER), nên bản chất giữa ORDER và PRODUCT là quan hệ Nhiều-Nhiều (M:N)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 20",
+          "title": "FIGURE 1-4 Enterprise model for Figure 1-3 segments",
+          "diagramText": [
+            "Thực thể mức doanh nghiệp: CUSTOMER, ORDER, BACKORDER, INVENTORY PRICING HISTORY, INVENTORY, EMPLOYEE",
+            "CUSTOMER (Places) —< (Is Placed By) ORDER",
+            "ORDER (Generates) —< (Completes) BACKORDER",
+            "ORDER (Contains) >—< (Is Contained In) INVENTORY",
+            "BACKORDER (Contains) —< (Is Contained In) INVENTORY",
+            "INVENTORY PRICING HISTORY (Keeps Price Changes For) >— (Has Price Changes Of) INVENTORY"
+          ],
+          "diagramNote": "Sơ đồ mở rộng của Figure 1-3 ở cấp doanh nghiệp (Enterprise model), bổ sung BACKORDER, INVENTORY PRICING HISTORY, INVENTORY và EMPLOYEE.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 20"
+          },
+          "pageNumber": 20,
+          "explanation": [
+            "Figure 1-4 mở rộng Figure 1-3 lên đầy đủ tầm mức Doanh nghiệp (Enterprise data model), bổ sung thêm các thực thể nghiệp vụ khác là BACKORDER (đơn hàng còn thiếu tồn kho), INVENTORY, INVENTORY PRICING HISTORY (lưu lịch sử biến động giá), và EMPLOYEE.",
+            "Đây là minh họa cho bức tranh dữ liệu tổng thể của toàn công ty trước khi chia nhỏ thành từng dự án triển khai cụ thể."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "DBMS, Ưu điểm, Chi phí/Rủi ro và 9 Thành phần của Môi trường CSDL",
+      "text": "Định nghĩa chính thức DBMS, 10 ưu điểm và 5 chi phí/rủi ro của tiếp cận CSDL, cùng sơ đồ và mô tả 9 thành phần của Database Environment.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 21–25"
+      },
+      "digest": {
+        "keyPoints": [
+          "10 ưu điểm của Database Approach: Program-data independence, Planned data redundancy, Improved data consistency, Improved data sharing, Increased productivity, Enforcement of standards, Improved data quality, Improved accessibility & responsiveness, Reduced program maintenance, Improved decision support.",
+          "5 chi phí/rủi ro: Nhân sự chuyên môn mới; Chi phí và độ phức tạp cài đặt/quản lý (đào tạo, hạ tầng); Chi phí chuyển đổi; Nhu cầu backup & recovery tường minh; Xung đột tổ chức.",
+          "9 thành phần trong môi trường CSDL: CASE tools, Repository, DBMS, Database, Application Programs, User Interface, Data/Database Administrators (DBA), System Developers, End Users."
+        ],
+        "terms": [
+          {
+            "term": "C.A.S.E. tools",
+            "meaning": "Computer-Aided Software Engineering — công cụ tự động hỗ trợ thiết kế CSDL và sinh mã chương trình."
+          },
+          {
+            "term": "Repository",
+            "meaning": "Kho lưu trữ tập trung chứa metadata (centralized storehouse of metadata)."
+          },
+          {
+            "term": "Planned data redundancy",
+            "meaning": "Dư thừa dữ liệu có chủ đích/kiểm soát nhằm tối ưu hiệu năng thay vì trùng lặp tự phát như xử lý file."
+          }
+        ],
+        "pitfalls": [
+          "Phân biệt Repository (chứa metadata) với Database (chứa user data thực tế).",
+          "Database approach KHÔNG loại bỏ hoàn toàn dư thừa dữ liệu mà chuyển thành 'Planned data redundancy' (trùng lặp có kế hoạch)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 21",
+          "title": "DATABASE MANAGEMENT SYSTEM",
+          "bullets": [
+            "A database management system (DBMS) is a software system that enables the use of a database approach. The primary purpose of a DBMS is to provide a systematic method of creating, updating, storing, and retrieving the data stored in a database"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 21"
+          },
+          "pageNumber": 21,
+          "explanation": [
+            "Đưa ra định nghĩa chuẩn mực của DBMS: là hệ phần mềm cho phép áp dụng Database Approach với mục đích chính là cung cấp phương thức có hệ thống để Tạo (creating), Cập nhật (updating), Lưu trữ (storing) và Truy xuất (retrieving) dữ liệu một cách có kiểm soát."
+          ]
+        },
+        {
+          "slideNumber": "Slide 22",
+          "title": "ADVANTAGES OF THE DATABASE APPROACH",
+          "bullets": [
+            "Program-data independence",
+            "Planned data redundancy",
+            "Improved data consistency",
+            "Improved data sharing",
+            "Increased application development productivity",
+            "Enforcement of standards",
+            "Improved data quality",
+            "Improved data accessibility and responsiveness",
+            "Reduced program maintenance",
+            "Improved decision support"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 22"
+          },
+          "pageNumber": 22,
+          "explanation": [
+            "Liệt kê trọn vẹn 10 ưu điểm của Database Approach khi doanh nghiệp áp dụng DBMS thay cho xử lý file truyền thống.",
+            "Cần đặc biệt chú ý gạch đầu dòng thứ 2: \"Planned data redundancy\" — cách tiếp cận CSDL KHÔNG xóa bỏ 100% dữ liệu trùng lặp, mà chuyển từ trùng lặp tự phát (mất kiểm soát) sang trùng lặp có kế hoạch (ví dụ khóa ngoại FK lặp lại, hoặc bảng tổng hợp/cache nhằm tăng tốc độ truy vấn)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 23",
+          "title": "COSTS AND RISKS OF THE DATABASE APPROACH",
+          "bullets": [
+            "New, specialized personnel",
+            "Installation and management cost and complexity (training, infrastructure)",
+            "Conversion costs",
+            "Need for explicit backup and recovery",
+            "Organizational conflict"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 23"
+          },
+          "pageNumber": 23,
+          "explanation": [
+            "Bên cạnh ưu điểm, slide cảnh báo 5 chi phí và rủi ro mà tổ chức phải đối mặt khi triển khai CSDL: cần tuyển nhân sự chuyên môn (như DBA), chi phí cài đặt/đào tạo/hạ tầng cao, chi phí chuyển đổi dữ liệu cũ (conversion costs), bắt buộc xây dựng cơ chế backup & recovery tường minh, và nguy cơ xung đột quyền sở hữu dữ liệu giữa các phòng ban."
+          ]
+        },
+        {
+          "slideNumber": "Slide 24",
+          "title": "Figure 1-5 Components of the database environment",
+          "diagramText": [
+            "Con người: [Data and database administrators]   [System developers]   [End users]",
+            "Tầng công cụ & giao diện: [Data modeling and design tools] ↔ [User interface] ↔ [Application programs]",
+            "Tầng lưu trữ & quản trị: [Repository] ↔ [DBMS] ↔ [Database]",
+            "Kết nối chính: Cả 3 nhóm người dùng tương tác với User interface; Data modeling and design tools ↔ Repository; User interface ↔ Repository & DBMS; Application programs ↔ DBMS."
+          ],
+          "diagramNote": "Sơ đồ liên kết giữa 3 nhóm con người, 3 thành phần phần mềm/công cụ lớp giữa và 3 thành phần lưu trữ–quản trị cốt lõi (Repository, DBMS, Database).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 24"
+          },
+          "pageNumber": 24,
+          "explanation": [
+            "Figure 1-5 vẽ sơ đồ tổng thể Môi trường CSDL (Database Environment) gồm 3 lớp rõ rệt: lớp Con người ở trên, lớp Công cụ/Phần mềm ở giữa, và lớp Lưu trữ/Quản trị cốt lõi ở dưới cùng.",
+            "Chú ý luồng mũi tên hai chiều: công cụ thiết kế (Data modeling/CASE) và Giao diện người dùng đều kết nối với Repository (nơi chứa metadata), còn mọi Chương trình ứng dụng và User interface đều đi qua DBMS để đọc/ghi vào Database."
+          ]
+        },
+        {
+          "slideNumber": "Slide 25",
+          "title": "COMPONENTS OF THE DATABASE ENVIRONMENT",
+          "bullets": [
+            "C.A.S.E. tools-- automated tools used to design databases and application programs (even code generation).",
+            "Repository–centralized storehouse of metadata",
+            "Database Management System (DBMS) –software for managing the database",
+            "Database–storehouse of the data",
+            "Application Programs–software using the data",
+            "User Interface–text, graphical displays, menus, etc. for user",
+            "Data/Database Administrators–personnel responsible for maintaining the database",
+            "System Developers–personnel responsible for designing databases and software",
+            "End Users–people who use the applications and databases"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 25"
+          },
+          "pageNumber": 25,
+          "explanation": [
+            "Định nghĩa chi tiết từng khối trong 9 thành phần ở Slide 24. Dễ bị hỏi trắc nghiệm nhất là sự khác nhau giữa Repository (kho lưu trữ tập trung chứa metadata), Database (kho chứa dữ liệu nghiệp vụ của người dùng) và C.A.S.E. tools (công cụ tự động hỗ trợ thiết kế E-R và sinh code).",
+            "Ngoài ra nắm rõ 3 vai trò con người: DBA/Data Administrators (vận hành, bảo trì CSDL), System Developers (thiết kế CSDL và viết phần mềm), và End Users (người dùng cuối khai thác ứng dụng)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Enterprise Data Model & Ma trận Chức năng kinh doanh – Thực thể dữ liệu",
+      "text": "Vai trò của Enterprise Data Model trong bước đầu quy trình phát triển CSDL và bảng ma trận đối chiếu chức năng nghiệp vụ với loại thực thể dữ liệu (Figure 1-6).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 26–27"
+      },
+      "digest": {
+        "keyPoints": [
+          "Enterprise Data Model là bước đầu tiên của quy trình phát triển CSDL, xác định phạm vi và nội dung tổng quát ở mức trừu tượng cao.",
+          "Gồm: sơ đồ E-R, mô tả các entity types, mối quan hệ giữa các entity và các quy tắc nghiệp vụ (business rules).",
+          "Ma trận Business Function-to-Data Entity (Figure 1-6) giúp xác định thực thể nào được sử dụng bởi chức năng nghiệp vụ nào — là cơ sở xác định các External Schema (user views) về sau."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 26",
+          "title": "ENTERPRISE DATA MODEL",
+          "bullets": [
+            "First step in the database development process",
+            "Specifies scope and general content",
+            "Overall picture of organizational data at high level of abstraction",
+            "Entity-relationship diagram",
+            "Descriptions of entity types",
+            "Relationships between entities",
+            "Business rules"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 26"
+          },
+          "pageNumber": 26,
+          "explanation": [
+            "Giới thiệu Enterprise Data Model là bước khởi đầu tiên quyết trong quy trình phát triển CSDL.",
+            "Nó xác định phạm vi và nội dung tổng quát toàn tổ chức ở mức trừu tượng cao thông qua 4 yếu tố: sơ đồ E-R mức cao, mô tả các loại thực thể (entity types), mối quan hệ giữa chúng, và các quy tắc nghiệp vụ (business rules)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 27",
+          "title": "FIGURE 1-6 Example business function-to-data entity matrix",
+          "table": {
+            "caption": "X = data entity is used within business function",
+            "headers": [
+              "Business Functions \\ Data Entity Types",
+              "Customer",
+              "Product",
+              "Raw Material",
+              "Order",
+              "Work Center",
+              "Work Order",
+              "Invoice",
+              "Equipment",
+              "Employee"
+            ],
+            "rows": [
+              [
+                "Business Planning",
+                "X",
+                "X",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "X",
+                "X"
+              ],
+              [
+                "Product Development",
+                "",
+                "X",
+                "X",
+                "",
+                "X",
+                "",
+                "",
+                "X",
+                ""
+              ],
+              [
+                "Materials Management",
+                "",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "",
+                "X",
+                ""
+              ],
+              [
+                "Order Fulfillment",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X"
+              ],
+              [
+                "Order Shipment",
+                "X",
+                "X",
+                "",
+                "X",
+                "X",
+                "",
+                "X",
+                "",
+                "X"
+              ],
+              [
+                "Sales Summarization",
+                "X",
+                "X",
+                "",
+                "X",
+                "",
+                "",
+                "X",
+                "",
+                "X"
+              ],
+              [
+                "Production Operations",
+                "",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "",
+                "X",
+                "X"
+              ],
+              [
+                "Finance and Accounting",
+                "X",
+                "X",
+                "X",
+                "X",
+                "X",
+                "",
+                "X",
+                "X",
+                "X"
+              ]
+            ]
+          },
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 27"
+          },
+          "pageNumber": 27,
+          "explanation": [
+            "Figure 1-6 giới thiệu công cụ lập kế hoạch quan trọng: Ma trận Chức năng kinh doanh – Thực thể dữ liệu (Business Function-to-Data Entity Matrix).",
+            "Dấu \"X\" cho biết chức năng nghiệp vụ ở hàng đó có sử dụng dữ liệu của thực thể ở cột tương ứng (ví dụ: Order Fulfillment dùng đủ cả 9 loại thực thể, trong khi Product Development chỉ dùng Product, Raw Material, Work Center, Equipment). Bảng này về sau là đầu vào trực tiếp để xác định các External Schema (User Views)."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Quy trình phát triển hệ thống (SDLC — 6 Pha)",
+      "text": "So sánh tổng quan SDLC vs Prototyping và đi sâu vào mục đích (Purpose), sản phẩm bàn giao (Deliverable) và hoạt động CSDL (Database activity) của đủ 6 pha SDLC.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 28–35"
+      },
+      "digest": {
+        "keyPoints": [
+          "6 pha SDLC theo đúng thứ tự: Planning → Analysis → Logical Design → Physical Design → Implementation → Maintenance (có mũi tên phản hồi quay lại pha trước).",
+          "Mức độ chi tiết của dữ liệu tăng dần qua các pha: Enterprise/Early Conceptual (Planning) → Thorough & Integrated Conceptual (Analysis) → Logical schema/views/security (Logical) → Physical schema & DBMS definition (Physical) → Coding/conversion (Implementation) → Tuning & sửa lỗi (Maintenance).",
+          "SDLC kỹ lưỡng, có kế hoạch rõ ràng nhưng tốn thời gian và chu kỳ phát triển dài; Prototyping làm mô hình dữ liệu sơ bộ nhanh rồi lặp cải tiến."
+        ],
+        "pitfalls": [
+          "Phân biệt pha Analysis vs Logical Design: Conceptual data modeling hoàn chỉnh nằm ở Analysis; còn Logical database design (giao dịch, form, display, view, bảo mật và toàn vẹn dữ liệu) nằm ở Logical Design.",
+          "Định nghĩa CSDL cho DBMS (define database to DBMS) và tổ chức lưu trữ vật lý thuộc pha Physical Design."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 28",
+          "title": "TWO APPROACHES TO DATABASE AND IS DEVELOPMENT",
+          "bullets": [
+            {
+              "text": "SDLC",
+              "subBullets": [
+                "System Development Life Cycle",
+                "Detailed, well-planned development process",
+                "Time-consuming, but comprehensive",
+                "Long development cycle"
+              ]
+            },
+            {
+              "text": "Prototyping",
+              "subBullets": [
+                "Rapid application development (RAD)",
+                "Cursory attempt at conceptual data modeling",
+                "Define database during development of initial prototype",
+                "Repeat implementation and maintenance activities with new prototype versions"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 28"
+          },
+          "pageNumber": 28,
+          "explanation": [
+            "So sánh hai phương pháp luận phát triển hệ thống thông tin và CSDL: SDLC (System Development Life Cycle — quy trình thác nước truyền thống, kỹ lưỡng, kế hoạch chặt chẽ nhưng chu kỳ dài) và Prototyping (thuộc nhóm RAD — phát triển ứng dụng nhanh, dựng mô hình khái niệm sơ bộ để sớm có bản mẫu chạy thử rồi lặp lại liên tục)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 29",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (SEE ALSO FIGURE 1-7)",
+          "diagramText": [
+            "Planning ↔ Analysis ↔ Logical Design ↔ Physical Design ↔ Implementation ↔ Maintenance"
+          ],
+          "diagramNote": "Sơ đồ bậc thang 6 pha của SDLC kèm các mũi tên tiến xuôi xuống pha kế tiếp và các mũi tên phản hồi quay ngược lại pha trước đó.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 29"
+          },
+          "pageNumber": 29,
+          "explanation": [
+            "Sơ đồ tổng quan 6 pha của SDLC (Figure 1-7): Planning → Analysis → Logical Design → Physical Design → Implementation → Maintenance.",
+            "Ý nghĩa của các mũi tên ngược: nếu ở pha sau phát hiện thiếu yêu cầu hoặc thiết kế không khả thi, nhóm dự án có thể quay ngược lại pha trước để điều chỉnh trước khi đi tiếp."
+          ]
+        },
+        {
+          "slideNumber": "Slide 30",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (CONT.) — Planning",
+          "bullets": [
+            "Phase highlighted: Planning",
+            "Purpose–preliminary understanding",
+            "Deliverable–request for study",
+            "Database activity–enterprise modeling and early conceptual data modeling"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 30"
+          },
+          "pageNumber": 30,
+          "explanation": [
+            "Chi tiết Pha 1 của SDLC — Planning: mục đích là hiểu sơ bộ bài toán, sản phẩm bàn giao (Deliverable) là tài liệu đề xuất nghiên cứu (request for study).",
+            "Về mặt CSDL (Database activity), pha này chỉ dừng ở Enterprise modeling và Conceptual data modeling ở mức sơ khai."
+          ]
+        },
+        {
+          "slideNumber": "Slide 31",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (CONT.) — Analysis",
+          "bullets": [
+            "Phase highlighted: Analysis",
+            "Purpose–thorough requirements analysis and structuring",
+            "Deliverable–functional system specifications",
+            "Database activity–thorough and integrated conceptual data modeling"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 31"
+          },
+          "pageNumber": 31,
+          "explanation": [
+            "Chi tiết Pha 2 của SDLC — Analysis: phân tích và cấu trúc hóa chi tiết các yêu cầu để bàn giao bản Đặc tả chức năng hệ thống (functional system specifications).",
+            "Hoạt động CSDL trọng tâm ở đây là hoàn thiện mô hình dữ liệu khái niệm một cách đầy đủ và tích hợp (thorough and integrated conceptual data modeling, tức vẽ sơ đồ E-R chuẩn xác cho dự án)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 32",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (CONT.) — Logical Design",
+          "bullets": [
+            "Phase highlighted: Logical Design",
+            "Purpose–information requirements elicitation and structure",
+            "Deliverable–detailed design specifications",
+            "Database activity–logical database design (transactions, forms, displays, views, data integrity and security)"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 32"
+          },
+          "pageNumber": 32,
+          "explanation": [
+            "Chi tiết Pha 3 của SDLC — Logical Design: thu thập và tổ chức chi tiết cấu trúc thông tin đầu ra để tạo Bản thiết kế chi tiết (detailed design specifications).",
+            "Hoạt động CSDL tại pha Logical Design gồm: thiết kế giao dịch (transactions), biểu mẫu (forms), màn hình hiển thị (displays), các góc nhìn (views/external schema), cũng như quy tắc toàn vẹn và bảo mật dữ liệu — vẫn độc lập với phần cứng hay hãng DBMS cụ thể."
+          ]
+        },
+        {
+          "slideNumber": "Slide 33",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (CONT.) — Physical Design",
+          "bullets": [
+            "Phase highlighted: Physical Design",
+            "Purpose–develop technology and organizational specifications",
+            "Deliverable–program/data structures, technology purchases, organization redesigns",
+            "Database activity–physical database design (define database to DBMS, physical data organization, database processing programs)"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 33"
+          },
+          "pageNumber": 33,
+          "explanation": [
+            "Chi tiết Pha 4 của SDLC — Physical Design: xác định thông số công nghệ, mua sắm hạ tầng và cấu trúc dữ liệu/chương trình thực tế.",
+            "Hoạt động CSDL cốt lõi tại pha này là **Physical database design**: chính thức định nghĩa cấu trúc CSDL vào DBMS (ví dụ viết DDL SQL), quyết định tổ chức lưu trữ vật lý (index, file organization), và thiết kế các chương trình xử lý CSDL."
+          ]
+        },
+        {
+          "slideNumber": "Slide 34",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (CONT.) — Implementation",
+          "bullets": [
+            "Phase highlighted: Implementation",
+            "Purpose–programming, testing, training, installation, documenting",
+            "Deliverable–operational programs, documentation, training materials",
+            "Database activity–database implementation, including coded programs, documentation, installation and conversion"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 34"
+          },
+          "pageNumber": 34,
+          "explanation": [
+            "Chi tiết Pha 5 của SDLC — Implementation: lập trình (coding), kiểm thử (testing), đào tạo người dùng, viết tài liệu hướng dẫn và đưa hệ thống vào cài đặt chạy thật.",
+            "Hoạt động CSDL quan trọng nhất là triển khai mã xử lý CSDL, cài đặt phần mềm và chuyển đổi dữ liệu (conversion) từ các tệp/hệ thống cũ sang CSDL mới."
+          ]
+        },
+        {
+          "slideNumber": "Slide 35",
+          "title": "SYSTEMS DEVELOPMENT LIFE CYCLE (CONT.) — Maintenance",
+          "bullets": [
+            "Phase highlighted: Maintenance",
+            "Purpose–monitor, repair, enhance",
+            "Deliverable–periodic audits",
+            "Database activity–database maintenance, performance analysis and tuning, error corrections"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 35"
+          },
+          "pageNumber": 35,
+          "explanation": [
+            "Chi tiết Pha 6 của SDLC — Maintenance: theo dõi vận hành hàng ngày, sửa lỗi phát sinh và nâng cấp tính năng, với đầu ra định kỳ là các báo cáo kiểm toán (periodic audits).",
+            "Hoạt động CSDL tại pha này tập trung vào bảo trì CSDL, phân tích & tinh chỉnh hiệu năng (performance analysis & tuning) và khắc phục lỗi dữ liệu/truy vấn."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Phương pháp Prototyping (RAD) và Agile",
+      "text": "Quy trình 4 chặng của Prototyping Database Methodology (Figure 1-8) từ phân tích vấn đề đến chuyển đổi sang hệ thống vận hành, và tuyên ngôn Agile cùng các phương pháp tiêu biểu.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 36–41"
+      },
+      "digest": {
+        "keyPoints": [
+          "Prototyping là phương pháp RAD (Rapid Application Development) cổ điển gồm vòng lặp: Identify problem → Develop initial prototype → Implement and use prototype ↔ Revise and enhance prototype → Convert to operational system (nếu prototype không hiệu quả).",
+          "Các hoạt động CSDL được ánh xạ trực tiếp vào Prototyping: Conceptual data modeling nằm ở bước đầu; Logical + Physical + Implementation gom tại bước xây dựng prototype ban đầu; Maintenance lặp liên tục trong vòng sửa prototype và chuyển sang hệ thống chính thức.",
+          "Tuyên ngôn Agile nhấn mạnh: con người & tương tác, phần mềm chạy được, hợp tác khách hàng và đáp ứng thay đổi (XP, Scrum, DSDM Consortium, Feature-driven development)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 36",
+          "title": "PROTOTYPING DATABASE METHODOLOGY (FIGURE 1-8)",
+          "paragraphs": [
+            "Prototyping is a classical Rapid Application Development (RAD) approach"
+          ],
+          "diagramText": [
+            "[Identify problem] —(Initial requirements)→ [Develop initial prototype]",
+            "[Develop initial prototype] —(Working prototype)→ [Implement and use prototype]",
+            "[Implement and use prototype] —(Problems)→ [Revise and enhance prototype] —(Next version)→ [Implement and use prototype]",
+            "New requirements → [Revise and enhance prototype]",
+            "[Implement and use prototype] - -(If prototype is inefficient)→ [Convert to operational system]"
+          ],
+          "diagramNote": "Sơ đồ tổng thể vòng đời phát triển theo phương pháp Prototyping.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 36"
+          },
+          "pageNumber": 36,
+          "explanation": [
+            "Figure 1-8 minh họa vòng đời của Prototyping Database Methodology (một phương pháp RAD kinh điển): đi từ [Identify problem] → [Develop initial prototype] → vòng lặp sử dụng và chỉnh sửa [Implement & use ↔ Revise & enhance] → và nhánh [Convert to operational system].",
+            "Chú ý điều kiện mũi tên nét đứt ở dưới cùng: chỉ khi bản prototype đạt mục tiêu tính năng nhưng chạy không đủ hiệu quả (If prototype is inefficient) thì mới chuyển qua bước tối ưu thành hệ thống vận hành chính thức."
+          ]
+        },
+        {
+          "slideNumber": "Slide 37",
+          "title": "PROTOTYPING DATABASE METHODOLOGY (FIGURE 1-8) — Conceptual modeling",
+          "bullets": [
+            {
+              "text": "Conceptual data modeling (tại bước Identify problem):",
+              "subBullets": [
+                "Analyze requirements",
+                "Develop preliminary data model"
+              ]
+            }
+          ],
+          "diagramNote": "Slide đánh dấu mũi tên vào bước [Identify problem] để gắn hoạt động Conceptual data modeling sơ lược.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 37"
+          },
+          "pageNumber": 37,
+          "explanation": [
+            "Ánh xạ hoạt động CSDL vào bước đầu tiên [Identify problem] của Prototyping: đây là lúc thực hiện **Conceptual data modeling** nhanh (phân tích yêu cầu ban đầu và dựng preliminary data model) chứ không kéo dài như SDLC."
+          ]
+        },
+        {
+          "slideNumber": "Slide 38",
+          "title": "PROTOTYPING DATABASE METHODOLOGY (FIGURE 1-8) — Initial prototype",
+          "bullets": [
+            {
+              "text": "Logical database design (tại bước Develop initial prototype):",
+              "subBullets": [
+                "Analyze requirements in detail",
+                "Integrate database views into conceptual data model"
+              ]
+            },
+            {
+              "text": "Physical database design and definition:",
+              "subBullets": [
+                "Define new database contents to DBMS",
+                "Decide on physical organization for new data",
+                "Design database processing programs"
+              ]
+            },
+            {
+              "text": "Database implementation:",
+              "subBullets": [
+                "Code database processing",
+                "Install new database contents, usually from existing data sources"
+              ]
+            }
+          ],
+          "diagramNote": "Slide đánh dấu bước [Develop initial prototype] nơi gom cả Logical design, Physical design và Database implementation.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 38"
+          },
+          "pageNumber": 38,
+          "explanation": [
+            "Ánh xạ hoạt động CSDL vào bước [Develop initial prototype]: đây là chi tiết RẤT hay hỏi khi so sánh với SDLC — Prototyping dồn 3 pha (Logical database design, Physical database design & definition, và Database implementation) vào cùng một bước dựng bản mẫu đầu tiên để người dùng sớm thấy giao diện chạy thật."
+          ]
+        },
+        {
+          "slideNumber": "Slide 39",
+          "title": "PROTOTYPING DATABASE METHODOLOGY (FIGURE 1-8) — Iterative maintenance",
+          "bullets": [
+            {
+              "text": "Database maintenance (vòng lặp giữa Implement and use prototype ↔ Revise and enhance prototype):",
+              "subBullets": [
+                "Analyze database to ensure it meets application needs",
+                "Fix errors in database"
+              ]
+            }
+          ],
+          "diagramNote": "Slide đánh dấu vòng lặp phản hồi giữa người dùng thử nghiệm prototype và đội phát triển chỉnh sửa phiên bản mới.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 39"
+          },
+          "pageNumber": 39,
+          "explanation": [
+            "Ánh xạ hoạt động CSDL vào vòng lặp [Implement and use prototype ↔ Revise and enhance prototype]: hoạt động **Database maintenance** (kiểm tra CSDL xem có đáp ứng đúng nghiệp vụ không và sửa lỗi) diễn ra ngay trong các vòng lặp nhận góp ý của người dùng, thay vì đợi tận cuối dự án mới bảo trì."
+          ]
+        },
+        {
+          "slideNumber": "Slide 40",
+          "title": "PROTOTYPING DATABASE METHODOLOGY (FIGURE 1-8) — Operational system",
+          "bullets": [
+            {
+              "text": "Database maintenance (tại bước Convert to operational system):",
+              "subBullets": [
+                "Tune database for improved performance",
+                "Fix errors in database"
+              ]
+            }
+          ],
+          "diagramNote": "Slide đánh dấu bước cuối [Convert to operational system] khi nguyên mẫu không đáp ứng hiệu năng và cần tinh chỉnh tối ưu để đưa vào vận hành.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 40"
+          },
+          "pageNumber": 40,
+          "explanation": [
+            "Ánh xạ hoạt động CSDL vào bước cuối [Convert to operational system]: lúc này prototype được gia cố lại cấu trúc và thực hiện **tuning (tinh chỉnh hiệu năng)** cũng như sửa lỗi triệt để để vận hành ổn định ở quy mô tải thật."
+          ]
+        },
+        {
+          "slideNumber": "Slide 41",
+          "title": "OTHER RAPID APPLICATION (RAD) APPROACHES",
+          "bullets": [
+            "Agile – emphasizes “individuals and interactions over processes and tools, working software over comprehensive documentation, customer collaboration over contract negotiation, and response to change over following a plan.” (The Agile Manifesto)",
+            {
+              "text": "Examples of agile programming methodologies",
+              "subBullets": [
+                "eXtreme programming",
+                "Scrum",
+                "DSDM Consortium",
+                "Feature-driven development"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 41"
+          },
+          "pageNumber": 41,
+          "explanation": [
+            "Giới thiệu thêm các phương pháp phát triển nhanh (RAD) hiện đại thuộc nhóm Agile. Trích dẫn nguyên văn 4 giá trị trong Agile Manifesto: ưu tiên con người & tương tác hơn quy trình/công cụ; phần mềm chạy được hơn tài liệu rườm rà; hợp tác khách hàng hơn đàm phán hợp đồng cứng nhắc; đáp ứng thay đổi hơn bám sát kế hoạch cố định.",
+            "Ghi nhớ 4 ví dụ về Agile methodology nêu trên slide: XP (eXtreme Programming), Scrum, DSDM Consortium, và Feature-driven development."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Kiến trúc Ba lược đồ (Three-Schema Architecture) & Quản lý dự án / Nhân sự",
+      "text": "Ba tầng lược đồ CSDL (External, Conceptual, Internal) cùng sơ đồ Figure 1-9, và các khái niệm quản lý dự án cùng 9 vai trò nhân sự tham gia dự án CSDL.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 42–45"
+      },
+      "digest": {
+        "keyPoints": [
+          "Three-schema architecture tách biệt góc nhìn người dùng khỏi lưu trữ bên dưới gồm: External Schema (User Views), Conceptual Schema (mô hình E-R, Ch.2–3), và Internal Schema gồm Logical (Ch.4) + Physical structures (Ch.5).",
+          "External Schema là tập con của Conceptual Schema, có thể xác định từ ma trận chức năng–thực thể và do DBA thiết lập cho từng nhóm người dùng.",
+          "Dự án được khởi tạo ở Planning, thực thi trong Analysis/Design/Implementation và đóng ở cuối Implementation, với 9 nhóm vai trò tham gia (Business analysts, Systems analysts, Database analysts/data modelers, Users, Programmers, Database architects, Data administrators, Project managers, Other technical experts)."
+        ],
+        "pitfalls": [
+          "Internal Schema trong giáo trình Hoffer bao gồm cả Logical Schemas (Ch.4) lẫn Physical Schemas (Ch.5), không chỉ mình tầng vật lý."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 42",
+          "title": "DATABASE SCHEMA",
+          "bullets": [
+            {
+              "text": "External Schema",
+              "subBullets": [
+                "User Views",
+                "Subsets of Conceptual Schema",
+                "Can be determined from business-function/data entity matrices",
+                "DBA determines schema for different users"
+              ]
+            },
+            {
+              "text": "Conceptual Schema",
+              "subBullets": [
+                "E-R models–covered in Chapters 2 and 3"
+              ]
+            },
+            {
+              "text": "Internal Schema",
+              "subBullets": [
+                "Logical structures–covered in Chapter 4",
+                "Physical structures–covered in Chapter 5"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 42"
+          },
+          "pageNumber": 42,
+          "explanation": [
+            "Giới thiệu Kiến trúc Ba lược đồ (Database Schema / Three-Schema Architecture) nhằm tách biệt góc nhìn người dùng khỏi cách lưu trữ vật lý bên dưới (tạo nên Program-Data Independence).",
+            "Gồm 3 cấp: (1) **External Schema** (các User Views là tập con của Conceptual Schema, xác định từ ma trận chức năng–thực thể ở Slide 27 do DBA thiết lập); (2) **Conceptual Schema** (mô hình E-R toàn hệ thống, học ở Chương 2–3); (3) **Internal Schema** (theo quy ước sách Hoffer, tầng này gồm cả Logical structures ở Chương 4 và Physical structures ở Chương 5)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 43",
+          "title": "Figure 1-9 Three-schema architecture",
+          "paragraphs": [
+            "Different people have different views of the database…these are the external schema",
+            "The internal schema is the underlying design and implementation"
+          ],
+          "diagramText": [
+            "[Enterprise Data Model] ↔ [External Schema] ↔ {User View 1 (report), User View 2 (screen display), ..., User View n (order form)}",
+            "[External Schema] ↔ [Conceptual Schema] ↔ [Internal Schema]",
+            "[Internal Schema] → Logical Schemas: Database 1 (Order Processing), Database 2 (Supply Chain), ..., Database m (Customer Service)",
+            "[Internal Schema] → Physical Schemas: Physical Schema 1, Physical Schema 2, ..., Physical Schema m"
+          ],
+          "diagramNote": "Sơ đồ kiến trúc ba lược đồ liên kết Enterprise Data Model với External Schema (các user views), Conceptual Schema và Internal Schema (gồm cả Logical và Physical Schemas).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 43"
+          },
+          "pageNumber": 43,
+          "explanation": [
+            "Figure 1-9 trực quan hóa sự liên thông giữa các lược đồ từ trên xuống dưới: Enterprise Data Model dẫn tới các External Schema (User View 1 cho báo cáo, User View 2 cho màn hình hiển thị, ..., User View n cho form nhập đơn), tất cả ánh xạ xuống một Conceptual Schema chung duy nhất.",
+            "Bên dưới Conceptual Schema là Internal Schema gồm hai lớp nhỏ: Logical Schemas (từng CSDL logic như Order Processing, Supply Chain, Customer Service) và các Physical Schemas tương ứng lưu trên phần cứng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 44",
+          "title": "MANAGING PEOPLE AND PROJECTS",
+          "bullets": [
+            "Project–a planned undertaking of related activities to reach an objective that has a beginning and an end",
+            "Initiated and planned in planning stage of SDLC",
+            "Executed during analysis, design, and implementation",
+            "Closed at the end of implementation"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 44"
+          },
+          "pageNumber": 44,
+          "explanation": [
+            "Chuyển sang góc độ quản lý dự án (Project Management): một Project là nỗ lực có kế hoạch gồm các hoạt động liên quan để đạt mục tiêu, luôn có điểm bắt đầu và điểm kết thúc xác định.",
+            "Đối chiếu với SDLC: dự án được khởi tạo & lập kế hoạch ở pha Planning, triển khai thực thi xuyên suốt Analysis → Design → Implementation, và chính thức đóng dự án (closed) ở cuối pha Implementation."
+          ]
+        },
+        {
+          "slideNumber": "Slide 45",
+          "title": "MANAGING PROJECTS: PEOPLE INVOLVED",
+          "bullets": [
+            "Business analysts",
+            "Systems analysts",
+            "Database analysts and data modelers",
+            "Users",
+            "Programmers",
+            "Database architects",
+            "Data administrators",
+            "Project managers",
+            "Other technical experts"
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 45"
+          },
+          "pageNumber": 45,
+          "explanation": [
+            "Liệt kê 9 nhóm nhân sự chủ chốt tham gia một dự án phát triển CSDL: Business analysts & Systems analysts (phân tích nghiệp vụ/hệ thống), Database analysts & data modelers (thiết kế mô hình dữ liệu), Database architects & Data administrators (kiến trúc & quản trị dữ liệu), Programmers (lập trình viên), Users (người dùng), Project managers (quản lý dự án) và các chuyên gia kỹ thuật khác."
+          ]
+        }
+      ]
+    },
+    {
+      "h": "Tiến hóa công nghệ CSDL & Phân loại quy mô ứng dụng (Evolution & Applications)",
+      "text": "Lịch sử phát triển các mô hình CSDL từ thập niên 1960 (Flat files → Hierarchical → Network → Relational → Object-oriented/Object-relational → Data warehousing/Multidimensional), 4 động lực tiến hóa, bảng phân loại quy mô ứng dụng (Table 1-5), kiến trúc multi-tier client/server, ERP/Data Warehouse và Project data model Home Office (Figure 1-15).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 46–55"
+      },
+      "digest": {
+        "keyPoints": [
+          "Sự tiến hóa hệ CSDL được thúc đẩy bởi 4 mục tiêu chính: giảm chi phí bảo trì nhờ program-data independence, quản lý kiểu dữ liệu phức tạp hơn, giúp người ít rành kỹ thuật dễ truy cập dữ liệu, và hỗ trợ ra quyết định (decision support) mạnh mẽ hơn.",
+          "Các kiến trúc mô hình dữ liệu chính: Hierarchical (cây 1 cha), Network (đồ thị đa cha), Relational (bảng dùng PK/FK), Object-oriented (class gồm Attributes & Methods), và Multidimensional (cube view & star-schema với Fact Table + Dimension Tables).",
+          "Bảng 1-5 phân loại 4 quy mô ứng dụng CSDL: Personal (1 user, MB), Multitier Client/Server (100–1000 users, GB), ERP (>100 users, GB–TB), Data warehousing (>100 users, TB–PB).",
+          "Trong kiến trúc 3 tầng (Client – Application/Web – Enterprise), trình duyệt client không lưu CSDL cục bộ mà qua Web/Application server và middleware để truy cập Database Server."
+        ],
+        "terms": [
+          {
+            "term": "ERP (Enterprise Resource Planning)",
+            "meaning": "Hệ thống tích hợp toàn bộ chức năng doanh nghiệp (sản xuất, tài chính, bán hàng, marketing, kho vận, kế toán, nhân sự)."
+          },
+          {
+            "term": "Data Warehouse",
+            "meaning": "Hệ thống hỗ trợ ra quyết định tích hợp được tổng hợp từ nhiều CSDL tác nghiệp khác nhau (dùng mô hình đa chiều / star-schema)."
+          }
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 46",
+          "title": "Figure 1-10a Evolution of database technologies",
+          "diagramText": [
+            "Trục thời gian: 1960 — 1970 — 1980 — 1990 — 2000 — 2010",
+            "• Flat files: Under active development (~1960–1986), Legacy systems still used (~1986–2010+)",
+            "• Hierarchical: Under active development (~late 1960s–early 1990s), Legacy systems still used (~1990s–2010+)",
+            "• Network: Under active development (~1970–1990), Legacy systems still used (~1990–~1999)",
+            "• Relational: Under active development (~early 1980s–2010+)",
+            "• Object-oriented: Under active development (~1991–2010+)",
+            "• Object-relational: Under active development (~1992–2010+)",
+            "• Data warehousing: Under active development (~1989–2010+)"
+          ],
+          "diagramNote": "Biểu đồ dòng thời gian phân biệt giai đoạn đang được phát triển tích cực (nét liền) và giai đoạn chỉ còn là hệ thống di sản (nét đứt) của 7 thế hệ công nghệ dữ liệu.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 46"
+          },
+          "pageNumber": 46,
+          "explanation": [
+            "Figure 1-10a vẽ dòng thời gian tiến hóa của 7 thế hệ công nghệ lưu trữ dữ liệu từ 1960 đến sau 2010. Đường nét liền thể hiện giai đoạn đang được nghiên cứu/phát triển tích cực (active development), đường nét đứt thể hiện giai đoạn đã lỗi thời nhưng vẫn còn tồn tại làm hệ thống di sản (legacy systems).",
+            "Điểm thú vị dễ thấy trên biểu đồ: Flat files, Hierarchical và Network từng phát triển mạnh giai đoạn 1960–1990 nhưng sau đó nhường chỗ cho Relational (từ đầu 1980s), Data warehousing (~1989+), Object-oriented (~1991+) và Object-relational (~1992+)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 47",
+          "title": "EVOLUTION OF DATABASE SYSTEMS",
+          "bullets": [
+            {
+              "text": "Driven by four main objectives:",
+              "subBullets": [
+                "Need for program-data independence → reduced maintenance",
+                "Desire to manage more complex data types and structures",
+                "Ease of data access for less technical personnel",
+                "Need for more powerful decision support platforms"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 47"
+          },
+          "pageNumber": 47,
+          "explanation": [
+            "Tổng kết 4 mục tiêu/động lực thúc đẩy toàn bộ lịch sử tiến hóa CSDL ở Slide 46: (1) Cần tính độc lập chương trình–dữ liệu để giảm gánh nặng bảo trì, (2) Mong muốn quản lý cấu trúc & kiểu dữ liệu phức tạp hơn, (3) Giúp nhân sự ít rành kỹ thuật (less technical) vẫn dễ truy xuất dữ liệu, và (4) Nhu cầu nền tảng hỗ trợ ra quyết định (decision support) mạnh mẽ hơn."
+          ]
+        },
+        {
+          "slideNumber": "Slide 48",
+          "title": "Figure 1-10b Database architectures",
+          "diagramText": [
+            "Trái: Hierarchical database model (cấu trúc cây phân cấp cha–con chặt chẽ: 1 nút gốc → 3 nút con → 2 nút cháu)",
+            "Phải: Network database model (cấu trúc đồ thị/mạng lưới cho phép 1 nút con có nhiều đường liên kết tới nhiều nút khác nhau)"
+          ],
+          "diagramNote": "Đối chiếu cấu trúc cây của mô hình phân cấp (Hierarchical) với cấu trúc đồ thị nhiều liên kết của mô hình mạng (Network).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 48"
+          },
+          "pageNumber": 48,
+          "explanation": [
+            "Figure 1-10b minh họa trực quan 2 kiến trúc CSDL thế hệ đầu: bên trái là **Hierarchical database model** (tổ chức dạng cây cha–con chặt chẽ: mỗi nút con chỉ có duy nhất 1 cha, tìm nhanh theo đường đi định sẵn nhưng khó biểu diễn quan hệ M:N).",
+            "Bên phải là **Network database model**: nâng cấp lên cấu trúc đồ thị tổng quát cho phép một bản ghi con kết nối tới nhiều bản ghi cha, giải quyết quan hệ phức tạp nhưng việc truy vết con trỏ rất khó lập trình và bảo trì."
+          ]
+        },
+        {
+          "slideNumber": "Slide 49",
+          "title": "Figure 1-10b Database architectures (cont.)",
+          "diagramText": [
+            "Trái — Relational database model:",
+            "  RELATION 1 (PRIMARY KEY, ATTRIBUTES...)",
+            "  ↖ (Foreign Key trỏ tới Primary Key)",
+            "  RELATION 2 (PRIMARY KEY, FOREIGN KEY, ATTRIBUTES...)",
+            "Phải — Object-oriented database model:",
+            "  Object Class 1 (chứa Attributes, lồng Object Class 2 [Attributes, Methods], Methods) — liên kết với Object Class 3 [Attributes, Methods]"
+          ],
+          "diagramNote": "So sánh mô hình quan hệ (các bảng liên kết qua Primary Key / Foreign Key) với mô hình hướng đối tượng (Class chứa thuộc tính, phương thức và đối tượng lồng nhau).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 49"
+          },
+          "pageNumber": 49,
+          "explanation": [
+            "Tiếp tục Figure 1-10b với 2 kiến trúc phổ biến giai đoạn sau: **Relational database model** (bên trái) bỏ con trỏ vật lý, dùng hoàn toàn các bảng (Relation 1, Relation 2) và nối với nhau thông qua cặp giá trị **Primary Key ↔ Foreign Key**.",
+            "Bên phải là **Object-oriented database model**: dữ liệu không tách rời khỏi hành vi mà đóng gói trong từng **Object Class** gồm cả thuộc tính (Attributes), phương thức xử lý (Methods) và có thể lồng/liên kết các lớp đối tượng."
+          ]
+        },
+        {
+          "slideNumber": "Slide 50",
+          "title": "Figure 1-10b Database architectures (cont.)",
+          "diagramText": [
+            "Trái — Multidimensional database model – multidimensional cube view:",
+            "  Khối lập phương Sales theo 3 chiều: Sản phẩm (Desk, Table, Chair) × Tháng (Jan, Feb, ...) × Khu vực (New England, Mid-Atlantic, Southeast)",
+            "Phải — Multidimensional database model – star-schema view:",
+            "  Fact Table [Dimensions | Facts] ở trung tâm, nối trực tiếp với Dimension 1, Dimension 2, Dimension 3, Dimension 4, Dimension 5, Dimension 6"
+          ],
+          "diagramNote": "Minh họa hai cách biểu diễn CSDL đa chiều (dùng cho Data Warehouse/OLAP): dạng khối lập phương (cube) và lược đồ hình sao (star schema).",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 50"
+          },
+          "pageNumber": 50,
+          "explanation": [
+            "Phần cuối của Figure 1-10b giới thiệu **Multidimensional database model** — nền tảng của Data Warehouse và phân tích OLAP, được thể hiện qua 2 góc nhìn: dạng **Multidimensional Cube** (khối lập phương dữ liệu 3 chiều Sản phẩm × Tháng × Khu vực) và **Star-Schema** (lược đồ hình sao gồm bảng sự kiện Fact Table ở tâm nối ra các bảng chiều Dimension 1..6)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 51",
+          "title": "THE RANGE OF DATABASE APPLICATIONS",
+          "bullets": [
+            "Personal databases",
+            "Two-tier and N-tier Client/Server databases",
+            {
+              "text": "Enterprise applications",
+              "subBullets": [
+                "Enterprise resource planning (ERP) systems",
+                "Data warehousing implementations"
+              ]
+            }
+          ],
+          "table": {
+            "caption": "TABLE 1-5 Summary of Database Applications",
+            "headers": [
+              "Type of Database / Application",
+              "Typical Number of Users",
+              "Typical Size of Database"
+            ],
+            "rows": [
+              [
+                "Personal",
+                "1",
+                "Megabytes"
+              ],
+              [
+                "Multitier Client/Server",
+                "100–1000",
+                "Gigabytes"
+              ],
+              [
+                "Enterprise resource planning",
+                ">100",
+                "Gigabytes–terabytes"
+              ],
+              [
+                "Data warehousing",
+                ">100",
+                "Terabytes–petabytes"
+              ]
+            ]
+          },
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 51"
+          },
+          "pageNumber": 51,
+          "explanation": [
+            "Slide và Table 1-5 phân loại phổ quy mô của các ứng dụng CSDL hiện đại từ nhỏ đến cực lớn: Personal (1 người dùng, vài MB), Two-tier/N-tier Client/Server (100–1000 người dùng, GB), Enterprise Resource Planning — ERP (>100 người dùng, GB–TB), và Data Warehousing (>100 người dùng, TB–PB)."
+          ]
+        },
+        {
+          "slideNumber": "Slide 52",
+          "title": "Figure 1-11 Multi-tiered client/server database architecture",
+          "diagramText": [
+            "Client tier (3 người dùng):",
+            "  • Accounts payable processing: Browser + Database of vendors, purchase orders, vendor invoices",
+            "  • Cash flow analyst: Browser + Database of customer receipts and our payments to vendors",
+            "  • Customer service representative (tablet): Browser + No local database",
+            "Application/Web tier: Application/Web server — A/P, A/R, order processing, inventory control, and so forth; access and connectivity to DBMS. Dynamic Web pages; management of session",
+            "Enterprise tier: Enterprise server with DBMS + Transaction databases containing all organizational data or summaries of data on department servers"
+          ],
+          "diagramNote": "Kiến trúc 3 tầng (Client tier, Application/Web tier, Enterprise tier) cho thấy Application/Web server xử lý nghiệp vụ và kết nối DBMS trung tâm.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 52"
+          },
+          "pageNumber": 52,
+          "explanation": [
+            "Figure 1-11 giải thích chi tiết kiến trúc Client/Server nhiều tầng (3-tier architecture): (1) **Client tier** chứa trình duyệt Web (lưu ý trường hợp máy tính bảng của Customer Service hoàn toàn \"No local database\"); (2) **Application/Web tier** xử lý logic nghiệp vụ (A/P, A/R, tồn kho), tạo trang Web động và quản lý phiên (session); (3) **Enterprise tier** chạy DBMS trung tâm quản lý toàn bộ CSDL giao dịch của tổ chức."
+          ]
+        },
+        {
+          "slideNumber": "Slide 53",
+          "title": "ENTERPRISE DATABASE APPLICATIONS",
+          "bullets": [
+            {
+              "text": "Enterprise Resource Planning (ERP)",
+              "subBullets": [
+                "Integrate all enterprise functions (manufacturing, finance, sales, marketing, inventory, accounting, human resources)"
+              ]
+            },
+            {
+              "text": "Data Warehouse",
+              "subBullets": [
+                "Integrated decision support system derived from various operational databases"
+              ]
+            }
+          ],
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 53"
+          },
+          "pageNumber": 53,
+          "explanation": [
+            "Phân biệt hai loại ứng dụng CSDL cấp doanh nghiệp lớn (Enterprise Database Applications): **ERP** là hệ thống tác nghiệp hợp nhất toàn bộ phòng ban trong công ty (sản xuất, tài chính, bán hàng, marketing, kho, kế toán, nhân sự) trên một nguồn dữ liệu chung.",
+            "Ngược lại, **Data Warehouse** là hệ thống hỗ trợ ra quyết định (Decision Support System) được trích xuất và tổng hợp từ nhiều CSDL tác nghiệp rời rạc để phục vụ phân tích xu hướng cho lãnh đạo."
+          ]
+        },
+        {
+          "slideNumber": "Slide 54",
+          "title": "FIGURE 1-13 Computer System for Pine Valley Furniture Company",
+          "diagramText": [
+            "Client devices: Customer (Internet) → Web/Application server; Sales → Web/Application server; Accounting → Web/Application server",
+            "Web/Application server → Web to Database Middleware → Database Server → Database",
+            "Purchasing (laptop nội bộ) → kết nối trực tiếp tới Database Server → Database"
+          ],
+          "diagramNote": "Mô hình hạ tầng máy tính thực tế tại Pine Valley Furniture Company kết hợp kết nối qua Web/Application server + middleware và kết nối trực tiếp từ Purchasing tới Database Server.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 54"
+          },
+          "pageNumber": 54,
+          "explanation": [
+            "Figure 1-13 minh họa sơ đồ hạ tầng thực tế tại công ty mẫu Pine Valley Furniture Company: khách hàng qua Internet, phòng Sales và Accounting đều dùng Web/Application Server đi qua lớp \"Web to Database Middleware\" để kết nối với Database Server.",
+            "Riêng phòng Purchasing dùng laptop nội bộ kết nối thẳng vào Database Server (kiểu client/server trực tiếp) thay vì đi qua Web tier — cho thấy một doanh nghiệp thực tế có thể kết hợp cả kiến trúc Web 3-tier và 2-tier."
+          ]
+        },
+        {
+          "slideNumber": "Slide 55",
+          "title": "FIGURE 1-15 Project data model for Home Office product line marketing support system",
+          "diagramText": [
+            "CUSTOMER: Customer ID (PK), Customer Name, Customer Type, Customer Zip Code, Customer Years",
+            "ORDER: Order Number (PK), Order Placement Date, Order Fulfillment Date, Order Number of Shipments",
+            "ORDER LINE (associative entity): Order Number (PK), Product ID (PK), Order Quantity",
+            "PRODUCT LINE: Product Line Name (PK), PL Prior Years Sales Goal, PL Current Years Sales Goal",
+            "PRODUCT: Product ID (PK), Product Description, Product Finish, Product Standard Price, Product Cost, PR Prior Years Sales Goal, PR Current Years Sales Goal",
+            "INVOICE: Invoice Number (PK), Order Number, Invoice Date",
+            "PAYMENT: Invoice Number (PK), Payment Date, Payment Amount",
+            "Relationships: CUSTOMER (Places 1:M) ORDER; ORDER (Contains 1:M) ORDER LINE; PRODUCT (Has 1:M) ORDER LINE; PRODUCT LINE (Includes 1:M) PRODUCT; ORDER (Is billed on 1:M) INVOICE; INVOICE (Is paid on 1:M) PAYMENT"
+          ],
+          "diagramNote": "Ví dụ hoàn chỉnh Project Data Model cho hệ thống hỗ trợ tiếp thị dòng sản phẩm Home Office gồm 7 thực thể, đầy đủ thuộc tính và khóa chính.",
+          "source": {
+            "file": "hoffer_mdm12e_pp_ch01.pdf",
+            "loc": "Slide 55"
+          },
+          "pageNumber": 55,
+          "explanation": [
+            "Figure 1-15 kết thúc Chương 1 bằng một **Project Data Model hoàn chỉnh** cho hệ thống Marketing sản phẩm Home Office gồm 7 thực thể (`CUSTOMER`, `ORDER`, `ORDER LINE`, `PRODUCT LINE`, `PRODUCT`, `INVOICE`, `PAYMENT`), đầy đủ thuộc tính và khóa chính gạch chân.",
+            "Lưu ý cách đọc nghiệp vụ trên sơ đồ: một `PRODUCT LINE` gồm nhiều `PRODUCT`; khách hàng đặt `ORDER`; quan hệ M:N giữa `ORDER` và `PRODUCT` được tách qua `ORDER LINE` (có khóa chính ghép `Order Number + Product ID`); mỗi đơn hàng được xuất nhiều hóa đơn `INVOICE` và mỗi hóa đơn nhận nhiều đợt thanh toán `PAYMENT`."
+          ]
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "dbs-ch01-c01", "front": "Metadata là gì?", "back": "Dữ liệu mô tả thuộc tính và ngữ cảnh của dữ liệu người dùng: kiểu dữ liệu, kích thước field, giá trị cho phép, mô tả, nguồn.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 3, 6" } },
-    { "id": "dbs-ch01-c02", "front": "5 nhược điểm của file processing truyền thống?", "back": "Program-data dependence; duplication of data; limited data sharing; lengthy development times; excessive program maintenance (80% ngân sách IS).", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slide 9" } },
-    { "id": "dbs-ch01-c03", "front": "DBMS là gì?", "back": "Hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới user databases.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slide 13" } },
-    { "id": "dbs-ch01-c04", "front": "Enterprise Data Model khác Project Data Model thế nào?", "back": "Enterprise: entity và relationship mức cao cho toàn tổ chức. Project: góc nhìn chi tiết hơn, khớp cấu trúc dữ liệu trong database/data warehouse.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 14–15" } },
-    { "id": "dbs-ch01-c05", "front": "Ba tầng của three-schema architecture?", "back": "External schema (user views), Conceptual schema (E-R), Internal schema (logical + physical).", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 42–43" } },
-    { "id": "dbs-ch01-c06", "front": "Sáu pha của SDLC theo thứ tự?", "back": "Planning → Analysis → Logical Design → Physical Design → Implementation → Maintenance.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 29–35" } }
+    {
+      "id": "dbs-ch01-c01",
+      "front": "Metadata là gì?",
+      "back": "Dữ liệu mô tả thuộc tính và ngữ cảnh của dữ liệu người dùng: kiểu dữ liệu, kích thước field, giá trị cho phép (min/max), mô tả, nguồn.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 3, 6"
+      }
+    },
+    {
+      "id": "dbs-ch01-c02",
+      "front": "5 nhược điểm của file processing truyền thống?",
+      "back": "Program-data dependence; duplication of data; limited data sharing; lengthy development times; excessive program maintenance (80% ngân sách IS).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 9"
+      }
+    },
+    {
+      "id": "dbs-ch01-c03",
+      "front": "DBMS là gì?",
+      "back": "Hệ phần mềm dùng để tạo, duy trì và cung cấp truy cập có kiểm soát tới user databases (quản lý dữ liệu tương tự OS quản lý phần cứng).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 13, 21"
+      }
+    },
+    {
+      "id": "dbs-ch01-c04",
+      "front": "Enterprise Data Model khác Project Data Model thế nào?",
+      "back": "Enterprise: entity và relationship mức cao cho toàn tổ chức. Project: góc nhìn chi tiết hơn (đủ thuộc tính, PK), khớp cấu trúc dữ liệu trong database/data warehouse.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 14–15"
+      }
+    },
+    {
+      "id": "dbs-ch01-c05",
+      "front": "Ba tầng của three-schema architecture?",
+      "back": "External schema (user views), Conceptual schema (E-R), Internal schema (logical + physical).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 42–43"
+      }
+    },
+    {
+      "id": "dbs-ch01-c06",
+      "front": "Sáu pha của SDLC theo thứ tự?",
+      "back": "Planning → Analysis → Logical Design → Physical Design → Implementation → Maintenance.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 29–35"
+      }
+    },
+    {
+      "id": "dbs-ch01-c07",
+      "front": "Phân biệt Data, Information và Database?",
+      "back": "Database: organized collection of logically related data. Data: stored representations of meaningful objects/events (structured & unstructured). Information: data processed to increase knowledge in the user.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "dbs-ch01-c08",
+      "front": "Vấn đề lớn nhất (biggest problem) của Data Redundancy là gì?",
+      "back": "Thay đổi dữ liệu ở một file có thể gây mâu thuẫn (inconsistencies) và làm tổn hại tính toàn vẹn dữ liệu (compromises in data integrity).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-ch01-c09",
+      "front": "5 chi phí và rủi ro của Database Approach?",
+      "back": "1) New, specialized personnel; 2) Installation and management cost/complexity (training, infrastructure); 3) Conversion costs; 4) Need for explicit backup and recovery; 5) Organizational conflict.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 23"
+      }
+    },
+    {
+      "id": "dbs-ch01-c10",
+      "front": "9 thành phần của Database Environment?",
+      "back": "C.A.S.E. tools, Repository, DBMS, Database, Application Programs, User Interface, Data/Database Administrators, System Developers, End Users.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 24–25"
+      }
+    },
+    {
+      "id": "dbs-ch01-c11",
+      "front": "Trong SDLC, Logical Design và Physical Design có hoạt động CSDL gì?",
+      "back": "Logical Design: transactions, forms, displays, views, data integrity & security. Physical Design: define database to DBMS, physical data organization, database processing programs.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 32–33"
+      }
+    },
+    {
+      "id": "dbs-ch01-c12",
+      "front": "4 bước chính của Prototyping (RAD) Database Methodology?",
+      "back": "1) Identify problem (conceptual data modeling); 2) Develop initial prototype (logical + physical + implementation); 3) Implement & use ↔ Revise & enhance (iterative maintenance); 4) Convert to operational system (tuning nếu prototype kém hiệu quả).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 36–40"
+      }
+    },
+    {
+      "id": "dbs-ch01-c13",
+      "front": "4 động lực thúc đẩy sự tiến hóa của Database Systems?",
+      "back": "1) Program-data independence → giảm bảo trì; 2) Quản lý cấu trúc & kiểu dữ liệu phức tạp hơn; 3) Dễ truy cập dữ liệu hơn cho người ít kỹ thuật; 4) Nền tảng hỗ trợ ra quyết định mạnh mẽ hơn.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 47"
+      }
+    },
+    {
+      "id": "dbs-ch01-c14",
+      "front": "Table 1-5: Quy mô user và dung lượng của 4 loại ứng dụng CSDL?",
+      "back": "Personal: 1 user, MB. Multitier Client/Server: 100–1000 users, GB. ERP: >100 users, GB–TB. Data warehousing: >100 users, TB–PB.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 51"
+      }
+    },
+    {
+      "id": "dbs-ch01-c15",
+      "front": "ERP và Data Warehouse khác nhau thế nào?",
+      "back": "ERP (Enterprise Resource Planning) tích hợp toàn bộ chức năng tác nghiệp doanh nghiệp (sản xuất, tài chính, bán hàng, nhân sự...). Data Warehouse là hệ hỗ trợ ra quyết định tích hợp từ các CSDL tác nghiệp.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 53"
+      }
+    }
   ],
   "questions": [
-    { "id": "dbs-ch01-q01", "stem": "Vấn đề lớn nhất của data redundancy trong file processing là gì?", "options": ["Tốn băng thông mạng", "Thay đổi dữ liệu ở một file có thể gây inconsistency và ảnh hưởng data integrity", "Chương trình chạy chậm hơn", "Không thể backup"], "answer": 1, "explanation": "Slide 11 nêu 'biggest problem' là thay đổi ở một file có thể dẫn tới inconsistency và compromise data integrity.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slide 11" } },
-    { "id": "dbs-ch01-q02", "stem": "Thành phần nào của database environment là 'centralized storehouse of metadata'?", "options": ["DBMS", "Repository", "CASE tool", "User interface"], "answer": 1, "explanation": "Repository là kho tập trung chứa metadata.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 24–25" } },
-    { "id": "dbs-ch01-q03", "stem": "Trong three-schema architecture, user views thuộc schema nào?", "options": ["External schema", "Conceptual schema", "Internal schema", "Physical schema"], "answer": 0, "explanation": "User views (report, màn hình, form) là external schema, là tập con của conceptual schema.", "source": { "file": "hoffer_mdm12e_pp_ch01.pdf", "loc": "Slides 42–43" } }
+    {
+      "id": "dbs-ch01-q01",
+      "stem": "Vấn đề lớn nhất của data redundancy trong file processing là gì?",
+      "options": [
+        "Tốn băng thông mạng",
+        "Thay đổi dữ liệu ở một file có thể gây inconsistency và ảnh hưởng data integrity",
+        "Chương trình chạy chậm hơn",
+        "Không thể backup"
+      ],
+      "answer": 1,
+      "explanation": "Slide 11 nêu 'biggest problem' là thay đổi ở một file có thể dẫn tới inconsistencies và compromise data integrity.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 11"
+      }
+    },
+    {
+      "id": "dbs-ch01-q02",
+      "stem": "Thành phần nào của database environment là 'centralized storehouse of metadata'?",
+      "options": [
+        "DBMS",
+        "Repository",
+        "CASE tool",
+        "User interface"
+      ],
+      "answer": 1,
+      "explanation": "Slide 25: Repository – centralized storehouse of metadata.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 24–25"
+      }
+    },
+    {
+      "id": "dbs-ch01-q03",
+      "stem": "Trong three-schema architecture, user views thuộc schema nào?",
+      "options": [
+        "External schema",
+        "Conceptual schema",
+        "Internal schema",
+        "Physical schema"
+      ],
+      "answer": 0,
+      "explanation": "User views (report, màn hình, form) là external schema, là tập con của conceptual schema.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 42–43"
+      }
+    },
+    {
+      "id": "dbs-ch01-q04",
+      "stem": "Trong hệ thống file processing truyền thống, chi phí bảo trì chương trình quá mức (Excessive Program Maintenance) chiếm khoảng bao nhiêu ngân sách IS?",
+      "options": [
+        "20%",
+        "50%",
+        "80%",
+        "95%"
+      ],
+      "answer": 2,
+      "explanation": "Slide 9: Excessive Program Maintenance — 80% of information systems budget.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 9"
+      }
+    },
+    {
+      "id": "dbs-ch01-q05",
+      "stem": "Khi nào dữ liệu được coi là có thêm 'context' giúp người dùng hiểu (như Figure 1-1a Class Roster)?",
+      "options": [
+        "Khi lưu ở dạng nhị phân thuần",
+        "Khi kèm ngữ cảnh như tên môn học, học kỳ, nhóm lớp và tên các cột",
+        "Khi xóa toàn bộ metadata",
+        "Khi tách ra nhiều file riêng không liên kết"
+      ],
+      "answer": 1,
+      "explanation": "Slide 4 minh họa ngữ cảnh (Course, Semester, Section, tiêu đề cột) giúp biến các giá trị rời rạc thành thông tin có ý nghĩa.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 4"
+      }
+    },
+    {
+      "id": "dbs-ch01-q06",
+      "stem": "Ma trận Business Function-to-Data Entity (Figure 1-6) giúp xác định trực tiếp thành phần nào trong kiến trúc 3 lược đồ?",
+      "options": [
+        "Physical schema",
+        "External schema (User views)",
+        "CASE tool",
+        "Backup schedule"
+      ],
+      "answer": 1,
+      "explanation": "Slide 42: External Schema (User Views) — Can be determined from business-function/data entity matrices.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 27, 42"
+      }
+    },
+    {
+      "id": "dbs-ch01-q07",
+      "stem": "Trong SDLC 6 pha, việc định nghĩa cấu trúc CSDL cho DBMS (define database to DBMS) và tổ chức lưu trữ vật lý thuộc pha nào?",
+      "options": [
+        "Planning",
+        "Analysis",
+        "Logical Design",
+        "Physical Design"
+      ],
+      "answer": 3,
+      "explanation": "Slide 33: Physical Design thực hiện physical database design (define database to DBMS, physical data organization, database processing programs).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 33"
+      }
+    },
+    {
+      "id": "dbs-ch01-q08",
+      "stem": "Trong Prototyping Database Methodology (Figure 1-8), hoạt động nào gộp cả Logical design, Physical design và Database implementation?",
+      "options": [
+        "Identify problem",
+        "Develop initial prototype",
+        "Convert to operational system",
+        "Enterprise data modeling"
+      ],
+      "answer": 1,
+      "explanation": "Slide 38 cho thấy tại bước Develop initial prototype thực hiện đồng thời Logical database design, Physical database design and definition, và Database implementation.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 38"
+      }
+    },
+    {
+      "id": "dbs-ch01-q09",
+      "stem": "Trong kiến trúc ba lược đồ (Slide 42–43), Internal Schema bao gồm những gì?",
+      "options": [
+        "Chỉ user views",
+        "Chỉ sơ đồ E-R mức khái niệm",
+        "Logical structures (Chương 4) và Physical structures (Chương 5)",
+        "Chỉ câu lệnh SQL truy vấn"
+      ],
+      "answer": 2,
+      "explanation": "Slide 42–43: Internal Schema bao gồm Logical structures (Ch.4) và Physical structures (Ch.5).",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slides 42–43"
+      }
+    },
+    {
+      "id": "dbs-ch01-q10",
+      "stem": "Theo Table 1-5, loại ứng dụng CSDL nào có kích thước điển hình từ Terabytes–Petabytes?",
+      "options": [
+        "Personal",
+        "Multitier Client/Server",
+        "Enterprise resource planning",
+        "Data warehousing"
+      ],
+      "answer": 3,
+      "explanation": "Slide 51 (Table 1-5): Data warehousing có Typical Number of Users >100 và Typical Size of Database là Terabytes–petabytes.",
+      "source": {
+        "file": "hoffer_mdm12e_pp_ch01.pdf",
+        "loc": "Slide 51"
+      }
+    }
   ]
 }

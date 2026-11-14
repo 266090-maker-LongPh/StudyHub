@@ -1,9 +1,18 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-13T03:20:10.732Z",
+  "updatedAt": "2026-11-14T10:40:12.971Z",
   "dbs": {
     "completedChapterIds": [],
-    "cards": {},
+    "cards": {
+      "dbs-ch01-c01": {
+        "interval": 1,
+        "repetitions": 1,
+        "easeFactor": 2.5,
+        "dueDate": "2026-11-15",
+        "lastRating": "good",
+        "lastReviewedAt": "2026-11-14T10:40:12.971Z"
+      }
+    },
     "quizHistory": [
       {
         "id": "1794540010731-62cd8",
@@ -27,7 +36,8 @@
       }
     ],
     "studyDates": [
-      "2026-11-13"
+      "2026-11-13",
+      "2026-11-14"
     ]
   },
   "se1": {

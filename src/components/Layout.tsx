@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import type { SubjectId } from '../types';
 
 interface LayoutProps {
@@ -23,10 +23,14 @@ export function Layout({
   darkMode,
   onToggleDark,
 }: LayoutProps) {
+  const { pathname } = useLocation();
+  const isWideLesson = pathname.startsWith('/lesson/');
+  const containerMaxWidth = isWideLesson ? 'max-w-[1680px]' : 'max-w-6xl';
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <div className={`mx-auto flex ${containerMaxWidth} flex-wrap items-center justify-between gap-3 px-4 py-3`}>
           <div className="flex items-center gap-3">
             <NavLink
               to="/"
@@ -122,7 +126,7 @@ export function Layout({
         </nav>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main className={`mx-auto w-full ${containerMaxWidth} flex-1 px-4 py-6`}>
         <Outlet />
       </main>
 

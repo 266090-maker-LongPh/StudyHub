@@ -1,24 +1,1111 @@
 {
-  "id": "se1-l09", "order": 8,
+  "id": "se1-l09",
+  "order": 8,
   "title": "Lecture 9: UML Class Diagrams",
-  "summary": [
-    { "h": "Design và UML", "text": "Design chuyển từ 'what' sang 'how' mà chưa viết cài đặt đầy đủ. Ba view cốt lõi: class diagram (static view), sequence diagram (dynamic view), activity diagram (thuật toán của chức năng). UML dùng như sketch (forward/backward design), blueprint, hoặc ngôn ngữ lập trình." },
-    { "h": "Cú pháp class diagram", "text": "Interface ghi «interface»; tên abstract class in nghiêng. Attribute: visibility name : type. Visibility: + public, # protected, - private, ~ package, / derived attribute. Static: gạch chân. Operation: visibility name(parameters) : return_type; bỏ ': return_type' ở constructor và khi void; không liệt kê method kế thừa; không bỏ method nào của interface." },
-    { "h": "Quan hệ", "text": "Generalization (mũi tên từ con tới cha): cha là class dùng nét liền + tam giác rỗng; cha là interface dùng nét đứt + tam giác rỗng. Aggregation ('is part of'): hình thoi rỗng ở phía toàn thể, phần có thể tồn tại độc lập. Composition ('is entirely made of'): hình thoi đặc, phần sống và chết cùng toàn thể. Dependency ('uses temporarily'): nét đứt mũi tên mở. Association có 3 chú thích: multiplicity (*, 1, 2..4, 3..*), name, navigability." },
-    { "h": "Cách tạo", "text": "Danh từ → class/object/field; động từ → method; quan hệ giữa danh từ → tương tác (chứa, tổng quát hóa, phụ thuộc). Analysis class diagram: ánh xạ entity thành domain class, relationship thành association, associative entity thành association class, viết constraint nếu có. Class diagram tốt để khám phá dữ liệu/thuộc tính liên quan và phụ thuộc; kém để khám phá hành vi thuật toán và luồng điều khiển." }
+  "audit": {
+    "sourceFile": "Resources/Lecture 9.pdf",
+    "totalPages": 23,
+    "extractedPages": 23,
+    "ocrNotes": [
+      "Tài liệu gốc Resources/Lecture 9.pdf là PDF dạng cuộn ảnh 1 trang dài (kích thước 960x16560) chứa đúng 23 slides; do file gốc chỉ có 1 trang PDF vật lý nên toàn bộ 23 slides đặt pageNumber: 1 kèm slideNumber \"Slide 1\"–\"Slide 23\".",
+      "Slide 3: Slide gốc viết 'what messages a resent and when.' (gõ dính/nhầm từ 'are sent'), giữ nguyên văn.",
+      "Slide 10: Trong hộp chú thích mẫu (note) viết 'The clone() methods is defined in the Object class.' (thừa 's' ở methods), giữ nguyên văn.",
+      "Slide 14: Mục 2 viết thiếu dấu mở ngoặc: 'what relationship the objects have)'; mục 3 ghi 'In the example, A uses B' trong khi sơ đồ bên phải vẽ hình thoi rỗng ◇ ở phía Class A kèm nhãn 'contains' và bội số '1..*' – 'k' (không vẽ mũi tên điều hướng ->).",
+      "Slides 21–23: Slide tổng kết 'UML class diagram: Summary' nằm ở vị trí Slide 21, ngay trước 2 slide hướng dẫn thực hành tạo class diagram (Slides 22–23); giữ nguyên đúng thứ tự trang của bài giảng gốc."
+    ]
+  },
+  "sources": [
+    {
+      "file": "Resources/Lecture 9.pdf",
+      "loc": "Slides 1–23 (PDF cuộn ảnh 1 trang dài chứa 23 slides)"
+    }
   ],
-  "sources": [{ "file": "Resources/Lecture 9.pdf", "loc": "Slides 1–23 (PDF ảnh 1 trang)" }],
+  "summary": [
+    {
+      "h": "Thiết kế phần mềm, Tổng quan UML & Ba cách sử dụng UML",
+      "text": "Giới thiệu giai đoạn Software Design chuyển từ 'what' sang 'how', 3 loại sơ đồ UML cốt lõi (Class, Sequence, Activity), bản chất ngôn ngữ mô hình hóa UML (descriptive vs prescriptive, Union of Many Languages) và 3 mục đích sử dụng UML (sketch, blueprint, programming language).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 1–6"
+      },
+      "digest": {
+        "keyPoints": [
+          "Design đặc tả cấu trúc cách viết và vận hành hệ thống mà chưa viết cài đặt hoàn chỉnh, chuyển từ 'what' (yêu cầu) sang 'how' (cần lớp nào, trường/phương thức gì, tương tác ra sao).",
+          "Ba sơ đồ UML trọng tâm của thiết kế hướng đối tượng: Class diagram (góc nhìn tĩnh — static view), Sequence diagram (góc nhìn động — gửi thông điệp gì, lúc nào) và Activity diagram (thuật toán xử lý bên trong hàm).",
+          "UML (Unified Modeling Language) là chuẩn mở hợp nhất nhiều loại sơ đồ (9+ loại), có thể nhìn như ngôn ngữ mô tả linh hoạt (descriptive) hoặc đặc tả hình thức chặt chẽ (prescriptive); được phép lược bỏ chi tiết không cần thiết cho nhóm/giảng viên.",
+          "Ba cách dùng UML: As a sketch (forward design trước khi code hoặc backward design làm tài liệu sau khi code, hay vẽ trên bảng/giấy), As a blueprint (bản vẽ đầy đủ để cài đặt, dùng công cụ CASE), và As a programming language (sinh mã thực thi tự động nếu nhanh hơn code tay)."
+        ],
+        "terms": [
+          {
+            "term": "Software Design",
+            "meaning": "Quá trình chuyển từ 'what' sang 'how': xác định cấu trúc lớp, thuộc tính, phương thức và tương tác mà chưa cần viết toàn bộ code cài đặt."
+          },
+          {
+            "term": "UML (Unified Modeling Language)",
+            "meaning": "Ngôn ngữ mô hình hóa thống nhất chuẩn mở cung cấp nhiều góc nhìn trực quan về hệ thống hướng đối tượng."
+          }
+        ],
+        "pitfalls": [
+          "Class diagram chỉ thể hiện static view ('cái gì tồn tại và có thể tương tác'), KHÔNG thể hiện được thứ tự thời gian gửi thông điệp (đây là việc của Sequence diagram) hay thuật toán từng bước (việc của Activity diagram)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 1",
+          "pageNumber": 1,
+          "title": "Lecture 9: UML Class Diagrams",
+          "paragraphs": [
+            "61FIT3SE1 - Software Engineering 1",
+            "Lecture 9",
+            "UML Class Diagrams"
+          ],
+          "explanation": [
+            "Slide mở đầu Lecture 9 thuộc học phần 61FIT3SE1 - Software Engineering 1, chuyển từ thiết kế kiến trúc tổng thể (Lecture 8) sang thiết kế chi tiết hướng đối tượng bằng UML Class Diagrams.",
+            "Đây là loại sơ đồ hay dùng nhất trong phân tích, thiết kế phần mềm hướng đối tượng bằng Java và xuất hiện thường xuyên trong các bài kiểm tra thiết kế."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 1"
+          }
+        },
+        {
+          "slideNumber": "Slide 2",
+          "pageNumber": 1,
+          "title": "Software design",
+          "bullets": [
+            "Design: specifying the structure of how a software system will be written and function, without actually writing the complete implementation",
+            {
+              "text": "A transition from \"what\" the system must do, to \"how\" the system will do it",
+              "subBullets": [
+                "What classes will we need to implement a system that meets our requirements?",
+                "What fields and methods will each class have?",
+                "How will the classes interact with each other?"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide chốt ranh giới của Software design: đặt ra bản cấu trúc để hệ thống vận hành trước khi viết code hoàn chỉnh.",
+            "Thiết kế lớp trả lời đúng 3 câu hỏi thực tế cho lập trình viên: cần tạo các class nào, mỗi class có fields & methods nào, và chúng tương tác/phụ thuộc nhau ra sao."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 2"
+          }
+        },
+        {
+          "slideNumber": "Slide 3",
+          "pageNumber": 1,
+          "title": "Describing designs with UML diagrams",
+          "bullets": [
+            {
+              "text": "Class diagram",
+              "subBullets": [
+                "Shows classes and relationships among them.",
+                "A static view of the system, displaying what interacts but not what happens when they do interact."
+              ]
+            },
+            {
+              "text": "Sequence diagram",
+              "subBullets": [
+                "A dynamic view of the system, describing how objects collaborate: what messages a resent and when."
+              ]
+            },
+            {
+              "text": "Activity diagram",
+              "subBullets": [
+                "Describes how the function work, the algorithm of the function."
+              ]
+            }
+          ],
+          "ocrNote": "Slide gốc viết 'what messages a resent and when.' (gõ lỗi từ 'are sent') và 'how the function work' (giữ nguyên văn).",
+          "explanation": [
+            "Ba loại sơ đồ UML bổ sung 3 góc nhìn không trùng lặp: Class diagram mô tả cấu trúc tĩnh (những lớp nào tồn tại và nối với nhau ra sao).",
+            "Sequence diagram bổ sung góc nhìn động theo trục thời gian (đối tượng gửi message nào vào thời điểm nào), còn Activity diagram đặc tả luồng thuật toán bên trong một hàm/chức năng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 3"
+          }
+        },
+        {
+          "slideNumber": "Slide 4",
+          "pageNumber": 1,
+          "title": "What is UML?",
+          "bullets": [
+            {
+              "text": "Pictures or views of an OO system",
+              "subBullets": [
+                "Programming languages are not abstract enough for OO design",
+                "UML is an open standard; lots of companies use it"
+              ]
+            },
+            {
+              "text": "What is legal UML?",
+              "subBullets": [
+                "A descriptive language: shaped by usage and convention",
+                "A prescriptive language: rigid formal syntax (like programming)",
+                "It's okay to omit things from UML diagrams if they aren't needed by team/supervisor/instructor"
+              ]
+            }
+          ],
+          "explanation": [
+            "Ngôn ngữ lập trình như Java quá chi tiết để nhìn bức tranh quan hệ giữa hàng chục lớp cùng lúc, nên cần một mức trừu tượng cao hơn — đó là UML, chuẩn mở được công nghiệp sử dụng rộng rãi.",
+            "Lưu ý thực tế về 'legal UML': dù chuẩn UML có ngữ pháp hình thức (prescriptive), trong công việc thực tế nó mang tính mô tả theo quy ước nhóm (descriptive), hoàn toàn được lược bỏ các chi tiết không phục vụ mục tiêu giao tiếp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 4"
+          }
+        },
+        {
+          "slideNumber": "Slide 5",
+          "pageNumber": 1,
+          "title": "UML: Unified Modeling Language",
+          "bullets": [
+            {
+              "text": "Union of Many Languages",
+              "subBullets": [
+                "Use case diagrams",
+                "Class diagrams",
+                "Object diagrams",
+                "Sequence diagrams",
+                "Collaboration diagrams",
+                "Statechart diagrams",
+                "Activity diagrams",
+                "Component diagrams",
+                "Deployment diagrams",
+                "..."
+              ]
+            }
+          ],
+          "diagramText": [
+            "Bong bóng chú thích (callout): \"A very big language!\""
+          ],
+          "diagramNote": "Bong bóng hội thoại trên slide nhấn mạnh UML hợp nhất rất nhiều ngôn ngữ sơ đồ thành phần (rất đồ sộ).",
+          "explanation": [
+            "Chữ 'Unified' trong UML nghĩa là hợp nhất nhiều ký pháp sơ đồ khác nhau từ thời kỳ đầu của OOP (Use case, Class, Object, Sequence, Collaboration, Statechart, Activity, Component, Deployment...).",
+            "Trong thực tế và phạm vi môn SE1, ta không cần thuộc hết cả bộ UML khổng lồ này mà tập trung thành thạo Use Case Diagram (Lecture 7) và Class Diagram (Lecture 9)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 5"
+          }
+        },
+        {
+          "slideNumber": "Slide 6",
+          "pageNumber": 1,
+          "title": "Uses for UML",
+          "bullets": [
+            {
+              "text": "As a sketch: to communicate aspects of system",
+              "subBullets": [
+                "Forward design: doing UML before coding",
+                "Backward design: doing UML after coding as documentation",
+                "Often done on whiteboard or paper",
+                "Used to get rough selective ideas"
+              ]
+            },
+            {
+              "text": "As a blueprint: a complete design to be implemented",
+              "subBullets": [
+                "Sometimes done with CASE (Computer-Aided Software Engineering) tools"
+              ]
+            },
+            {
+              "text": "As a programming language: with the right tools, code can be auto-generated and executed from UML",
+              "subBullets": [
+                "Only good if this is faster than coding in a \"real\" language"
+              ]
+            }
+          ],
+          "explanation": [
+            "Theo Martin Fowler, có 3 mức độ sử dụng UML trong dự án: (1) As a sketch — phác thảo nhanh trên bảng/giấy để trao đổi ý tưởng chọn lọc trước khi code (forward) hoặc tóm tắt lại code đã viết (backward).",
+            "(2) As a blueprint — bản vẽ chi tiết đầy đủ để lập trình viên nhìn vào cài đặt trọn vẹn (thường dùng công cụ CASE); (3) As a programming language — sinh thẳng code chạy từ UML, nhưng chỉ hữu ích khi nhanh hơn việc tự viết bằng ngôn ngữ lập trình thật."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 6"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Cú pháp hộp Class, Thuộc tính (Attributes), Phương thức (Operations) & Ghi chú (Comments)",
+      "text": "Cấu trúc 3 ngăn của một hộp lớp (Class name, Attributes, Operations), quy ước đặt tên Interface và Abstract class, cú pháp visibility (+, #, -, ~, /), static (gạch chân), constructor/void return type và cách gắn folded note chú thích.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 7–10"
+      },
+      "digest": {
+        "keyPoints": [
+          "Hộp Class gồm tên lớp (trên), ngăn Attributes (giữa, tùy chọn) và ngăn Operations/methods (dưới, tùy chọn); interface ghi «interface» phía trên tên lớp; abstract class in nghiêng tên lớp.",
+          "Cú pháp Attribute: `visibility name : type` với visibility: `+` (public), `#` (protected), `-` (private), `~` (package/default), `/` (derived attribute — không lưu trữ mà tính toán từ các thuộc tính khác); gạch chân biểu diễn static.",
+          "Cú pháp Operation: `visibility name(parameters) : return_type` với tham số viết dạng `name : type`, static gạch chân, và lược bỏ `: return_type` ở constructor cũng như khi hàm trả về `void`.",
+          "Quy tắc liệt kê Operations: có thể bỏ các getter/setter tầm thường, KHÔNG được bỏ phương thức nào của interface, và KHÔNG liệt kê lại các phương thức đã kế thừa (chỉ vẽ phần mới hoặc override).",
+          "Comment trong UML vẽ bằng hình chữ nhật gập góc (folded note) nối tới phần tử liên quan bằng nét đứt."
+        ],
+        "terms": [
+          {
+            "term": "Derived attribute (/)",
+            "meaning": "Thuộc tính không được lưu trữ trực tiếp mà có thể tính toán suy ra từ các thuộc tính khác (ký hiệu dấu `/` trước tên, ví dụ `/ area: double`)."
+          },
+          {
+            "term": "Visibility symbols",
+            "meaning": "`+` public, `#` protected, `-` private, `~` package (default), và `/` đánh dấu thuộc tính dẫn xuất (derived)."
+          }
+        ],
+        "pitfalls": [
+          "Kiểu dữ liệu và kiểu trả về trong UML đứng SAU dấu hai chấm (`width: int`, `getID(): int`), ngược với cú pháp khai báo trong Java (`int width`, `int getID()`).",
+          "Đừng gạch đầu dòng nhầm `void`: constructor và phương thức `void` bỏ luôn phần `: return_type` ở cuối.",
+          "Phân biệt tĩnh (static = gạch chân toàn bộ tên thành phần) với lớp trừu tượng (abstract = in nghiêng tên lớp)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 7",
+          "pageNumber": 1,
+          "title": "Class Diagram",
+          "bullets": [
+            {
+              "text": "Class name",
+              "subBullets": [
+                "write «interface» on top of interfaces' names",
+                "use italics for an abstract class name"
+              ]
+            },
+            {
+              "text": "Attributes (optional)",
+              "subBullets": [
+                "fields of the class"
+              ]
+            },
+            {
+              "text": "Operations / methods (optional)",
+              "subBullets": [
+                "may omit trivial (get/set) methods",
+                "but don't omit any methods from an interface!",
+                "should not include inherited methods"
+              ]
+            }
+          ],
+          "diagramText": [
+            "Ví dụ 1 — [ Rectangle ]:",
+            "  Ngăn Attributes:  - width: int  |  - height: int  |  / area: double",
+            "  Ngăn Operations: + Rectangle(w: int, h: int)  |  + distance(r: Rectangle): double",
+            "Ví dụ 2 — [ Student ]:",
+            "  Ngăn Attributes:  - name: String  |  - id: int  |  - totalStudents: int (gạch chân = static)",
+            "  Ngăn Operations: # getID(): int  |  ~ getEmail(): String"
+          ],
+          "diagramNote": "Hai hộp lớp mẫu minh họa đầy đủ 3 ngăn, ký hiệu visibility (-, +, #, ~, /), gạch chân static và lược bỏ kiểu trả về ở constructor Rectangle.",
+          "explanation": [
+            "Slide tổng hợp toàn bộ quy ước trình bày hộp Class: tên interface gắn stereotype «interface» ở dòng trên, tên lớp abstract in nghiêng; hai ngăn Attributes và Operations có thể ẩn bớt khi vẽ sơ đồ tổng quan.",
+            "Với phương thức, để sơ đồ gọn sạch, ta được phép bỏ các get/set đơn giản và tuyệt đối không lặp lại các phương thức thừa kế từ lớp cha (trừ trường hợp cần chỉ rõ interface bắt buộc phải liệt kê đủ mọi method của interface)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 7"
+          }
+        },
+        {
+          "slideNumber": "Slide 8",
+          "pageNumber": 1,
+          "title": "Attributes",
+          "paragraphs": [
+            "visibility name : type"
+          ],
+          "bullets": [
+            {
+              "text": "visibility",
+              "subBullets": [
+                "+ public",
+                "# protected",
+                "- private",
+                "~ package (default)",
+                "/ derived"
+              ]
+            },
+            "derived attribute: not stored, but can be computed from other attribute values",
+            "Underline: static attributes"
+          ],
+          "diagramText": [
+            "Minh họa bên phải:",
+            "• Rectangle: - width: int, - height: int, / area: double (dấu / vì area = width * height)",
+            "• Student: - name: String, - id: int, - totalStudents: int (gạch chân = static)"
+          ],
+          "diagramNote": "Cặp hộp Rectangle và Student minh họa dấu '/' cho derived attribute (/ area: double) và gạch chân cho static attribute (- totalStudents: int).",
+          "explanation": [
+            "Mỗi dòng trong ngăn Attributes tuân thủ cú pháp `visibility name : type` — lưu ý tên biến đặt trước dấu hai chấm và kiểu đặt sau dấu hai chấm.",
+            "Điểm hay thi nằm ở hai ký hiệu đặc biệt: dấu gạch chéo `/` (derived attribute, ví dụ `area` suy từ `width` và `height` mà không cần lưu thành trường lưu trữ riêng) và gạch chân dưới tên biến để chỉ biến `static` (như `totalStudents` dùng chung cho mọi `Student`)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 8"
+          }
+        },
+        {
+          "slideNumber": "Slide 9",
+          "pageNumber": 1,
+          "title": "Operations",
+          "paragraphs": [
+            "visibility name(parameters) : return_type"
+          ],
+          "bullets": [
+            {
+              "text": "visibility",
+              "subBullets": [
+                "+ public",
+                "# protected",
+                "- private",
+                "~ package (default)"
+              ]
+            },
+            "parameters listed as name : type",
+            "static methods are underlined",
+            "omit return_type on constructors and when return type is void"
+          ],
+          "diagramText": [
+            "Minh họa bên phải:",
+            "• Rectangle: + Rectangle(w: int, h: int) (constructor nên bỏ : return_type); + distance(r: Rectangle): double",
+            "• Student: # getID(): int (protected); ~ getEmail(): String (package-private)"
+          ],
+          "diagramNote": "Hai hộp Rectangle và Student minh họa cách viết tham số `name : type` và bỏ phần `: return_type` ở constructor.",
+          "explanation": [
+            "Ngăn Operations dùng cùng bộ 4 ký hiệu visibility (+, #, -, ~) như Attributes, trong đó từng tham số trong ngoặc cũng viết ngược theo chuẩn `tên : kiểu` (ví dụ `w: int, h: int`).",
+            "Hai quy tắc rất dễ bị trừ điểm nếu quên khi vẽ bài tập: phương thức `static` phải gạch chân, còn constructor và phương thức `void` phải bỏ luôn phần `: return_type`."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 9"
+          }
+        },
+        {
+          "slideNumber": "Slide 10",
+          "pageNumber": 1,
+          "title": "Comments",
+          "bullets": [
+            "Represented as a folded note, attached to the appropriate class/method/etc by a dashed line"
+          ],
+          "diagramText": [
+            "[ «interface» Cloneable ]  - - - - - - -  [ Folded Note: \"Cloneable is a tagging interface with no methods. The clone() methods is defined in the Object class.\" ]"
+          ],
+          "diagramNote": "Biểu diễn chú thích trong UML bằng hộp chữ nhật có nếp gập góc trên phải, nối tới lớp/phương thức bằng đường nét đứt.",
+          "ocrNote": "Trong hình note trên slide gốc viết 'The clone() methods is defined...' (thừa chữ s ở methods), giữ nguyên văn.",
+          "explanation": [
+            "Khi cần giải thích ràng buộc nghiệp vụ, lưu ý thiết kế hay lý do một interface trống rỗng (như tagging/marker interface `Cloneable`), ta dùng biểu tượng folded note gắn bằng đường nét đứt vào thành phần tương ứng.",
+            "Cũng giống như trong Use Case Diagram (Lecture 7 Slide 23), folded note chỉ mang tính giải thích tài liệu chứ không làm thay đổi ngữ nghĩa quan hệ giữa các lớp."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 10"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Các Mối quan hệ (Generalization, Association, Multiplicity) & Ví dụ",
+      "text": "Phân loại Generalization (kế thừa class vs cài đặt interface) và Association (Dependency, Aggregation, Composition), 3 chú thích của Association (Multiplicity, Name, Navigability) cùng các ví dụ Car–Engine, Book–Page, Lottery–RNG, Cinema–BoxOffice–Movie và hệ thống People (Person, Student, Professor, Address).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 11–17"
+      },
+      "digest": {
+        "keyPoints": [
+          "Hai nhóm quan hệ chính: Generalization (kế thừa class và cài đặt interface) và Association (quan hệ sử dụng: dependency, aggregation, composition).",
+          "Generalization vẽ mũi tên hướng từ lớp con tới lớp cha với đầu tam giác rỗng: cha là class dùng đường nét liền, cha là interface dùng đường nét đứt; thường bỏ qua lớp cha hiển nhiên như Object.",
+          "Ba kiểu quan hệ sử dụng: Aggregation ('is part of', hình thoi rỗng ở phía toàn thể — bộ phận có thể tồn tại độc lập), Composition ('is entirely made of', hình thoi đen đặc — bộ phận sống chết cùng toàn thể), Dependency ('uses temporarily', mũi tên nét đứt — thường là chi tiết cài đặt chứ không giữ thành trạng thái đối tượng).",
+          "Association thường gắn 3 chú thích: (1) Multiplicity (`*`, `1`, `2..4`, `3..*`), (2) Name (tên quan hệ), (3) Navigability (hướng điều hướng).",
+          "Ví dụ Cinema (Slide 16): Cinema ◆1──1 BoxOffice (composition: rạp đóng cửa thì phòng vé biến mất), Cinema ◇*──* Movie (aggregation: rạp đóng cửa nhưng bộ phim vẫn tồn tại ở rạp khác)."
+        ],
+        "terms": [
+          {
+            "term": "Generalization vs Realization",
+            "meaning": "Chiều từ con lên cha bằng tam giác rỗng: nét liền khi cha là class (kế thừa), nét đứt khi cha là interface (cài đặt/realization)."
+          },
+          {
+            "term": "Aggregation (◇)",
+            "meaning": "Quan hệ 'is part of' (hình thoi trắng): thành phần bộ phận có thể tồn tại độc lập khi đối tượng toàn thể biến mất (ví dụ Car–Engine, Cinema–Movie)."
+          },
+          {
+            "term": "Composition (◆)",
+            "meaning": "Quan hệ 'is entirely made of' mạnh hơn aggregation (hình thoi đen đặc): các bộ phận sống và chết cùng toàn thể (ví dụ Book–Page, Cinema–BoxOffice)."
+          },
+          {
+            "term": "Dependency (⇢)",
+            "meaning": "Quan hệ 'uses temporarily' (mũi tên nét đứt): thường dùng tạm trong tham số/biến cục bộ của hàm chứ không phải thuộc tính trạng thái (ví dụ Lottery ⇢ RNG)."
+          }
+        ],
+        "pitfalls": [
+          "Hướng mũi tên Generalization là từ CON lên CHA (tam giác rỗng nằm áp sát cạnh lớp CHA) — rất nhiều bạn vẽ nhầm chiều ngược lại từ cha xuống con.",
+          "Nhớ đúng vị trí hình thoi (◇ hoặc ◆): hình thoi luôn gắn ở phía lớp TOÀN THỂ (Whole — ví dụ gắn sát Car, Book, Cinema), còn bội số gắn ở đầu tương ứng (ví dụ Book [1] ◆──── [*] Page nghĩa là 1 Book có nhiều Page).",
+          "Khi kiểm tra câu hỏi 'nếu A mất đi thì B có mất theo không?', nếu B vẫn sống độc lập → Aggregation (◇); nếu B chết theo A → Composition (◆)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 11",
+          "pageNumber": 1,
+          "title": "Relationships between classes",
+          "bullets": [
+            {
+              "text": "Generalization: an inheritance relationship",
+              "subBullets": [
+                "inheritance between classes",
+                "interface implementation"
+              ]
+            },
+            {
+              "text": "Association: a usage relationship",
+              "subBullets": [
+                "dependency",
+                "aggregation",
+                "composition"
+              ]
+            }
+          ],
+          "explanation": [
+            "Slide phân thành 2 họ quan hệ lớn trong sơ đồ lớp: Generalization (quan hệ 'is-a' gồm kế thừa giữa các class và cài đặt interface) và Association (quan hệ 'has-a / uses-a' gồm dependency, aggregation, composition).",
+            "Cách phân nhóm này giúp hệ thống hóa toàn bộ các loại đường nối và đầu mũi tên xuất hiện ở Slides 12–17."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 11"
+          }
+        },
+        {
+          "slideNumber": "Slide 12",
+          "pageNumber": 1,
+          "title": "Generalization relationships",
+          "bullets": [
+            "Represents class hierarchy",
+            "Arrows point from child to parent",
+            {
+              "text": "Line/arrow styles indicate if parent is a(n):",
+              "subBullets": [
+                "class: solid line, white arrow",
+                "interface: dashed line, white arrow"
+              ]
+            },
+            "Often omit trivial / obvious generalization relationships, such as drawing the Object class as a parent"
+          ],
+          "diagramText": [
+            "[ «interface» Shape | + getArea(): double ]",
+            "       ▲ (nét đứt, tam giác rỗng = implements)",
+            "[ RectangularShape (chữ nghiêng = abstract class) | - width: int, - height: int, / area: double | + contains(x: int, y: int): boolean, + getArea(): double ]",
+            "       ▲ (nét liền, tam giác rỗng = extends)",
+            "[ Rectangle | - x: int, - y: int | + Rectangle(x: int, y: int), + distance(r: Rectangle): double ]"
+          ],
+          "diagramNote": "Sơ đồ phân cấp hình học bên phải minh họa đủ 2 kiểu đường: nét đứt + tam giác rỗng từ RectangularShape lên «interface» Shape, và nét liền + tam giác rỗng từ Rectangle lên lớp trừu tượng RectangularShape.",
+          "explanation": [
+            "Khi vẽ kế thừa trong UML, luôn nhớ mũi tên tam giác rỗng đi từ CON trỏ lên CHA: nếu cha là `class` (kể cả `abstract class`) thì vẽ nét liền; nếu cha là `interface` thì vẽ nét đứt.",
+            "Quan sát ví dụ bên phải: `RectangularShape` tên in nghiêng nên là `abstract class`, cài đặt `Shape` (nét đứt), còn `Rectangle` kế thừa `RectangularShape` (nét liền) và chỉ liệt kê các trường/hàm mới của riêng mình (`- x`, `- y`, constructor, `distance`) mà không lặp lại `width`, `height` hay `contains` đã kế thừa."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 12"
+          }
+        },
+        {
+          "slideNumber": "Slide 13",
+          "pageNumber": 1,
+          "title": "Association types",
+          "bullets": [
+            {
+              "text": "Aggregation",
+              "subBullets": [
+                "meaning: “is part of”",
+                "symbolized by a clear white diamond"
+              ]
+            },
+            {
+              "text": "Composition",
+              "subBullets": [
+                "meaning: “is entirely made of”, the stronger version of aggregation",
+                "the parts live and die with the whole",
+                "symbolized by a black diamond"
+              ]
+            },
+            {
+              "text": "Dependency",
+              "subBullets": [
+                "meaning: “uses temporarily”",
+                "symbolized by dotted line",
+                "often is an implementation detail, not essentially a part of the object's state"
+              ]
+            }
+          ],
+          "diagramText": [
+            "[ Car ]  1 ◇──────── 1  [ Engine ]   (Aggregation: thoi trắng)",
+            "[ Book ] 1 ◆──────── *  [ Page ]     (Composition: thoi đen)",
+            "[ Lottery ] - - - - - → [ RNG ]      (Dependency: mũi tên nét đứt)"
+          ],
+          "diagramNote": "Ba ví dụ kinh điển phân biệt mức độ gắn kết từ yếu tới mạnh: Dependency (nét đứt, dùng tạm), Aggregation (thoi trắng, vòng đời độc lập) và Composition (thoi đen, sống chết cùng nhau).",
+          "explanation": [
+            "Ba mức độ phụ thuộc thể hiện mức độ ràng buộc vòng đời khác nhau trong code Java: `Dependency` (`Lottery` tạo/nhận đối tượng `RNG` tạm thời trong một phương thức, không giữ làm field); `Aggregation` (`Car` giữ reference tới `Engine`, nhưng chiếc xe hỏng thì động cơ vẫn tháo ra tái sử dụng được).",
+            "`Composition` là mức chặt nhất (`Book` làm hoàn toàn từ `Page`): nếu hủy cuốn sách thì các trang sách gắn với cuốn sách đó cũng không còn ý nghĩa tồn tại riêng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 13"
+          }
+        },
+        {
+          "slideNumber": "Slide 14",
+          "pageNumber": 1,
+          "title": "Associational (usage) relationships",
+          "bullets": [
+            {
+              "text": "1. Multiplicity (how many are used)",
+              "subBullets": [
+                "* (zero or more)",
+                "1 (exactly one)",
+                "2..4 (between 2 and 4, inclusive)",
+                "3..* (3 or more, * may be omitted)"
+              ]
+            },
+            {
+              "text": "2. Name",
+              "subBullets": [
+                "what relationship the objects have)"
+              ]
+            },
+            {
+              "text": "3. Navigability (direction)",
+              "subBullets": [
+                "In the example, A uses B"
+              ]
+            }
+          ],
+          "diagramText": [
+            "[ Class A ]  1..* ◇────── contains ────── k  [ Class B ]",
+            "Chú thích số khoanh tròn trên sơ đồ:",
+            "• (1) chỉ vào bội số '1..*' (đầu Class A) và 'k' (đầu Class B) → Multiplicity",
+            "• (2) chỉ vào nhãn 'contains' trên đường nối → Name",
+            "• (3) chỉ vào hình thoi rỗng ◇ gắn sát Class A"
+          ],
+          "diagramNote": "Minh họa 3 nhãn chú thích trên một đường Association: (1) bội số hai đầu, (2) tên quan hệ ở giữa và (3) ký hiệu phía toàn thể/điều hướng ở Class A.",
+          "ocrNote": "Slide gốc viết thiếu dấu mở ngoặc trong 'what relationship the objects have)'; ở mục 3 chữ viết 'In the example, A uses B' trong khi hình vẽ dùng hình thoi rỗng ◇ gắn tại Class A với nhãn 'contains' (callout số 3 trỏ vào hình thoi này thay vì đầu mũi tên).",
+          "explanation": [
+            "Một đường Association đầy đủ thông tin thường có 3 nhãn: (1) Multiplicity ở hai đầu cho biết số lượng tối thiểu–tối đa (`*`, `1`, `2..4`, `3..*`), (2) Name đặt giữa đường để đọc thành câu ngữ nghĩa (như `contains`), và (3) Navigability chỉ hướng lớp nào nắm tham chiếu tới lớp nào.",
+            "Một mẹo đọc ký hiệu `3..*`: khi ký hiệu `*` bị lược bỏ (chỉ viết `3..`), UML hiểu ngầm giới hạn trên là vô cùng."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 14"
+          }
+        },
+        {
+          "slideNumber": "Slide 15",
+          "pageNumber": 1,
+          "title": "Association multiplicities",
+          "bullets": [
+            {
+              "text": "One-to-one",
+              "subBullets": [
+                "Each car has exactly one engine.",
+                "Each engine belongs to exactly one car."
+              ]
+            },
+            {
+              "text": "One-to-many",
+              "subBullets": [
+                "Each book has many pages.",
+                "Each page belongs to exactly one book."
+              ]
+            }
+          ],
+          "diagramText": [
+            "[ Car ]  1 ◇──────── 1  [ Engine ]",
+            "[ Book ] 1 ◆──────── *  [ Page ]"
+          ],
+          "diagramNote": "Minh họa cách đọc bội số hai đầu: 1–1 (Car–Engine) và 1–* (Book–Page).",
+          "explanation": [
+            "Cách đọc đúng bội số trên Association: đứng ở đầu lớp A nhìn sang con số bên đầu lớp B để biết 'một A liên kết với bao nhiêu B', rồi làm ngược lại.",
+            "Ví dụ với `Book 1 ◆──── * Page`: nhìn từ `Book` sang đầu `Page` thấy `*` (một sách có nhiều trang); nhìn từ `Page` sang đầu `Book` thấy `1` (mỗi trang chỉ thuộc đúng 1 cuốn sách)."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 15"
+          }
+        },
+        {
+          "slideNumber": "Slide 16",
+          "pageNumber": 1,
+          "title": "Aggregation / composition example",
+          "bullets": [
+            {
+              "text": "If the cinema goes away",
+              "subBullets": [
+                "so does the box (ticket) office: composition",
+                "but movies may still exist: aggregation"
+              ]
+            }
+          ],
+          "diagramText": [
+            "[ Cinema ] 1 ◆──────── 1 [ BoxOffice ]   (Composition 1-1)",
+            "[ Cinema ]",
+            "    ◇ *",
+            "    │",
+            "    │ *",
+            "[ Movie ]   (Aggregation *-*)"
+          ],
+          "diagramNote": "Sơ đồ rạp chiếu phim minh họa bài kiểm tra vòng đời: BoxOffice phụ thuộc sống chết vào Cinema (◆), còn Movie tồn tại độc lập (◇) với quan hệ nhiều–nhiều (*–*).",
+          "explanation": [
+            "Đây là câu hỏi kinh điển để phân biệt Aggregation và Composition: dùng phép thử 'nếu toàn thể biến mất thì bộ phận có biến mất theo không?'.",
+            "Rạp chiếu phim (`Cinema`) đóng cửa thì phòng vé (`BoxOffice`) của rạp đó cũng tiêu biến → Composition (`◆`); nhưng bộ phim (`Movie`) vẫn còn lưu hành ở rạp khác và một rạp chiếu nhiều phim, một phim chiếu ở nhiều rạp → Aggregation (`◇`) với bội số `*` ở cả hai đầu."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 16"
+          }
+        },
+        {
+          "slideNumber": "Slide 17",
+          "pageNumber": 1,
+          "title": "Class diagram example: people",
+          "diagramText": [
+            "[ Person (in nghiêng = abstract) | Name, Phone Number, Email Address | Purchase Parking Pass ]  0..1 ── lives at ── 1 → [ Address | Street, City, State, Postal Code, Country | Validate, Output As Label ]",
+            "          ▲ (nét liền, tam giác rỗng)",
+            "    ┌─────┴─────┐",
+            "[ Student | Student Number, Average Mark | Is Eligible To Enroll (gạch chân = static), Get Seminars Taken ]",
+            "[ Professor | Salary | (ngăn methods trống) ]"
+          ],
+          "diagramNote": "Sơ đồ tổng hợp mô hình People: kết hợp lớp trừu tượng (Person), kế thừa phân nhánh (Student, Professor), phương thức static gạch chân (Is Eligible To Enroll) và Association có hướng (0..1 lives at 1 → Address).",
+          "explanation": [
+            "Sơ đồ tổng hợp gần như toàn bộ cú pháp đã học: `Person` viết nghiêng là lớp trừu tượng, truyền lại các trường tên/số điện thoại/email và hàm `Purchase Parking Pass` xuống cho hai lớp con `Student` và `Professor` qua mũi tên kế thừa nét liền tam giác rỗng.",
+            "Quan hệ `Person 0..1 ── lives at ── 1 → Address` đọc là: một `Person` sống tại đúng `1` `Address` (có mũi tên điều hướng chỉ từ `Person` sang `Address` nghĩa là `Person` giữ tham chiếu tới `Address`), còn một `Address` có `0..1` `Person` sinh sống."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 17"
+          }
+        }
+      ]
+    },
+    {
+      "h": "Công cụ vẽ, Ưu/nhược điểm, Tổng kết & Cách xây dựng Class Diagram",
+      "text": "Các công cụ tạo sơ đồ UML phổ biến, điểm mạnh và điểm hạn chế của Class Diagram, slide tổng kết UML class diagram (Slide 21) và hai phương pháp xây dựng từ yêu cầu dự án: phân tích từ loại/động từ (Slide 22) và tạo Analysis Class Diagram từ mô hình thực thể (Slide 23).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 18–23"
+      },
+      "digest": {
+        "keyPoints": [
+          "Công cụ vẽ UML phổ biến: Diagrams.net (draw.io), Lucidchart, StarUML, Visual Paradigm (online/offline).",
+          "Class Diagram rất mạnh trong: khám phá dữ liệu & thuộc tính liên quan, nhìn nhanh các entity quan trọng, phát hiện có quá ít/quá nhiều class, đánh giá quan hệ có quá phức tạp/rối không và phát hiện dependencies giữa các lớp.",
+          "Class Diagram kém phù hợp cho: khám phá hành vi thuật toán (algorithmic, không hướng dữ liệu), tìm luồng các bước xử lý của đối tượng, và hiểu luồng điều khiển tổng thể (event-driven, web-based, sequential...).",
+          "Cách rút ra từ yêu cầu (Slide 22): Danh từ (Nouns) → class, object, field; Động từ (Verbs) → method/responsibility; Quan hệ giữa các danh từ → containment, generalization, dependence.",
+          "Cách tạo Analysis Class Diagram (Slide 23): ánh xạ entity → domain class; relationship → association; cardinality constraints → class cardinalities; associative entities → association classes; kèm constraint statements nếu có."
+        ],
+        "terms": [
+          {
+            "term": "Noun / Verb Analysis",
+            "meaning": "Kỹ thuật đọc văn bản yêu cầu để tách danh từ thành ứng viên class/field và tách động từ thành ứng viên method/responsibility."
+          },
+          {
+            "term": "Analysis Class Diagram",
+            "meaning": "Sơ đồ lớp mức phân tích thu được bằng cách ánh xạ trực tiếp từ mô hình thực thể–liên kết (entities → domain classes, associative entities → association classes)."
+          }
+        ],
+        "pitfalls": [
+          "Không dùng Class Diagram để mô tả thuật toán hay luồng chạy chương trình (event-driven/tuần tự) — Slide 20 chỉ rõ đó là điểm yếu của nó; muốn xem luồng bước/hành vi phải chuyển sang Sequence hoặc Activity diagram.",
+          "Không phải danh từ nào trong đề bài cũng trở thành Class: cần phân biệt danh từ nào là Class độc lập và danh từ nào chỉ là thuộc tính (Field) nằm bên trong một Class (Slide 22)."
+        ]
+      },
+      "slides": [
+        {
+          "slideNumber": "Slide 18",
+          "pageNumber": 1,
+          "title": "Tools for creating UML diagrams",
+          "bullets": [
+            "Diagrams.net (draw.io)",
+            "Lucidchart",
+            "StarUML",
+            "Visual Paradigm (online/offline)"
+          ],
+          "explanation": [
+            "Slide giới thiệu 4 công cụ phổ biến để vẽ UML trong học phần và dự án: draw.io (Diagrams.net) miễn phí trên web/desktop, Lucidchart cộng tác trực tuyến, StarUML và Visual Paradigm chuyên sâu cho sinh mã/kiểm tra cú pháp UML.",
+            "Khi làm bài tập lớn hoặc đồ án môn SE1, các công cụ như StarUML hay Visual Paradigm giúp đảm bảo ký hiệu kế thừa, bội số và interface chuẩn xác hơn vẽ tay."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 18"
+          }
+        },
+        {
+          "slideNumber": "Slide 19",
+          "pageNumber": 1,
+          "title": "Class diagrams are great for:",
+          "bullets": [
+            "discovering related data and attributes",
+            "getting a quick picture of the important entities in a system",
+            "seeing whether you have too few/many classes",
+            "seeing whether the relationships between objects are too complex, too many in number, simple enough, etc.",
+            "spotting dependencies between one class/object and another"
+          ],
+          "explanation": [
+            "Class diagram phát huy sức mạnh nhất ở góc nhìn cấu trúc dữ liệu và độ ghép nối: giúp gom các thuộc tính liên quan vào đúng lớp, nhìn tổng thể các thực thể trọng yếu và cân bằng số lượng lớp (tránh quá ít gây phình to 'God class' hoặc quá nhiều gây phân mảnh).",
+            "Nó cũng giúp kiến trúc sư phát hiện sớm mạng nhện phụ thuộc dày đặc (quá nhiều đường nối hay dependency chằng chịt) để tách giảm coupling."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 19"
+          }
+        },
+        {
+          "slideNumber": "Slide 20",
+          "pageNumber": 1,
+          "title": "Class diagrams are not so great for:",
+          "bullets": [
+            "discovering algorithmic (not data-driven) behavior",
+            "finding the flow of steps for objects to solve a given problem",
+            "understanding the app's overall control flow (event-driven? web-based? sequential? etc.)"
+          ],
+          "explanation": [
+            "Ba giới hạn cố hữu của Class diagram đều liên quan tới chiều thời gian và logic xử lý động: nhìn vào Class diagram ta không biết thuật toán bên trong hàm chạy ra sao, các bước gọi nối tiếp nhau thế nào, hay ứng dụng theo mô hình luồng điều khiển nào (hướng sự kiện, web hay tuần tự).",
+            "Do đó trong thiết kế hoàn chỉnh phải phối hợp Class diagram với Sequence diagram và Activity diagram như đã nêu ở Slide 3."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 20"
+          }
+        },
+        {
+          "slideNumber": "Slide 21",
+          "pageNumber": 1,
+          "title": "UML class diagram: Summary",
+          "bullets": [
+            "UML is a language for describing various aspects of software designs.",
+            "UML class diagrams present a static view of the system, displaying classes and relationships between them."
+          ],
+          "ocrNote": "Slide tổng kết nằm ở vị trí Slide 21 ngay trước 2 slide hướng dẫn cách tạo class diagram (Slides 22–23), giữ nguyên thứ tự gốc.",
+          "explanation": [
+            "Slide nhắc lại thông điệp cốt lõi của bài: UML là ngôn ngữ mô tả nhiều khía cạnh thiết kế phần mềm, trong đó Class diagram cung cấp góc nhìn tĩnh (static view) về các lớp và mối quan hệ giữa chúng.",
+            "Hai slide cuối (Slides 22–23) bổ sung hướng dẫn thực hành để chuyển từ đề bài/mô hình dữ liệu thành bản vẽ Class diagram đầu tiên."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 21"
+          }
+        },
+        {
+          "slideNumber": "Slide 22",
+          "pageNumber": 1,
+          "title": "How to create class diagram?",
+          "bullets": [
+            {
+              "text": "Identify classes and interactions from project requirements:",
+              "subBullets": [
+                "Nouns are potential classes, objects, and fields"
+              ]
+            },
+            "Verbs are potential methods or responsibilities of a class",
+            "Relationships between nouns are potential interactions (containment, generalization, dependence, etc.)"
+          ],
+          "diagramText": [
+            "Câu hỏi lọc dưới mục Nouns trên slide gốc:",
+            "• Which nouns in your project should be classes?",
+            "• Which nouns are fields?"
+          ],
+          "diagramNote": "Hai câu hỏi con dưới dòng 'Nouns are potential classes, objects, and fields' dùng để sàng lọc đâu là Class và đâu chỉ là thuộc tính Field.",
+          "explanation": [
+            "Phương pháp phân tích ngữ pháp từ mô tả yêu cầu: gạch chân toàn bộ Danh từ để làm danh sách ứng viên cho Class, Object và Field — rồi lọc xem danh từ nào có dữ liệu/hành vi riêng xứng đáng làm Class và danh từ nào chỉ là giá trị đơn làm Field.",
+            "Tiếp theo, gạch chân các Động từ gắn với mỗi danh từ để xác định Methods/Responsibilities của lớp đó, và tìm các cụm liên hệ (sở hữu, chứa đựng, là một loại của, sử dụng...) để dựng đường Relationships."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 22"
+          }
+        },
+        {
+          "slideNumber": "Slide 23",
+          "pageNumber": 1,
+          "title": "How to create an analysis class diagram",
+          "bullets": [
+            "Map entities to domain classes",
+            {
+              "text": "Map relationships to associations",
+              "subBullets": [
+                "cardinality constraints to class cardinalities"
+              ]
+            },
+            "Map associative entities to association classes",
+            "Write constraint statements (if any)"
+          ],
+          "explanation": [
+            "Nếu đã có mô hình dữ liệu mức phân tích (như ERD trong môn Cơ sở dữ liệu), ta có thể ánh xạ thẳng sang Analysis Class Diagram qua 4 quy tắc: thực thể (entities) thành lớp miền nghiệp vụ (domain classes), liên kết thành associations kèm chuyển đổi lực lượng (cardinality).",
+            "Các thực thể liên kết (associative entities — bảng trung gian mang thuộc tính riêng của quan hệ nhiều-nhiều, ví dụ Enrollment có điểm số) được ánh xạ thành association classes, kèm ghi chú các ràng buộc nghiệp vụ bổ sung nếu có."
+          ],
+          "source": {
+            "file": "Resources/Lecture 9.pdf",
+            "loc": "Slide 23"
+          }
+        }
+      ]
+    }
+  ],
   "cards": [
-    { "id": "se1-l09-c01", "front": "Ký hiệu visibility trong UML?", "back": "+ public, # protected, - private, ~ package, / derived attribute.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 7–8" } },
-    { "id": "se1-l09-c02", "front": "Aggregation khác composition?", "back": "Aggregation (thoi rỗng): phần tồn tại được khi toàn thể mất. Composition (thoi đặc): phần sống và chết cùng toàn thể.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 13–15" } },
-    { "id": "se1-l09-c03", "front": "Vẽ generalization với cha là interface thế nào?", "back": "Nét đứt với tam giác rỗng (cha là class: nét liền).", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 11–12" } },
-    { "id": "se1-l09-c04", "front": "Ba chú thích của association?", "back": "Multiplicity, name, navigability.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slide 14" } },
-    { "id": "se1-l09-c05", "front": "Ba view UML cốt lõi?", "back": "Class (static), sequence (dynamic), activity (thuật toán).", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slide 3" } },
-    { "id": "se1-l09-c06", "front": "Quy tắc khi liệt kê operation trong class diagram?", "back": "Có thể bỏ get/set tầm thường ở class thường nhưng không bỏ method của interface; không ghi method kế thừa; bỏ return type ở constructor và void.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 7, 9" } }
+    {
+      "id": "se1-l09-c01",
+      "front": "Ba sơ đồ UML chính trên Slide 3 và góc nhìn tương ứng của mỗi sơ đồ?",
+      "back": "Class diagram (static view: các lớp và quan hệ giữa chúng, không thấy hành vi khi tương tác); Sequence diagram (dynamic view: các đối tượng cộng tác gửi thông điệp gì và khi nào); Activity diagram (mô tả thuật toán, cách hàm hoạt động).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "se1-l09-c02",
+      "front": "Ba mục đích sử dụng UML trên Slide 6?",
+      "back": "As a sketch (phác thảo ý tưởng chọn lọc: forward design trước code hoặc backward design sau code); As a blueprint (thiết kế hoàn chỉnh để cài đặt, dùng CASE tools); As a programming language (tự động sinh và chạy code từ UML nếu nhanh hơn code thật).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 6"
+      }
+    },
+    {
+      "id": "se1-l09-c03",
+      "front": "Cách biểu diễn Interface, Abstract class và thành phần Static trong Class Diagram?",
+      "back": "Interface: viết «interface» phía trên tên; Abstract class: viết nghiêng tên lớp; Static attributes/methods: gạch chân.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 7–9"
+      }
+    },
+    {
+      "id": "se1-l09-c04",
+      "front": "Năm ký hiệu ở ngăn Attributes (Slide 8)?",
+      "back": "+ public, # protected, - private, ~ package (default), / derived attribute (không lưu trữ, tính từ các thuộc tính khác).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l09-c05",
+      "front": "Cú pháp chuẩn của Operations và những quy tắc lược bỏ cần nhớ?",
+      "back": "Cú pháp: visibility name(parameters) : return_type (tham số viết name : type). Bỏ ': return_type' ở constructor và khi return type là void; có thể bỏ get/set tầm thường nhưng KHÔNG bỏ method nào của interface và KHÔNG ghi method kế thừa.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 7, 9"
+      }
+    },
+    {
+      "id": "se1-l09-c06",
+      "front": "Cách biểu diễn Comment (ghi chú) trong UML Class Diagram?",
+      "back": "Dùng hộp chữ nhật có góc gập (folded note) gắn vào class/method/phần tử liên quan bằng một đường nét đứt.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 10"
+      }
+    },
+    {
+      "id": "se1-l09-c07",
+      "front": "Quy tắc vẽ Generalization khi lớp cha là Class vs Interface?",
+      "back": "Mũi tên luôn trỏ từ CON tới CHA với đầu tam giác trắng rỗng: cha là class → đường nét liền; cha là interface → đường nét đứt. Thường bỏ qua các kế thừa hiển nhiên như lớp Object.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 11–12"
+      }
+    },
+    {
+      "id": "se1-l09-c08",
+      "front": "Phân biệt Aggregation, Composition và Dependency (nghĩa + ký hiệu + ví dụ)?",
+      "back": "Aggregation ('is part of', thoi trắng ◇, bộ phận tồn tại độc lập: Car–Engine); Composition ('is entirely made of', thoi đen ◆, sống chết cùng toàn thể: Book–Page); Dependency ('uses temporarily', mũi tên nét đứt, dùng tạm chứ không là trạng thái đối tượng: Lottery–RNG).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 13, 15–16"
+      }
+    },
+    {
+      "id": "se1-l09-c09",
+      "front": "Ba chú thích thường gắn trên quan hệ Association?",
+      "back": "1) Multiplicity (*, 1, 2..4, 3..* [có thể bỏ *]); 2) Name (tên mô tả quan hệ giữa các đối tượng); 3) Navigability (hướng sử dụng/điều hướng).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 14"
+      }
+    },
+    {
+      "id": "se1-l09-c10",
+      "front": "Giải thích quan hệ giữa Cinema với BoxOffice và Cinema với Movie (Slide 16)?",
+      "back": "Nếu rạp phim (Cinema) biến mất: phòng vé (BoxOffice) biến mất theo → Composition (thoi đen, 1–1); còn phim (Movie) vẫn có thể tồn tại → Aggregation (thoi trắng, *–*).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 16"
+      }
+    },
+    {
+      "id": "se1-l09-c11",
+      "front": "Class diagram RẤT TỐT để làm gì và KÉM để làm gì?",
+      "back": "Tốt: khám phá dữ liệu/thuộc tính liên quan, nhìn nhanh thực thể quan trọng, cân số lượng lớp, đánh giá độ phức tạp quan hệ và phát hiện dependencies. Kém: khám phá hành vi thuật toán (not data-driven), tìm luồng bước xử lý của đối tượng, và hiểu luồng điều khiển tổng thể (event-driven/web/sequential).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 19–20"
+      }
+    },
+    {
+      "id": "se1-l09-c12",
+      "front": "Cách xác định Class, Field, Method và Relationship từ tài liệu yêu cầu dự án?",
+      "back": "Nouns (danh từ) → ứng viên cho class, object và field (cần lọc xem danh từ nào là class, danh từ nào chỉ là field); Verbs (động từ) → method/trách nhiệm của class; Relationships giữa các danh từ → containment, generalization, dependence...",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 22"
+      }
+    },
+    {
+      "id": "se1-l09-c13",
+      "front": "Bốn bước chuyển sang Analysis Class Diagram (Slide 23)?",
+      "back": "1) Map entities → domain classes; 2) Map relationships → associations (cardinality constraints → class cardinalities); 3) Map associative entities → association classes; 4) Write constraint statements (if any).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 23"
+      }
+    }
   ],
   "questions": [
-    { "id": "se1-l09-q01", "stem": "Ký hiệu nào biểu diễn thuộc tính dẫn xuất (derived)?", "options": ["+", "#", "~", "/"], "answer": 3, "explanation": "Dấu / đặt trước tên attribute là derived.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slide 8" } },
-    { "id": "se1-l09-q02", "stem": "Book và Page: trang sách chỉ tồn tại cùng cuốn sách. Quan hệ phù hợp?", "options": ["Dependency", "Aggregation", "Composition", "Generalization"], "answer": 2, "explanation": "Composition: parts live and die with the whole (hình thoi đặc).", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 13–15" } },
-    { "id": "se1-l09-q03", "stem": "Class diagram KHÔNG phù hợp để làm gì?", "options": ["Khám phá dữ liệu liên quan", "Nhìn nhanh các entity quan trọng", "Hiểu luồng điều khiển tổng thể và thuật toán", "Phát hiện phụ thuộc"], "answer": 2, "explanation": "Slide 20: kém trong khám phá hành vi thuật toán và control flow.", "source": { "file": "Resources/Lecture 9.pdf", "loc": "Slides 19–20" } }
+    {
+      "id": "se1-l09-q01",
+      "stem": "Ký hiệu nào trong UML Class Diagram biểu diễn một thuộc tính dẫn xuất (derived attribute — không lưu trữ mà tính từ thuộc tính khác)?",
+      "options": [
+        "+",
+        "#",
+        "~",
+        "/"
+      ],
+      "answer": 3,
+      "explanation": "Slide 8: dấu `/` đặt trước tên thuộc tính biểu diễn derived attribute (ví dụ `/ area: double` ở lớp Rectangle).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 8"
+      }
+    },
+    {
+      "id": "se1-l09-q02",
+      "stem": "Mối quan hệ nào phù hợp nhất giữa Book và Page khi biết trang sách sống và chết cùng cuốn sách?",
+      "options": [
+        "Dependency (nét đứt)",
+        "Aggregation (hình thoi rỗng)",
+        "Composition (hình thoi đen đặc)",
+        "Generalization (tam giác rỗng)"
+      ],
+      "answer": 2,
+      "explanation": "Slides 13, 15: Composition ('is entirely made of', hình thoi đen đặc) biểu diễn quan hệ trong đó bộ phận sống và chết cùng toàn thể (Book 1 ◆──── * Page).",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 13–15"
+      }
+    },
+    {
+      "id": "se1-l09-q03",
+      "stem": "Theo Slide 20, UML Class Diagram KHÔNG phù hợp cho mục đích nào dưới đây?",
+      "options": [
+        "Khám phá dữ liệu và các thuộc tính liên quan",
+        "Nhìn nhanh bức tranh các thực thể quan trọng trong hệ thống",
+        "Hiểu luồng điều khiển tổng thể của ứng dụng (event-driven, web-based, sequential...) và hành vi thuật toán",
+        "Phát hiện phụ thuộc (dependencies) giữa các lớp"
+      ],
+      "answer": 2,
+      "explanation": "Slide 20 liệt kê 3 nhược điểm của Class Diagram: không tốt để khám phá hành vi thuật toán, luồng bước giữa đối tượng và luồng điều khiển tổng thể của ứng dụng.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 19–20"
+      }
+    },
+    {
+      "id": "se1-l09-q04",
+      "stem": "Sơ đồ UML nào cung cấp góc nhìn động (dynamic view) mô tả cách các đối tượng cộng tác qua các thông điệp gửi cho nhau theo thời gian?",
+      "options": [
+        "Class diagram",
+        "Sequence diagram",
+        "Activity diagram",
+        "Deployment diagram"
+      ],
+      "answer": 1,
+      "explanation": "Slide 3 phân biệt: Class diagram là static view; Sequence diagram là dynamic view (what messages are sent and when); Activity diagram mô tả thuật toán của hàm.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 3"
+      }
+    },
+    {
+      "id": "se1-l09-q05",
+      "stem": "Quy tắc nào ĐÚNG khi ghi phương thức (Operations) trong hộp Class Diagram theo Slides 7 và 9?",
+      "options": [
+        "Luôn ghi `: void` ở cuối mọi constructor",
+        "Có thể lược bỏ các getter/setter tầm thường và KHÔNG liệt kê method kế thừa, nhưng KHÔNG được bỏ bất kỳ method nào của interface",
+        "Viết kiểu tham số trước tên tham số giống hệt Java (`int w`)",
+        "Phương thức `static` được viết in nghiêng thay vì gạch chân"
+      ],
+      "answer": 1,
+      "explanation": "Slides 7 & 9: tham số viết dạng `name : type`; `static` phải gạch chân; bỏ `: return_type` ở constructor và khi trả về `void`; được bỏ get/set tầm thường nhưng không bỏ method của interface và không ghi lại method kế thừa.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slides 7, 9"
+      }
+    },
+    {
+      "id": "se1-l09-q06",
+      "stem": "Trong sơ đồ Slide 12 (`Shape` → `RectangularShape` → `Rectangle`), đường nối từ `RectangularShape` lên `«interface» Shape` được vẽ như thế nào?",
+      "options": [
+        "Đường nét liền với mũi tên tam giác rỗng chĩa về RectangularShape",
+        "Đường nét đứt với mũi tên tam giác rỗng chĩa lên Shape",
+        "Đường nét liền với hình thoi đen ở phía Shape",
+        "Đường nét đứt với mũi tên mở chĩa về Rectangle"
+      ],
+      "answer": 1,
+      "explanation": "Slide 12 quy định: mũi tên Generalization luôn trỏ từ con tới cha bằng tam giác rỗng; khi cha là interface thì dùng nét đứt, khi cha là class thì dùng nét liền.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 12"
+      }
+    },
+    {
+      "id": "se1-l09-q07",
+      "stem": "Vì sao quan hệ giữa `Lottery` và `RNG` (Slide 13) được vẽ bằng Dependency (nét đứt) thay vì Aggregation/Composition?",
+      "options": [
+        "Vì RNG luôn tồn tại trước Lottery trong cơ sở dữ liệu",
+        "Vì Lottery chỉ sử dụng RNG tạm thời như một chi tiết cài đặt chứ không phải thành phần thuộc trạng thái lâu dài của đối tượng",
+        "Vì Lottery kế thừa từ RNG",
+        "Vì mỗi Lottery chỉ dùng đúng 1 RNG sống chết cùng nó"
+      ],
+      "answer": 1,
+      "explanation": "Slide 13 giải thích Dependency mang nghĩa 'uses temporarily', thường là chi tiết cài đặt nhất thời chứ không phải một phần bản chất thuộc trạng thái của đối tượng.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 13"
+      }
+    },
+    {
+      "id": "se1-l09-q08",
+      "stem": "Trong sơ đồ People ở Slide 17, ký hiệu nào dưới đây phản ánh CHÍNH XÁC thông tin được vẽ trên lớp `Person` và `Student`?",
+      "options": [
+        "Person là lớp cụ thể (in đứng), còn Student là abstract class (in nghiêng)",
+        "Person có tên in nghiêng (abstract class), phương thức `Is Eligible To Enroll` của Student được gạch chân (static), và mũi tên từ Person `0..1 lives at 1` trỏ sang Address",
+        "Student có quan hệ Composition với Address",
+        "Professor kế thừa từ Student"
+      ],
+      "answer": 1,
+      "explanation": "Slide 17 vẽ `Person` in nghiêng (abstract), `Student` và `Professor` cùng kế thừa `Person`, `Is Eligible To Enroll` trong `Student` được gạch chân (static), và `Person` liên kết `0..1 lives at 1 → Address`.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 17"
+      }
+    },
+    {
+      "id": "se1-l09-q09",
+      "stem": "Khi tạo Analysis Class Diagram từ mô hình thực thể (Slide 23), các thực thể liên kết (associative entities) được ánh xạ thành gì?",
+      "options": [
+        "Domain classes độc lập không có association",
+        "Interface không có thuộc tính",
+        "Association classes",
+        "Derived attributes"
+      ],
+      "answer": 2,
+      "explanation": "Slide 23 quy định: entities → domain classes; relationships → associations; associative entities → association classes; cardinality constraints → class cardinalities.",
+      "source": {
+        "file": "Resources/Lecture 9.pdf",
+        "loc": "Slide 23"
+      }
+    }
   ]
 }
