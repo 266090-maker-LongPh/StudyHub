@@ -1,62 +1,73 @@
-# Study Hub — Web App Ôn Tập Cá Nhân (DBS & SE1-2026)
+# Study Hub — Ứng Dụng Ôn Tập DBS & SE1-2026
 
-Ứng dụng web chạy **hoàn toàn cục bộ (local-only)** giúp ôn tập hai môn **DBS (Database Systems)** và **SE1-2026 (Software Engineering 1)** bám sát 100% tài liệu nguồn của người dùng, có trích dẫn nguồn (`file` + vị trí slide/trang/lab) trên từng bài học, flashcard và câu hỏi trắc nghiệm.
+Ứng dụng web chạy **cục bộ (local-only)** giúp ôn tập hai môn **Database Systems (DBS)** và **Software Engineering 1 (SE1-2026)** bám sát tài liệu gốc, hỗ trợ xem song song **PDF slide + giải thích chi tiết từng slide**, flashcard lặp lại ngắt quãng SM-2, quiz trắc nghiệm và tìm kiếm toàn văn.
 
-## 1. Cấu trúc thư mục chính
+## Tính năng chính
 
-- `materials/DBS/`, `materials/SE1-2026/` — Bản sao tài liệu gốc của từng môn.
-- `config/sources.json` — Cấu hình đường dẫn thư mục nguồn, danh sách file tham khảo bỏ qua và file bỏ qua thủ công.
-- `content/dbs/`, `content/se1/`, `content/issues.json` — Dữ liệu bài học, flashcard, quiz và các mục "Vấn đề cần xác nhận".
-- `scripts/ingest/index.mjs` — Script kiểm tra tài liệu nguồn, sinh `file-report.json` và hợp nhất/kiểm định dữ liệu vào `public/data/`.
-- `public/data/` — Dữ liệu JSON tĩnh (`dbs.json`, `se1.json`, `issues.json`, `file-report.json`).
-- `storage/progress.json` — File lưu đồng bộ tiến độ học tập ngay trong workspace hiện tại (khi chạy `npm run dev` hoặc `npm run preview`).
-- `src/` — Mã nguồn giao diện React + TypeScript + Tailwind CSS và logic ôn tập SM-2.
+- **Giao diện Bài học Chia đôi 50/50 (Split-Screen):**
+  - **Khung trái:** Hiển thị trực tiếp toàn bộ file PDF gốc để cuộn liên tục, hỗ trợ chuyển nhanh trang/slide và đổi tài liệu khi chương có nhiều file.
+  - **Khung phải:** Trình bày **Tóm tắt mục** (`digest`), **Giải thích chi tiết từng slide** bằng tiếng Việt (`explanation`) và **Nội dung gốc nguyên văn** (text, bảng biểu, code SQL/Java, mô tả sơ đồ). Bấm **`← Xem PDF trang N`** trên bất kỳ thẻ slide nào để đồng bộ khung PDF tới đúng trang đó.
+  - Hỗ trợ 3 chế độ hiển thị: **Chia đôi: PDF + Giải thích**, **Chỉ Nội dung gốc**, và **Chỉ Giải thích & Tóm tắt**.
+- **Flashcard (SM-2):** Lịch ôn tập tự động theo thuật toán lặp lại ngắt quãng với 4 mức đánh giá (`Quên`, `Khó`, `Nhớ`, `Dễ`), tách riêng tiến độ cho từng môn.
+- **Quiz trắc nghiệm:** Luyện đề theo từng chương hoặc trộn nhiều chương, chấm điểm tức thì kèm giải thích và trích dẫn nguồn slide/trang.
+- **Tìm kiếm toàn văn (`MiniSearch`):** Tra cứu nhanh theo từ khóa trong nội dung gốc, giải thích từng slide, tóm tắt, flashcard và câu hỏi quiz.
+- **Theo dõi tiến độ & Lưu trữ cục bộ:** Thống kê chuỗi ngày học, biểu đồ lịch sử điểm quiz, đồng bộ tự động vào workspace (`storage/progress.json`) và hỗ trợ Export/Import JSON.
 
-## 2. Yêu cầu môi trường & Cách chạy
+---
 
-Nếu máy bạn đã cài Node.js LTS trên `PATH`, có thể dùng trực tiếp `npm`. Nếu đang dùng Node đi kèm WebStorm (chưa thêm vào `PATH` hệ thống), chạy PowerShell như sau:
+## Yêu cầu môi trường
 
-```powershell
-$n="C:\Users\phhai\AppData\Roaming\JetBrains\WebStorm2026.2\node\versions\24.22.1"
-$env:Path="$n;$env:Path"
+- **Node.js** `>= 20` (khuyến nghị Node.js LTS) và **npm**.
 
-# Cài thư viện (nếu chưa có node_modules)
+## Hướng dẫn cài đặt & chạy
+
+```bash
+# 1. Clone repository
+git clone <url-repository-của-bạn>
+cd <tên-thư-mục-dự-án>
+
+# 2. Cài đặt dependencies
 npm install
 
-# Chạy máy chủ phát triển trên localhost
+# 3. Khởi chạy máy chủ phát triển
 npm run dev
 ```
 
-Mở trình duyệt tại **http://localhost:5173**.
+Mở trình duyệt và truy cập: **http://localhost:5173**
 
-Các lệnh hữu ích khác:
-- `npm run ingest` — Quét lại `materials/`, kiểm định tính hợp lệ nguồn và xuất lại `public/data/*.json`.
-- `npm run build` — Kiểm tra TypeScript (`tsc --noEmit`) và build bản production vào `dist/`.
-- `npm run preview` — Chạy thử bản build tại `http://localhost:4173`.
+### Các lệnh khác
 
-## 3. Cập nhật nguồn tài liệu & Chạy lại Ingest
+| Lệnh | Mô tả |
+|---|---|
+| `npm run dev` | Chạy Vite dev server ở cổng `5173` (kèm middleware `/materials/` và `/api/local-storage`). |
+| `npm run ingest` | Quét thư mục `materials/`, kiểm tra hợp lệ nguồn và biên dịch `content/` thành `public/data/*.json`. |
+| `npm run build` | Kiểm tra kiểu TypeScript (`tsc --noEmit`) và đóng gói production vào `dist/`. |
+| `npm run preview` | Chạy thử bản build production ở cổng `4173`. |
 
-1. Chỉnh đường dẫn hoặc danh sách bỏ qua trong `config/sources.json` (`subjects.dbs.materialsDir`, `subjects.se1.materialsDir`, `referenceSkipped`, `manualSkipped`).
-2. Thêm hoặc cập nhật nội dung trong `content/dbs/*.json`, `content/se1/*.json`, `content/issues.json`.
-3. Chạy lại `npm run ingest`. Script sẽ tự động:
-   - Kiểm tra toàn bộ file nguồn và xuất `public/data/file-report.json`.
-   - Kiểm tra trùng ID, đảm bảo mọi flashcard/câu hỏi đều có `source.file` thuộc đúng môn đó và không tham chiếu file bị bỏ qua (như đề Studocu).
+> **Lưu ý khi chạy không có thư mục `materials/`:** Toàn bộ nội dung văn bản, giải thích từng slide, flashcard và quiz đều đã được biên dịch sẵn trong `public/data/`. Nếu clone bản không kèm `materials/`, ứng dụng vẫn chạy và học bình thường ở chế độ **`Chỉ Giải thích & Tóm tắt`** hoặc **`Ẩn khung PDF`**; chỉ khung xem PDF gốc bên trái và lệnh `npm run ingest` cần có thư mục `materials/`.
 
-## 4. Cơ chế lưu tiến độ (SM-2 & Workspace Storage)
+---
 
-- **Thuật toán lặp lại ngắt quãng SM-2 (`src/lib/sm2.ts`)**: 4 mức tự đánh giá (`Quên` / `Khó` / `Nhớ` / `Dễ`) tự tính `interval`, `repetitions`, `easeFactor` và ngày đến hạn (`dueDate`).
-- **Tách biệt hai môn**: Tiến độ của DBS và SE1-2026 lưu tách riêng theo key `studyhub_progress_dbs_v1` và `studyhub_progress_se1_v1` trong `localStorage` của trình duyệt.
-- **Đồng bộ trực tiếp vào workspace (`storage/progress.json`)**: Plugin Vite trong `vite.config.ts` cung cấp endpoint cục bộ `/api/local-storage` giúp tự động lưu và khôi phục tiến độ vào file `storage/progress.json` ngay trong thư mục dự án (an toàn khi đổi trình duyệt hoặc xóa cache). Ngoài ra vẫn hỗ trợ **Export / Import JSON** thủ công tại trang Tiến độ.
+## Cấu trúc thư mục
 
-## 5. Thư viện sử dụng (`package.json`)
+```text
+├── config/
+│   └── sources.json          # Cấu hình thư mục nguồn và danh sách file bỏ qua
+├── content/
+│   ├── dbs/                  # Nội dung biên soạn từng chương môn DBS (JSON)
+│   ├── se1/                  # Nội dung biên soạn từng chương môn SE1-2026 (JSON)
+│   └── issues.json           # Ghi chú các mục cần lưu ý / đối chiếu nguồn
+├── materials/                # Tài liệu PDF/SQL/ảnh gốc (tùy chọn khi chia sẻ repo)
+├── public/data/              # Dữ liệu JSON đã hợp nhất cho frontend (dbs.json, se1.json)
+├── scripts/ingest/           # Script kiểm định nguồn và sinh dữ liệu public/data/
+├── src/                      # Mã nguồn React + TypeScript + Tailwind CSS v4
+└── vite.config.ts            # Cấu hình Vite + middleware đọc PDF & đồng bộ tiến độ cục bộ
+```
 
-- **Runtime dependencies**:
-  - `react`, `react-dom` (`^18.3.1`): Xây dựng giao diện component.
-  - `react-router-dom` (`^6.26.2`): Điều hướng nhiều trang (Trang chủ, Bài học, Flashcard, Quiz, Tìm kiếm, Tiến độ, Vấn đề & Nguồn).
-  - `highlight.js` (`^11.10.0`): Chỉ nạp `highlight.js/lib/core` kèm 2 ngôn ngữ `sql` và `java` để tô màu cú pháp gọn nhẹ.
-  - `minisearch` (`^7.1.0`): Chỉ mục tìm kiếm toàn văn nhẹ chạy trực tiếp trên trình duyệt.
-- **Dev dependencies**:
-  - `vite`, `@vitejs/plugin-react`: Máy chủ phát triển nhanh và bundler production.
-  - `typescript`, `@types/react`, `@types/react-dom`: Kiểm tra kiểu tĩnh.
-  - `tailwindcss`, `@tailwindcss/vite`: Tailwind CSS v4 (hỗ trợ Dark/Light mode).
-- *(Lưu ý: Biểu đồ điểm Quiz được vẽ trực tiếp bằng SVG thuần trong `src/pages/ProgressPage.tsx`, không cài thư viện chart nặng.)*
+---
+
+## Công nghệ sử dụng
+
+- **Frontend:** React 18, TypeScript, React Router v6, Tailwind CSS v4
+- **Tìm kiếm & Tô màu mã:** MiniSearch, Highlight.js (`sql`, `java`)
+- **Build tool:** Vite 5
